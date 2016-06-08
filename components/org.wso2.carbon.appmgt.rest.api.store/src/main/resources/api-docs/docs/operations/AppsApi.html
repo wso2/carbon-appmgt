@@ -8,7 +8,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Enterprise Download an new App\n</p>
+            <p class="marked">Enterprise Download a new App\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/administration/apps/download</code>
@@ -206,11 +206,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="administrationAppsUninstallationPost"></a>Enterprise Uninstall App</h3>
+            <h3 class="operation-heading"><a name="administrationAppsUninstallationPost"></a>Enterprise uninstall App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Enterprise Uninstall an existing App\n</p>
+            <p class="marked">Enterprise uninstall an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/administration/apps/uninstallation</code>
@@ -471,7 +471,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -501,7 +501,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**Search condition**.\n\nYou can search in attributes by using an **\&quot;attribute:\&quot;** modifier.\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n</p>
+                            <p class="param-description marked">A search condition.\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n</p>
                             
                         </td>
                         <td>
@@ -531,7 +531,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Used to limit the fields in response.\n\n\n\n\nSupported filters are [ **basic,all**]\n</p>
+                            <p class="param-description marked">Used to limit the fields in the response.\n\n\n\n\nSupported filters are [**basic, all**]\n</p>
                             
                                 <p><b>Accepted values: </b></p>
 
@@ -658,7 +658,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -820,7 +820,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -850,7 +850,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -880,7 +880,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">file name.\n</p>
+                            <p class="param-description marked">The file name.\n</p>
                             
                         </td>
                         <td>
@@ -940,7 +940,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -988,7 +988,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1033,7 +1033,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Get details of an app.\n</p>
+            <p class="marked">Get details of an App.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}</code>
@@ -1102,7 +1102,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1132,7 +1132,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1192,7 +1192,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1222,7 +1222,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1311,11 +1311,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdRateGet"></a>Get app rating details</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdRateGet"></a>Get App rating details</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get rating details of an app.\n</p>
+            <p class="marked">Get rating details of an App.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/rate</code>
@@ -1384,7 +1384,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1414,7 +1414,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1534,7 +1534,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1564,7 +1564,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1734,7 +1734,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1764,7 +1764,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1794,7 +1794,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App rating object that needs to be added\n</p>
+                            <p class="param-description marked">App rating object that needs to be added.\n</p>
                             
                         </td>
                         <td>
@@ -1886,7 +1886,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -1921,7 +1921,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">Ok.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1934,7 +1934,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1988,11 +1988,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdUnsubscriptionPost"></a>Un subscribe App</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdUnsubscriptionPost"></a>Unsubscribe to an App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Un subscribe to an existing App\n</p>
+            <p class="marked">Unsubscribe to an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/unsubscription</code>
@@ -2061,7 +2061,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -2091,7 +2091,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2227,7 +2227,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Download an new App\n</p>
+            <p class="marked">Download a new App\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/download</code>
@@ -2429,7 +2429,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Publish User hit Stats details.\n</p>
+            <p class="marked">Publish user hit stat details.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/event-publish</code>
@@ -2627,11 +2627,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsFavouritePageGet"></a>check if it is the favourite page</h3>
+            <h3 class="operation-heading"><a name="appsFavouritePageGet"></a>Check if it is a favourite page</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">check if it is the favourite page.\n</p>
+            <p class="marked">Check if it is a favourite page.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/favourite-page</code>
@@ -2730,7 +2730,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2819,11 +2819,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf, documents files</h3>
+            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf and document files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Retrieving images for banners, screenshots etc.\n</p>
+            <p class="marked">Retrieving images for banners, screenshots, etc.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/static-contents/{fileName}</code>
@@ -2892,7 +2892,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Application type</p>
+                            <p class="param-description marked">The application type.</p>
                             
                         </td>
                         <td>
@@ -2922,7 +2922,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">file name.\n</p>
+                            <p class="param-description marked">The file name.\n</p>
                             
                         </td>
                         <td>
@@ -2982,7 +2982,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -3017,7 +3017,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nStatic content Retrieved successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\nStatic content retrieved successfully.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 

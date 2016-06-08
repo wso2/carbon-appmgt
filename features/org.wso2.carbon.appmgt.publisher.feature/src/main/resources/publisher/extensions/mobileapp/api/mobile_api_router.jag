@@ -1,5 +1,5 @@
 <%
-
+include("/extensions/webapp/modules/jagg/jagg.jag");
 require('/modules/publisher.js').exec(function(ctx) {
 
     var config = require('/config/publisher.json');
@@ -11,6 +11,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var rxtManager = publisher.rxtManager;
     var server = require('store').server;
     var permissions=require('/modules/permissions.js').permissions;
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
 
 
     routeManager.register('DELETE', 'publisher', '/publisher/api/mobile/delete/{app}', function (ctx) {
@@ -21,7 +22,27 @@ require('/modules/publisher.js').exec(function(ctx) {
         if(deleteAuthorized){
             var app = ctx.params.app;
             var artifactManager = rxtManager.getArtifactManager("mobileapp");
+            var fileNames = [];
+
+            var artifact = artifactManager.get(app);
+            fileNames.push(artifact.attributes.images_thumbnail);
+            fileNames.push(artifact.attributes.images_banner);
+            var screenShots = artifact.attributes.images_screenshots.split(",");
+
+            for each(var screenshot in screenShots){
+                if(screenshot){
+                    fileNames.push(screenshot);
+                }
+            }
+            if(artifact.attributes.overview_type != "webapp" && artifact.attributes.overview_type != "public"){
+               var mobileBinaryUrl = artifact.attributes.overview_url;
+                if(mobileBinaryUrl){
+                   var binaryFileName = mobileBinaryUrl.substring(mobileBinaryUrl.lastIndexOf("/") + 1, mobileBinaryUrl.length);
+                   fileNames.push(binaryFileName);
+                }
+            }
             artifactManager.remove(app);
+            apiProvider.removeBinaryFilesFromStorage(fileNames);
         }
     });
 

@@ -4225,6 +4225,29 @@ public class APIProviderHostObject extends ScriptableObject {
         return HostObjectUtils.getBinaryStorageConfiguration();
     }
 
+    /**
+     * Remove mobile application binary files
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeBinaryFilesFromStorage(Context cx, Scriptable thisObj, Object[] args,
+                                                         Function funObj) throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof NativeArray)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        NativeArray fileNames = (NativeArray) args[0];
+        for(int i = 0;i<fileNames.getLength(); i++){
+            apiProvider.removeBinaryFromStorage(fileNames.get(i).toString());
+        }
+    }
 }
 
 

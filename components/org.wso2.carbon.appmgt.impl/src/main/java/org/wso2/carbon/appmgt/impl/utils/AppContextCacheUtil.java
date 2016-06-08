@@ -85,10 +85,10 @@ public class AppContextCacheUtil {
 
             while (listI.hasNext()) {
                 WebApp app = (WebApp) listI.next();
+                String appVersion = app.isDefaultVersion() ? "/" + app.getId().getVersion() : "";
                 contextVersion.put((app.getContext().startsWith("/") ?
                         app.getContext() :
-                        "/" + app.getContext()) +
-                        "/" + app.getId().getVersion(), app.getUrl());
+                        "/" + app.getContext()) + appVersion, app.getUrl());
             }
             return contextVersion;
         } catch (AppManagementException e) {

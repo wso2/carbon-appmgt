@@ -3,7 +3,7 @@
     "info": {
         "version": "1.1.0",
         "title": "WSO2 APP Manager - Publisher API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for **WSO2 APP Manager - Publisher**.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -76,7 +76,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "**Search condition**.\n\n\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "description": "A search condition.\n\n\n\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
                         "type": "string"
                     },
                     {
@@ -100,7 +100,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "description": "OK.\nList of qualifying Apps is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/AppList"
                         },
@@ -110,25 +110,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -149,7 +149,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "App object that needs to be added\n",
+                        "description": "App object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/App"
@@ -167,7 +167,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "description": "Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n",
                         "schema": {
                             "$ref": "#/definitions/App"
                         },
@@ -181,19 +181,19 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional request\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -230,9 +230,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nQualifying App is returned.\n",
+                        "description": "OK.\nQualifying App is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppInfo"
+                            "$ref": "#/definitions/App"
                         },
                         "headers": {
                             "Content-Type": {
@@ -240,25 +240,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -282,7 +282,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "App object that needs to be added\n",
+                        "description": "App object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/App"
@@ -303,7 +303,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nSuccessful response with updated App object\n",
+                        "description": "OK.\nSuccessful response with updated App object.\n",
                         "schema": {
                             "$ref": "#/definitions/App"
                         },
@@ -317,35 +317,35 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modifed the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modifed.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -377,22 +377,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
+                        "description": "OK.\nResource successfully deleted.\n"
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -406,7 +406,7 @@
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags\"",
                 "x-wso2-response": "{\"tags\":[\"w1\",\"webapptag1\",\"webapptag2\"]}",
                 "summary": "Get all Tags of an App",
-                "description": "Get a list of available Tags relevant to given App Internal Id.\n",
+                "description": "Get a list of available Tags relevant to the given App Internal ID.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -426,7 +426,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of Tags is returned.\n",
+                        "description": "OK.\nList of tags is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/TagList"
                         },
@@ -436,25 +436,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -467,7 +467,7 @@
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"tags\":[\"tag1\"]}",
                 "summary": "Add a new tag",
-                "description": "Add a new tag into tag collection of a given application type.\n",
+                "description": "Add a new tag to the tag collection of a given application type.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -478,7 +478,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "Tag object that needs to be added\n",
+                        "description": "Tag object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/TagList"
@@ -502,25 +502,25 @@
                         "description": "OK.\n"
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -549,7 +549,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "Tag object that needs to be added\n",
+                        "description": "Tag object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/TagList"
@@ -561,22 +561,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
+                        "description": "OK.\nResource successfully deleted.\n"
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -613,7 +613,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nQualifying User List is returned.\n",
+                        "description": "OK.\nQualifying user list is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/UserIdList"
                         },
@@ -623,25 +623,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -664,7 +664,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "App object that needs to be added\n",
+                        "description": "App object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/App"
@@ -682,7 +682,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "description": "Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains the URL of the newly created entity.\n",
                         "schema": {
                             "$ref": "#/definitions/App"
                         },
@@ -696,19 +696,19 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -742,7 +742,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nDetails of a lifecycle is returned.\n",
+                        "description": "OK.\nDetails of a lifecycle is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/LifeCycle"
                         },
@@ -752,25 +752,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -804,7 +804,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "description": "OK.\nList of qualifying Apps is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/LifeCycleHistoryList"
                         },
@@ -814,25 +814,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -870,13 +870,13 @@
                         "description": "OK.\n"
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -890,7 +890,7 @@
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers\"",
                 "x-wso2-response": "{\"tierList\":[{\"tierSortKey\":1,\"tierName\":\"Bronze\",\"tierDisplayName\":\"Bronze\",\"tierDescription\":\"Allows 1 request(s) per minute.\"},{\"tierSortKey\":20,\"tierName\":\"Gold\",\"tierDisplayName\":\"Gold\",\"tierDescription\":\"Allows 20 request(s) per minute.\"},{\"tierSortKey\":5,\"tierName\":\"Silver\",\"tierDisplayName\":\"Silver\",\"tierDescription\":\"Allows 5 request(s) per minute.\"},{\"tierSortKey\":10000,\"tierName\":\"Unlimited\",\"tierDisplayName\":\"Unlimited\",\"tierDescription\":\"Allows unlimited requests\"}]}",
                 "summary": "Get all Tiers",
-                "description": "Get a list of Tiers.\n",
+                "description": "Get a list of tiers.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -910,7 +910,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of Tiers is returned.\n",
+                        "description": "OK.\nList of tiers is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/TierList"
                         },
@@ -920,25 +920,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -969,14 +969,14 @@
                     {
                         "in": "formData",
                         "name": "file",
-                        "description": "Document to upload",
+                        "description": "Document to be uploaded.",
                         "type": "file",
                         "required": false
                     },
                     {
                         "in": "formData",
                         "name": "inlineContent",
-                        "description": "Inline content of the document",
+                        "description": "Inline content of the document.",
                         "type": "string",
                         "required": false
                     },
@@ -992,29 +992,29 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nDocument uploaded successfully.\n",
+                        "description": "OK.\nDocument uploaded successfully.\n",
                         "schema": {
                             "$ref": "#/definitions/StaticContent"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "description": "Not Found.\nRequested entity does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1028,7 +1028,7 @@
                 "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3\"",
                 "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
                 "summary": "Get App Documents",
-                "description": "Get a list of documents belonging to an APP.\n",
+                "description": "Get a list of documents belonging to an App.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1054,7 +1054,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nDocument list is returned.\n",
+                        "description": "OK.\nDocument list is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/DocumentList"
                         },
@@ -1064,22 +1064,22 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "304": {
-                        "description": "Not Modified. \nEmpty body because the client has already the latest version of the requested resource.\n"
+                        "description": "Not Modified.\nEmpty body because the client already has the latest version of the requested resource.\n"
                     },
                     "404": {
-                        "description": "Not Found. \nRequested API does not exist.\n",
+                        "description": "Not Found.\nRequested resource does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "406": {
-                        "description": "Not Acceptable. \nThe requested media type is not supported\n",
+                        "description": "Not Acceptable.\nThe requested media type is not supported.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1103,7 +1103,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "Document object that needs to be added\n",
+                        "description": "Document object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Document"
@@ -1118,13 +1118,13 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created. \nSuccessful response with the newly created Document object as entity in the body. \nLocation header contains URL of newly added document.\n",
+                        "description": "Created.\nSuccessful response with the newly created document object as the entity in the body.\nLocation header contains the URL of the newly added document.\n",
                         "schema": {
                             "$ref": "#/definitions/Document"
                         },
                         "headers": {
                             "Location": {
-                                "description": "Location to the newly created Document.\n",
+                                "description": "Location to the newly created document.\n",
                                 "type": "string"
                             },
                             "Content-Type": {
@@ -1132,19 +1132,19 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. \nUsed by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the response resource.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported media type. \nThe entity of the request was in a not supported format.\n"
+                        "description": "Unsupported media type.\nThe entity of the request was in an unsupported format.\n"
                     }
                 }
             }
@@ -1155,7 +1155,7 @@
                 "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\"",
                 "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Retrieving document",
-                "description": "Retrieving document.\n",
+                "description": "Retrieving the document.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1178,35 +1178,35 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nDocument Retrieved successfully.\n",
+                        "description": "OK.\nDocument retrieved successfully.\n",
                         "schema": {
                             "type": "file"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "description": "Not Found.\nRequested entity does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1218,7 +1218,7 @@
                 "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -X DELETE http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Document",
-                "description": "Delete an existing Document\n",
+                "description": "Delete an existing document.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1241,16 +1241,16 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
+                        "description": "OK.\nResource successfully deleted.\n"
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1264,14 +1264,14 @@
                 "x-scope": "appm:publish",
                 "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "description": "Change the lifecycle of an App\n",
+                "description": "Change the lifecycle of an App.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
                     },
                     {
                         "name": "action",
-                        "description": "The action to demote or promote the state of the App.\n\n\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n",
+                        "description": "The action determining whether to demote or promote the state of the App.\n\n\n\n\nSupported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]\n",
                         "in": "query",
                         "type": "string",
                         "required": true,
@@ -1305,32 +1305,32 @@
                         "schema": {
                             "$ref": "#/definitions/ResponseMessage"
                         },
-                        "description": "OK. \nLifecycle changed successfully.\n",
+                        "description": "OK.\nLifecycle changed successfully.\n",
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the App lifecycle was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested App does not exist.\n",
+                        "description": "Not Found.\nRequested App does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1345,7 +1345,7 @@
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"tags\":[\"aa\",\"bb\",\"cc\"]}",
                 "summary": "Validate App Context",
-                "description": "Validate App Context.\n",
+                "description": "Validate App context.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1368,13 +1368,13 @@
                         "description": "OK.\n"
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1387,8 +1387,8 @@
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer ede4387e36fbf87c802026f1240b7e5d\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/stats/getAppUsagePerPage\"",
                 "x-wso2-response": "{\"result\": [{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step2.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 15,\"context\": \"/travel\"},{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step1.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 20,\"context\": \"/travel\"},{\"apiName\": \"PlanYourTrip_admin(v1.0.0)\",\"referer\": \"/planYourTrip/1.0.0\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\", \"count\": 10, \"context\": \"/planYourTrip\"}]}",
-                "summary": "Get Stat summary",
-                "description": "Get Stat summary results.\n",
+                "summary": "Get stat summary",
+                "description": "Get stat summary results.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1398,21 +1398,21 @@
                     },
                     {
                         "name": "startTimeStamp",
-                        "description": "Start date/time of the stat analysis (2016-04-19#10:32:00)",
+                        "description": "The start date and time of the stat analysis in the following format: 2016-04-19 10:32:00",
                         "in": "query",
                         "type": "string",
                         "required": false
                     },
                     {
                         "name": "endTimeStamp",
-                        "description": "End date/time of the stat analysis (2016-04-19#10:32:00)",
+                        "description": "The end date and time of the stat analysis in the following format: 2016-04-19 10:32:00",
                         "in": "query",
                         "type": "string",
                         "required": false
                     },
                     {
                         "name": "limit",
-                        "description": "Limit of records",
+                        "description": "The limit of the number of records.",
                         "in": "query",
                         "type": "integer",
                         "required": false
@@ -1439,25 +1439,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1471,7 +1471,7 @@
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/tags\"",
                 "x-wso2-response": "[{\"name\":\"webapptag1\",\"noOfOccurrences\":1},{\"name\":\"webapptag2\",\"noOfOccurrences\":1},{\"name\":\"webapptag3\",\"noOfOccurrences\":1}]",
                 "summary": "Get all Tags",
-                "description": "Get a list of available Tags relevant to given App Type.\n",
+                "description": "Get a list of available tags relevant to the given App type.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -1488,7 +1488,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of Tags is returned.\n",
+                        "description": "OK.\nList of tags is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/TagList"
                         },
@@ -1498,25 +1498,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1538,7 +1538,7 @@
                     {
                         "in": "formData",
                         "name": "file",
-                        "description": "Document to upload",
+                        "description": "Document to be uploaded.",
                         "type": "file",
                         "required": false
                     },
@@ -1554,35 +1554,35 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nBinary file uploaded successfully.\n",
+                        "description": "OK.\nBinary file uploaded successfully.\n",
                         "schema": {
                             "$ref": "#/definitions/Binary"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested App does not exist.\n",
+                        "description": "Not Found.\nRequested App does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1596,7 +1596,7 @@
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0763d28a85f20d6fd8954f955859055c\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/O0lsxdlhR998Hhc.apk\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binaries",
-                "description": "Retrieving .apk, .ipa binaries for mobile apps.\n",
+                "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/fileName"
@@ -1613,35 +1613,35 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nMobile app binary content retrieved successfully.\n",
+                        "description": "OK.\nMobile app binary content retrieved successfully.\n",
                         "schema": {
                             "type": "file"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "description": "Not Found.\nRequested entity does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1654,8 +1654,8 @@
                 "x-scope": "appm:read",
                 "x-wso2-curl": "",
                 "x-wso2-response": "",
-                "summary": "Get plist",
-                "description": "Plist file of the specified iOS (Apple) mobile app.\n",
+                "summary": "Get Plist",
+                "description": "Get the plist file of the specified iOS (Apple) mobile app.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/tenantId"
@@ -1685,25 +1685,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1719,19 +1719,19 @@
                 "x-scope": "appm:create",
                 "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 0763d28a85f20d6fd8954f955859055c\" -H \"Content-Type: multipart/form-data\" -F \"file=@/home/user/sample.jpg\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents?appType=webapp\"",
                 "x-wso2-response": "{\"id\": \"ZQCIsEEkYM2LJ9C.jpg\"}",
-                "summary": "Uploading images, pdf, documents files",
+                "summary": "Uploading images, pdf and document files",
                 "description": "Uploading images for banners, screenshots etc.\n",
                 "parameters": [
                     {
                         "in": "formData",
                         "name": "file",
-                        "description": "Document to upload",
+                        "description": "Document to be uploaded.",
                         "type": "file",
                         "required": false
                     },
                     {
                         "name": "appType",
-                        "description": "Application type",
+                        "description": "The application type.",
                         "in": "query",
                         "type": "string",
                         "required": true
@@ -1748,35 +1748,35 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nStatic content uploaded successfully.\n",
+                        "description": "OK.\nStatic content uploaded successfully.\n",
                         "schema": {
                             "$ref": "#/definitions/StaticContent"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "description": "Not Found.\nRequested entity does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1789,12 +1789,12 @@
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c7fff7b0307472345c8652d6595b1b1c\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/ZQCIsEEkYM2LJ9C.jpg?appType=mobileapp\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "summary": "Retrieving images, pdf, documents files",
-                "description": "Retrieving images for banners, screenshots etc.\n",
+                "summary": "Retrieving images, pdf and documents files",
+                "description": "Retrieving images for banners, screenshots, etc.\n",
                 "parameters": [
                     {
                         "name": "appType",
-                        "description": "Application type",
+                        "description": "The application type.",
                         "in": "query",
                         "type": "string",
                         "required": true
@@ -1814,35 +1814,35 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nStatic content Retrieved successfully.\n",
+                        "description": "OK.\nStatic content retrieved successfully.\n",
                         "schema": {
                             "type": "file"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "description": "Not Found.\nRequested entity does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1876,7 +1876,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of XACML policies is returned.\n",
+                        "description": "OK.\nList of XACML policies is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/PolicyPartialList"
                         },
@@ -1886,25 +1886,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1944,7 +1944,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "description": "OK.\nList of qualifying Apps is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/AppList"
                         },
@@ -1954,25 +1954,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1986,13 +1986,13 @@
                 "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}",
-                "summary": "Validate Policy content",
-                "description": "Create a new App\n",
+                "summary": "Validate policy content",
+                "description": "Validates the content of the policy.\n",
                 "parameters": [
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "PolicyPartial object that needs to be added\n",
+                        "description": "Policy Partial object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/PolicyPartial"
@@ -2013,13 +2013,13 @@
                         "description": "OK.\n"
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2030,7 +2030,7 @@
         "/administration/xacmlpolicies/": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",  \"isSharedPartial\": true,  \"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",  \"isSharedPartial\": true, \"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies\"",
                 "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null,\"policyPartialIc\": 2}",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null}",
                 "summary": "Create a new Policy Partial",
@@ -2039,7 +2039,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "PolicyPartial object that needs to be added\n",
+                        "description": "Policy Partial object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/PolicyPartial"
@@ -2057,7 +2057,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "description": "Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n",
                         "schema": {
                             "$ref": "#/definitions/PolicyPartial"
                         },
@@ -2071,19 +2071,19 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2106,7 +2106,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "App object that needs to be added\n",
+                        "description": "App object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/PolicyPartial"
@@ -2130,35 +2130,35 @@
                         "description": "OK.\n",
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time at which the App lifecycle was last modified.\nUsed by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2190,7 +2190,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nQualifying App is returned.\n",
+                        "description": "OK.\nQualifying App is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/PolicyPartial"
                         },
@@ -2200,25 +2200,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2247,22 +2247,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
+                        "description": "OK.\nResource successfully deleted.\n"
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2290,7 +2290,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of qualifying Business Owner List is returned.\n",
+                        "description": "OK.\nList of qualifying business owners is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/BusinessOwnerList"
                         },
@@ -2300,25 +2300,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2331,12 +2331,12 @@
                 "x-wso2-response": "{\"id\": 4}",
                 "x-wso2-request": "{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
                 "summary": "Create a new Business Owner",
-                "description": "Create a new Business Owner\n",
+                "description": "Create a new business owner.\n",
                 "parameters": [
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "BusinessOwner object that needs to be added\n",
+                        "description": "Business Owner object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/BusinessOwner"
@@ -2354,7 +2354,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "description": "Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n",
                         "schema": {
                             "$ref": "#/definitions/BusinessOwner"
                         },
@@ -2368,19 +2368,19 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional request\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "description": "Unsupported Media Type.\nThe entity of the request was in a not supported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2393,8 +2393,8 @@
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1\"",
                 "x-wso2-response": "{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}",
-                "summary": "Get a Business owners by Id",
-                "description": "Get a Business owners by Id.\n",
+                "summary": "Get business owners by ID",
+                "description": "Get business owners by ID.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/businessOwnerId"
@@ -2421,25 +2421,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2451,8 +2451,8 @@
                 "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -H \"Content-Type: application/json\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"site\": \"newSysUser.lk\",\"email\": \"newSysUser@gmail.com\",\"description\":\"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
-                "summary": "Update an existing Business Owner",
-                "description": "Update an existing Business Owner.\n",
+                "summary": "Update an existing business owner",
+                "description": "Update an existing business owner.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/businessOwnerId"
@@ -2460,7 +2460,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "BusinessOwner object that needs to be added\n",
+                        "description": "Business Owner object that needs to be added.\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/BusinessOwner"
@@ -2484,25 +2484,25 @@
                         "description": "OK.\n"
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2514,7 +2514,7 @@
                 "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Business Owner",
-                "description": "Delete an existing Business Owner.\n",
+                "description": "Delete an existing business owner.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/businessOwnerId"
@@ -2531,22 +2531,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
+                        "description": "OK.\nResource successfully deleted.\n"
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2557,10 +2557,10 @@
         "/roles": {
             "get": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\"  \"http://localhost:9763/api/appm/publisher/v1.1/roles\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.1/roles\"",
                 "x-wso2-response": "{\"roleIds\": [\"admin\",\"Application/app_11_04_001\", \"Application/app_11_04_002\",\"Application/app_11_04_011\"]}",
                 "summary": "Get all Roles",
-                "description": "Get a list of available Roles.\n",
+                "description": "Get a list of available roles.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/Accept"
@@ -2574,7 +2574,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of Roles are returned.\n",
+                        "description": "OK.\nList of roles is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/RoleIdList"
                         },
@@ -2584,25 +2584,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2636,7 +2636,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nQualifying App is returned.\n",
+                        "description": "OK.\nQualifying App is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/JavaPolicyList"
                         },
@@ -2646,25 +2646,25 @@
                                 "type": "string"
                             },
                             "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
                     },
                     "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2677,49 +2677,49 @@
         "appId": {
             "name": "appId",
             "in": "path",
-            "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "description": "**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n",
             "required": true,
             "type": "string"
         },
         "appType": {
             "name": "appType",
             "in": "path",
-            "description": "App Type. Either webapp or mobileapp\n",
+            "description": "The App type (either Webapp/Mobile app).\n",
             "required": true,
             "type": "string"
         },
         "policyPartialId": {
             "name": "policyPartialId",
             "in": "path",
-            "description": "policy partial id\n",
+            "description": "Policy partial ID\n",
             "required": true,
             "type": "integer"
         },
         "appId-Q": {
             "name": "appId",
             "in": "query",
-            "description": "**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "description": "**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid App ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n",
             "required": true,
             "type": "string"
         },
         "appContext": {
             "name": "appContext",
             "in": "query",
-            "description": "Application Context",
+            "description": "Application context.",
             "required": true,
             "type": "string"
         },
         "isGlobal": {
             "name": "isGlobal",
             "in": "query",
-            "description": "Either global policy or not. Default value is 'true'.",
+            "description": "Determines whether or not the policy is global. The default value is 'true'.",
             "required": false,
             "default": true,
             "type": "boolean"
         },
         "fieldFilter": {
             "name": "field-filter",
-            "description": "Used to limit the fields in response.\n\n\n\n\nSupported filters are [ **basic,all**]\n",
+            "description": "Used to limit the fields in the response.\n\n\n\n\nSupported filters are [ **basic, all**]\n",
             "in": "query",
             "type": "string",
             "required": false,
@@ -2739,35 +2739,35 @@
         "offset": {
             "name": "offset",
             "in": "query",
-            "description": "Starting point within the complete list of items qualified.  \n",
+            "description": "Starting point within the complete list of items qualified.\n",
             "default": 0,
             "type": "integer"
         },
         "fileName": {
             "name": "fileName",
             "in": "path",
-            "description": "File name.\n",
+            "description": "The file name.\n",
             "required": true,
             "type": "string"
         },
         "documentId": {
             "name": "documentId",
             "in": "path",
-            "description": "Document uuid.\n",
+            "description": "Document UUID.\n",
             "required": true,
             "type": "string"
         },
         "tenantId": {
             "name": "tenantId",
             "in": "path",
-            "description": "Tenant Id.\n",
+            "description": "Tenant ID.\n",
             "required": true,
             "type": "string"
         },
         "statType": {
             "name": "statType",
             "in": "path",
-            "description": "Stat Type.\n\n\n\n\nSupported stat types are [**getAppUsagePerPage,getSubscriptionCountsPerApp,getSubscriptionsPerApp,getAppUsagePerUser,getAppResponseTime,getCacheHit**]\n",
+            "description": "The stat type.\n\n\n\n\nSupported stat types are [**getAppUsagePerPage, getSubscriptionCountsPerApp, getSubscriptionsPerApp, getAppUsagePerUser, getAppResponseTime, getCacheHit**]\n",
             "required": true,
             "type": "string",
             "enum": [
@@ -2782,7 +2782,7 @@
         "businessOwnerId": {
             "name": "businessOwnerId",
             "in": "path",
-            "description": "Business Owner Id.\n",
+            "description": "Business owner ID.\n",
             "required": true,
             "type": "integer"
         },
@@ -2804,25 +2804,25 @@
         "If-None-Match": {
             "name": "If-None-Match",
             "in": "header",
-            "description": "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n",
+            "description": "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n",
             "type": "string"
         },
         "If-Modified-Since": {
             "name": "If-Modified-Since",
             "in": "header",
-            "description": "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n",
+            "description": "Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n",
             "type": "string"
         },
         "If-Match": {
             "name": "If-Match",
             "in": "header",
-            "description": "Validator for conditional requests; based on ETag.\n",
+            "description": "Validator for conditional requests; based on the ETag.\n",
             "type": "string"
         },
         "If-Unmodified-Since": {
             "name": "If-Unmodified-Since",
             "in": "header",
-            "description": "Validator for conditional requests; based on Last Modified header.\n",
+            "description": "Validator for conditional requests; based on the Last Modified header.\n",
             "type": "string"
         }
     },
@@ -2837,24 +2837,30 @@
                 },
                 "next": {
                     "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n",
                     "example": "/app?limit=1&offset=2&query="
                 },
                 "previous": {
                     "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n",
                     "example": "/app?limit=1&offset=0&query="
                 },
-                "list": {
+                "appList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AppInfo"
+                        "$ref": "#/definitions/App"
+                    }
+                },
+                "appSummaryList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AppSummary"
                     }
                 }
             }
         },
-        "AppInfo": {
-            "title": "App Info object with basic App details.",
+        "AppSummary": {
+            "title": "App summary object with basic App details.",
             "properties": {
                 "id": {
                     "type": "string",
@@ -2888,7 +2894,7 @@
                 "rating": {
                     "description": "User rating for the app\n",
                     "type": "number",
-                    "example": 4.0
+                    "example": 4
                 }
             }
         },
@@ -2911,7 +2917,7 @@
                 },
                 "type": {
                     "type": "string",
-                    "description": "App type (either Webapp/Mobile app)",
+                    "description": "The App type (either Webapp/Mobile app)",
                     "example": "webapp,mobileapp"
                 },
                 "appmeta": {
@@ -2919,7 +2925,7 @@
                     "properties": {
                         "path": {
                             "type": "string",
-                            "description": "Application binary file API \n",
+                            "description": "Application binary file API\n",
                             "example": "/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
                         },
                         "package": {
@@ -3072,7 +3078,7 @@
                     "example": "/_system/governance/mobileapps/admin/webapp/m1/1"
                 },
                 "resourceId": {
-                    "description": "Resource Id path of the asset\n",
+                    "description": "Resource ID path of the asset.\n",
                     "type": "string",
                     "example": "/_system/governance/mobileapps/admin/android/test/1.0"
                 },
@@ -3089,7 +3095,7 @@
                 "rating": {
                     "description": "User rating for the app\n",
                     "type": "number",
-                    "example": 4.0
+                    "example": 4
                 },
                 "appUrL": {
                     "description": "URL of the asset\n",
@@ -3170,12 +3176,12 @@
                 },
                 "next": {
                     "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n",
                     "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=2"
                 },
                 "previous": {
                     "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n",
                     "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=0"
                 },
                 "list": {
@@ -3339,12 +3345,12 @@
             "properties": {
                 "policyPartialId": {
                     "type": "integer",
-                    "description": "Id of the policy\n",
+                    "description": "ID of the policy\n",
                     "example": "1"
                 },
                 "policyPartialName": {
                     "type": "string",
-                    "description": "name of the policy\n",
+                    "description": "Name of the policy\n",
                     "example": "policy1"
                 },
                 "policyPartial": {
@@ -3373,12 +3379,12 @@
                 },
                 "next": {
                     "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n",
                     "example": "/xacmlpolicies?limit=1&offset=2&query="
                 },
                 "previous": {
                     "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n",
                     "example": "/xacmlpolicies?limit=1&offset=0&query="
                 },
                 "policyList": {
@@ -3394,7 +3400,7 @@
             "properties": {
                 "policyPartialId": {
                     "type": "integer",
-                    "description": "Id of the policy\n",
+                    "description": "ID of the policy\n",
                     "example": "1"
                 },
                 "policyPartialName": {
@@ -3636,12 +3642,12 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "ID of the URI Template \n",
+                    "description": "ID of the URI Template\n",
                     "example": "1"
                 },
                 "urlPattern": {
                     "type": "string",
-                    "description": "URL pattern of the URI \n",
+                    "description": "URL pattern of the URI\n",
                     "example": "/user/details"
                 },
                 "httpVerb": {
@@ -3666,17 +3672,17 @@
             "properties": {
                 "policyGroupId": {
                     "type": "integer",
-                    "description": "Id of the policy group \n",
+                    "description": "Id of the policy group\n",
                     "example": "1"
                 },
                 "policyGroupName": {
                     "type": "string",
-                    "description": "Name of the policy group \n",
+                    "description": "Name of the policy group\n",
                     "example": "default"
                 },
                 "description": {
                     "type": "string",
-                    "description": "Description of the policy group \n",
+                    "description": "Description of the policy group\n",
                     "example": "Default policy group"
                 },
                 "throttlingTier": {
@@ -3690,7 +3696,9 @@
                         "type": "string"
                     },
                     "description": "The name of the uri template policy group\n",
-                    "example": ["admin"]
+                    "example": [
+                        "admin"
+                    ]
                 },
                 "policyPartialMapping": {
                     "type": "array",
@@ -3698,11 +3706,13 @@
                         "type": "string"
                     },
                     "description": "Entitlement policy partial name list\n",
-                    "example": ["sample"]
+                    "example": [
+                        "sample"
+                    ]
                 },
                 "allowAnonymousAccess": {
                     "type": "string",
-                    "description": "Allow anonymous access to mobile \n",
+                    "description": "Allow anonymous access to mobile\n",
                     "example": "GET,POST,PUT,DELETE,OPTION"
                 }
             }
@@ -3732,7 +3742,7 @@
                 },
                 "error": {
                     "type": "array",
-                    "description": "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n",
+                    "description": "If there are more than one error list them out.\nFor example, list out validation errors by each field.\n",
                     "items": {
                         "$ref": "#/definitions/ErrorListItem"
                     }

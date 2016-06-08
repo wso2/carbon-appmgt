@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.rest.api.publisher.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
 import java.math.BigDecimal;
 
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 
 @ApiModel(description = "")
-public class AppInfoDTO  {
+public class AppSummaryDTO {
   
   
   
@@ -140,7 +140,7 @@ public class AppInfoDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AppInfoDTO {\n");
+    sb.append("class AppSummaryDTO {\n");
     
     sb.append("  id: ").append(id).append("\n");
     sb.append("  name: ").append(name).append("\n");
