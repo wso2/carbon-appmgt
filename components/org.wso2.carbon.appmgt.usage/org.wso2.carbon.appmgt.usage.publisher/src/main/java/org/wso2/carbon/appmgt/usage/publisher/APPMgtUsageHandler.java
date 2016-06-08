@@ -30,25 +30,16 @@ import org.wso2.carbon.appmgt.usage.publisher.internal.APPManagerConfigurationSe
 import org.wso2.carbon.appmgt.usage.publisher.internal.UsageComponent;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.cache.Caching;
 import java.util.Map;
 
-import javax.cache.Caching;
-
 public class APPMgtUsageHandler extends AbstractHandler {
-	
-	private static final String URL_SEPERATOR = "/";
-	private static final String API_AUTH_CONTEXT = "__API_AUTH_CONTEXT";
 
-    private static final Log log   = LogFactory.getLog(APPMgtUsageHandler.class);
-
+    private static final Log log = LogFactory.getLog(APPMgtUsageHandler.class);
     private volatile APIMgtUsageDataPublisher publisher;
-    
-    private String publisherClass = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getPublisherClass();
-
+    private String publisherClass =
+            APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getPublisherClass();
     private boolean enabled = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().isEnabled();
-    
-    private boolean cacheStatsEnabled = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().isCacheStatsEnabled();
-
 
     public boolean handleRequest(MessageContext mc) {
 
@@ -70,7 +61,6 @@ public class APPMgtUsageHandler extends AbstractHandler {
                 mc.setProperty(APIMgtUsagePublisherConstants.TRANSPORT_URL, transportURL);
 
             }
-
         } catch (Throwable e) {
             log.error("Error:  " + e.getMessage(), e);
         }
@@ -78,9 +68,7 @@ public class APPMgtUsageHandler extends AbstractHandler {
     }
 
     public boolean handleResponse(MessageContext mc) {
-
         try {
-
             if (enabled) {
                 Boolean isLogoutReqeust = (Boolean) mc.getProperty("isLogoutRequest");
                 if (isLogoutReqeust != null && isLogoutReqeust.booleanValue()) {
@@ -89,19 +77,11 @@ public class APPMgtUsageHandler extends AbstractHandler {
                 Long currentTime = System.currentTimeMillis();
                 Long serviceTime = currentTime - (Long) mc.getProperty(APIMgtUsagePublisherConstants.REQUEST_TIME);
                 String transportURL = (String) mc.getProperty(APIMgtUsagePublisherConstants.TRANSPORT_URL);
-                UsageComponent.addResponseTime(transportURL, serviceTime);                
-                
-                if (cacheStatsEnabled) {
-                    //publish Cache hit/miss event
-                   // publishCacheEvent(mc);
-                }
+                UsageComponent.addResponseTime(transportURL, serviceTime);
             }
-
         } catch (Throwable e) {
             log.error("Error " + e.getMessage(), e);
         }
         return true; // Should never stop the message flow
     }
-
-
 }

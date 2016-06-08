@@ -31,7 +31,7 @@ public class Test {
 
         AppManagerConfiguration config = new AppManagerConfiguration();
 
-        //TODO: Populate the config with required BAM parameters - config.load(testFilePath)
+        //TODO: Populate the config with required DAS parameters - config.load(testFilePath)
 
         APIMGTConfigReaderService readerService = new APIMGTConfigReaderService(config);
 

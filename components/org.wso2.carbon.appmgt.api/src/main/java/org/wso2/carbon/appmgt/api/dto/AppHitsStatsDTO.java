@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.appmgt.usage.client.dto;
+package org.wso2.carbon.appmgt.api.dto;
 
 import java.util.ArrayList;
 import java.util.List;

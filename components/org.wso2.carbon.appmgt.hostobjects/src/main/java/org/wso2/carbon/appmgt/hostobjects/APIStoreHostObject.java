@@ -31,9 +31,16 @@ import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.dto.AppVersionUserUsageDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
@@ -44,8 +51,6 @@ import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
-import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
@@ -53,6 +58,8 @@ import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
@@ -65,6 +72,7 @@ import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
+import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.SelfSignUpUtil;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
@@ -72,9 +80,6 @@ import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
-import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUserUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -2872,7 +2877,7 @@ public class APIStoreHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIUsageforSubscriber(Context cx, Scriptable thisObj,
                                                                   Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIVersionUserUsageDTO> list = null;
+        List<AppVersionUserUsageDTO> list = null;
         if (args==null || args.length == 0) {
             handleException("Invalid number of parameters.");
         }
@@ -2884,12 +2889,14 @@ public class APIStoreHostObject extends ScriptableObject {
         String period = (String) args[1];
 
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIStoreHostObject) thisObj).getUsername());
-            list = client.getUsageBySubscriber(subscriberName, period);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.
+                    getUsageBySubscriber(subscriberName, period);
+        } catch (AppUsageQueryServiceClientException e) {
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         } catch (Exception e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2902,7 +2909,7 @@ public class APIStoreHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIVersionUserUsageDTO usage = (APIVersionUserUsageDTO) usageObject;
+                AppVersionUserUsageDTO usage = (AppVersionUserUsageDTO) usageObject;
                 row.put("api", row, usage.getApiname());
                 row.put("version", row, usage.getVersion());
                 row.put("count", row, usage.getCount());
