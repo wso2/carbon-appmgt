@@ -25,7 +25,6 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppUsageStatisticsClient;
 import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
-import org.wso2.carbon.appmgt.api.dto.AppMCacheCountDTO;
 import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
@@ -40,6 +39,7 @@ import org.wso2.carbon.appmgt.api.dto.UserHitsPerAppDTO;
 import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClientConstants;
@@ -47,6 +47,7 @@ import org.wso2.carbon.appmgt.usage.client.billing.PaymentPlan;
 import org.wso2.carbon.appmgt.usage.client.internal.AppMUsageClientServiceComponent;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppAccessTime;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppFirstAccess;
+import org.wso2.carbon.appmgt.usage.client.pojo.AppMCacheHitCount;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppResponseFaultCount;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppResponseTime;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppUsage;
@@ -56,7 +57,6 @@ import org.wso2.carbon.appmgt.usage.client.pojo.AppUsageByUser;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppUsageByUserName;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppVersionUsageByUser;
 import org.wso2.carbon.appmgt.usage.client.pojo.AppVersionUsageByUserMonth;
-import org.wso2.carbon.appmgt.usage.client.pojo.AppMCacheHitCount;
 import org.wso2.carbon.bam.presentation.stub.QueryServiceStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -94,11 +94,8 @@ import java.util.TreeMap;
 public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
 
     private APIProvider apiProviderImpl;
-    //    private APIConsumer apiConsumerImpl;
     private static volatile DataSource dataSource = null;
     private static PaymentPlan paymentPlan;
-    private static final String API_USAGE_TRACKING = "Analytics.";
-    private static final String DATA_SOURCE_NAME = API_USAGE_TRACKING + "DataSourceName";
     private static String errorMsg = "DAS data source hasn't been initialized. Ensure that the data source is " +
             "properly configured in the APIUsageTracker configuration.";
 
@@ -139,7 +136,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
             return;
         }
         AppManagerConfiguration config = AppMUsageClientServiceComponent.getAPIManagerConfiguration();
-        String dataSourceName = config.getFirstProperty(DATA_SOURCE_NAME);
+        String dataSourceName = config.getFirstProperty(AppMConstants.DATA_SOURCE_NAME);
 
         if (dataSourceName != null) {
             try {
@@ -152,7 +149,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
     }
 
-    public List<AppUsageDTO> getUsageByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppUsageDTO> getUsageByApps(String providerName, String fromDate, String toDate,
                                             int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException {
 
@@ -183,40 +180,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return getAPIUsageTopEntries(new ArrayList<AppUsageDTO>(usageByAPIs.values()), limit);
     }
 
-//    public List<AppVersionUsageDTO> getUsageByAPIs(String providerName,
-//                                                   String apiName)
-//            throws AppUsageQueryServiceClientException {
-//
-//        QueryServiceStub.CompositeIndex[] compositeIndex = new QueryServiceStub.CompositeIndex[1];
-//        compositeIndex[0] = new QueryServiceStub.CompositeIndex();
-//        compositeIndex[0].setIndexName("api");
-//        compositeIndex[0].setRangeFirst(apiName);
-//        compositeIndex[0].setRangeLast(getNextStringInLexicalOrder(apiName));
-//        OMElement omElement = this.queryBetweenTwoDaysForAPIUsageByVersion(
-//                APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, null, null, compositeIndex);
-//        Collection<APIUsage> usageData = getUsageData(omElement);
-//        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-//        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
-//        Map<String, AppVersionUsageDTO> usageByVersions = new TreeMap<String, AppVersionUsageDTO>();
-//
-//        for (APIUsage usage : usageData) {
-//            for (WebApp providerAPI : providerAPIs) {
-//                if (providerAPI.getId().getApiName().equals(usage.getApiName()) &&
-//                        providerAPI.getId().getVersion().equals(usage.getApiVersion()) &&
-//                        providerAPI.getContext().equals(usage.getContext())) {
-//
-//                    AppVersionUsageDTO usageDTO = new AppVersionUsageDTO();
-//                    usageDTO.setVersion(usage.getApiVersion());
-//                    usageDTO.setCount(usage.getRequestCount());
-//                    usageByVersions.put(usage.getApiVersion(), usageDTO);
-//                }
-//            }
-//        }
-//
-//        return new ArrayList<AppVersionUsageDTO>(usageByVersions.values());
-//    }
-
-    public List<AppVersionUsageDTO> getUsageByAPIVersions(String providerName, String apiName,
+    public List<AppVersionUsageDTO> getUsageByAppVersions(String providerName, String apiName,
                                                           String fromDate, String toDate)
             throws AppUsageQueryServiceClientException {
 
@@ -248,7 +212,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return new ArrayList<AppVersionUsageDTO>(usageByVersions.values());
     }
 
-    public List<AppVersionUsageDTO> getUsageByAPIVersions(String providerName,
+    public List<AppVersionUsageDTO> getUsageByAppVersions(String providerName,
                                                           String apiName) throws AppUsageQueryServiceClientException {
 
         QueryServiceStub.CompositeIndex[] compositeIndex = new QueryServiceStub.CompositeIndex[1];
@@ -280,7 +244,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return new ArrayList<AppVersionUsageDTO>(usageByVersions.values());
     }
 
-    public List<AppResourcePathUsageDTO> getAPIUsageByResourcePath(String providerName, String fromDate, String toDate)
+    public List<AppResourcePathUsageDTO> getAppUsageByResourcePath(String providerName, String fromDate, String toDate)
             throws AppUsageQueryServiceClientException {
 
         OMElement omElement = this.queryToGetAPIUsageByResourcePath(
@@ -309,7 +273,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return usageByResourcePath;
     }
 
-    public List<AppPageUsageDTO> getAPIUsageByPage(String providerName, String fromDate, String toDate
+    public List<AppPageUsageDTO> getAppUsageByPage(String providerName, String fromDate, String toDate
             , String tenantDomainName)
             throws AppUsageQueryServiceClientException {
 
@@ -347,7 +311,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return usageByResourcePath;
     }
 
-    public List<AppUsageByUserDTO> getAPIUsageByUser(String providerName, String fromDate, String toDate,
+    public List<AppUsageByUserDTO> getAppUsageByUser(String providerName, String fromDate, String toDate,
                                                      String tenantDomainName)
             throws AppUsageQueryServiceClientException {
 
@@ -433,30 +397,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return appHitsStatsList;
     }
 
-    public List<AppMCacheCountDTO> getCacheHitCount(String providerName, String fromDate, String toDate)
-            throws AppUsageQueryServiceClientException, SQLException, XMLStreamException {
-
-        OMElement omElement = this.queryForCacheHitCount(fromDate, toDate, null);
-        Collection<AppMCacheHitCount> usageData = getCacheHitCount(omElement);
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
-        List<AppMCacheCountDTO> cacheHit = new ArrayList<AppMCacheCountDTO>();
-
-        for (AppMCacheHitCount usage : usageData) {
-            AppMCacheCountDTO usageDTO = new AppMCacheCountDTO();
-            usageDTO.setApiName(usage.getApiName());
-            usageDTO.setVersion(usage.getVersion());
-            usageDTO.setCacheHit(usage.getCacheHit());
-            usageDTO.setFullRequestPath(usage.getFullRequestPath());
-            usageDTO.setRequestDate(usage.getRequestDate());
-            usageDTO.setTotalRequestCount(usage.getTotalRequestCount());
-            cacheHit.add(usageDTO);
-        }
-
-        return cacheHit;
-    }
-
-    public List<AppResponseTimeDTO> getResponseTimesByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppResponseTimeDTO> getResponseTimesByApps(String providerName, String fromDate, String toDate,
                                                            int limit, String tenantDomain)
             throws AppUsageQueryServiceClientException {
 
@@ -492,7 +433,8 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return list;
     }
 
-    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByAPI(String providerName, String fromDate, String toDate
+    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByApps(String providerName, String fromDate,
+                                                                      String toDate
             , int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException {
 
@@ -563,7 +505,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return getTopEntries(new ArrayList<PerUserAPIUsageDTO>(usageByUsername.values()), limit);
     }
 
-    public List<AppResponseFaultCountDTO> getAPIResponseFaultCount(String providerName, String fromDate, String toDate)
+    public List<AppResponseFaultCountDTO> getAppResponseFaultCount(String providerName, String fromDate, String toDate)
             throws AppUsageQueryServiceClientException {
 
         OMElement omElement = this.queryBetweenTwoDaysForFaulty(
@@ -586,7 +528,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     faultyDTO.setContext(fault.getContext());
                     faultyDTO.setCount(fault.getFaultCount());
 
-                    apiVersionUsageList = getUsageByAPIVersions(providerName, fault.getApiName(), fromDate, toDate);
+                    apiVersionUsageList = getUsageByAppVersions(providerName, fault.getApiName(), fromDate, toDate);
                     for (int i = 0; i < apiVersionUsageList.size(); i++) {
                         apiVersionUsageDTO = apiVersionUsageList.get(i);
                         if (apiVersionUsageDTO.getVersion().equals(fault.getApiVersion())) {
@@ -605,7 +547,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         return faultyCount;
     }
 
-    public List<AppResponseFaultCountDTO> getAPIFaultyAnalyzeByTime(String providerName)
+    public List<AppResponseFaultCountDTO> getAppFaultyAnalyzeByTime(String providerName)
             throws AppUsageQueryServiceClientException {
 
         OMElement omElement = this.queryDatabase(
@@ -1779,7 +1721,6 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                 usageData.remove(limit);
             }
         }
-
         return usageData;
     }
 
@@ -1871,11 +1812,6 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
     }
 
-//    private Set<SubscribedAPI> getSubscribedAPIs(String subscriberName) throws
-//                                                                        AppManagementException {
-//        return apiConsumerImpl.getSubscribedAPIs(new Subscriber(subscriberName));
-//    }
-
     private List<PerUserAPIUsageDTO> getTopEntries(List<PerUserAPIUsageDTO> usageData, int limit) {
         Collections.sort(usageData, new Comparator<PerUserAPIUsageDTO>() {
             public int compare(PerUserAPIUsageDTO o1, PerUserAPIUsageDTO o2) {
@@ -1932,5 +1868,4 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
     private Map<String, Object> evaluate(String param, int calls) throws Exception {
         return paymentPlan.evaluate(param, calls);
     }
-
 }

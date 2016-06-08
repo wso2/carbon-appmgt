@@ -35,7 +35,6 @@ public final class APIMgtUsagePublisherConstants {
     public static final String API_USAGE_DAS_SERVER_USER = API_USAGE_TRACKING + "DASUsername";
     public static final String API_USAGE_DAS_SERVER_PASSWORD = API_USAGE_TRACKING + "DASPassword";
     public static final String API_USAGE_PUBLISHER_CLASS = API_USAGE_TRACKING + "PublisherClass";
-    public static final String APP_STATISTIC_CLIENT_PROVIDER = API_USAGE_TRACKING + "StatisticClientProvider";
 
     public static final String CONSUMER_KEY = "api.ut.consumerKey";
     public static final String USER_ID = "api.ut.userId";
@@ -51,6 +50,7 @@ public final class APIMgtUsagePublisherConstants {
     public static final String APPLICATION_NAME = "api.ut.application.name";
     public static final String APPLICATION_ID = "api.ut.application.id";
     public static final String ANONYMOUS_USER = "anonymous.user";
+    public static final String API_AUTH_CONTEXT = "__API_AUTH_CONTEXT";
 
 	public static final String API_MANAGER_STREAM_NAME_DEFINITION = API_USAGE_TRACKING + "DASEventStreams.";
 	public static final String API_MANAGER_REQUEST_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION

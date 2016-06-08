@@ -19,6 +19,7 @@ package org.wso2.carbon.appmgt.impl.service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppUsageStatisticsClient;
+import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
 import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
@@ -28,13 +29,9 @@ import org.wso2.carbon.appmgt.api.dto.AppUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionLastAccessTimeDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionUserUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.AppMCacheCountDTO;
-import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
 import org.wso2.carbon.appmgt.api.dto.PerUserAPIUsageDTO;
 import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 
-import javax.xml.stream.XMLStreamException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class AppUsageStatisticsService {
@@ -51,30 +48,30 @@ public class AppUsageStatisticsService {
         this.userName = userName;
     }
 
-    public List<AppResponseTimeDTO> getResponseTimesByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppResponseTimeDTO> getResponseTimesByApps(String providerName, String fromDate, String toDate,
                                                            int limit, String tenantDomain)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getResponseTimesByAPIs(providerName, fromDate, toDate, limit, tenantDomain);
+            return appUsageStatisticsClient.getResponseTimesByApps(providerName, fromDate, toDate, limit, tenantDomain);
         }
     }
 
-    public List<AppVersionUsageDTO> getUsageByAPIVersions(String providerName,
+    public List<AppVersionUsageDTO> getUsageByAppVersions(String providerName,
                                                           String apiName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getUsageByAPIVersions(providerName, apiName);
+            return appUsageStatisticsClient.getUsageByAppVersions(providerName, apiName);
         }
     }
 
-    public List<AppUsageDTO> getUsageByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppUsageDTO> getUsageByApps(String providerName, String fromDate, String toDate,
                                             int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getUsageByAPIs(providerName, fromDate, toDate, limit, tenantDomainName);
+            return appUsageStatisticsClient.getUsageByApps(providerName, fromDate, toDate, limit, tenantDomainName);
         }
     }
 
@@ -83,37 +80,29 @@ public class AppUsageStatisticsService {
         return appUsageStatisticsClient.getUsageBySubscribers(providerName, apiName, limit);
     }
 
-    public List<AppResourcePathUsageDTO> getAPIUsageByResourcePath(String providerName, String fromDate, String toDate)
+    public List<AppResourcePathUsageDTO> getAppUsageByResourcePath(String providerName, String fromDate, String toDate)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getAPIUsageByResourcePath(providerName, fromDate, toDate);
+            return appUsageStatisticsClient.getAppUsageByResourcePath(providerName, fromDate, toDate);
         }
     }
 
-    public List<AppPageUsageDTO> getAPIUsageByPage(String providerName, String fromDate, String toDate
+    public List<AppPageUsageDTO> getAppUsageByPage(String providerName, String fromDate, String toDate
             , String tenantDomainName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
+            return appUsageStatisticsClient.getAppUsageByPage(providerName, fromDate, toDate, tenantDomainName);
         }
     }
 
-    public List<AppUsageByUserDTO> getAPIUsageByUser(String providerName, String fromDate, String toDate,
+    public List<AppUsageByUserDTO> getAppUsageByUser(String providerName, String fromDate, String toDate,
                                                      String tenantDomainName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
-        }
-    }
-
-    public List<AppMCacheCountDTO> getCacheHitCount(String providerName, String fromDate, String toDate)
-            throws AppUsageQueryServiceClientException, SQLException, XMLStreamException {
-        synchronized (userName) {
-            appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getCacheHitCount(providerName, fromDate, toDate);
+            return appUsageStatisticsClient.getAppUsageByUser(providerName, fromDate, toDate, tenantDomainName);
         }
     }
 
@@ -126,21 +115,21 @@ public class AppUsageStatisticsService {
         }
     }
 
-    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByAPI(String providerName, String fromDate, String toDate
-            , int limit, String tenantDomainName)
+    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByApps(String providerName, String fromDate,
+                                                                      String toDate, int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getLastAccessTimesByAPI(providerName, fromDate, toDate, limit,
-                                                                    tenantDomainName);
+            return appUsageStatisticsClient.getLastAccessTimesByApps(providerName, fromDate, toDate, limit,
+                                                                     tenantDomainName);
         }
     }
 
-    public List<AppResponseFaultCountDTO> getAPIFaultyAnalyzeByTime(String providerName)
+    public List<AppResponseFaultCountDTO> getAppFaultyAnalyzeByTime(String providerName)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getAPIFaultyAnalyzeByTime(providerName);
+            return appUsageStatisticsClient.getAppFaultyAnalyzeByTime(providerName);
         }
     }
 
@@ -152,11 +141,11 @@ public class AppUsageStatisticsService {
         }
     }
 
-    public List<AppResponseFaultCountDTO> getAPIResponseFaultCount(String providerName, String fromDate, String toDate)
+    public List<AppResponseFaultCountDTO> getAppResponseFaultCount(String providerName, String fromDate, String toDate)
             throws AppUsageQueryServiceClientException {
         synchronized (userName) {
             appUsageStatisticsClient.initialize(userName);
-            return appUsageStatisticsClient.getAPIResponseFaultCount(providerName, fromDate, toDate);
+            return appUsageStatisticsClient.getAppResponseFaultCount(providerName, fromDate, toDate);
         }
     }
 

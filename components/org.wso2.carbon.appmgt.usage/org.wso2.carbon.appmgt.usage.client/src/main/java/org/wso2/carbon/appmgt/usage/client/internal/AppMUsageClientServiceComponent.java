@@ -25,29 +25,18 @@ import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.usage.client.impl.AppUsageStatisticsRdbmsClient;
-import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @scr.component name="org.wso2.appmgt.usage.client" immediate="true"
  * @scr.reference name="api.manager.config.service"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
  * policy="dynamic" bind="setAPIManagerConfigurationService" unbind="unsetAPIManagerConfigurationService"
- * @scr.reference name="app.manager.default.stat.usageClient"
- * interface="org.wso2.carbon.appmgt.api.AppUsageStatisticsClient" cardinality="0..n"
- * policy="dynamic" bind="setAppUsageStatisticsClient" unbind="unsetAppUsageStatisticsClient"
  */
 public class AppMUsageClientServiceComponent {
 
     private static final Log log = LogFactory.getLog(AppMUsageClientServiceComponent.class);
 
     private static AppManagerConfiguration configuration = null;
-
-    private AppUsageStatisticsClient appUsageStatisticsClient;
-    private Set<AppUsageStatisticsClient> appUsageStatisticsClients = new HashSet<>();
-    private  String appUsageStatisticsClientImplClazz;
 
     protected void activate(ComponentContext componentContext)
             throws AppUsageQueryServiceClientException {
@@ -56,23 +45,8 @@ public class AppMUsageClientServiceComponent {
         }
         BundleContext bundleContext = componentContext.getBundleContext();
         //Register the default App usage stat client as a OSGi service.
-        bundleContext.registerService(AppUsageStatisticsClient.class.getName(), new AppUsageStatisticsRdbmsClient(), null);
-
-        //Find the app usage statistics client which is proffered in the configuration and set instance of it.
-        appUsageStatisticsClientImplClazz = configuration.getFirstProperty(APIMgtUsagePublisherConstants.APP_STATISTIC_CLIENT_PROVIDER);
-        doRegisterAppUsageStatisticsClient();
-    }
-
-    private void doRegisterAppUsageStatisticsClient() {
-        for (AppUsageStatisticsClient tempAppUsageStatisticsClient : appUsageStatisticsClients) {
-            if (tempAppUsageStatisticsClient.getClass().getName().equals(appUsageStatisticsClientImplClazz)) {
-                appUsageStatisticsClient = tempAppUsageStatisticsClient;
-            }
-        }
-        if (appUsageStatisticsClient != null) {
-            org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
-                    .setAppUsageStatClient(appUsageStatisticsClient);
-        }
+        bundleContext.registerService(AppUsageStatisticsClient.class.getName(), new AppUsageStatisticsRdbmsClient(),
+                                      null);
     }
 
     protected void deactivate(ComponentContext componentContext) {
@@ -93,14 +67,5 @@ public class AppMUsageClientServiceComponent {
         return configuration;
     }
 
-    protected void setAppUsageStatisticsClient(AppUsageStatisticsClient appUsageStatClient) {
-        log.debug("App usage stat client bind method is calling");
-        appUsageStatisticsClients.add(appUsageStatClient);
-        doRegisterAppUsageStatisticsClient();
-    }
 
-    protected void unsetAppUsageStatisticsClient(AppUsageStatisticsClient appUsageStatClient) {
-        log.debug("App usage stat client unbind method is calling");
-        appUsageStatisticsClients.remove(appUsageStatClient);
-    }
 }

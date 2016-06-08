@@ -49,9 +49,6 @@ public class AppResponseTime {
         for(int x = 1;x<pageName.length;x++){
             referer =referer + "/"+pageName[x] ;
         }
-
-            /*responseCount = (long) Double.parseDouble(row.getFirstChildWithName(new QName(
-                    APIUsageStatisticsClientConstants.RESPONSE)).getText());*/
     }
 
     public String getApiName() {

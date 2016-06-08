@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.appmgt.api;
 
+import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
 import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
@@ -25,15 +26,10 @@ import org.wso2.carbon.appmgt.api.dto.AppUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionLastAccessTimeDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionUserUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.AppMCacheCountDTO;
-import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
 import org.wso2.carbon.appmgt.api.dto.PerUserAPIUsageDTO;
 import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 
-import javax.xml.stream.XMLStreamException;
-import java.sql.SQLException;
 import java.util.List;
-
 
 public interface AppUsageStatisticsClient {
 
@@ -54,7 +50,7 @@ public interface AppUsageStatisticsClient {
      * @return a List of AppUsageDTO objects - possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException if an error occurs while contacting backend services
      */
-    public List<AppUsageDTO> getUsageByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppUsageDTO> getUsageByApps(String providerName, String fromDate, String toDate,
                                             int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException;
 
@@ -68,10 +64,9 @@ public interface AppUsageStatisticsClient {
      * @return a List of AppVersionUsageDTO objects, possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
      */
-    public List<AppVersionUsageDTO> getUsageByAPIVersions(String providerName,
+    public List<AppVersionUsageDTO> getUsageByAppVersions(String providerName,
                                                           String apiName)
             throws AppUsageQueryServiceClientException;
-
 
     /**
      * Returns a list of AppVersionUsageDTO objects that contain information related to a
@@ -85,10 +80,9 @@ public interface AppUsageStatisticsClient {
      * @return AppVersionUsageDTO
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException
      */
-    public List<AppVersionUsageDTO> getUsageByAPIVersions(String providerName, String apiName,
+    public List<AppVersionUsageDTO> getUsageByAppVersions(String providerName, String apiName,
                                                           String fromDate, String toDate)
             throws AppUsageQueryServiceClientException;
-
 
     /**
      * Returns a list of AppResourcePathUsageDTO objects that contain information related to a
@@ -101,14 +95,25 @@ public interface AppUsageStatisticsClient {
      * @return a List of AppResourcePathUsageDTO objects, possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
      */
-    public List<AppResourcePathUsageDTO> getAPIUsageByResourcePath(String providerName, String fromDate,
+    public List<AppResourcePathUsageDTO> getAppUsageByResourcePath(String providerName, String fromDate,
                                                                    String toDate)
             throws AppUsageQueryServiceClientException;
 
-    public List<AppPageUsageDTO> getAPIUsageByPage(String providerName, String fromDate, String toDate,
+    /**
+     * Returns a list of AppPageUsageDTO objects that contain information related to a
+     * particular WebApp of a specified provider, along with the number of WebApp calls processed
+     * by each resource page of that WebApp.
+     *
+     * @param providerName Name of the WebApp provider
+     * @param fromDate
+     * @param toDate
+     * @param tenantDomainName
+     * @return a List of AppPageUsageDTO objects, possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
+    public List<AppPageUsageDTO> getAppUsageByPage(String providerName, String fromDate, String toDate,
                                                    String tenantDomainName)
             throws AppUsageQueryServiceClientException;
-
 
     /**
      * Returns a list of AppUsageByUserDTO objects that contain information related to
@@ -121,7 +126,7 @@ public interface AppUsageStatisticsClient {
      * @return a List of AppUsageByUserDTO objects, possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
      */
-    public List<AppUsageByUserDTO> getAPIUsageByUser(String providerName, String fromDate, String toDate,
+    public List<AppUsageByUserDTO> getAppUsageByUser(String providerName, String fromDate, String toDate,
                                                      String tenantDomainName)
             throws AppUsageQueryServiceClientException;
 
@@ -138,18 +143,6 @@ public interface AppUsageStatisticsClient {
             throws AppUsageQueryServiceClientException;
 
     /**
-     * Get cache hit summary.
-     *
-     * @param providerName Name of the WebApp provider
-     * @param fromDate String
-     * @param toDate   String
-     * @return AppMCacheCountDTO App cache hits stats list.
-     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException
-     */
-    public List<AppMCacheCountDTO> getCacheHitCount(String providerName, String fromDate, String toDate)
-            throws AppUsageQueryServiceClientException, SQLException, XMLStreamException;
-
-    /**
      * Gets a list of AppResponseTimeDTO objects containing information related to Apps belonging
      * to a particular provider along with their average response times.
      *
@@ -161,7 +154,7 @@ public interface AppUsageStatisticsClient {
      * @return a List of AppResponseTimeDTO objects, possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
      */
-    public List<AppResponseTimeDTO> getResponseTimesByAPIs(String providerName, String fromDate, String toDate,
+    public List<AppResponseTimeDTO> getResponseTimesByApps(String providerName, String fromDate, String toDate,
                                                            int limit, String tenantDomain)
             throws AppUsageQueryServiceClientException;
 
@@ -178,8 +171,8 @@ public interface AppUsageStatisticsClient {
      * @return a list of AppVersionLastAccessTimeDTO objects, possibly empty
      * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
      */
-    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByAPI(String providerName, String fromDate,
-                                                                     String toDate, int limit, String tenantDomainName)
+    public List<AppVersionLastAccessTimeDTO> getLastAccessTimesByApps(String providerName, String fromDate,
+                                                                      String toDate, int limit, String tenantDomainName)
             throws AppUsageQueryServiceClientException;
 
     /**
@@ -196,19 +189,61 @@ public interface AppUsageStatisticsClient {
     public List<PerUserAPIUsageDTO> getUsageBySubscribers(String providerName, String apiName, int limit)
             throws AppUsageQueryServiceClientException;
 
-    public List<AppResponseFaultCountDTO> getAPIResponseFaultCount(String providerName, String fromDate,
+    /**
+     * Returns list of AppResponseFaultCountDTO objects related to a particular fault.
+     *
+     * @param providerName WebApp provider name
+     * @param fromDate
+     * @param toDate
+     * @return a List of AppResponseFaultCountDTO objects - Possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
+    public List<AppResponseFaultCountDTO> getAppResponseFaultCount(String providerName, String fromDate,
                                                                    String toDate)
             throws AppUsageQueryServiceClientException;
 
-    public List<AppResponseFaultCountDTO> getAPIFaultyAnalyzeByTime(String providerName)
+    /**
+     * Returns list of AppResponseFaultCountDTO objects related to a particular fault.
+     *
+     * @param providerName WebApp provider name
+     * @return a List of AppResponseFaultCountDTO objects - Possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
+    public List<AppResponseFaultCountDTO> getAppFaultyAnalyzeByTime(String providerName)
             throws AppUsageQueryServiceClientException;
 
+    /**
+     * Returns list of PerUserAPIUsageDTO objects related to a particular provider.
+     *
+     * @param providerName WebApp provider name
+     * @param apiName
+     * @param apiVersion
+     * @param limit
+     * @return a List of PerUserAPIUsageDTO objects - Possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
     public List<PerUserAPIUsageDTO> getUsageBySubscribers(String providerName, String apiName,
                                                           String apiVersion, int limit)
             throws AppUsageQueryServiceClientException;
 
+    /**
+     * Returns list of AppVersionUserUsageDTO objects related to a particular subscriber.
+     *
+     * @param subscriberName
+     * @param period
+     * @return a List of AppVersionUserUsageDTO objects - Possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
     public List<AppVersionUserUsageDTO> getUsageBySubscriber(String subscriberName, String period)
             throws Exception;
 
+    /**
+     * Returns list of String.
+     *
+     * @param providerName
+     * @param limit
+     * @return a List of String- Possibly empty
+     * @throws org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException on error
+     */
     public List<String> getFirstAccessTime(String providerName, int limit) throws AppUsageQueryServiceClientException;
 }

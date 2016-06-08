@@ -36,8 +36,6 @@ import java.util.Map;
 
 public class APPMgtUsageHandler extends AbstractHandler {
 
-    private static final String URL_SEPERATOR = "/";
-    private static final String API_AUTH_CONTEXT = "__API_AUTH_CONTEXT";
     private static final Log log = LogFactory.getLog(APPMgtUsageHandler.class);
     private volatile APIMgtUsageDataPublisher publisher;
     private String publisherClass =
@@ -85,7 +83,8 @@ public class APPMgtUsageHandler extends AbstractHandler {
         if (saml2CookieValue != null) {
             String fullRequestPath =
                     String.valueOf(messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH));
-            AuthenticationContext authContext = (AuthenticationContext) messageContext.getProperty(API_AUTH_CONTEXT);
+            AuthenticationContext authContext = (AuthenticationContext) messageContext.getProperty(
+                    APIMgtUsagePublisherConstants.API_AUTH_CONTEXT);
 
             if (publisher == null) {
                 synchronized (this) {
@@ -157,7 +156,6 @@ public class APPMgtUsageHandler extends AbstractHandler {
             cacheStatPublisherDTO.setFullRequestPath(fullRequestPath);
             publisher.publishEvent(cacheStatPublisherDTO);
         }
-
     }
 
     public boolean handleResponse(MessageContext mc) {

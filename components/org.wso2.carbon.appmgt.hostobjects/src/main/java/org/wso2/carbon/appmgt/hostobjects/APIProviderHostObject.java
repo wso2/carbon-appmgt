@@ -42,8 +42,19 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
+import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseTimeDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageByUserDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppVersionLastAccessTimeDTO;
 import org.wso2.carbon.appmgt.api.dto.AppVersionUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.PerUserAPIUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
+import org.wso2.carbon.appmgt.api.dto.UserHitsPerAppDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
@@ -73,18 +84,6 @@ import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
-import org.wso2.carbon.appmgt.api.dto.AppResponseTimeDTO;
-import org.wso2.carbon.appmgt.api.dto.AppUsageByUserDTO;
-import org.wso2.carbon.appmgt.api.dto.AppUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.AppVersionLastAccessTimeDTO;
-import org.wso2.carbon.appmgt.api.dto.AppMCacheCountDTO;
-import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
-import org.wso2.carbon.appmgt.api.dto.PerUserAPIUsageDTO;
-import org.wso2.carbon.appmgt.api.dto.UserHitsPerAppDTO;
-import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -94,7 +93,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.net.ssl.SSLHandshakeException;
-import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
@@ -102,7 +100,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2580,7 +2577,7 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
-            list = appUsageStatisticsService.getUsageByAPIVersions(providerName, apiName);
+            list = appUsageStatisticsService.getUsageByAppVersions(providerName, apiName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIVersionUsage", e);
         }
@@ -2624,7 +2621,7 @@ public class APIProviderHostObject extends ScriptableObject {
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(userName);
-            list = appUsageStatisticsService.getUsageByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
+            list = appUsageStatisticsService.getUsageByApps(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (AppUsageQueryServiceClientException e) {
             handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2709,7 +2706,7 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
-            list = appUsageStatisticsService.getAPIUsageByResourcePath(providerName, fromDate, toDate);
+            list = appUsageStatisticsService.getAppUsageByResourcePath(providerName, fromDate, toDate);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2760,7 +2757,7 @@ public class APIProviderHostObject extends ScriptableObject {
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(userName);
-            list = appUsageStatisticsService.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
+            list = appUsageStatisticsService.getAppUsageByPage(providerName, fromDate, toDate, tenantDomainName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2812,7 +2809,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     AppUsageStatisticsService(userName);
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
 
-            list = appUsageStatisticsService.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
+            list = appUsageStatisticsService.getAppUsageByUser(providerName, fromDate, toDate, tenantDomainName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2843,61 +2840,11 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
-    //cache hit
-
+    //Removed feature.
     public static NativeArray jsFunction_getcashHitMiss(Context cx, Scriptable thisObj,
                                                            Object[] args, Function funObj)
             throws AppManagementException {
-        List<AppMCacheCountDTO> list = null;
         NativeArray myn = new NativeArray(0);
-        if(!HostObjectUtils.checkDataPublishingEnabled()){
-            return myn;
-        }
-        if (args.length == 0) {
-            handleException("Invalid number of parameters.");
-        }
-        if (!HostObjectUtils.checkDataPublishingEnabled()) {
-            return myn;
-        }
-        String providerName = (String) args[0];
-        String fromDate = (String) args[1];
-        String toDate = (String) args[2];
-
-        try {
-            AppUsageStatisticsService appUsageStatisticsService = new
-                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
-            list = appUsageStatisticsService.getCacheHitCount(providerName,fromDate,toDate);
-        } catch (AppUsageQueryServiceClientException e) {
-            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
-        } catch (SQLException e) {
-            log.error("Error while executing the SQL", e);
-        } catch (XMLStreamException e) {
-            log.error("Error while reading the xml-stream", e);
-        }
-
-        Iterator it = null;
-        if (list != null) {
-            it = list.iterator();
-        }
-        int i = 0;
-        if (it != null) {
-            while (it.hasNext()) {
-                NativeObject row = new NativeObject();
-                Object usageObject = it.next();
-                AppMCacheCountDTO usage = (AppMCacheCountDTO) usageObject;
-                String userName[]=usage.getApiName().split("--");
-                String name[]=userName[1].split(":");
-                row.put("apiName", row,  name[0]);
-                row.put("version", row, usage.getVersion());
-                row.put("fullRequestPath", row, usage.getFullRequestPath());
-                row.put("cachetHit",row,usage.getCacheHit());
-                row.put("totalRequestCount", row, usage.getTotalRequestCount());
-                row.put("time", row, usage.getRequestDate());
-
-                myn.put(i, myn, row);
-                i++;
-            }
-        }
         return myn;
     }
 
@@ -2966,7 +2913,8 @@ public class APIProviderHostObject extends ScriptableObject {
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(userName);
 
-            list = appUsageStatisticsService.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10, tenantDomainName);
+            list = appUsageStatisticsService.getLastAccessTimesByApps(providerName, fromDate, toDate, 10,
+                                                                      tenantDomainName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIVersionLastAccess", e);
         }
@@ -3013,8 +2961,8 @@ public class APIProviderHostObject extends ScriptableObject {
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(userName);
-            list = appUsageStatisticsService.getResponseTimesByAPIs(providerName,
-                                                                            fromDate, toDate, 10, tenantDomainName);
+            list = appUsageStatisticsService.getResponseTimesByApps(providerName,
+                                                                    fromDate, toDate, 10, tenantDomainName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIServiceTime", e);
         }
@@ -3542,7 +3490,7 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
-            list = appUsageStatisticsService.getAPIResponseFaultCount(providerName,fromDate,toDate);
+            list = appUsageStatisticsService.getAppResponseFaultCount(providerName, fromDate, toDate);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -3584,7 +3532,7 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             AppUsageStatisticsService appUsageStatisticsService = new
                     AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
-            list = appUsageStatisticsService.getAPIFaultyAnalyzeByTime(providerName);
+            list = appUsageStatisticsService.getAppFaultyAnalyzeByTime(providerName);
         } catch (AppUsageQueryServiceClientException e) {
             log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
