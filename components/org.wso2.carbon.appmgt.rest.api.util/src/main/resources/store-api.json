@@ -1583,6 +1583,65 @@
                 }
             }
         },
+        "/apps/mobile/binaries/one-time/{id}": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "",
+                "x-wso2-response": "",
+                "summary": "Retrieving mobile application binary",
+                "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/id"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\nMobile app binary content retrieved successfully.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/tags/{tagName}/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
@@ -1719,6 +1778,13 @@
             "name": "appId",
             "in": "path",
             "description": "**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n",
+            "required": true,
+            "type": "string"
+        },
+        "uuid": {
+            "name": "uuid",
+            "in": "path",
+            "description": " APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n",
             "required": true,
             "type": "string"
         },
