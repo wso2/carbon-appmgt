@@ -15,27 +15,16 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.wso2.carbon.appmgt.api.exception;
 
-package org.wso2.carbon.appmgt.usage.client.dto;
+public class AppUsageQueryServiceClientException extends Exception{
 
-public class APIUsageDTO {
-    
-    private String apiName;
-    private long count;
-
-    public String getApiName() {
-        return apiName;
+    public AppUsageQueryServiceClientException(String message) {
+        super(message);
     }
 
-    public void setApiName(String apiName) {
-        this.apiName = apiName;
+    public AppUsageQueryServiceClientException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public long getCount() {
-        return count;
-    }
-
-    public void setCount(long count) {
-        this.count = count;
-    }
 }

@@ -16,10 +16,10 @@
 
 package org.wso2.carbon.appmgt.impl.service;
 
-import org.wso2.carbon.appmgt.api.IdentityApplicationManagementAdapter;
 import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppMgtXACMLPolicyTemplateReader;
+import org.wso2.carbon.appmgt.api.AppUsageStatisticsClient;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.indexing.service.TenantIndexingLoader;
 import org.wso2.carbon.user.core.UserRealm;
@@ -37,6 +37,7 @@ public class ServiceReferenceHolder {
     private TenantIndexingLoader indexLoader;
     private AppMgtXACMLPolicyTemplateReader xacmlPolicyTemplateReader;
     private IdentityApplicationManagementFactory identityApplicationManagementFactory;
+    private AppUsageStatisticsClient appUsageStatClient;
 
     public static ConfigurationContextService getContextService() {
         return contextService;
@@ -111,5 +112,13 @@ public class ServiceReferenceHolder {
     public void setIdentityApplicationManagementFactory(
             IdentityApplicationManagementFactory identityApplicationManagementFactory) {
         this.identityApplicationManagementFactory = identityApplicationManagementFactory;
+    }
+
+    public AppUsageStatisticsClient getAppUsageStatClient() {
+        return appUsageStatClient;
+    }
+
+    public void setAppUsageStatClient(AppUsageStatisticsClient appUsageStatClient) {
+        this.appUsageStatClient = appUsageStatClient;
     }
 }

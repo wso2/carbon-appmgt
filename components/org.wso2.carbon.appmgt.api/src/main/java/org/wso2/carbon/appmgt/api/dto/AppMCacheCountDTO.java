@@ -1,9 +1,9 @@
-package org.wso2.carbon.appmgt.usage.client.dto;
+package org.wso2.carbon.appmgt.api.dto;
 
 /**
  * Created by binalip91 on 2/28/15.
  */
-public class APPMCacheCountDTO {
+public class AppMCacheCountDTO {
 
     private String apiName;
     private String version;
