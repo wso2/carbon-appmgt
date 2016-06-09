@@ -4193,7 +4193,8 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
         NativeArray fileNames = (NativeArray) args[0];
         for(int i = 0;i<fileNames.getLength(); i++){
-            apiProvider.removeBinaryFromStorage(fileNames.get(i).toString());
+            apiProvider.removeBinaryFromStorage(HostObjectUtils.getBinaryStorageConfiguration() +
+                    fileNames.get(i).toString());
         }
     }
 }

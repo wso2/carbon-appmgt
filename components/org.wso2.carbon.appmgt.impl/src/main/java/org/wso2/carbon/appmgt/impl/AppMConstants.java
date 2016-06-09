@@ -222,6 +222,7 @@ public final class AppMConstants {
     public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
     public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
     public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
+    public static final String MOBILE_APP_TYPE_PUBLIC= "public";
 
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";

@@ -64,7 +64,7 @@ public class RestApiPublisherUtils {
     public static String uploadFileIntoStorage(FileContent fileContent) throws AppManagementException {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
+        String directoryLocation =
                 appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
         File binaryFile = new File(directoryLocation);
         //Generate UUID for the uploading file

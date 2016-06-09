@@ -1400,6 +1400,64 @@ paths:
             is not met.
           schema:
             $ref: '#/definitions/Error'
+  '/apps/mobile/binaries/one-time/{uuid}':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      summary: Retrieving mobile application binary
+      description: |
+        Retrieving .apk and .ipa binaries for mobile apps.
+      parameters:
+        - $ref: '#/parameters/uuid'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+            Mobile app binary content retrieved successfully.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time at which the resource was last modified.
+                Used by caches or in conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Requested entity does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
   '/tags/{tagName}/apps/{appType}':
     get:
       x-scope: 'appm:read'
@@ -1518,6 +1576,14 @@ parameters:
       of the app, name of the App and the version.
 
       Should be formatted as **provider-name-version**.
+    required: true
+    type: string
+  uuid:
+    name: uuid
+    in: path
+    description: >
+      The UUID parameter of the one-time download link, which has the external
+      representation of a downloadable binary file
     required: true
     type: string
   appType:

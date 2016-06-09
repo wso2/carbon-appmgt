@@ -157,6 +157,19 @@ public class RestApiUtil {
      * @param log Log instance
      * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
      */
+    public static void handleForbiddenRequest(String msg, Log log) throws ForbiddenException {
+        ForbiddenException forbiddenException = buildForbiddenException(msg);
+        log.error(msg);
+        throw forbiddenException;
+    }
+
+    /**
+     * Logs the error, builds a BadRequestException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
+     */
     public static void handlePreconditionFailedRequest(String msg, Log log) throws BadRequestException {
         PreconditionFailedException preconditionFailedRequest = buildPreconditionFailedRequestException(msg);
         log.error(msg);
@@ -183,6 +196,17 @@ public class RestApiUtil {
     public static ConflictException buildConflictException(String description) {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_CONFLCIT_MESSAGE_DEFAULT, 409l, description);
         return new ConflictException(errorDTO);
+    }
+
+    /**
+     * Returns a new ConflictException
+     *
+     * @param description description of the exception
+     * @return a new ConflictException with the specified details as a response DTO
+     */
+    public static ForbiddenException buildForbiddenException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT, 403l, description);
+        return new ForbiddenException(errorDTO);
     }
 
 
@@ -518,7 +542,7 @@ public class RestApiUtil {
         File storageFile = null;
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String filePath = CarbonUtils.getCarbonHome() + File.separator +
+        String filePath =
                 appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
         storageFile = new File(filePath);
         return storageFile;

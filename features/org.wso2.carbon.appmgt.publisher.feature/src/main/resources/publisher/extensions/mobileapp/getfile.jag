@@ -10,12 +10,7 @@ if (matcher.match('/{context}/api/mobileapp/getfile/{filename}')) {
 
     var binaryFileLocation = apiProvider.getBinaryFileStorage();
 
-    if (binaryFileLocation.substring(0, 1) === "/") {
-        var path = binaryFileLocation + fileName;
-    } else {
-        var path = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + fileName;
-    }
-
+    var path = binaryFileLocation + fileName;
     var mime = "application/octet-stream"
 
     var ext = (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName) : undefined;
