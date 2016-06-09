@@ -150,6 +150,26 @@ public class AppsApi  {
     {
     return delegate.appsMobileBinariesFileNameGet(fileName,ifMatch,ifUnmodifiedSince);
     }
+
+    @GET
+    @Path("/mobile/binaries/one-time/{uuid}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieving mobile application binary", notes = "Retrieving .apk and .ipa binaries for mobile apps. ", response = File.class, tags={ "MobileApps",  })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. Mobile app binary content retrieved successfully. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. Invalid request or validation error. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. Requested entity does not exist. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. The request has not been performed because one of the preconditions is not met. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden.\nThe request must be conditional but no condition has been specified.") })
+    public Response appsMobileBinariesOneTimeUuidGet(
+            @ApiParam(value = "The UUID parameter of the one-time download link, which has the external representation of a downloadable binary file",required=true) @PathParam("uuid") String uuid,
+            @ApiParam(value = "Validator for conditional requests; based on ETag. " )@HeaderParam("If-Match") String ifMatch,
+            @ApiParam(value = "Validator for conditional requests; based on the Last Modified header. " )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+    {
+        return delegate.appsMobileBinariesOneTimeUuidGet(uuid,ifMatch,ifUnmodifiedSince);
+    }
+
     @GET
     @Path("/static-contents/{fileName}")
     @Consumes({ "application/json" })

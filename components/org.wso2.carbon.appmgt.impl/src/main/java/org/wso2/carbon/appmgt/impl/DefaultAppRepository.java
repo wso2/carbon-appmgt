@@ -302,7 +302,7 @@ public class DefaultAppRepository implements AppRepository {
         PreparedStatement preparedStatement = null;
         OneTimeDownloadLink oneTimeDownloadLink = null;
         String queryToRetrieveOneTimeDownloadLinkDetails =
-                "SELECT BINARY_FILE, IS_DOWNLOADED APM_ONE_TIME_DOWNLOAD_LINK WHERE UUID = ?";
+                "SELECT BINARY_FILE, IS_DOWNLOADED FROM APM_ONE_TIME_DOWNLOAD_LINK WHERE UUID = ?";
         ResultSet downloadLinkData = null;
         try {
             connection = getRDBMSConnectionWithoutAutoCommit();
@@ -311,9 +311,10 @@ public class DefaultAppRepository implements AppRepository {
             downloadLinkData = preparedStatement.executeQuery();
             while (downloadLinkData.next()){
                 oneTimeDownloadLink = new OneTimeDownloadLink();
+                oneTimeDownloadLink.setUUID(UUID);
                 oneTimeDownloadLink.setFileName(downloadLinkData.getString("BINARY_FILE"));
                 oneTimeDownloadLink.setDownloaded(downloadLinkData.getBoolean("IS_DOWNLOADED"));
-                oneTimeDownloadLink.setCreatedTime(downloadLinkData.getTimestamp("CREATED_TIME").getTime());
+//                oneTimeDownloadLink.setCreatedTime(downloadLinkData.getTimestamp("CREATED_TIME").getTime());
             }
 
         } catch (SQLException e) {
@@ -337,7 +338,6 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatement = connection.prepareStatement(queryToUpdateOneTimeDownloadLinkStatus);
             preparedStatement.setBoolean(1, oneTimeDownloadLink.isDownloaded());
             preparedStatement.setString(2, oneTimeDownloadLink.getUUID());
-            preparedStatement.executeQuery();
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -354,13 +354,6 @@ public class DefaultAppRepository implements AppRepository {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
     }
-
-
-    @Override
-    public boolean isDownloadable(String uuid) throws AppManagementException {
-        return false;
-    }
-
     // ------------------- END : Repository API implementation methods. ----------------------------------
 
     private AppFactory getAppFactory(String appType) {

@@ -29,13 +29,7 @@ import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Subscription;
-import org.wso2.carbon.appmgt.api.model.Tag;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
@@ -99,16 +93,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
-
-            //check app validity
-            Map<String, String> searchTerms = new HashMap<String, String>();
-            searchTerms.put("id", appId);
-            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
-            if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
-            }
-
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -311,6 +295,50 @@ public class AppsApiServiceImpl extends AppsApiService {
                 + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
         response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
         return response.build();
+    }
+
+    /**
+     * Mobile app one-time download API
+     *
+     * @param uuid              one-time download link uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsMobileBinariesOneTimeUuidGet(String uuid, String ifMatch, String ifUnmodifiedSince) {
+        File binaryFile = null;
+        String contentType = null;
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if (oneTimeDownloadLink.isDownloaded()) {
+                RestApiUtil.handleForbiddenRequest("App binary one-time download API resource access with uuid '" +
+                        uuid + "' is forbidden", log);
+            }
+            String fileName = oneTimeDownloadLink.getFileName();
+            binaryFile = RestApiUtil.readFileFromStorage(fileName);
+            contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
+            if (!contentType.startsWith("application")) {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
+                        log);
+            }
+            Response.ResponseBuilder response = Response.ok((Object) binaryFile);
+            response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
+                    + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
+            response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
+            oneTimeDownloadLink.setDownloaded(true);
+            appProvider.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
+            return response.build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid downloadable link uuid", uuid, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving mobile binary via one-time download link with uuid" + uuid, e, log);
+            }
+        }
+        return null;
     }
 
     /**

@@ -1583,7 +1583,7 @@
                 }
             }
         },
-        "/apps/mobile/binaries/one-time/{id}": {
+        "/apps/mobile/binaries/one-time/{uuid}": {
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "",
@@ -1592,7 +1592,7 @@
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
                     {
-                        "$ref": "#/parameters/id"
+                        "$ref": "#/parameters/uuid"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -1635,6 +1635,12 @@
                     },
                     "412": {
                         "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1784,7 +1790,7 @@
         "uuid": {
             "name": "uuid",
             "in": "path",
-            "description": " APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n",
+            "description": "The UUID parameter of the one-time download link, which has the external representation of a downloadable binary file",
             "required": true,
             "type": "string"
         },
