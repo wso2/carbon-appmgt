@@ -31,7 +31,7 @@ $(function(){
     });
     
     // TODO : This code silently fails when enterprise subscriptions are not allowed. Handle it nicely.
-    $('#btnEnterpriseSubscriptions').popover({
+    $('.enterpriseSubscriptions').popover({
       html:true,
       placement: 'bottom',
       trigger: 'click',
@@ -81,22 +81,15 @@ $(function(){
     };
 
     var doSaveEnterpriseSubscriptions = function(subscribedEnterprises){
-
-      if(metadata){
         var subscription={};
-
-        var apiDetails=metadata.apiAssetData.attributes;
-        subscription['apiName']=apiDetails.overview_name;
-        subscription['apiVersion']=apiDetails.overview_version;
+        subscription['apiName'] = appName;
+        subscription['apiVersion'] = appVersion;
         subscription['apiTier']=getTier();
         subscription['subscriptionType'] = SUBSCRIPTION_TYPE_ENTERPRISE;
-        subscription['apiProvider']=apiDetails.overview_provider;
-        subscription['appName']="DefaultApplication";
+        subscription['apiProvider'] = appProvider;
+        subscription['appName'] = APPLICATION;
         subscription['enterprises'] = JSON.stringify(subscribedEnterprises);
         subscribeToApp(subscription);
-      }
-                
-            
     };
 
     var unSubscribe = function () {
@@ -203,7 +196,7 @@ $(function(){
     
     var updateUIAfterEnterpriseSubscription = function(subscription){
       
-      $('#btnEnterpriseSubscriptions').popover('hide');
+      $('.enterpriseSubscriptions').popover('hide');
       
       var subscribedEnterprises = JSON.parse(subscription.enterprises);
 
