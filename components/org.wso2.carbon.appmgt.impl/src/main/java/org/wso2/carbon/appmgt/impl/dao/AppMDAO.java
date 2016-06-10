@@ -7746,10 +7746,10 @@ public class AppMDAO {
      *
      * @param policyGroupId
      * @param conn
-     * @throws SQLException
+     * @throws SQLException,AppManagementException
      */
     private static void deleteXACMLPoliciesFromEntitlementService(int policyGroupId, Connection conn)
-            throws SQLException {
+            throws SQLException,AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String query = "SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";

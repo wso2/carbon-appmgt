@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.token;
+package org.wso2.carbon.appmgt.gateway.token;
 
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-  ~  Copyright (c) 2005-2015, WSO2 Inc. (http://wso2.com) All Rights Reserved.
+  ~  Copyright (c) 2016, WSO2 Inc. (http://wso2.com) All Rights Reserved.
   ~
   ~  WSO2 Inc. licenses this file to you under the Apache License,
   ~  Version 2.0 (the "License"); you may not use this file except
@@ -25,7 +25,7 @@
             <property name="STATUS" value="Message dispatched to the main sequence. Invalid URL."/>
             <property name="RESOURCE" expression="fn:concat('/', $axis2:REST_URL_POSTFIX)"/>
         </log>
-	<!--Removing Build sequence as it is of no use when used with PT Transport-->
+        <!--Removing Build sequence as it is of no use when used with PT Transport-->
         <!--sequence key="_build_"/-->
         <filter source="$ctx:TRANSPORT_DENIED" regex="true">
             <payloadFactory>
@@ -63,7 +63,7 @@
             <else>
                 <class name="org.wso2.carbon.appmgt.custom.mediators.redirection.RefererRewriteMediator"/>
                 <header name="Location" expression="$trp:referer" scope="transport"/>
-                <property name="HTTP_SC" value="303" scope="axis2"/>                
+                <property name="HTTP_SC" value="303" scope="axis2"/>
                 <respond/>
             </else>
         </filter>

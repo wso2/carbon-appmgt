@@ -76,7 +76,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.services.appm" immediate="true"
+ * @scr.component name="org.wso2.appmgt.impl.services.appm" immediate="true"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"

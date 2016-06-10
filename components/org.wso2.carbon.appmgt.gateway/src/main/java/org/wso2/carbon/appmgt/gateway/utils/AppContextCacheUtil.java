@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.utils;
+package org.wso2.carbon.appmgt.gateway.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +25,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 
 import javax.cache.Cache;
 import javax.cache.Caching;

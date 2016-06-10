@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.token;
+package org.wso2.carbon.appmgt.gateway.token;
 
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
@@ -28,6 +28,8 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.token.ClaimsRetriever;
+import org.wso2.carbon.appmgt.impl.token.JWTSignatureAlgorithm;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
@@ -96,7 +98,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Reads the ClaimsRetrieverImplClass from app-manager.xml ->
      * AppConsumerAuthConfiguration -> ClaimsRetrieverImplClass.
      *
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     public AbstractJWTGenerator() {
 
@@ -142,7 +144,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param webApp
      * @param messageContext
      * @return jwt token
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     public String generateToken(Map<String, Object> saml2Assertions, WebApp webApp,
                                 MessageContext messageContext) throws AppManagementException {
@@ -248,7 +250,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param assertion
      * @param endUserName
      * @return signed assertion
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     private byte[] signJWT(String assertion, String endUserName) throws AppManagementException {
         int tenantId = getTenantId(endUserName);
@@ -293,7 +295,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param endUserName
      * @param tenantId
      * @return private key
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     private Key getPrivateKey(String endUserName, int tenantId) throws AppManagementException {
 
@@ -346,7 +348,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      *
      * @param endUserName
      * @return jwt header as a string
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     private String addThumbPrintToHeader(String endUserName) throws AppManagementException {
         int tenantId = getTenantId(endUserName);
@@ -372,7 +374,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param endUserName
      * @param tenantId
      * @return base 64 encoded thumb print
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     private String getBase64EncodedThumbPrint(String endUserName, int tenantId) throws AppManagementException {
         try {
@@ -410,7 +412,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param endUserName
      * @param tenantId
      * @return public certificate
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     private Certificate getPublicCertificate(String endUserName, int tenantId) throws AppManagementException {
         String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
@@ -476,7 +478,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      *
      * @param userName
      * @return tenantId
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @throws AppManagementException
      */
     protected int getTenantId(String userName) throws AppManagementException {
         int tenantId;

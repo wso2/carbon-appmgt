@@ -32,7 +32,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 import java.io.File;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.configuration.services" immediate="true"
+ * @scr.component name="org.wso2.appmgt.impl.configuration.services" immediate="true"
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService"
  * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService"

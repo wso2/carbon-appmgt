@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.configuration.services" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.usage.publisher.services" immediate="true"
  * @scr.reference name="tomcat.service.provider"
  * interface="org.wso2.carbon.tomcat.api.CarbonTomcatService"
  * cardinality="1..1" policy="dynamic" bind="setCarbonTomcatService"
