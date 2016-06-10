@@ -33,7 +33,7 @@ public interface EntitlementService {
     /**
      * Initializes the service.
      */
-    void init();
+    void init() throws AppManagementException;
 
     /**
      * Saves the given policy.
@@ -46,7 +46,7 @@ public interface EntitlementService {
      * @param request Request to be checked.
      * @return true if the request is permitted, false otherwise.
      */
-    boolean isPermitted(EntitlementDecisionRequest request);
+    boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException;
 
     /**
      * Get the policy content from the policy id

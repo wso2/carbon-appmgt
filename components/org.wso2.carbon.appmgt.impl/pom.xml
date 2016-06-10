@@ -85,15 +85,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.rest.api.stub</artifactId>
-        </dependency>
-        <!-- APPM 1.1.0 <dependency>-->
-            <!--<groupId>org.wso2.carbon.apimgt</groupId>-->
-            <!--<artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>-->
-        <!--</dependency>-->
-        <dependency>
-             <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
              <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
         </dependency>
         <dependency>
@@ -109,33 +101,13 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.mediation.registry</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-        </dependency>
-	<dependency>
-           <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.sequences.stub</artifactId>
         </dependency>
         <dependency>
            <groupId>org.wso2.carbon.identity</groupId>
            <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
         </dependency>
-	<dependency>
-	   <groupId>org.wso2.carbon.mediation</groupId>
-	   <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
-	</dependency>
         <dependency>
           <groupId>org.wso2.carbon.registry</groupId>
           <artifactId>org.wso2.carbon.registry.indexing</artifactId>
@@ -169,8 +141,8 @@
           <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
       <dependency>
-          <groupId>org.wso2.carbon.mediation</groupId>
-          <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
+          <groupId>org.wso2.carbon.appmgt</groupId>
+          <artifactId>org.wso2.carbon.appmgt.gateway.stub</artifactId>
       </dependency>
       <dependency>
           <groupId>org.wso2.carbon.store</groupId>
@@ -259,7 +231,6 @@
                             javax.servlet.resources;version="${javax.servlet.imp.pkg.version}",
                             org.eclipse.equinox.http.helper,
                             org.wso2.carbon.identity.*;version="${carbon.identity.pkg.version}",
-                            org.wso2.carbon.mediation.*;version="${carbon.mediation.pkg.version}";resolution:=optional,
                             org.wso2.carbon.um.ws.api.stub.*;version="${carbon.identity.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>

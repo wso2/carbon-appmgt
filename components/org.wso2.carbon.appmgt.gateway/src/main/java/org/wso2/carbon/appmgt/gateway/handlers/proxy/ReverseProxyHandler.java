@@ -159,6 +159,13 @@ public class ReverseProxyHandler extends AbstractHandler {
 
 		int firstSlashIndex = oldPath.indexOf("/");
 		boolean pathEndsWithSlash = oldPath.endsWith("/");
+		boolean pathStartsWithSlash = oldPath.startsWith("/");
+
+		if (pathStartsWithSlash && oldPath.length() > 1) { //eg: "/coffeeshop/" but not "/"
+			String[] contextSeparatedPath = oldPath.split("/");
+			oldPath = oldPath.substring(contextSeparatedPath[1].length() + 1, oldPath.length());
+		}
+
 		if (firstSlashIndex >= 0) {
 			int lastPosition = pathEndsWithSlash ? oldPath.length() - 1 : oldPath.length();
 			oldPath = oldPath.substring(firstSlashIndex, lastPosition);

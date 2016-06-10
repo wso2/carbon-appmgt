@@ -222,6 +222,7 @@ public final class AppMConstants {
     public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
     public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
     public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
+    public static final String MOBILE_APP_TYPE_PUBLIC= "public";
 
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";
@@ -698,8 +699,10 @@ public final class AppMConstants {
     public static final int API_AUTH_FORBIDDEN = 900908;
 
     public static final String ANALYTICS = "Analytics.";
-    public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = ANALYTICS
-            + "UIActivityBAMPublishEnabled";
+    public static final String APP_USAGE_DAS_UI_ACTIVITY_ENABLED = ANALYTICS
+            + "UIActivityDASPublishEnabled";
+    public static final String DATA_SOURCE_NAME = ANALYTICS + "DataSourceName";
+    public static final String APP_STATISTIC_CLIENT_PROVIDER = ANALYTICS + "StatisticClientProvider";
 
     public static final String EXTERNAL_APP_STORES_LOCATION = APPMGT_APPLICATION_DATA_LOCATION
             + "/external-app-stores.xml";

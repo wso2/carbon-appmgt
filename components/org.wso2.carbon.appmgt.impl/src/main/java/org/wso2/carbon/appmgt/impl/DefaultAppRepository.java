@@ -11,14 +11,12 @@ import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
-import org.wso2.carbon.appmgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
-import org.wso2.carbon.appmgt.impl.workflow.*;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -256,6 +254,106 @@ public class DefaultAppRepository implements AppRepository {
         return subscriptionId;
     }
 
+    /**
+     * Persist one-tim download link reference in database
+     * @param oneTimeDownloadLink
+     * @throws AppManagementException
+     */
+    @Override
+    public void persistOneTimeDownloadLink(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException {
+        Connection connection = null;
+
+        PreparedStatement preparedStatement = null;
+        String queryToPersistOneTimeDownload =
+                "INSERT INTO APM_ONE_TIME_DOWNLOAD_LINK (BINARY_FILE,UUID,IS_DOWNLOADED,CREATED_TIME) VALUES (?,?,?,?)";
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            preparedStatement = connection.prepareStatement(queryToPersistOneTimeDownload);
+            preparedStatement.setString(1, oneTimeDownloadLink.getFileName());
+            preparedStatement.setString(2, oneTimeDownloadLink.getUUID());
+            preparedStatement.setBoolean(3, oneTimeDownloadLink.isDownloaded());
+            preparedStatement.setTimestamp(4, new Timestamp(new java.util.Date().getTime()));
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(
+                        String.format("Couldn't rollback save operation of one-time download link reference for uuid "+
+                                oneTimeDownloadLink.getUUID()), e1);
+            }
+            handleException("Error occurred while persisting one-time download link reference for uuid " +
+                    oneTimeDownloadLink.getUUID(), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+    }
+
+    /**
+     * Retrieve one-time download link details from database
+     * @param UUID
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public OneTimeDownloadLink getOneTimeDownloadLinkDetails(String UUID) throws AppManagementException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        OneTimeDownloadLink oneTimeDownloadLink = null;
+        String queryToRetrieveOneTimeDownloadLinkDetails =
+                "SELECT BINARY_FILE, IS_DOWNLOADED FROM APM_ONE_TIME_DOWNLOAD_LINK WHERE UUID = ?";
+        ResultSet downloadLinkData = null;
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            preparedStatement = connection.prepareStatement(queryToRetrieveOneTimeDownloadLinkDetails);
+            preparedStatement.setString(1, UUID);
+            downloadLinkData = preparedStatement.executeQuery();
+            while (downloadLinkData.next()){
+                oneTimeDownloadLink = new OneTimeDownloadLink();
+                oneTimeDownloadLink.setUUID(UUID);
+                oneTimeDownloadLink.setFileName(downloadLinkData.getString("BINARY_FILE"));
+                oneTimeDownloadLink.setDownloaded(downloadLinkData.getBoolean("IS_DOWNLOADED"));
+//                oneTimeDownloadLink.setCreatedTime(downloadLinkData.getTimestamp("CREATED_TIME").getTime());
+            }
+
+        } catch (SQLException e) {
+
+            handleException("Error occurred while retrieving one-time download link details for uuid " +
+                    oneTimeDownloadLink.getUUID(), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, downloadLinkData);
+        }
+        return oneTimeDownloadLink;
+    }
+
+    @Override
+    public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException{
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        String queryToUpdateOneTimeDownloadLinkStatus =
+                "UPDATE APM_ONE_TIME_DOWNLOAD_LINK SET IS_DOWNLOADED=? WHERE UUID = ?";
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            preparedStatement = connection.prepareStatement(queryToUpdateOneTimeDownloadLinkStatus);
+            preparedStatement.setBoolean(1, oneTimeDownloadLink.isDownloaded());
+            preparedStatement.setString(2, oneTimeDownloadLink.getUUID());
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(
+                        String.format("Couldn't rollback update operation of one-time download link reference for uuid "+
+                                oneTimeDownloadLink.getUUID()), e1);
+            }
+            handleException("Error occurred while retrieving one-time download link details for uuid " +
+                    oneTimeDownloadLink.getUUID(), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+    }
     // ------------------- END : Repository API implementation methods. ----------------------------------
 
     private AppFactory getAppFactory(String appType) {

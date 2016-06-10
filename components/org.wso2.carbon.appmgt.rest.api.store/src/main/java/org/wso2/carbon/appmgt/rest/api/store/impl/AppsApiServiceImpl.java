@@ -29,13 +29,7 @@ import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Subscription;
-import org.wso2.carbon.appmgt.api.model.Tag;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
@@ -63,7 +57,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
-import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
+import org.wso2.carbon.appmgt.usage.publisher.AppMUIActivitiesDASDataPublisher;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.social.core.SocialActivityException;
@@ -99,16 +93,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
-
-            //check app validity
-            Map<String, String> searchTerms = new HashMap<String, String>();
-            searchTerms.put("id", appId);
-            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
-            if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
-            }
-
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -156,7 +140,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         if (events.getEvents().size() == 0) {
             RestApiUtil.handleBadRequest("Invalid event stream", log);
         }
-        APPMgtUiActivitiesBamDataPublisher appMgtBAMPublishObj = new APPMgtUiActivitiesBamDataPublisher();
+        AppMUIActivitiesDASDataPublisher appMgtBAMPublishObj = new AppMUIActivitiesDASDataPublisher();
 
         NativeObject[] statsObjectArr = new NativeObject[events.getEvents().size()];
         for (int i = 0; i < events.getEvents().size(); i++) {
@@ -314,6 +298,50 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     /**
+     * Mobile app one-time download API
+     *
+     * @param uuid              one-time download link uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsMobileBinariesOneTimeUuidGet(String uuid, String ifMatch, String ifUnmodifiedSince) {
+        File binaryFile = null;
+        String contentType = null;
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if (oneTimeDownloadLink.isDownloaded()) {
+                RestApiUtil.handleForbiddenRequest("App binary one-time download API resource access with uuid '" +
+                        uuid + "' is forbidden", log);
+            }
+            String fileName = oneTimeDownloadLink.getFileName();
+            binaryFile = RestApiUtil.readFileFromStorage(fileName);
+            contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
+            if (!contentType.startsWith("application")) {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
+                        log);
+            }
+            Response.ResponseBuilder response = Response.ok((Object) binaryFile);
+            response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
+                    + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
+            response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
+            oneTimeDownloadLink.setDownloaded(true);
+            appProvider.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
+            return response.build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid downloadable link uuid", uuid, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving mobile binary via one-time download link with uuid" + uuid, e, log);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Retrieve a given static content from storage
      *
      * @param fileName          request file name
@@ -438,7 +466,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
                                    String accept, String ifNoneMatch) {
-        AppListDTO appListDTO;
 
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
@@ -463,10 +490,12 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
 
-            appListDTO = APPMappingUtil.fromAPIListToDTO(result, offset, limit);
-            if (appListDTO.getCount() == 0) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            AppListDTO appListDTO = null;
+            if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
+                appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
+
+            }else{
+                appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
 
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());

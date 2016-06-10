@@ -103,7 +103,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
@@ -303,7 +302,7 @@ public class AppMDAO {
             statementToDelete = connection.prepareStatement(queryToDelete);
             statementToDelete.setInt(1, businessOwner.getBusinessOwnerId());
             statementToDelete.executeUpdate();
-            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE, " +
+            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, " +
                     "SHOW_IN_STORE) VALUES(?,?,?, ?)";
 
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
@@ -350,7 +349,7 @@ public class AppMDAO {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT KEY, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE" +
+        String queryToGetKeyValue = "SELECT NAME, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE" +
                 " OWNER_ID = ?";
         try {
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
@@ -358,7 +357,7 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("KEY"));
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("NAME"));
                 businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
                 businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
                         ("SHOW_IN_STORE")));
@@ -461,7 +460,7 @@ public class AppMDAO {
                    }
 
             String queryToInsertRecordTwo =
-                    "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE, SHOW_IN_STORE) VALUES" +
+                    "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
                             "(LAST_INSERT_ID(),?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
@@ -7152,7 +7151,7 @@ public class AppMDAO {
             //get the connection for the AM data source
             conn = APIMgtDBUtil.getConnection();
             List<String> uuidsList;
-            if (AppManagerUtil.isUIActivityBAMPublishEnabled()) {
+            if (AppManagerUtil.isUIActivityDASPublishEnabled()) {
                 uuidsList = getAppHitStatsFromBamDBAndAppmDB(conn, userId, startIndex, pageSize,
                                                              builderDataContext);
             } else {
@@ -7175,7 +7174,7 @@ public class AppMDAO {
     }
 
     /**
-     * Get app hits when ui data activity data source hasn't set to BAM data source.
+     * Get app hits when ui data activity data source hasn't set to DAS data source.
      * @param conn Connection.
      * @param userId user Id.
      * @param startIndex pagination start index.
@@ -7235,7 +7234,7 @@ public class AppMDAO {
     }
 
     /**
-     * Get app hits when ui data activity data source has set to BAM data source.
+     * Get app hits when ui data activity data source has set to DAS data source.
      * @param appMCon Connection to App Manager database.
      * @param userId user Id.
      * @param pageSize No of elements per page.
@@ -7307,7 +7306,7 @@ public class AppMDAO {
             }
         } catch (SQLException ex) {
             throw new AppManagementException(
-                    "SQL Exception is occurred while reading driver name of BAM database connection "
+                    "SQL Exception is occurred while reading driver name of DAS database connection "
                             + " : " + ex.getMessage(), ex);
         }
         return uuidRetrivealBamQuery;
@@ -7747,10 +7746,10 @@ public class AppMDAO {
      *
      * @param policyGroupId
      * @param conn
-     * @throws SQLException
+     * @throws SQLException,AppManagementException
      */
     private static void deleteXACMLPoliciesFromEntitlementService(int policyGroupId, Connection conn)
-            throws SQLException {
+            throws SQLException,AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String query = "SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";

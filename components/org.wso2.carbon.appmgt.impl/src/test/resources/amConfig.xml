@@ -14,8 +14,8 @@
     <Analytics>
         <Enabled>false</Enabled>
         <ThriftPort>7612</ThriftPort>
-        <BAMServerURL>https://localhost:9444/</BAMServerURL>
-        <BAMUsername>admin</BAMUsername>
-        <BAMPassword>admin</BAMPassword>
+        <DASServerURL>https://localhost:9444/</DASServerURL>
+        <DASUsername>admin</DASUsername>
+        <DASPassword>admin</DASPassword>
     </Analytics>
 </APIManager>

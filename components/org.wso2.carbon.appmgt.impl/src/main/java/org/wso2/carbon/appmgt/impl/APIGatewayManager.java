@@ -21,13 +21,13 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.impl.clients.SequenceAdminServiceClient;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.RESTAPIAdminClient;
+import org.wso2.carbon.appmgt.impl.utils.AppGatewayAdminClient;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -74,11 +74,12 @@ public class APIGatewayManager {
 	 */
 	public void publishToGateway(WebApp api, APITemplateBuilder builder, String tenantDomain)
 	                                                                                      throws Exception {
+		APIIdentifier webAppId = api.getId();
 		for (Environment environment : environments) {
-			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
+			AppGatewayAdminClient client = new AppGatewayAdminClient(webAppId, environment);
 			String operation; 
 			// If the WebApp exists in the Gateway
-			if (client.getVersionedWebApp(tenantDomain) != null) {
+			if (client.getVersionedWebApp(webAppId, tenantDomain) != null) {
 
 				// If the Gateway type is 'production' and the production url
 				// has been removed
@@ -87,25 +88,25 @@ public class APIGatewayManager {
 				if ((AppMConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType()) && !AppManagerUtil.isProductionEndpointsExists(api)) ||
 				    (AppMConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType()) && !AppManagerUtil.isSandboxEndpointsExists(api))) {
 					if (debugEnabled) {
-						log.debug("Removing WebApp " + api.getId().getApiName() +
+						log.debug("Removing WebApp " + webAppId.getApiName() +
 						          " from Environment " + environment.getName() +
 						          " since its relevant URL has been removed.");
 					}
 					// We need to remove the api from the environment since its
 					// relevant url has been removed.
 					operation ="delete";
-					if (client.getNonVersionedWebAppData(tenantDomain) != null) {
-						client.deleteNonVersionedWebApp(tenantDomain);
+					if (client.getNonVersionedWebAppData(webAppId, tenantDomain) != null) {
+						client.deleteNonVersionedWebApp(webAppId, tenantDomain);
 					}
-					client.deleteVersionedWebApp(tenantDomain);
-					undeployCustomSequences(api,tenantDomain, environment);
+					client.deleteVersionedWebApp(webAppId, tenantDomain);
+					undeployCustomSequences(api, tenantDomain, environment);
 				} else {
 					if (debugEnabled) {
-						log.debug("WebApp exists, updating existing WebApp " + api.getId().getApiName() +
+						log.debug("WebApp exists, updating existing WebApp " + webAppId.getApiName() +
 						          " in environment " + environment.getName());
 					}
 					operation ="update";
-					client.updateVersionedWebApp(builder, tenantDomain);
+					client.updateVersionedWebApp(builder, webAppId, tenantDomain);
 					updateCustomSequences(api, tenantDomain, environment);
 				}
 			} else {
@@ -124,18 +125,18 @@ public class APIGatewayManager {
 					continue;
 				} else {
 					if (debugEnabled) {
-						log.debug("WebApp does not exist, adding new WebApp " + api.getId().getApiName() +
+						log.debug("WebApp does not exist, adding new WebApp " + webAppId.getApiName() +
 						          " in environment " + environment.getName());
 					}
 					operation = "add";
                     if(api.isDefaultVersion()) {
-                        if (client.getNonVersionedWebAppData(tenantDomain) != null) {
-                            client.updateNonVersionedWebApp(builder, tenantDomain);
+                        if (client.getNonVersionedWebAppData(webAppId, tenantDomain) != null) {
+                            client.updateNonVersionedWebApp(builder, webAppId, tenantDomain);
                         } else {
-                            client.addNonVersionedWebApp(builder, tenantDomain);
+                            client.addNonVersionedWebApp(builder, webAppId, tenantDomain);
                         }
                     }
-					client.addVersionedWebApp(builder, tenantDomain);
+					client.addVersionedWebApp(builder, webAppId, tenantDomain);
 					deployCustomSequences(api, tenantDomain, environment);
 				}
 			}
@@ -155,21 +156,22 @@ public class APIGatewayManager {
 	 *             stop all subsequent attempts to remove from other Gateways.
 	 */
 	public void removeFromGateway(WebApp api, String tenantDomain) throws Exception {
+		APIIdentifier appId = api.getId();
 		for (Environment environment : environments) {
-			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
+			AppGatewayAdminClient client = new AppGatewayAdminClient(appId, environment);
 
-			if (client.getVersionedWebApp(tenantDomain) != null) {
+			if (client.getVersionedWebApp(appId,tenantDomain) != null) {
 				if (debugEnabled) {
-					log.debug("Removing WebApp " + api.getId().getApiName() + " From environment " +
+					log.debug("Removing WebApp " + appId.getApiName() + " From environment " +
 									  environment.getName());
 				}
 				String operation = "delete";
                 if (api.isDefaultVersion()) {
-                    if (client.getNonVersionedWebAppData(tenantDomain) != null) {
-                        client.deleteNonVersionedWebApp(tenantDomain);
+                    if (client.getNonVersionedWebAppData(appId,tenantDomain) != null) {
+                        client.deleteNonVersionedWebApp(appId,tenantDomain);
                     }
                 }
-                client.deleteVersionedWebApp(tenantDomain);
+                client.deleteVersionedWebApp(appId,tenantDomain);
 				undeployCustomSequences(api, tenantDomain, environment);
 			}
 		}
@@ -188,11 +190,12 @@ public class APIGatewayManager {
 	 *             - Thrown if a check to at least one Gateway fails.
 	 */
 	public boolean isAPIPublished(WebApp api, String tenantDomain) throws Exception {
+		APIIdentifier appId = api.getId();
 		for (Environment environment : environments) {
-			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
+			AppGatewayAdminClient client = new AppGatewayAdminClient(appId, environment);
 			// If the WebApp exists in at least one environment, consider as
 			// published and return true.
-			if (client.getVersionedWebApp(tenantDomain) != null) {
+			if (client.getVersionedWebApp(appId,tenantDomain) != null) {
 				return true;
 			}
 		}
@@ -252,11 +255,11 @@ public class APIGatewayManager {
         String inSequenceName = api.getInSequence();
         OMElement inSequence = AppManagerUtil.getCustomSequence(inSequenceName, tenantId, "in");
 
-       SequenceAdminServiceClient sequenceAdminServiceClient = new SequenceAdminServiceClient(environment);
+        AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
         if (inSequence != null) {
             inSequence.getAttribute(new QName("name")).setAttributeValue(inSeqExt);
-            sequenceAdminServiceClient.addSequence(inSequence, tenantDomain);
+            appGatewayAdminClient.addSequence(inSequence, tenantDomain);
         }
     }
 
@@ -267,11 +270,11 @@ public class APIGatewayManager {
         String outSequenceName = api.getOutSequence();
         OMElement outSequence = AppManagerUtil.getCustomSequence(outSequenceName, tenantId, "out");
 
-        SequenceAdminServiceClient sequenceAdminServiceClient = new SequenceAdminServiceClient(environment);
+        AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
         if (outSequence != null) {
             outSequence.getAttribute(new QName("name")).setAttributeValue(outSeqExt);
-            sequenceAdminServiceClient.addSequence(outSequence, tenantDomain);
+            appGatewayAdminClient.addSequence(outSequence, tenantDomain);
         }
     }
 
@@ -295,15 +298,16 @@ public class APIGatewayManager {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
                             (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
                 }
-                SequenceAdminServiceClient seqClient = new SequenceAdminServiceClient(environment);
+
+                AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
                 if (isSequenceDefined(api.getInSequence())) {
                     String inSequence = AppManagerUtil.getSequenceExtensionName(api) + "--In";
-                    seqClient.deleteSequence(inSequence, tenantDomain);
+                    appGatewayAdminClient.deleteSequence(inSequence, tenantDomain);
                 }
                 if (isSequenceDefined(api.getOutSequence())) {
                     String outSequence = AppManagerUtil.getSequenceExtensionName(api) + "--Out";
-                    seqClient.deleteSequence(outSequence, tenantDomain);
+                    appGatewayAdminClient.deleteSequence(outSequence, tenantDomain);
                 }
             } catch (Exception e) {
                 String msg = "Error in deleting the sequence from gateway";
@@ -340,15 +344,15 @@ public class APIGatewayManager {
                 }
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-                SequenceAdminServiceClient seqClient = new SequenceAdminServiceClient(environment);
+                AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
                 //If an inSequence has been added, updated or removed.
                 if (isSequenceDefined(api.getInSequence()) || isSequenceDefined(api.getOldInSequence())) {
                     String inSequenceKey = AppManagerUtil.getSequenceExtensionName(api) + "--In";
                     //If sequence already exists
-                    if (seqClient.isExistingSequence(inSequenceKey, tenantDomain)) {
+                    if (appGatewayAdminClient.isExistingSequence(inSequenceKey, tenantDomain)) {
                         //Delete existing sequence
-                        seqClient.deleteSequence(inSequenceKey, tenantDomain);
+                        appGatewayAdminClient.deleteSequence(inSequenceKey, tenantDomain);
                     }
                     //If an inSequence has been added or updated.
                     if(isSequenceDefined(api.getInSequence())){
@@ -361,9 +365,9 @@ public class APIGatewayManager {
                 if (isSequenceDefined(api.getOutSequence()) || isSequenceDefined(api.getOldOutSequence())) {
                     String outSequence = AppManagerUtil.getSequenceExtensionName(api) + "--Out";
                     //If the outSequence exists.
-                    if (seqClient.isExistingSequence(outSequence, tenantDomain)) {
+                    if (appGatewayAdminClient.isExistingSequence(outSequence, tenantDomain)) {
                         //Delete existing outSequence
-                        seqClient.deleteSequence(outSequence, tenantDomain);
+                        appGatewayAdminClient.deleteSequence(outSequence, tenantDomain);
                     }
 
                     //If an outSequence has been added or updated.

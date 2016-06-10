@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.impl.entitlement;
 
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 
@@ -34,8 +35,10 @@ public class EntitlementServiceFactory {
      * NOTE : Only XACML entitlement service is supported as of now.
      * @param configuration
      * @return
+     * @throws AppManagementException
      */
-    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration){
+    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration)
+            throws AppManagementException {
 
         String serverUrl = configuration.getFirstProperty(SERVER_URL);
         String username = configuration.getFirstProperty(USERNAME);

@@ -25,7 +25,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
-import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
+import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @scr.component name="org.wso2.appmgt.impl.services.gateway.saml.authentication.component" immediate="true"
  * @scr.reference name="app.manager.jwt.token,generator"
- * interface="org.wso2.carbon.appmgt.impl.token.TokenGenerator" cardinality="1..n"
+ * interface="org.wso2.carbon.appmgt.gateway.token.TokenGenerator" cardinality="1..n"
  * policy="dynamic" bind="setTokenGenerator" unbind="unsetTokenGenerator"
  * @scr.reference name="app.manager.config.service"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"

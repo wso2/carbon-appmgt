@@ -24,8 +24,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
-import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
-import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
+import org.wso2.carbon.appmgt.gateway.token.JWTGenerator;
+import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
 
 /**
  *

@@ -64,6 +64,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -71,16 +72,9 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -704,9 +698,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *
      * @param policyId Entitlement policy id
      * @return entitlement policy content
+     * @throws AppManagementException
      */
     @Override
-    public String getEntitlementPolicy(String policyId) {
+    public String getEntitlementPolicy(String policyId) throws AppManagementException {
         if (policyId == null) {
             return null;
         }
@@ -1164,7 +1159,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
-                        } else {
+                        } else if(status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
                             removeFromGateway(api);
                         }
                     }
@@ -2889,5 +2884,82 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         return null;
     }
+
+    /**
+     * Remove mobile applications binary files from storage
+     * @param filePath file path of the banner image, thumbnail, screenshots and app binary
+     * @throws AppManagementException
+     */
+    public void removeBinaryFromStorage(String filePath) throws AppManagementException {
+        if (StringUtils.isEmpty(filePath)) {
+            handleException("Mobile Application BinaryFileStorage Configuration cannot be found." +
+                    " Pleas check the configuration in app-management.xml ");
+        }
+
+        File binaryFile = new File(filePath);
+        if (!binaryFile.exists()) {
+            handleException("Binary file " + filePath + " does not exist");
+        }
+
+        boolean isDeleted = binaryFile.delete();
+        if (!isDeleted) {
+            handleException("Error occurred while deleting file " + filePath);
+        }
+    }
+
+    /**
+     * Persists one-time download link content in Database
+     * @param appId mobile application id that the one-time download link generated for
+     * @return UUID of the download link
+     * @throws AppManagementException
+     */
+    public String persistOneTimeDownloadLink(String appId) throws AppManagementException {
+
+        String downloadLinkUUID = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            GenericArtifact mobileAppArtifact = artifactManager.getGenericArtifact(appId);
+            if (mobileAppArtifact == null) {
+                handleResourceNotFoundException(
+                        "Failed to generate one-time download link for Mobile App. The artifact corresponding to artifactId "
+                                + appId + " does not exist");
+            }
+
+            if (!AppMConstants.MOBILE_APP_TYPE_PUBLIC.equals(mobileAppArtifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE))) {
+                OneTimeDownloadLink oneTimeDownloadLink = new OneTimeDownloadLink();
+                UUID contentUUID = UUID.randomUUID();
+                downloadLinkUUID = contentUUID.toString();
+                oneTimeDownloadLink.setUUID(downloadLinkUUID);
+                oneTimeDownloadLink.setFileName(mobileAppArtifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+                oneTimeDownloadLink.setDownloaded(false);
+                appRepository.persistOneTimeDownloadLink(oneTimeDownloadLink);
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while generating one-time download link for mobile application : " + appId, e);
+        }
+        return downloadLinkUUID;
+    }
+
+
+    /**
+     * Retrieve one-time download link details from database
+     * @param UUID UUID of the one-time download link
+     * @return
+     * @throws AppManagementException
+     */
+    public OneTimeDownloadLink getOneTimeDownloadLinkDetails(String UUID) throws AppManagementException{
+        return appRepository.getOneTimeDownloadLinkDetails(UUID);
+    }
+
+    /**
+     * Update one-time download link details in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException{
+        appRepository.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
+    }
+
 
 }

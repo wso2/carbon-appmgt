@@ -232,7 +232,7 @@
                     "200": {
                         "description": "OK.\nQualifying App is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppInfo"
+                            "$ref": "#/definitions/App"
                         },
                         "headers": {
                             "Content-Type": {
@@ -2845,16 +2845,22 @@
                     "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n",
                     "example": "/app?limit=1&offset=0&query="
                 },
-                "list": {
+                "appList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AppInfo"
+                        "$ref": "#/definitions/App"
+                    }
+                },
+                "appSummaryList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AppSummary"
                     }
                 }
             }
         },
-        "AppInfo": {
-            "title": "App Info object with basic App details.",
+        "AppSummary": {
+            "title": "App summary object with basic App details.",
             "properties": {
                 "id": {
                     "type": "string",
