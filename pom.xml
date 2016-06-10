@@ -56,6 +56,7 @@
     <module>features/org.wso2.carbon.appmgt.rest.api.store.feature</module>
     <module>features/org.wso2.carbon.appmgt.rest.api.publisher.feature</module>
     <module>features/categories</module>
+    <module>service-stubs/org.wso2.carbon.appmgt.gateway.stub</module>
   </modules>
 
   <build>
