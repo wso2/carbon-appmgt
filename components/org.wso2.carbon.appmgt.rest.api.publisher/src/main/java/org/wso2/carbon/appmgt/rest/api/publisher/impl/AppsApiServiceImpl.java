@@ -540,6 +540,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             try {
                 APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+                body.setId(appId);
                 WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
                 apiProvider.updateApp(webApp);
 
@@ -551,7 +552,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } else{
             RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
         }
-        return Response.accepted().build();
+        return Response.ok().build();
     }
 
     @Override
