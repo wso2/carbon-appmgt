@@ -332,7 +332,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void addSequence(String sequence) throws AppManagementException {
-        if (StringUtils.isEmpty(sequence)) {
+        if (!StringUtils.isEmpty(sequence)) {
             OMElement element = null;
             try {
                 element = AXIOMUtil.stringToOM(sequence);
@@ -355,7 +355,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void addSequenceForTenant(String sequence, String tenantDomain) throws AppManagementException {
-        if (StringUtils.isEmpty(sequence)) {
+        if (!StringUtils.isEmpty(sequence)) {
             OMElement element = null;
             try {
                 element = AXIOMUtil.stringToOM(sequence);

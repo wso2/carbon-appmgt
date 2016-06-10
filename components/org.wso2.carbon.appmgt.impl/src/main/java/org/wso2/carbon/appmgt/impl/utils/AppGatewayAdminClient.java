@@ -69,7 +69,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.addVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
                                                                 tenantDomain);
@@ -101,7 +101,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         WebAppData appData;
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
                                                                           tenantDomain);
@@ -134,7 +134,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.updateVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
                                                                    tenantDomain);
@@ -164,7 +164,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appVersion = apiId.getVersion();
         String appProvider = apiId.getProviderName();
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.deleteVersionedWebAppForTenant(appProvider, appName, appVersion, tenantDomain);
             } else {
@@ -193,7 +193,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.addNonVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig, tenantDomain);
             } else {
@@ -225,7 +225,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.updateNonVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
                                                                       tenantDomain);
@@ -255,7 +255,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appVersion = apiId.getVersion();
         String appProvider = apiId.getProviderName();
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.deleteNonVersionedWebAppForTenant(appProvider, appName, appVersion, tenantDomain);
             } else {
@@ -285,7 +285,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appProvider = apiId.getProviderName();
         try {
             WebAppData appData;
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appData = appGatewayAdminStub.getNonVersionedWebAppDataForTenant(appProvider, appName, appVersion,
                                                                                  tenantDomain);
@@ -316,7 +316,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
             StringWriter writer = new StringWriter();
             sequence.serializeAndConsume(writer);
             String addedSequence = writer.toString();
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.addSequenceForTenant(addedSequence, tenantDomain);
             } else {
@@ -343,7 +343,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public void deleteSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.deleteSequenceForTenant(sequenceName, tenantDomain);
             } else {
@@ -367,7 +367,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public OMElement getSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 return (OMElement) appGatewayAdminStub.getSequenceForTenant(sequenceName, tenantDomain);
             } else {
@@ -391,7 +391,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public boolean isExistingSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
-            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+            if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 return appGatewayAdminStub.isExistingSequenceForTenant(sequenceName, tenantDomain);
             } else {
