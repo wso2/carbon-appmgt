@@ -286,6 +286,16 @@ public interface APIProvider extends APIManager {
     public void updateMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
+     * patch an existing Mobile Application. This method must not be used to change Mobile App status. Implementations
+     * should throw an exceptions when such attempts are made. All life cycle state changes
+     * should be carried out using the changeAPIStatus method of this interface.
+     *
+     * @param mobileApp Mobile App
+     * @throws AppManagementException if failed to update WebApp
+     */
+    public void patchMobileApp(MobileApp mobileApp) throws AppManagementException;
+
+    /**
      * Change the lifecycle state of the specified WebApp
      *
      * @param api The WebApp whose status to be updated

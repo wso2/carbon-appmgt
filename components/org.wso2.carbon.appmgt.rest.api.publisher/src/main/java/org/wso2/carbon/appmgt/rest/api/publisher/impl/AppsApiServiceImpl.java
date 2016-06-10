@@ -330,6 +330,30 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.accepted().build();
     }
 
+
+    @Override
+    public Response appsAppTypeIdAppIdPatch(String appType, String appId, AppDTO body, String contentType, String ifMatch,
+                                          String ifUnmodifiedSince) {
+
+        if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                //TODO:APP Validations
+                //TODO:Get provider name from context (Token owner)
+                //TODO:Permission check
+                MobileApp updatingMobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
+                updatingMobileApp.setAppId(appId);
+                appProvider.patchMobileApp(updatingMobileApp);
+
+            } catch (AppManagementException e) {
+                RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
+            }
+        } else {
+            RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
+        }
+        return Response.accepted().build();
+    }
+
     @Override
     public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince) {
         try {
