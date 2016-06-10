@@ -29,6 +29,8 @@ import org.wso2.carbon.appmgt.usage.publisher.service.APIMGTConfigReaderService;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /*
  * This class is used to capture the UI activity changes events and publish to
@@ -105,7 +107,7 @@ public class AppMUIActivitiesDASDataPublisher {
                                           String appVersion, String context){
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
-             // if BAM is configured
+             // if DAS is configured
 			 if (enableUiActivityDASPublishing) {
 				 APIMGTConfigReaderService apimgtConfigReaderService = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService();
 				 String streamId = apimgtConfigReaderService.getApiManagerDasUiActivityStreamName() + ":"
@@ -113,7 +115,7 @@ public class AppMUIActivitiesDASDataPublisher {
 
 				 //Publish UIActivity Data
 				 dataPublisher.publish(streamId, System.currentTimeMillis(), new Object[]{"external"}, null,
-						 (new Object[] {appId, userId, item, action, timeStamp, tenantId, appName,
+						 (new Object[] {appId, userId, item, action, getCurrentDateTimeAsString(), tenantId, appName,
 								 appVersion, context}));
 			} else {
                 // Write directly to DB
@@ -124,4 +126,11 @@ public class AppMUIActivitiesDASDataPublisher {
             log.error("Failed to write to table : " + e.getMessage(), e);
         }
     }
+
+	private String getCurrentDateTimeAsString() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		Date now = new Date();
+		String strDate = sdfDate.format(now);
+		return strDate;
+	}
 }

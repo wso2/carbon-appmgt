@@ -450,7 +450,7 @@
             -->
         </MDMProperties>
         <BinaryFileStorage>
-            <FilePreciseLocation>repository/resources/mobileapps/</FilePreciseLocation>
+            <FilePreciseLocation>${carbon.home}/repository/resources/mobileapps/</FilePreciseLocation>
             <FileAPILocation>/api/mobileapp/getfile/</FileAPILocation>
         </BinaryFileStorage>
 

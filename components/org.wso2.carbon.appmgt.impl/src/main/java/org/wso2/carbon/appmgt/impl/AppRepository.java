@@ -3,9 +3,9 @@ package org.wso2.carbon.appmgt.impl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +77,36 @@ public interface AppRepository {
      */
     public FileContent getStaticContent(String contentId) throws AppManagementException;
 
+    /**
+     * Add user subscription for a webapp/site
+     * @param subscriberName Subscriber username
+     * @param webApp WebApp object
+     * @param applicationName Application Name
+     * @return subscription id
+     * @throws AppManagementException
+     */
     public int addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException;
+
+    /**
+     * Persist one-time download link reference in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void persistOneTimeDownloadLink(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
+
+    /**
+     * Retrieve one-time download link details from database
+     * @param UUID UUID of the one-time download link
+     * @return
+     * @throws AppManagementException
+     */
+    public OneTimeDownloadLink getOneTimeDownloadLinkDetails(String UUID) throws AppManagementException;
+
+    /**
+     * Update one-time download link details in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
 
 }

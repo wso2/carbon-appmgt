@@ -60,6 +60,7 @@ public abstract class AbstractAPIManager implements APIManager {
     protected int tenantId;
     protected String tenantDomain;
     protected String username;
+    protected AppRepository appRepository;
 
     public AbstractAPIManager() throws AppManagementException {
     }
@@ -93,6 +94,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 AppManagerUtil.loadTenantAPIPolicy( tenantUserName, tenantId);
                 AppManagerUtil.writeDefinedSequencesToTenantRegistry(tenantId);
             }
+            appRepository = new DefaultAppRepository(this.registry);
             ServiceReferenceHolder.setUserRealm(ServiceReferenceHolder.getInstance().
                     getRegistryService().getConfigSystemRegistry().getUserRealm());
             registerCustomQueries(configRegistry, username);
