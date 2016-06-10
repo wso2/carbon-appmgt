@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
+import org.wso2.carbon.sequences.services.SequenceAdminService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
 /**
@@ -33,6 +34,9 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
  * @scr.reference name="arg.wso2.appmgt.impl.services.appm"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
  * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
+ * @scr.reference name="org.wso2.carbon.sequences" immediate="true"
+ * interface="org.wso2.carbon.sequences.services.SequenceAdminService" cardinality="1..1"
+ * policy="dynamic" bind="setSequenceAdminService" unbind="unsetSequenceAdminService"
  */
 public class AppManagerGatewayComponent {
 
@@ -45,7 +49,7 @@ public class AppManagerGatewayComponent {
         BundleContext bundleContext = componentContext.getBundleContext();
 
         //Register Tenant service creator to deploy tenant specific common synapse configurations
-        TenantLoadGatewayObserver listener = new TenantLoadGatewayObserver();
+        TenantCreateGatewayObserver listener = new TenantCreateGatewayObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
 
     }
@@ -68,6 +72,20 @@ public class AppManagerGatewayComponent {
             log.debug("App manager configuration service is unset to gateway bundle");
         }
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+    }
+
+    protected void setSequenceAdminService(SequenceAdminService sequenceAdminService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Sequence service is set to gateway bundle");
+        }
+        ServiceReferenceHolder.getInstance().setSequenceAdminService(sequenceAdminService);
+    }
+
+    protected void unsetSequenceAdminService(SequenceAdminService sequenceAdminService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Sequence service is unset to gateway bundle");
+        }
+        ServiceReferenceHolder.getInstance().setSequenceAdminService(null);
     }
 
 }

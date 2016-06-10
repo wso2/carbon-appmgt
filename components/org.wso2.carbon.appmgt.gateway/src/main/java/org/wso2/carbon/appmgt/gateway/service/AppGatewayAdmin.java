@@ -19,20 +19,21 @@ package org.wso2.carbon.appmgt.gateway.service;
 
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.gateway.dto.AppData;
+import org.wso2.carbon.appmgt.gateway.dto.WebAppData;
 import org.wso2.carbon.appmgt.gateway.dto.ResourceData;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.gateway.utils.MediationSecurityAdminServiceClient;
+import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.utils.RESTAPIAdminClient;
-import org.wso2.carbon.appmgt.gateway.utils.SequenceAdminServiceClient;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
 import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
+import org.wso2.carbon.sequences.common.SequenceEditorException;
 
+import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,8 +78,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return versioned webapp configuration data.
      * @throws AppManagementException
      */
-    public AppData getVersionedWebAppForTenant(String appProviderName, String appName, String version,
-                                               String tenantDomain) throws AppManagementException {
+    public WebAppData getVersionedWebAppForTenant(String appProviderName, String appName, String version,
+                                                  String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getVersionedWebAppForTenant(tenantDomain);
         return convert(apiData);
@@ -92,7 +93,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return versioned webapp configuration data.
      * @throws AppManagementException
      */
-    public AppData getVersionedWebApp(String appProviderName, String appName, String version)
+    public WebAppData getVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getVersionedWebApp();
@@ -251,8 +252,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return non versioned webapp configuration data.
      * @throws AppManagementException
      */
-    public AppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version,
-                                                      String tenantDomain) throws AppManagementException {
+    public WebAppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version,
+                                                         String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getNonVersionedWebAppDataForTenant(tenantDomain);
         return convert(apiData);
@@ -266,18 +267,18 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return non versioned webapp configuration data.
      * @throws AppManagementException
      */
-    public AppData getNonVersionedWebAppData(String appProviderName, String appName, String version)
+    public WebAppData getNonVersionedWebAppData(String appProviderName, String appName, String version)
             throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getNonVersionedWebAppData();
         return convert(apiData);
     }
 
-    private AppData convert(APIData data) {
+    private WebAppData convert(APIData data) {
         if (data == null) {
             return null;
         }
-        AppData apiData = new AppData();
+        WebAppData apiData = new WebAppData();
         apiData.setContext(data.getContext());
         apiData.setFileName(data.getFileName());
         apiData.setHost(data.getHost());
@@ -319,8 +320,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
         if (StringUtils.isEmpty(sequence)) {
             return null;
         }
-        String processedSequence = StringUtils.replaceEach(sequence, new String[]{"&gt", "&lt", "\n", "\t" }, new
-                String[]{">", "<", "", " "});
+        String processedSequence = StringEscapeUtils.unescapeXml(sequence);
         return  processedSequence;
 
     }
@@ -332,14 +332,17 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void addSequence(String sequence) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        if (sequence != null && !sequence.isEmpty()) {
+        if (StringUtils.isEmpty(sequence)) {
             OMElement element = null;
             try {
                 element = AXIOMUtil.stringToOM(sequence);
-                client.addSequence(element);
-            } catch (Exception e) {
-                log.error("Exception occurred while converting String to an OM.");
+                ServiceReferenceHolder.getInstance().getSequenceAdminService().addSequence(element);
+            } catch (SequenceEditorException e) {
+                String errorMsg = "Error while adding the sequence : " + sequence + " for super tenant.";
+                throw new AppManagementException(errorMsg, e);
+            } catch (XMLStreamException e) {
+                String errorMsg = "Error while streaming the sequence : " + sequence + " for super tenant.";
+                throw new AppManagementException(errorMsg, e);
             }
         }
     }
@@ -352,14 +355,18 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void addSequenceForTenant(String sequence, String tenantDomain) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        if (sequence != null && !sequence.isEmpty()) {
+        if (StringUtils.isEmpty(sequence)) {
             OMElement element = null;
             try {
                 element = AXIOMUtil.stringToOM(sequence);
-                client.addSequenceForTenant(element, tenantDomain);
-            } catch (Exception e) {
-                log.error("Exception occurred while converting String to an OM.");
+                ServiceReferenceHolder.getInstance().getSequenceAdminService().addSequenceForTenant(element,
+                                                                                                    tenantDomain);
+            } catch (SequenceEditorException e) {
+                String errorMsg = "Error while adding the sequence : " + sequence + " for tenant : " + tenantDomain;
+                throw new AppManagementException(errorMsg, e);
+            } catch (XMLStreamException e) {
+                String errorMsg = "Error while streaming the sequence : " + sequence + " for super tenant.";
+                throw new AppManagementException(errorMsg, e);
             }
         }
     }
@@ -371,8 +378,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void deleteSequence(String sequenceName) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        client.deleteSequence(sequenceName);
+        try {
+            ServiceReferenceHolder.getInstance().getSequenceAdminService().deleteSequence(sequenceName);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while deleting the sequence : " + sequenceName + " for super tenant.";
+            throw new AppManagementException(errorMsg, e);
+        }
     }
 
     /**
@@ -383,8 +394,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public void deleteSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        client.deleteSequenceForTenant(sequenceName, tenantDomain);
+        try {
+            ServiceReferenceHolder.getInstance().getSequenceAdminService().deleteSequenceForTenant
+                    (sequenceName, tenantDomain);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while deleting the sequence : " + sequenceName + " for tenant : " + tenantDomain;
+            throw new AppManagementException(errorMsg, e);
+        }
     }
 
     /**
@@ -394,8 +410,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public OMElement getSequence(String sequenceName) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        return (OMElement) client.getSequence(sequenceName);
+        try {
+            return ServiceReferenceHolder.getInstance().getSequenceAdminService().getSequence(sequenceName);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while retrieving the sequence : " + sequenceName + " for super tenant.";
+            throw new AppManagementException(errorMsg, e);
+        }
     }
 
     /**
@@ -406,8 +426,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException on errors.
      */
     public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        return (OMElement) client.getSequenceForTenant(sequenceName, tenantDomain);
+        try {
+            return ServiceReferenceHolder.getInstance().getSequenceAdminService().getSequenceForTenant(sequenceName, tenantDomain);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while retrieving the sequence : " + sequenceName + " for tenant : " + tenantDomain;
+            throw new AppManagementException(errorMsg, e);
+        }
     }
 
     /**
@@ -417,8 +441,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException
      */
     public boolean isExistingSequence(String sequenceName) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        return client.isExistingSequence(sequenceName);
+        try {
+            return ServiceReferenceHolder.getInstance().getSequenceAdminService().isExistingSequence(sequenceName);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while checking for existence of sequence : " + sequenceName;
+            throw new AppManagementException(errorMsg, e);
+        }
     }
 
     /**
@@ -429,25 +457,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @throws AppManagementException
      */
     public boolean isExistingSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
-        SequenceAdminServiceClient client = new SequenceAdminServiceClient();
-        return client.isExistingSequenceForTenant(sequenceName, tenantDomain);
-    }
-
-    /**
-     * Encrypt plain text password.
-     * @param plainTextPass plain text password.
-     * @return encoded password.
-     * @throws AppManagementException on errors.
-     */
-    public String doEncryption(String plainTextPass) throws AppManagementException {
-        MediationSecurityAdminServiceClient client = new MediationSecurityAdminServiceClient();
-        String encodedValue = null;
         try {
-            encodedValue = client.doEncryption(plainTextPass);
-        } catch (AppManagementException e) {
-            String msg = "Failed to encrypt the secured endpoint password, " + e.getMessage();
-            throw new AppManagementException(msg, e);
+            return ServiceReferenceHolder.getInstance().getSequenceAdminService().isExistingSequenceForTenant
+                    (sequenceName, tenantDomain);
+        } catch (SequenceEditorException e) {
+            String errorMsg = "Error while checking for existence of sequence : " + sequenceName + "in tenant " +
+                    tenantDomain;
+            throw new AppManagementException(errorMsg, e);
         }
-        return encodedValue;
     }
 }

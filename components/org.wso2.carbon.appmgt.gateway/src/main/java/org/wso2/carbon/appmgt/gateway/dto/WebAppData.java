@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.appmgt.gateway.dto;
 
-public class AppData {
+public class WebAppData {
     private String name;
     private String host;
     private int port;

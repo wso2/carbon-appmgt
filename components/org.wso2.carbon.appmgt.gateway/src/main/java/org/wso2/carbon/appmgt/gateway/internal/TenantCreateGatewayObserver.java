@@ -45,7 +45,6 @@ import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationInitilizerException;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.registry.WSO2Registry;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 
@@ -65,19 +64,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * sandbox error handler, throttle out handler, build sequence, main sequence and fault sequence into tenant
  * synapse artifact space.
  */
-public class TenantLoadGatewayObserver extends AbstractAxis2ConfigurationContextObserver {
-    private static final Log log = LogFactory.getLog(TenantLoadGatewayObserver.class);
+public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationContextObserver {
+    private static final Log log = LogFactory.getLog(TenantCreateGatewayObserver.class);
     private String resourceMisMatchSequenceName = "_resource_mismatch_handler_";
-    private String authFailureHandlerSequenceName = "_auth_failure_handler_";
-    private String sandboxKeyErrorSequenceName = "_sandbox_key_error_";
-    private String productionKeyErrorSequenceName = "_production_key_error_";
     private String throttleOutSequenceName = "_throttle_out_handler_";
     private String buildSequenceName = "_build_";
     private String faultSequenceName = "fault";
     private String mainSequenceName = "main";
     private String saml2SequenceName = "saml2_sequence";
-    private String synapseConfigRootPath = CarbonBaseUtils.getCarbonHome() +
-            AppMConstants.SYNAPSE_CONFIG_RESOURCES_PATH;
+    private String synapseConfigRootPath = CarbonBaseUtils.getCarbonHome() + AppMConstants.SYNAPSE_CONFIG_RESOURCES_PATH;
     private SequenceMediator authFailureHandlerSequence = null;
     private SequenceMediator resourceMisMatchSequence = null;
     private SequenceMediator throttleOutSequence = null;
@@ -121,8 +116,10 @@ public class TenantLoadGatewayObserver extends AbstractAxis2ConfigurationContext
             manger.init();
 
             File synapseConfigDir = new File(synapseConfigsDir, manger.getTracker().getCurrentConfigurationName());
-            File buildSequenceFile = new File(synapseConfigsDir + "/" + manger.getTracker().getCurrentConfigurationName() +
-                    "/" + MultiXMLConfigurationBuilder.SEQUENCES_DIR + "/" + buildSequenceName + ".xml");
+            File buildSequenceFile = new File(synapseConfigsDir + File.separator + manger.getTracker()
+                    .getCurrentConfigurationName() + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR +
+                                                      File.separator + buildSequenceName + ".xml");
+
             //Here we will check build sequence exist in synapse artifact. If it is not available we will create
             //sequence synapse configurations by using resource artifacts
             if (!buildSequenceFile.exists()) {
@@ -164,20 +161,11 @@ public class TenantLoadGatewayObserver extends AbstractAxis2ConfigurationContext
 
         SynapseConfiguration initialSynapseConfig = SynapseConfigurationBuilder.getDefaultConfiguration();
         try {
-            if (authFailureHandlerSequence == null) {
-                addSequenceMediatorName(authFailureHandlerSequence, authFailureHandlerSequenceName);
-            }
             if (resourceMisMatchSequence == null) {
-                addSequenceMediatorName(resourceMisMatchSequence, resourceMisMatchSequenceName);
+                addSequenceFileName(resourceMisMatchSequence, resourceMisMatchSequenceName);
             }
             if (throttleOutSequence == null) {
-                addSequenceMediatorName(throttleOutSequence, throttleOutSequenceName);
-            }
-            if (sandboxKeyErrorSequence == null) {
-                addSequenceMediatorName(sandboxKeyErrorSequence, sandboxKeyErrorSequenceName);
-            }
-            if (productionKeyErrorSequence == null) {
-                addSequenceMediatorName(productionKeyErrorSequence, productionKeyErrorSequenceName);
+                addSequenceFileName(throttleOutSequence, throttleOutSequenceName);
             }
             FileUtils.copyFile(new File(synapseConfigRootPath + mainSequenceName + ".xml"),
                     new File(synapseConfigDir.getAbsolutePath() + File.separator + "sequences" + File.separator + mainSequenceName + ".xml"));
@@ -207,7 +195,7 @@ public class TenantLoadGatewayObserver extends AbstractAxis2ConfigurationContext
         }
     }
 
-    private void addSequenceMediatorName(SequenceMediator sequenceMediator, String sequenceName) {
+    private void addSequenceFileName(SequenceMediator sequenceMediator, String sequenceName) {
         InputStream in = null;
         try {
             in = FileUtils.openInputStream(new File(synapseConfigRootPath + sequenceName + ".xml"));

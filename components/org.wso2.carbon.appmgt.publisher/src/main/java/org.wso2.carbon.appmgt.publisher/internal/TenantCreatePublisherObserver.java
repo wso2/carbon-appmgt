@@ -29,8 +29,11 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.mgt.UserMgtConstants;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 
-public class TenantLoadPublisherObserver extends AbstractAxis2ConfigurationContextObserver {
-    private static final Log log = LogFactory.getLog(TenantLoadPublisherObserver.class);
+/**
+ * Load configuration files to tenant's registry.
+ */
+public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationContextObserver {
+    private static final Log log = LogFactory.getLog(TenantCreatePublisherObserver.class);
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();

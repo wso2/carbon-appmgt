@@ -20,7 +20,7 @@ package org.wso2.carbon.appmgt.gateway.dto;
 import org.apache.synapse.rest.RESTConstants;
 
 /**
- * Http Resources Data.
+ * REST Resources Data.
  */
 public class ResourceData {
     private String[] httpMethods;

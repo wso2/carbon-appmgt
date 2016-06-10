@@ -414,26 +414,4 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
             throw new AppManagementException(errorMsg, e);
         }
     }
-
-    /**
-     * Encrypt the plain text password.
-     *
-     * @param plainTextPass plain text password
-     * @return encrypted password
-     * @throws AppManagementException
-     */
-    private String doEncryption(String plainTextPass) throws AppManagementException {
-        String encodedValue = null;
-        try {
-            encodedValue = appGatewayAdminStub.doEncryption(plainTextPass);
-
-        } catch (AppGatewayAdminAppManagementExceptionException e) {
-            String errorMsg = "Failed to encrypt the secured endpoint password ,";
-            throw new AppManagementException(errorMsg + e.getMessage(), e);
-        } catch (RemoteException e) {
-            String errorMsg = "Failed to encrypt the secured endpoint password ,";
-            throw new AppManagementException(errorMsg + e.getMessage(), e);
-        }
-        return encodedValue;
-    }
 }

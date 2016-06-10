@@ -35,7 +35,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public RESTAPIAdminClient(String apiProviderName, String apiName, String version) throws AppManagementException {
 		try {
 			this.qualifiedName = apiProviderName + "--" + apiName + ":v" + version;
-			this.qualifiedNonVersionedWebAppName=apiProviderName + "--" + apiName;
+			this.qualifiedNonVersionedWebAppName = apiProviderName + "--" + apiName;
 			restApiAdminStub = new RestApiAdminStub(null, backendURLl + "RestApiAdmin");
 		} catch (AxisFault ex) {
 			throw new AppManagementException("Error occurred while gateway operations.", ex);
@@ -49,12 +49,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void addVersionedWebAppForTenant(String appConfig, String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while adding new WebApp for tenant user.";
 		try {
 			restApiAdminStub.addApiForTenant(appConfig, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while adding new WebApp for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while adding new WebApp for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -65,12 +66,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void addVersionedWebApp(String appConfig) throws AppManagementException {
-		String errorMsg = "Error while adding new WebApp for super tenant user.";
 		try {
 			restApiAdminStub.addApiFromString(appConfig);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while adding new WebApp for super tenant user.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while adding new WebApp for super tenant user.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -82,13 +84,14 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public APIData getVersionedWebAppForTenant(String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while obtaining versioned webApp information from gateway for tenant user.";
 		try {
 			APIData apiData = restApiAdminStub.getApiForTenant(qualifiedName, tenantDomain);
 			return apiData;
 		} catch (RemoteException e) {
+			String errorMsg = "Error while obtaining versioned webApp information from gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while obtaining versioned webApp information from gateway for tenant :." + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -115,12 +118,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void updateVersionedWebAppForTenant(String apiConfig, String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while updating WebApp for tenant user.";
 		try {
 			restApiAdminStub.updateApiForTenant(qualifiedName, apiConfig, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while updating WebApp for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while updating WebApp for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -130,12 +134,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void updateVersionedWebApp(String apiConfig) throws AppManagementException {
-		String errorMsg = "Error while updating WebApp for super tenant user.";
 		try {
 			restApiAdminStub.updateApiFromString(qualifiedName, apiConfig);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while updating WebApp for super tenant user.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while updating WebApp for super tenant user.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -146,12 +151,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void deleteVersionedWebAppForTenant(String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while deleting WebApp for tenant users.";
 		try {
 			restApiAdminStub.deleteApiForTenant(qualifiedName, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while deleting WebApp for tenant :." + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while deleting WebApp for tenant :." + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -161,12 +167,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void deleteVersionedWebApp() throws AppManagementException {
-		String errorMsg = "Error while deleting WebApp for super tenant users.";
 		try {
 			restApiAdminStub.deleteApi(qualifiedName);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while deleting WebApp for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while deleting WebApp for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -178,12 +185,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void addNonVersionedWebAppForTenant(String apiConfig, String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error publishing non-versioned web app to the gateway for tenant users.";
 		try {
 			restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error publishing non-versioned web app to the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error publishing non-versioned web app to the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -194,12 +202,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void addNonVersionedWebApp(String apiConfig) throws AppManagementException {
-		String errorMsg = "Error publishing non-versioned web app to the gateway for super tenant users.";
 		try {
 			restApiAdminStub.addApiFromString(apiConfig);
 		} catch (RemoteException e) {
+			String errorMsg = "Error publishing non-versioned web app to the gateway for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error publishing non-versioned web app to the gateway for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -211,12 +220,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void updateNonVersionedWebAppForTenant(String apiConfig, String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while updating non-versioned web app in the gateway for tenant users.";
 		try {
 			restApiAdminStub.updateApiForTenant(qualifiedNonVersionedWebAppName, apiConfig, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while updating non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while updating non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -227,12 +237,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void updateNonVersionedWebApp(String apiConfig) throws AppManagementException {
-		String errorMsg = "Error while updating non-versioned web app in the gateway for super tenant users.";
 		try {
 			restApiAdminStub.updateApiFromString(qualifiedNonVersionedWebAppName, apiConfig);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while updating non-versioned web app in the gateway for super tenant.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while updating non-versioned web app in the gateway for super tenant.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -243,12 +254,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void deleteNonVersionedWebAppForTenant(String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while deleting non-versioned web app in the gateway for tenant users.";
 		try {
 			restApiAdminStub.deleteApiForTenant(qualifiedNonVersionedWebAppName, tenantDomain);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while deleting non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while deleting non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -258,12 +270,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void deleteNonVersionedWebApp() throws AppManagementException {
-		String errorMsg = "Error while deleting non-versioned web app in the gateway for super tenant users.";
 		try {
 			restApiAdminStub.deleteApi(qualifiedNonVersionedWebAppName);
 		} catch (RemoteException e) {
+			String errorMsg = "Error while deleting non-versioned web app in the gateway for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while deleting non-versioned web app in the gateway for super tenant users.";
 			throw new AppManagementException(errorMsg, e);
 		}
 	}
@@ -275,13 +288,14 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public APIData getNonVersionedWebAppDataForTenant(String tenantDomain) throws AppManagementException {
-		String errorMsg = "Error while obtaining non-versioned web app in the gateway for tenant users.";
 		try {
 			APIData apiData = restApiAdminStub.getApiForTenant(qualifiedNonVersionedWebAppName, tenantDomain);
 			return apiData;
 		} catch (RemoteException e) {
+			String errorMsg = "Error while obtaining non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		} catch (RestApiAdminAPIException e) {
+			String errorMsg = "Error while obtaining non-versioned web app in the gateway for tenant : " + tenantDomain;
 			throw new AppManagementException(errorMsg, e);
 		}
 	}

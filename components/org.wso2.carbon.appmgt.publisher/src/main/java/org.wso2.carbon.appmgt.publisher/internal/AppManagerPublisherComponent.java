@@ -27,12 +27,10 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
 /**
  *
- * Application manager publisher component
+ * App Manager publisher component
  *
  * @scr.component name="org.wso2.appmgt.services.publisher" immediate="true"
- * @scr.reference name="arg.wso2.appmgt.impl.services.appm"
- * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
- * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
+ *
  **/
 public class AppManagerPublisherComponent {
 
@@ -45,7 +43,7 @@ public class AppManagerPublisherComponent {
         BundleContext bundleContext = componentContext.getBundleContext();
 
         //Register Tenant service creator to deploy tenant specific common synapse configurations
-        TenantLoadPublisherObserver listener = new TenantLoadPublisherObserver();
+        TenantCreatePublisherObserver listener = new TenantCreatePublisherObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
     }
 
@@ -53,20 +51,5 @@ public class AppManagerPublisherComponent {
         if (log.isDebugEnabled()) {
             log.debug("Deactivating Publisher component");
         }
-    }
-
-    protected void setAppManagerConfigurationService(AppManagerConfigurationService amcService) {
-        if (log.isDebugEnabled()) {
-            log.debug("App manager configuration service is set to publisher bundle");
-        }
-
-        ServiceReferenceHolder.getInstance().setAppManagerConfigurationService(amcService);
-    }
-
-    protected void unsetAppManagerConfigurationService(AppManagerConfigurationService amcService) {
-        if (log.isDebugEnabled()) {
-            log.debug("App manager configuration service is unset from publisher bundle");
-        }
-        ServiceReferenceHolder.getInstance().setAppManagerConfigurationService(null);
     }
 }
