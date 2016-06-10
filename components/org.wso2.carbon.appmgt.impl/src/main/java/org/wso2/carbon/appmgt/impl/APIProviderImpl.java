@@ -777,29 +777,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
-    /**
-     * Patch an existing WebApp
-     *
-     * @param api WebApp
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *          if failed to update WebApp
-     */
-    public void patchMobileApp(MobileApp mobileApp) throws AppManagementException {
-
-
-        try {
-
-            patchMobileAppArtifact(mobileApp, true);
-
-        } catch (AppManagementException e) {
-            handleException("Error while updating the WebApp :" +mobileApp.getAppName(),e);
-        }
-
-
-    }
-
-
-
 
     private void updateApiArtifact(WebApp api, boolean updateMetadata,boolean updatePermissions) throws
                                                                                                  AppManagementException {
@@ -911,40 +888,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 
 
-            registry.commitTransaction();
-        } catch (Exception e) {
-            try {
-                registry.rollbackTransaction();
-            } catch (RegistryException re) {
-                handleException("Error while rolling back the transaction for WebApp: " +mobileApp.getAppName(), re);
-            }
-            handleException("Error while performing registry transaction operation", e);
-
-        }
-    }
-
-    /**
-     * Patch the mobile app artifact with new value
-     *
-     * @param mobileApp MobileApp
-     * @param updatePermissions update the permissions
-     */
-    private void patchMobileAppArtifact(MobileApp mobileApp, boolean updatePermissions) throws
-            AppManagementException {
-        try {
-            registry.beginTransaction();
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                    AppMConstants.MOBILE_ASSET_TYPE);
-            GenericArtifact artifact = artifactManager.getGenericArtifact(mobileApp.getAppId());
-            if (artifact != null) {
-
-                GenericArtifact updateApiArtifact = AppManagerUtil.createMobileAppArtifactContent(artifact, mobileApp);
-                String artifactPath = GovernanceUtils.getArtifactPath(registry, updateApiArtifact.getId());
-                artifactManager.updateGenericArtifact(updateApiArtifact);
-            }else{
-                handleResourceNotFoundException(
-                        "Failed to get Mobile App. The artifact corresponding to artifactId " + mobileApp.getAppId() + " does not exist");
-            }
             registry.commitTransaction();
         } catch (Exception e) {
             try {

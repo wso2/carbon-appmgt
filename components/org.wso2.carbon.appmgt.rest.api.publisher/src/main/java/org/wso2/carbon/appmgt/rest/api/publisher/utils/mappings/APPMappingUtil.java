@@ -443,7 +443,7 @@ public class APPMappingUtil {
      * @return if appDTO is valid, returns the converted MobileApp, else throws a BadRequestException
      * @throws AppManagementException
      */
-    public static MobileApp fromDTOtoMobileApp(AppDTO appDTO){
+    public static MobileApp fromDTOtoMobileApp(AppDTO appDTO , boolean skipValidation){
 
         String providerName = RestApiUtil.getLoggedInUsername();
 
@@ -453,63 +453,73 @@ public class APPMappingUtil {
         mobileAppModel.setAppProvider(providerName);
         //Validate Mandatory fields
 
-        validateMandatoryField("platform", appDTO.getPlatform());
+        validateMandatoryField("platform", appDTO.getPlatform(), skipValidation);
         mobileAppModel.setPlatform(appDTO.getPlatform());
 
-        validateMandatoryField("markettype", appDTO.getMarketType());
+        validateMandatoryField("markettype", appDTO.getMarketType(), skipValidation);
         mobileAppModel.setMarketType(appDTO.getMarketType());
 
-        if (validateMandatoryField("appmeta", appAppmetaDTO)) {
+        if (validateMandatoryField("appmeta", appAppmetaDTO, skipValidation)) {
             if (AppMConstants.MOBILE_APPS_PLATFORM_ANDROID.equals(appDTO.getPlatform()) ||
                     AppMConstants.MOBILE_APPS_PLATFORM_IOS.equals(appDTO.getPlatform())) {
 
                 if ("enterprise".equals(appDTO.getMarketType())) {
-                    validateMandatoryField("path", appAppmetaDTO.getPath());
+                    validateMandatoryField("path", appAppmetaDTO.getPath(), skipValidation);
                     mobileAppModel.setAppUrl(appAppmetaDTO.getPath());
-                    validateMandatoryField("package", appAppmetaDTO.getPackage());
+                    validateMandatoryField("package", appAppmetaDTO.getPackage(), skipValidation);
                     mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
-                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion(), skipValidation);
                     mobileAppModel.setBundleVersion(appAppmetaDTO.getVersion());
                     mobileAppModel.setVersion(appDTO.getVersion());
                 } else if ("public".equals(appDTO.getMarketType())) {
-                    validateMandatoryField("package", appAppmetaDTO.getPackage());
+                    validateMandatoryField("package", appAppmetaDTO.getPackage(), skipValidation);
                     mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
-                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion(), skipValidation);
                     mobileAppModel.setBundleVersion(appAppmetaDTO.getVersion());
                     mobileAppModel.setVersion(appDTO.getVersion());
                 } else {
-                    RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
-                            "' is provided for platform : " + appDTO.getPlatform(), log);
+                    if(!skipValidation){
+                        RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
+                                "' is provided for platform : " + appDTO.getPlatform(), log);
+                    }
                 }
             } else if (AppMConstants.MOBILE_APPS_PLATFORM_WEBAPP.equals(appDTO.getPlatform())) {
                 if ("webapp".equals(appDTO.getMarketType())) {
-                    validateMandatoryField("weburl", appAppmetaDTO.getWeburl());
+                    validateMandatoryField("weburl", appAppmetaDTO.getWeburl(), skipValidation);
                     mobileAppModel.setAppUrl(appAppmetaDTO.getWeburl());
-                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion(), skipValidation);
                     mobileAppModel.setVersion(appAppmetaDTO.getVersion());
                 } else {
-                    RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
-                            "' is provided for platform : " + appDTO.getPlatform(), log);
+                    if(!skipValidation){
+                        RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
+                                "' is provided for platform : " + appDTO.getPlatform(), log);
+                    }
+
                 }
             } else {
-                RestApiUtil.handleBadRequest("Unsupported platform '" + appDTO.getPlatform() + "' is provided.", log);
+                if(!skipValidation){
+                    RestApiUtil.handleBadRequest("Unsupported platform '" + appDTO.getPlatform() + "' is provided.", log);
+                }
             }
         }
         mobileAppModel.setAppName(appDTO.getName());
         mobileAppModel.setDisplayName(appDTO.getDisplayName());
-        validateMandatoryField("description", appDTO.getDescription());
+        validateMandatoryField("description", appDTO.getDescription(), skipValidation);
         mobileAppModel.setDescription(appDTO.getDescription());
-        validateMandatoryField("category", appDTO.getCategory());
+        validateMandatoryField("category", appDTO.getCategory(), skipValidation);
         mobileAppModel.setCategory(appDTO.getCategory());
-        validateMandatoryField("banner", appDTO.getBanner());
+        validateMandatoryField("banner", appDTO.getBanner(), skipValidation);
         mobileAppModel.setBanner(appDTO.getBanner());
-        validateMandatoryField("iconFile", appDTO.getIcon());
+        validateMandatoryField("iconFile", appDTO.getIcon(), skipValidation);
         mobileAppModel.setThumbnail(appDTO.getIcon());
         List<String> screenShots = appDTO.getScreenshots();
-        validateMandatoryField("screenshots", screenShots);
+        validateMandatoryField("screenshots", screenShots, skipValidation);
         if(screenShots.size() > 3){
-            RestApiUtil.handleBadRequest("Attached screenshots count exceeds the maximum number of allowed screenshots",
-                    log);
+            if(!skipValidation){
+                RestApiUtil.handleBadRequest("Attached screenshots count exceeds the maximum number of allowed screenshots",
+                        log);
+            }
+
         }
         while(screenShots.size() < 3){
             screenShots.add("");
@@ -532,9 +542,10 @@ public class APPMappingUtil {
         return mobileAppModel;
     }
 
-    private static boolean validateMandatoryField(String fieldName, Object fieldValue) {
+    private static boolean validateMandatoryField(String fieldName, Object fieldValue, boolean skipValidation) {
 
-        if (fieldValue == null) {
+
+        if ((!skipValidation) && fieldValue == null) {
             RestApiUtil.handleBadRequest("Mandatory field  '" + fieldName + "' is not provided.", log);
         }
         return true;

@@ -213,7 +213,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
 
-                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
+                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body, false);
                 String applicationId = appProvider.createMobileApp(mobileApp);
                 appDTO.setId(applicationId);
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
@@ -317,7 +317,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 //TODO:APP Validations
                 //TODO:Get provider name from context (Token owner)
                 //TODO:Permission check
-                MobileApp updatingMobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
+                MobileApp updatingMobileApp = APPMappingUtil.fromDTOtoMobileApp(body, false);
                 updatingMobileApp.setAppId(appId);
                 appProvider.updateMobileApp(updatingMobileApp);
 
@@ -341,9 +341,9 @@ public class AppsApiServiceImpl extends AppsApiService {
                 //TODO:APP Validations
                 //TODO:Get provider name from context (Token owner)
                 //TODO:Permission check
-                MobileApp updatingMobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
+                MobileApp updatingMobileApp = APPMappingUtil.fromDTOtoMobileApp(body, true);
                 updatingMobileApp.setAppId(appId);
-                appProvider.patchMobileApp(updatingMobileApp);
+                appProvider.updateMobileApp(updatingMobileApp);
 
             } catch (AppManagementException e) {
                 RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
