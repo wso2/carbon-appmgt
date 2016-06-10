@@ -2,7 +2,7 @@
     <wsdl:documentation>AppGatewayAdmin</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://dto.gateway.appmgt.carbon.wso2.org/xsd">
-            <xs:complexType name="AppData">
+            <xs:complexType name="WebAppData">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="context" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
@@ -15,13 +15,13 @@
             <xs:complexType name="ResourceData">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="contentType" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="faultSeqXml" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="faultSequenceKey" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="inSeqXml" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="faultSequenceXml" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="httpMethods" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="inSequenceKey" nillable="true" type="xs:string"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="methods" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="outSeqXml" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inSequenceXml" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="outSequenceKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outSequenceXml" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="protocol" type="xs:int"/>
                     <xs:element minOccurs="0" name="uriTemplate" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="urlMapping" nillable="true" type="xs:string"/>
@@ -78,7 +78,7 @@
             <xs:element name="getVersionedWebAppForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:WebAppData"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -94,7 +94,7 @@
             <xs:element name="getVersionedWebAppResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:WebAppData"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -212,7 +212,7 @@
             <xs:element name="getNonVersionedWebAppDataForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:WebAppData"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -228,7 +228,7 @@
             <xs:element name="getNonVersionedWebAppDataResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:WebAppData"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -299,20 +299,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="doEncryption">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="plainTextPass" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="doEncryptionResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="addSequence">
                 <xs:complexType>
                     <xs:sequence>
@@ -371,12 +357,6 @@
     </wsdl:message>
     <wsdl:message name="deleteNonVersionedWebAppForTenantRequest">
         <wsdl:part name="parameters" element="ns:deleteNonVersionedWebAppForTenant"/>
-    </wsdl:message>
-    <wsdl:message name="doEncryptionRequest">
-        <wsdl:part name="parameters" element="ns:doEncryption"/>
-    </wsdl:message>
-    <wsdl:message name="doEncryptionResponse">
-        <wsdl:part name="parameters" element="ns:doEncryptionResponse"/>
     </wsdl:message>
     <wsdl:message name="deleteVersionedWebAppRequest">
         <wsdl:part name="parameters" element="ns:deleteVersionedWebApp"/>
@@ -476,11 +456,6 @@
         <wsdl:operation name="deleteNonVersionedWebAppForTenant">
             <wsdl:input message="ns:deleteNonVersionedWebAppForTenantRequest" wsaw:Action="urn:deleteNonVersionedWebAppForTenant"/>
             <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteNonVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
-        </wsdl:operation>
-        <wsdl:operation name="doEncryption">
-            <wsdl:input message="ns:doEncryptionRequest" wsaw:Action="urn:doEncryption"/>
-            <wsdl:output message="ns:doEncryptionResponse" wsaw:Action="urn:doEncryptionResponse"/>
-            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:doEncryptionAppGatewayAdminAppManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteVersionedWebApp">
             <wsdl:input message="ns:deleteVersionedWebAppRequest" wsaw:Action="urn:deleteVersionedWebApp"/>
@@ -631,18 +606,6 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="AppGatewayAdminAppManagementException">
-                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="doEncryption">
-            <soap:operation soapAction="urn:doEncryption" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
             <wsdl:fault name="AppGatewayAdminAppManagementException">
                 <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
             </wsdl:fault>
@@ -890,18 +853,6 @@
                 <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="doEncryption">
-            <soap12:operation soapAction="urn:doEncryption" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="AppGatewayAdminAppManagementException">
-                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="deleteVersionedWebApp">
             <soap12:operation soapAction="urn:deleteVersionedWebApp" style="document"/>
             <wsdl:input>
@@ -1120,15 +1071,6 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="doEncryption">
-            <http:operation location="doEncryption"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteVersionedWebApp">
             <http:operation location="deleteVersionedWebApp"/>

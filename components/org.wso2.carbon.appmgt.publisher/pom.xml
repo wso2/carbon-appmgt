@@ -59,8 +59,7 @@
                             org.wso2.carbon.core,
                             org.wso2.carbon.registry.core.service; version="${carbon.registry.imp.pkg.version}",
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
-                            org.wso2.carbon.appmgt.impl.*,
-                            *;resolution:=optional
+                            org.wso2.carbon.appmgt.impl.*
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

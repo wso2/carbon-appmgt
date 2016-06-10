@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.appmgt.publisher.category.feature</artifactId>
     <packaging>pom</packaging>
-    <name>APP Publisher ${project.version}</name>
+    <name>WSO2 Carbon - Publisher</name>
     <url>http://wso2.org</url>
     <description>Includes features for Publisher component.</description>
 

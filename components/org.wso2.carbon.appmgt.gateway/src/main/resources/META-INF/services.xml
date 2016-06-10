@@ -28,7 +28,7 @@
 
     <service name="AppGatewayAdmin" scope="transportsession">
         <transports><transport>http</transport></transports>
-        <description>Admin service to manage App publisher and store related functionality at the App Gateway</description>
+        <description>Admin service to wrap REST api and sequence related functionality at App Gateway</description>
         <parameter name="ServiceClass">org.wso2.carbon.appmgt.gateway.service.AppGatewayAdmin</parameter>
         <parameter name="DoAuthentication" locked="true">true</parameter>
         <parameter name="AuthorizationAction" locked="true">/permission/admin/login</parameter>

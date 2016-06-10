@@ -17,25 +17,18 @@
  */
 package org.wso2.carbon.appmgt.impl.utils;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.gateway.dto.stub.AppData;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.gateway.dto.stub.WebAppData;
 import org.wso2.carbon.appmgt.gateway.stub.AppGatewayAdminAppManagementExceptionException;
 import org.wso2.carbon.appmgt.gateway.stub.AppGatewayAdminStub;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateException;
-import org.wso2.carbon.registry.core.Resource;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.apache.axiom.om.OMElement;
-import org.wso2.carbon.appmgt.impl.dto.Environment;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.StringWriter;
@@ -102,12 +95,12 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @return
      * @throws AppManagementException on errors.
      */
-    public AppData getVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
+    public WebAppData getVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
         String appVersion = apiId.getVersion();
         String appProvider = apiId.getProviderName();
+        WebAppData appData;
         try {
-            AppData appData;
             if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
@@ -286,12 +279,12 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @return
      * @throws AppManagementException on errors.
      */
-    public AppData getNonVersionedWebAppData(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
+    public WebAppData getNonVersionedWebAppData(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
         String appVersion = apiId.getVersion();
         String appProvider = apiId.getProviderName();
         try {
-            AppData appData;
+            WebAppData appData;
             if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appData = appGatewayAdminStub.getNonVersionedWebAppDataForTenant(appProvider, appName, appVersion,
