@@ -29,6 +29,7 @@ public class ApplicationOperationAction {
 	private String type;
 	private String[] params;
 	private HashMap<String, String> configParams;
+	private String schedule;
 
 	public User getUser() {
 		return user;
@@ -84,6 +85,14 @@ public class ApplicationOperationAction {
 
 	public void setConfigParams(HashMap<String, String> configParams) {
 		this.configParams = configParams;
+	}
+
+	public String getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(String schedule) {
+		this.schedule = schedule;
 	}
 
 }

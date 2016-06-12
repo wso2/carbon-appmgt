@@ -39,7 +39,7 @@ public interface ApplicationOperations {
      * @param applicationOperationAction holds the information needs to perform an action on mdm
      * @throws MobileApplicationException
      */
-    void performAction(ApplicationOperationAction applicationOperationAction) throws MobileApplicationException;
+    String performAction(ApplicationOperationAction applicationOperationAction) throws MobileApplicationException;
 
 	/**
      *  This used to get the device list from mdm

@@ -53,12 +53,12 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
     private static final Log log = LogFactory.getLog(ApplicationOperationsImpl.class);
 
-	/**
+    /**
      *
      * @param applicationOperationAction holds the information needs to perform an action on mdm
      */
 
-    public void performAction(ApplicationOperationAction applicationOperationAction) {
+    public String performAction(ApplicationOperationAction applicationOperationAction) {
 
         HashMap<String, String> configProperties = applicationOperationAction.getConfigParams();
 
@@ -155,9 +155,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
             }
         }
 
+        return null;
+
     }
 
-	/**
+    /**
      *
      * @param applicationOperationDevice holds the information needs to retrieve device list
      * @return List of devices
@@ -206,7 +208,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
                         device.setPlatform("ios");
                     }
                     device.setImage(String.format(configProperties.get("ImageURL"),
-                                                  properties.get("model").toString()));
+                            properties.get("model").toString()));
                     device.setType("mobileDevice");
                     device.setPlatformVersion("0");
                     devices.add(device);

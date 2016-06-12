@@ -925,6 +925,78 @@ paths:
             is not met.
           schema:
             $ref: '#/definitions/Error'
+  /apps/mobile/schedule-install:
+    post:
+      x-scope: 'appm:subscribe'
+      summary: Schedule Install App
+      description: |
+        Schedule Install an App
+      parameters:
+        - in: body
+          name: schedule
+          schema:
+            $ref: '#/definitions/Schedule'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/mobile/schedule-update:
+    post:
+      x-scope: 'appm:create'
+      summary: Schedule Update App
+      description: |
+        Schedule Update an App
+      parameters:
+        - in: body
+          name: schedule
+          schema:
+            $ref: '#/definitions/Schedule'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
   /devices:
     get:
       x-scope: 'appm:read'
@@ -1968,8 +2040,10 @@ definitions:
           Download type (either user or devices).
         example: user/device
       deviceIds:
-        type: object
+        type: array
         description: List of device Id's
+        items:
+          type: string
         example: '[{"id":"358812061121105","type":"ANDROID"}]'
       appId:
         type: string
@@ -1989,6 +2063,22 @@ definitions:
       appId:
         type: string
         description: App Id
+  Schedule:
+    title: Schedule Install App
+    properties:
+      scheduleTime:
+        type: string
+        example: '04-30-2016 11:25 am'
+      deviceIds:
+        type: array
+        description: List of device Id's
+        items:
+          type: string
+        example: '["{"id":"358812061121105","type":"ANDROID"}"]'
+      appId:
+        type: string
+        description: Installing mobile app ID
+        example: aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c
   TagList:
     title: Tag List
     properties:

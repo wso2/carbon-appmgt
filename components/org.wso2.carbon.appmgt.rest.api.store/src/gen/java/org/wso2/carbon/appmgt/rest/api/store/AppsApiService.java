@@ -21,6 +21,7 @@ import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 public abstract class AppsApiService {
     public abstract Response appsDownloadPost(String contentType,InstallDTO install);
@@ -31,7 +32,7 @@ public abstract class AppsApiService {
     public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileBinariesOneTimeUuidGet(String uuid,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsFileNameGet(String appType,String fileName,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsUninstallationPost(String contentType,InstallDTO install);
+    public abstract Response appsUninstallationPost(String contentType, InstallDTO install);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDocsFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
@@ -46,5 +47,9 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdSubscriptionUsersGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdUnsubscriptionPost(String appType,String appId,String contentType);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
+    public abstract Response appsMobileScheduleInstallPost(String contentType, ScheduleDTO schedule,
+                                                           SecurityContext securityContext);
+    public abstract Response appsMobileScheduleUpdatePost(String contentType, ScheduleDTO schedule,
+                                                          SecurityContext securityContext);
 }
 

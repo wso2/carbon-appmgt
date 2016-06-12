@@ -26,6 +26,7 @@ public class MDMAppConstants {
 	public static final String ANDROID = "android";
 	public static final String WEBAPP = "webapp";
 	public static final String INSTALL = "install";
+	public static final String UPDATE = "update";
 	public static final String ACTIVE = "active";
 	public static final String ENTERPRISE = "enterprise";
 	public static final String DEVICE = "device";
@@ -61,6 +62,7 @@ public class MDMAppConstants {
 		}
 
 		public static final String OPCODE_INSTALL_APPLICATION = "INSTALL_APPLICATION";
+		public static final String OPCODE_UPDATE_APPLICATION = "UPDATE_APPLICATION";
 		public static final String OPCODE_UNINSTALL_APPLICATION = "UNINSTALL_APPLICATION";
 	}
 
