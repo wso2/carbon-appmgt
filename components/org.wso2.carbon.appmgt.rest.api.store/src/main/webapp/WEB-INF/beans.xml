@@ -33,7 +33,7 @@
             <ref bean="oauthInterceptor" />
         </cxf:inInterceptors>
     </cxf:bus>
-
+    <bean id="PreAuthenticationInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.PreAuthenticationInterceptor" />
     <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor" />
 
     <bean id="jacksonObjectMapper" class="org.wso2.carbon.appmgt.rest.api.util.spring.ObjectMapperFactoryBean"/>

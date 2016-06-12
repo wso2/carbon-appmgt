@@ -294,6 +294,10 @@ public final class AppMConstants {
 
     // ReST API constants
     public static final String REST_API_SCOPES_CONFIG = "RESTAPIScopes";
+    public static final String API_RESTAPI = "RESTAPI.";
+    public static final String API_RESTAPI_WHITELISTED_URI = API_RESTAPI + "WhiteListedURIs.WhiteListedURI.";
+    public static final String API_RESTAPI_WHITELISTED_URI_URI = API_RESTAPI_WHITELISTED_URI + "URI";
+    public static final String API_RESTAPI_WHITELISTED_URI_HTTPMethods = API_RESTAPI_WHITELISTED_URI + "HTTPMethods";
 
 
     public static class TokenStatus {

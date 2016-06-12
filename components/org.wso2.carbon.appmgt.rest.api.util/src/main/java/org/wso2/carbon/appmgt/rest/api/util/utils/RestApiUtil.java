@@ -42,6 +42,8 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.uri.template.URITemplate;
+import org.wso2.uri.template.URITemplateException;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
@@ -50,18 +52,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RestApiUtil {
 
     private static final Log log = LogFactory.getLog(RestApiUtil.class);
+    private static Dictionary<org.wso2.uri.template.URITemplate, List<String>> uriToHttpMethodsMap;
 
     public static <T> ErrorDTO getConstraintViolationErrorDTO(Set<ConstraintViolation<T>> violations) {
         ErrorDTO errorDTO = new ErrorDTO();
@@ -625,5 +623,63 @@ public class RestApiUtil {
         }
 
         return searchTerms;
+    }
+
+    /**
+     * Returns the white-listed URIs and associated HTTP methods for REST API. If not already read before, reads
+     * app-manager.xml configuration, store the results in a static reference and returns the results.
+     * Otherwise returns previously stored the static reference object.
+     *
+     * @return A Dictionary with the white-listed URIs and the associated HTTP methods
+     * @throws AppManagementException
+     */
+    public static Dictionary<URITemplate, List<String>> getWhiteListedURIsToMethodsMap()
+            throws AppManagementException {
+
+        if (uriToHttpMethodsMap == null) {
+            uriToHttpMethodsMap = getWhiteListedURIsToMethodsMapFromConfig();
+        }
+        return uriToHttpMethodsMap;
+    }
+
+    /**
+     * Returns the white-listed URIs and associated HTTP methods for REST API by reading api-manager.xml configuration
+     *
+     * @return A Dictionary with the white-listed URIs and the associated HTTP methods
+     * @throws AppManagementException
+     */
+    private static Dictionary<org.wso2.uri.template.URITemplate, List<String>> getWhiteListedURIsToMethodsMapFromConfig()
+            throws AppManagementException {
+        Hashtable<org.wso2.uri.template.URITemplate, List<String>> uriToMethodsMap = new Hashtable<>();
+        AppManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        List<String> uriList = apiManagerConfiguration
+                .getProperty(AppMConstants.API_RESTAPI_WHITELISTED_URI_URI);
+        List<String> methodsList = apiManagerConfiguration
+                .getProperty(AppMConstants.API_RESTAPI_WHITELISTED_URI_HTTPMethods);
+
+        if (uriList != null && methodsList != null) {
+            if (uriList.size() != methodsList.size()) {
+                String errorMsg = "Provided White-listed URIs for REST API are invalid."
+                        + " Every 'WhiteListedURI' should include 'URI' and 'HTTPMethods' elements";
+                log.error(errorMsg);
+                return new Hashtable<>();
+            }
+
+            for (int i = 0; i < uriList.size(); i++) {
+                String uri = uriList.get(i);
+                try {
+                    org.wso2.uri.template.URITemplate uriTemplate = new org.wso2.uri.template.URITemplate(uri);
+                    String methodsForUri = methodsList.get(i);
+                    List<String> methodListForUri = Arrays.asList(methodsForUri.split(","));
+                    uriToMethodsMap.put(uriTemplate, methodListForUri);
+                } catch (URITemplateException e) {
+                    String msg = "Error in parsing uri " + uri + " when retrieving white-listed URIs for REST API";
+                    log.error(msg, e);
+                    throw new AppManagementException(msg, e);
+                }
+            }
+        }
+        return uriToMethodsMap;
     }
 }
