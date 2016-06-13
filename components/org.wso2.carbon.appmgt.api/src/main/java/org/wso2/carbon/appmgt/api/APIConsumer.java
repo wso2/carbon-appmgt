@@ -98,6 +98,17 @@ public interface APIConsumer extends APIManager {
      */
     public Set<WebApp> getTopRatedAPIs(int limit) throws AppManagementException;
 
+
+    /**
+     * Get average rating of an App by UUID
+     *
+     * @param uuid
+     * @param assetType
+     * @return average rating
+     * @throws AppManagementException
+     */
+    public float getAverageRating(String uuid, String assetType) throws AppManagementException;
+
     /**
      * Get recently added APIs to the store
      *
@@ -126,27 +137,6 @@ public interface APIConsumer extends APIManager {
      */
     public Set<Tag> getAllTags(String tenantDomain, String assetType, Map<String, String> attributeMap)
             throws AppManagementException;
-
-    /**
-     * Rate a particular WebApp. This will be called when subscribers rate an WebApp
-     *
-     * @param apiId  The WebApp identifier
-     * @param rating The rating provided by the subscriber
-     * @param user   Username of the subscriber providing the rating
-     * @throws AppManagementException If an error occurs while rating the WebApp
-     */
-    public void rateAPI(APIIdentifier apiId, APIRating rating, String user) throws
-                                                                            AppManagementException;
-
-    /**
-     * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an
-     * WebApp
-     *
-     * @param apiId The WebApp identifier
-     * @param user  Username of the subscriber providing the rating
-     * @throws AppManagementException If an error occurs while rating the WebApp
-     */
-    public void removeAPIRating(APIIdentifier apiId, String user) throws AppManagementException;
 
     /**
      * Returns a set of SubscribedAPI purchased by the given Subscriber
@@ -242,22 +232,6 @@ public interface APIConsumer extends APIManager {
             throws AppManagementException;
 
     /**
-     * @param identifier Api identifier
-     * @param comment    comment text
-     * @param user       Username of the comment author
-     * @throws AppManagementException if failed to add comment for WebApp
-     */
-    public void addComment(APIIdentifier identifier, String comment,
-                           String user) throws AppManagementException;
-
-    /**
-     * @param identifier Api identifier
-     * @return Comments
-     * @throws AppManagementException if failed to get comments for identifier
-     */
-    public Comment[] getComments(APIIdentifier identifier) throws AppManagementException;
-
-    /**
      * Returns details of an WebApp
      *
      * @param uuid uuid of the A
@@ -295,7 +269,6 @@ public interface APIConsumer extends APIManager {
                                                    int end) throws
                                                             AppManagementException;
 
-    public int getUserRating(APIIdentifier apiId, String user) throws AppManagementException;
 
     /**
      * Get a list of published APIs by the given provider.
