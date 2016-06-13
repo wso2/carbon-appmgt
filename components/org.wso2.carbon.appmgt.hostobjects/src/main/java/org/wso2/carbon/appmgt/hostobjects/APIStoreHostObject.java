@@ -1397,79 +1397,6 @@ public class APIStoreHostObject extends ScriptableObject {
 
     }
 
-
-    public static NativeArray jsFunction_getComments(Context cx,
-                                                     Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-        Comment[] commentlist = new Comment[0];
-        String providerName = "";
-        String apiName = "";
-        String version = "";
-        if (args!=null && args.length!=0 ) {
-            providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            apiName = (String)args[1];
-            version = (String)args[2];
-        }
-        APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName,
-                version);
-        NativeArray myn = new NativeArray(0);
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        try {
-            commentlist = apiConsumer.getComments(apiIdentifier);
-        } catch (AppManagementException e) {
-            handleException("Error from registry while getting  comments for " + apiName, e);
-        } catch (Exception e) {
-            handleException("Error while getting comments for " + apiName, e);
-        }
-
-        int i = 0;
-        if(commentlist!=null){
-        for (Comment n : commentlist) {
-            NativeObject row = new NativeObject();
-            row.put("userName", row, n.getUser());
-            row.put("comment", row, n.getText());
-            row.put("createdTime", row, n.getCreatedTime().getTime());
-            myn.put(i, myn, row);
-            i++;
-        }
-        }
-        return myn;
-
-    }
-
-    public static NativeArray jsFunction_addComments(Context cx,
-                                                     Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-        String providerName = "";
-        String apiName = "";
-        String version = "";
-        String commentStr = "";
-        if (args!=null&& args.length!=0 &&isStringArray(args)) {
-            providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            apiName = (String)args[1];
-            version = (String)args[2];
-            commentStr = (String)args[3];
-        }
-        APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
-        NativeArray myn = new NativeArray(0);
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        try {
-            apiConsumer.addComment(apiIdentifier, commentStr, getUsernameFromObject(thisObj));
-        } catch (AppManagementException e) {
-            handleException("Error from registry while adding comments for " + apiName, e);
-        } catch (Exception e) {
-            handleException("Error while adding comments for " + apiName, e);
-        }
-
-        int i = 0;
-        NativeObject row = new NativeObject();
-        row.put("userName", row, providerName);
-        row.put("comment", row, commentStr);
-        myn.put(i, myn, row);
-
-        return myn;
-    }
-
     /**
      * Returns the subscription for the given criteria based on the subscription type. e.g. Individual, Enterprise
      * @param cx
@@ -1778,131 +1705,6 @@ public class APIStoreHostObject extends ScriptableObject {
         }
 
     }
-
-
-    public static NativeArray jsFunction_rateAPI(Context cx,
-                                                 Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
-        if (args!=null && args.length!=0 ) {
-            String providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            String apiName = (String)args[1];
-            String version = (String)args[2];
-            String rateStr = (String)args[3];
-            int rate;
-            try {
-                rate = Integer.parseInt(rateStr.substring(0, 1));
-            } catch (NumberFormatException e) {
-                log.error("Rate must to be number " + rateStr, e);
-                return myn;
-            } catch (Exception e) {
-                log.error("Error from while Rating WebApp " + rateStr, e);
-                return myn;
-            }
-            APIIdentifier apiId;
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            try {
-                apiId = new APIIdentifier(providerName, apiName, version);
-                String user = getUsernameFromObject(thisObj);
-                switch (rate) {
-                    //Below case 0[Rate 0] - is to remove ratings from a user
-                    case 0: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_ZERO, user);
-                        break;
-                    }
-                    case 1: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_ONE, user);
-                        break;
-                    }
-                    case 2: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_TWO, user);
-                        break;
-                    }
-                    case 3: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_THREE, user);
-                        break;
-                    }
-                    case 4: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_FOUR, user);
-                        break;
-                    }
-                    case 5: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_FIVE, user);
-                        break;
-                    }
-                    default: {
-                        throw new IllegalArgumentException("Can't handle " + rate);
-                    }
-
-                }
-            } catch (AppManagementException e) {
-                log.error("Error while Rating WebApp " + apiName
-                        + e);
-                return myn;
-            } catch (Exception e) {
-                log.error("Error while Rating WebApp " + apiName + e);
-                return myn;
-            }
-
-            NativeObject row = new NativeObject();
-            row.put("name", row, apiName);
-            row.put("provider", row, AppManagerUtil.replaceEmailDomainBack(providerName));
-            row.put("version", row, version);
-            row.put("rates", row, rateStr);
-            row.put("newRating", row, Float.toString(apiConsumer.getAPI(apiId).getRating()));
-            myn.put(0, myn, row);
-
-        }// end of the if
-        return myn;
-    }
-
-    public static NativeArray jsFunction_removeAPIRating(Context cx,
-                                                 Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
-        if (args != null && args.length != 0) {
-            String providerName = AppManagerUtil.replaceEmailDomain((String) args[0]);
-            String apiName = (String) args[1];
-            String version = (String) args[2];
-            float rating = 0;
-            APIIdentifier apiId;
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            boolean isTenantFlowStarted = false;
-            try {
-                apiId = new APIIdentifier(providerName, apiName, version);
-                String user = getUsernameFromObject(thisObj);
-                
-                String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(user));
-                if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
-                		isTenantFlowStarted = true;
-                        PrivilegedCarbonContext.startTenantFlow();
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-                }
-                
-                apiConsumer.removeAPIRating(apiId, user);
-                rating = apiConsumer.getAPI(apiId).getRating();
-
-            } catch (AppManagementException e) {
-                throw new AppManagementException("Error while remove User Rating of the WebApp " + apiName
-                          + e);
-
-            } catch (Exception e) {
-                throw new AppManagementException("Error while remove User Rating of the WebApp  " + apiName + e);
-
-            } finally {
-            	if (isTenantFlowStarted) {
-            		PrivilegedCarbonContext.endTenantFlow();
-            	}
-            }
-            NativeObject row = new NativeObject();
-            row.put("newRating", row, Float.toString(rating));
-            myn.put(0, myn, row);
-        }// end of the if
-        return myn;
-    }
-
 
     public static NativeArray jsFunction_getSubscriptions(Context cx,
                                                           Scriptable thisObj, Object[] args, Function funObj)
@@ -2800,8 +2602,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 currentApi.put("version", currentApi,
                         apiIdentifier.getVersion());
                 currentApi.put("description", currentApi, api.getDescription());
-                //Rating should retrieve from db
-                currentApi.put("rates", currentApi, AppMDAO.getAverageRating(api.getId()));
+                //Retrieving Rating
+                currentApi.put("rates", currentApi, apiConsumer.getAverageRating(api.getUUID(), AppMConstants.API_KEY));
                 if (api.getThumbnailUrl() == null) {
                     currentApi.put("thumbnailurl", currentApi, "images/api-default.png");
                 } else {
