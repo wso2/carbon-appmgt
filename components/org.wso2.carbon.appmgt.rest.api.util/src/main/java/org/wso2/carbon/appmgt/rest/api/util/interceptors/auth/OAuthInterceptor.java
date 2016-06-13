@@ -27,6 +27,7 @@ import org.apache.cxf.phase.Phase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth2.OAuth2TokenValidationService;
@@ -63,6 +64,11 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
         super(Phase.PRE_INVOKE);
     }
     public void handleMessage(Message inMessage) {
+
+        if (inMessage.get(RestApiConstants.AUTHENTICATION_REQUIRED) != null &&
+                !Boolean.parseBoolean(RestApiConstants.AUTHENTICATION_REQUIRED)) {
+            return;
+        }
 
         String accessToken = getAccessToken(inMessage);
 

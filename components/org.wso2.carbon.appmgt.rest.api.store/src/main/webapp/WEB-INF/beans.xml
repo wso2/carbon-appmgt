@@ -28,11 +28,6 @@
         </jaxrs:properties>
     </jaxrs:server>
 
-    <cxf:bus>
-        <cxf:inInterceptors>
-            <ref bean="oauthInterceptor" />
-        </cxf:inInterceptors>
-    </cxf:bus>
     <bean id="PreAuthenticationInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.PreAuthenticationInterceptor" />
     <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor" />
 
@@ -40,5 +35,11 @@
     <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
         <property name="mapper" ref="jacksonObjectMapper"/>
     </bean>
+    <cxf:bus>
+        <cxf:inInterceptors>
+            <ref bean="PreAuthenticationInterceptor"/>
+            <ref bean="oauthInterceptor" />
+        </cxf:inInterceptors>
+    </cxf:bus>
 
 </beans>
