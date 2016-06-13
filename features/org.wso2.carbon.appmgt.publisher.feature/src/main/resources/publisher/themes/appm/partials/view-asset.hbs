@@ -15,14 +15,14 @@
                             <div class="space-right-20 pull-left" style="width: 25%;">
                                 {{#if newViewData.images.defaultThumbnail}}
                                     <div class="app-default-thumbnail"
-                                         style="background: #{{newViewData.images.defaultThumbnail.color}};">
+                                        style="background: #{{newViewData.images.defaultThumbnail.color}};">
                                         {{newViewData.images.defaultThumbnail.text}}
                                     </div>
                                 {{else}}
-                                <div>
-                                    <img src="{{newViewData.images.images_thumbnail}}"
-                                         style="max-width: 400px; max-height: 400px;"
-                                         class="pull-left app-stand-alone-icon" />
+                                    <div>
+                                        <img src="{{newViewData.images.images_thumbnail}}"
+                                         style="max-width: 250px; max-height: 250px;"/>
+                                    </div>
                                 {{/if}}
 
                             </div>
