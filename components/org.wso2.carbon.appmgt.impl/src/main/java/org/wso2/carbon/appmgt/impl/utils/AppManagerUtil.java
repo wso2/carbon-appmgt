@@ -2761,10 +2761,6 @@ public final class AppManagerUtil {
 		return uriTemplate;
 	}
 
-	public static float getAverageRating(APIIdentifier apiId) throws AppManagementException {
-		return AppMDAO.getAverageRating(apiId);
-	}
-
 	public static List<Tenant> getAllTenantsWithSuperTenant() throws UserStoreException {
 		Tenant[] tenants =
 		                   ServiceReferenceHolder.getInstance().getRealmService()

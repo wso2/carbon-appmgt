@@ -668,6 +668,18 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return apiSortedSet;
     }
 
+    public float getAverageRating(String uuid, String assetType) throws AppManagementException {
+        float rating = 0;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, assetType);
+            GenericArtifact genericArtifact = artifactManager.getGenericArtifact(uuid);
+            rating = registry.getAverageRating(genericArtifact.getPath());
+        } catch (RegistryException e) {
+            handleException("Failed to retrieve rating", e);
+        }
+        return rating;
+    }
+
     /**
      * Get the recently added APIs set
      *
@@ -852,21 +864,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleException("Failed to get all the tags", e);
         }
         return tagSet;
-    }
-
-    public void rateAPI(APIIdentifier apiId, APIRating rating,
-                        String user) throws AppManagementException {
-        appMDAO.addRating(apiId, rating.getRating(), user);
-
-    }
-
-    public void removeAPIRating(APIIdentifier apiId, String user) throws AppManagementException {
-        appMDAO.removeAPIRating(apiId, user);
-
-    }
-
-    public int getUserRating(APIIdentifier apiId, String user) throws AppManagementException {
-        return appMDAO.getUserRating(apiId, user);
     }
 
     public Set<WebApp> getPublishedAPIsByProvider(String providerId, int limit)
@@ -1436,16 +1433,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             throws AppManagementException {
         WebApp api = getAPI(identifier);
         appMDAO.updateSubscriptions(identifier, api.getContext(), applicationId);
-    }
-
-    public void addComment(APIIdentifier identifier, String commentText, String user) throws
-                                                                                      AppManagementException {
-        appMDAO.addComment(identifier, commentText, user);
-    }
-
-    public org.wso2.carbon.appmgt.api.model.Comment[] getComments(APIIdentifier identifier)
-            throws AppManagementException {
-        return appMDAO.getComments(identifier);
     }
 
     /**

@@ -85,13 +85,6 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     }
 
     @Override
-    public void addComment(APIIdentifier identifier, String s, String user) throws
-                                                                            AppManagementException {
-        checkSubscribePermission();
-        super.addComment(identifier, s, user);
-    }
-
-    @Override
     public void addToFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
