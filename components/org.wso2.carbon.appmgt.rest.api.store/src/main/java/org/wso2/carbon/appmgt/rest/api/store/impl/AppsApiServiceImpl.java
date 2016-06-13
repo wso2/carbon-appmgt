@@ -336,6 +336,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    @Override
+    public Response appsMobilePlistAppIdUuidGet(String appId, String uuid, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
     /**
      * Retrieve a given static content from storage
      *

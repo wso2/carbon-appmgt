@@ -146,6 +146,24 @@ public class AppsApi  {
     }
 
     @GET
+    @Path("/mobile/plist/{appId}/{uuid}")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Retrieving plist for ios app installation", notes = "Retrieving plist for ios mobile apps. ", response = File.class, tags = {"MobileApps",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. IOS Mobile app plist content retrieved successfully. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. Invalid request or validation error. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. Requested entity does not exist. ", response = File.class),
+            @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. The request has not been performed because one of the preconditions is not met. ", response = File.class)})
+    public Response appsMobilePlistAppIdUuidGet(
+            @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version. Should be formatted as **provider-name-version**. ", required = true) @PathParam("appId") String appId,
+            @ApiParam(value = "The UUID parameter of the one-time download link, which has the external representation of a downloadable binary file", required = true) @PathParam("uuid") String uuid,
+            @ApiParam(value = "Validator for conditional requests; based on ETag. ") @HeaderParam("If-Match") String ifMatch,
+            @ApiParam(value = "Validator for conditional requests; based on the Last Modified header. ") @HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince) {
+        return delegate.appsMobilePlistAppIdUuidGet(appId, uuid, ifMatch, ifUnmodifiedSince);
+    }
+
+    @GET
     @Path("/mobile/binaries/one-time/{uuid}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })

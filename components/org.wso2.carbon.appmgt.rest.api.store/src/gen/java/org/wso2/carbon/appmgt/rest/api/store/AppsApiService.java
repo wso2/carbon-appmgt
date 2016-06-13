@@ -31,6 +31,7 @@ public abstract class AppsApiService {
     public abstract Response appsFavouritePageDelete();
     public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileBinariesOneTimeUuidGet(String uuid,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsMobilePlistAppIdUuidGet(String appId,String uuid,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsFileNameGet(String appType,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsUninstallationPost(String contentType, InstallDTO install);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);

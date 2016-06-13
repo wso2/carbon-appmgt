@@ -469,4 +469,18 @@
         <Type>site</Type>
     </EnabledAssetTypeList>
 
+    <RESTAPI>
+        <!--Configure white-listed URIs of REST API. Accessing white-listed URIs does not require credentials (does not require Authorization header). -->
+        <WhiteListedURIs>
+            <WhiteListedURI>
+                <URI>/api/appm/store/{version}/apps/mobile/binaries/one-time/{uuid}</URI>
+                <HTTPMethods>GET,HEAD</HTTPMethods>
+            </WhiteListedURI>
+            <WhiteListedURI>
+                <URI>/api/appm/store/{version}/apps/static-contents/{fileName}</URI>
+                <HTTPMethods>GET,HEAD</HTTPMethods>
+            </WhiteListedURI>
+        </WhiteListedURIs>
+    </RESTAPI>
+
 </AppManager>
