@@ -104,6 +104,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
+            //Check for app existance and app state
+
 
             appProvider.subscribeMobileApp(username, appId);
             String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters, null);

@@ -2908,12 +2908,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Persists one-time download link content in Database
+     * Generate one-time download link content in Database
      * @param appId mobile application id that the one-time download link generated for
      * @return UUID of the download link
      * @throws AppManagementException
      */
-    public String persistOneTimeDownloadLink(String appId) throws AppManagementException {
+    public String generateOneTimeDownloadLink(String appId) throws AppManagementException {
 
         String downloadLinkUUID = null;
         try {

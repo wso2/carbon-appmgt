@@ -785,11 +785,11 @@ public interface APIProvider extends APIManager {
     public void removeBinaryFromStorage(String fileName) throws AppManagementException;
 
     /**
-     * Persist generated one-time download link URL
+     * Generate generated one-time download link URL
      * @param appId mobile application id that the one-time download link generated for
      * @throws AppManagementException
      */
-    public String persistOneTimeDownloadLink(String appId) throws AppManagementException;
+    public String generateOneTimeDownloadLink(String appId) throws AppManagementException;
 
     /**
      * Retrieve one-time download link details from database
