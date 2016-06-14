@@ -14,7 +14,7 @@ Documentation
 ==============
 
 On-line product documentation is available at:
-        <https://docs.wso2.com/display/APPM110/WSO2+App+Manager+Documentation>
+        <https://docs.wso2.com/display/APPM120/WSO2+App+Manager+Documentation>
 
 Support
 ==================================
