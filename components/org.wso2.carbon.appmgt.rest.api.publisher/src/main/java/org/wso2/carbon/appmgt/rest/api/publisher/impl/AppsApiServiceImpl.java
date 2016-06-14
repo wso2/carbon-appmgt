@@ -375,6 +375,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
 
+            if (appListDTO.getCount() == 0) {
+                String errorMessage = "No result found.";
+                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            }
+
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
