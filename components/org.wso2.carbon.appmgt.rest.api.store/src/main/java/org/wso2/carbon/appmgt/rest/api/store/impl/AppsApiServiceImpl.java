@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeObject;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -41,7 +42,9 @@ import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
+import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.*;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
@@ -56,6 +59,7 @@ import org.wso2.carbon.social.core.SocialActivityException;
 import org.wso2.carbon.social.core.service.SocialActivityService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.mobile.utils.utilities.PlistTemplateBuilder;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -72,7 +76,6 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         String username = RestApiUtil.getLoggedInUsername();
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -338,10 +341,43 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsMobilePlistAppIdUuidGet(String appId, String uuid, String ifMatch, String ifUnmodifiedSince) {
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if(oneTimeDownloadLink == null){
+                RestApiUtil.handleResourceNotFoundError("one-time download link uuid", uuid, log);
+            }
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            carbonContext.setUsername(oneTimeDownloadLink.getCreatedUserName());
+            carbonContext.setTenantDomain(org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            carbonContext.setTenantId(oneTimeDownloadLink.getCreatedTenantID());
+            appProvider = RestApiUtil.getLoggedInUserProvider();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            String oneTimeDownloadLinkAPIPath =
+                    HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
+                            appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION) + uuid;
+            PlistTemplateContext plistTemplateContext = new PlistTemplateContext();
+            plistTemplateContext.setAppName(mobileApp.getAppName());
+            plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());
+            plistTemplateContext.setPackageName(mobileApp.getPackageName());
+            plistTemplateContext.setOneTimeDownloadUrl(oneTimeDownloadLinkAPIPath);
+
+            PlistTemplateBuilder plistTemplateBuilder = new PlistTemplateBuilder();
+            String plistFileContent = plistTemplateBuilder.generatePlistConfig(plistTemplateContext);
+
+        } catch (AppManagementException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    /**
+        /**
      * Retrieve a given static content from storage
      *
      * @param fileName          request file name

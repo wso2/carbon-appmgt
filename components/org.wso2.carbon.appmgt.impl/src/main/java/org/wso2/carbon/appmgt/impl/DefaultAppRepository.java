@@ -265,14 +265,17 @@ public class DefaultAppRepository implements AppRepository {
 
         PreparedStatement preparedStatement = null;
         String queryToPersistOneTimeDownload =
-                "INSERT INTO APM_ONE_TIME_DOWNLOAD_LINK (BINARY_FILE,UUID,IS_DOWNLOADED,CREATED_TIME) VALUES (?,?,?,?)";
+                "INSERT INTO APM_ONE_TIME_DOWNLOAD_LINK (BINARY_FILE,UUID,IS_DOWNLOADED,USERNAME, TENANT_ID, TENANT_DOMAIN, CREATED_TIME) VALUES (?,?,?,?,?,?,?)";
         try {
             connection = getRDBMSConnectionWithoutAutoCommit();
             preparedStatement = connection.prepareStatement(queryToPersistOneTimeDownload);
             preparedStatement.setString(1, oneTimeDownloadLink.getFileName());
             preparedStatement.setString(2, oneTimeDownloadLink.getUUID());
             preparedStatement.setBoolean(3, oneTimeDownloadLink.isDownloaded());
-            preparedStatement.setTimestamp(4, new Timestamp(new java.util.Date().getTime()));
+            preparedStatement.setString(4, getUsernameOfCurrentUser());
+            preparedStatement.setInt(5, getTenantIdOfCurrentUser());
+            preparedStatement.setString(6, getTenantDomainOfCurrentUser());
+            preparedStatement.setTimestamp(7, new Timestamp(new java.util.Date().getTime()));
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -302,7 +305,7 @@ public class DefaultAppRepository implements AppRepository {
         PreparedStatement preparedStatement = null;
         OneTimeDownloadLink oneTimeDownloadLink = null;
         String queryToRetrieveOneTimeDownloadLinkDetails =
-                "SELECT BINARY_FILE, IS_DOWNLOADED FROM APM_ONE_TIME_DOWNLOAD_LINK WHERE UUID = ?";
+                "SELECT BINARY_FILE, IS_DOWNLOADED, USERNAME, TENANT_ID, TENANT_DOMAIN FROM APM_ONE_TIME_DOWNLOAD_LINK WHERE UUID = ?";
         ResultSet downloadLinkData = null;
         try {
             connection = getRDBMSConnectionWithoutAutoCommit();
@@ -314,6 +317,9 @@ public class DefaultAppRepository implements AppRepository {
                 oneTimeDownloadLink.setUUID(UUID);
                 oneTimeDownloadLink.setFileName(downloadLinkData.getString("BINARY_FILE"));
                 oneTimeDownloadLink.setDownloaded(downloadLinkData.getBoolean("IS_DOWNLOADED"));
+                oneTimeDownloadLink.setCreatedUserName(downloadLinkData.getString("USERNAME"));
+                oneTimeDownloadLink.setCreatedTenantID(downloadLinkData.getInt("TENANT_ID"));
+                oneTimeDownloadLink.setCreatedTenantDomain(downloadLinkData.getString("TENANT_DOMAIN"));
 //                oneTimeDownloadLink.setCreatedTime(downloadLinkData.getTimestamp("CREATED_TIME").getTime());
             }
 

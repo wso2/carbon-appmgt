@@ -114,6 +114,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -331,6 +332,37 @@ public final class AppManagerUtil {
 		return api;
 	}
 
+    /**
+     * Generate MobileApp Data Model from a given mobileapp GenericArtifact
+     * @param artifact 'mobileapp' GenericArtifact
+     * @return MobileApp
+     * @throws AppManagementException
+     */
+    public static MobileApp getMobileApp(GenericArtifact artifact) throws AppManagementException {
+        MobileApp mobileApp = new MobileApp();
+        try {
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
+            String screenShots = artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS);
+            mobileApp.setScreenShots(Arrays.asList(screenShots.split("\\s*,\\s*")));
+        } catch (GovernanceException e) {
+           handleException("Failed to get Mobile app with artifact id "+artifact.getId());
+        }
+        return mobileApp;
+    }
 
     public static WebApp getGenericApp(GovernanceArtifact artifact) throws AppManagementException {
 
