@@ -40,7 +40,6 @@ import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
-import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.JavaPolicy;
 import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
@@ -97,7 +96,6 @@ import org.wso2.carbon.utils.xml.StringUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -207,7 +205,7 @@ public class AppMDAO {
             }
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToDeleteRecordTwo = "DELETE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
+            String queryToDeleteRecordTwo = "DELETE FROM APM_BUSINESS_OWNER_PROPERTY WHERE OWNER_ID = ?";
 
             statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo);
             statementToDeleteRecordTwo.setString(1, businessOwnerId);
@@ -297,12 +295,12 @@ public class AppMDAO {
             statementToInsertRecord.setInt(5, businessOwner.getBusinessOwnerId());
 
             statementToInsertRecord.executeUpdate();
-            String queryToDelete = "DELETE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
+            String queryToDelete = "DELETE FROM APM_BUSINESS_OWNER_PROPERTY WHERE OWNER_ID = ?";
 
             statementToDelete = connection.prepareStatement(queryToDelete);
             statementToDelete.setInt(1, businessOwner.getBusinessOwnerId());
             statementToDelete.executeUpdate();
-            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, " +
+            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, " +
                     "SHOW_IN_STORE) VALUES(?,?,?, ?)";
 
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
@@ -349,7 +347,7 @@ public class AppMDAO {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT NAME, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE" +
+        String queryToGetKeyValue = "SELECT NAME, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_PROPERTY WHERE" +
                 " OWNER_ID = ?";
         try {
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
@@ -460,7 +458,7 @@ public class AppMDAO {
                    }
 
             String queryToInsertRecordTwo =
-                    "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
+                    "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
                             "(LAST_INSERT_ID(),?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
