@@ -88,6 +88,7 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.publisher</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.base.version}</importFeatureDef>
