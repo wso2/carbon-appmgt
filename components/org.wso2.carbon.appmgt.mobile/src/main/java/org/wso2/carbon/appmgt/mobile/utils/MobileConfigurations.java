@@ -155,7 +155,7 @@ public class MobileConfigurations {
 
             while(iterator.hasNext()){
                 OMElement propertyElement = iterator.next();
-                configs.put(propertyElement.getAttributeValue(new QName("name")), propertyElement.getText());
+                configs.put(propertyElement.getLocalName(), propertyElement.getText());
             }
             return binaryFileStorageConfig = configs;
         }

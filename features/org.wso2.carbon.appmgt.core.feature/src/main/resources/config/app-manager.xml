@@ -451,6 +451,10 @@
                 <URI>/api/appm/store/{version}/apps/static-contents/{fileName}</URI>
                 <HTTPMethods>GET,HEAD</HTTPMethods>
             </WhiteListedURI>
+            <WhiteListedURI>
+                <URI>/api/appm/store/{version}/apps/mobile/plist/{appId}/{uuid}</URI>
+                <HTTPMethods>GET,HEAD</HTTPMethods>
+            </WhiteListedURI>
         </WhiteListedURIs>
     </RESTAPI>
 

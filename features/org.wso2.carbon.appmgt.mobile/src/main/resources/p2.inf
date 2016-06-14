@@ -1,0 +1,2 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.mobile_${feature.version}/plist-templates/,target:${installFolder}/../../resources/,overwrite:true);\
