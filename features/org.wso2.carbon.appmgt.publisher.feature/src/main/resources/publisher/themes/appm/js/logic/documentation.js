@@ -23,7 +23,7 @@ $(document).ready(function () {
         var errorCondition = false;
         if (checkIllegalCharacters(docId.val())) {
             errorCondition = true;
-            var message = "contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)";
+            var message = "contains one or more illegal characters (/[~!@#$;%^&*()+={}|\\<>\"',)";
             if (!validInput(docId, message, errorCondition)) {
                 return;
             }
@@ -76,7 +76,7 @@ $(document).ready(function () {
             }
         } else if (checkIllegalCharacters(docId.val())) {
             errorCondition = true;
-            var message = "contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)";
+            var message = "contains one or more illegal characters (/[~!@#$;%^&*()+={}|\\<>\"',)";
             if (!validInput(docId, message, errorCondition)) {
                 return;
             }
@@ -102,7 +102,7 @@ $(document).ready(function () {
             //check whether file name contains illegal characters
             var fileName = fileDiv.val().split('\\').pop();
             errorCondition = checkIllegalCharacters(fileName);
-            var message = "contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)";
+            var message = "contains one or more illegal characters (/[~!@#$;%^&*()+={}|\\<>\"',)";
             if (!validInput(fileDiv, message, errorCondition)) {
                 return;
             }
@@ -409,6 +409,6 @@ var validInput = function (divId, message, condition) {
 
 var checkIllegalCharacters = function (value) {
     // registry doesn't allow following illegal charecters
-    var match = value.match(/[~!@#;%^*()+={}|\\<>"',]/);
+    var match = value.match(/[~!@#$;%^&*()+={}|\\<>"',]/);
     return !!match; // '!!' converts the value to boolean
 };
