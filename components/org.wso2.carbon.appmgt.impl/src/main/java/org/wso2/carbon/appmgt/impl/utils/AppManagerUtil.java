@@ -342,20 +342,21 @@ public final class AppManagerUtil {
         MobileApp mobileApp = new MobileApp();
         try {
             mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
-            mobileApp.setAppName(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
+            mobileApp.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+            mobileApp.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
+            mobileApp.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
+            mobileApp.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
+            mobileApp.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            mobileApp.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
+            mobileApp.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
+            mobileApp.setAppProvider(artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER));
+            mobileApp.setDescription(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
+            mobileApp.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
+            mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+            mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+          //  mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
             String screenShots = artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS);
             mobileApp.setScreenShots(Arrays.asList(screenShots.split("\\s*,\\s*")));
         } catch (GovernanceException e) {

@@ -1474,6 +1474,8 @@ paths:
             $ref: '#/definitions/Error'
   '/apps/mobile/plist/{appId}/{uuid}':
     get:
+      produces:
+        - text/xml
       x-scope: 'appm:read'
       x-wso2-curl: ''
       x-wso2-response: ''

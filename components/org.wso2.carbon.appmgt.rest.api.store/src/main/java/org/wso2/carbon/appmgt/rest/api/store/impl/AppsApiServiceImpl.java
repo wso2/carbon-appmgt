@@ -74,6 +74,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
     BeanValidator beanValidator;
 
+    /**
+     * Download/Install mobile application
+     * @param contentType
+     * @param install InstallDTO
+     * @return
+     */
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
         String username = RestApiUtil.getLoggedInUsername();
@@ -84,6 +90,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if(!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())){
+                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+            }
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -161,6 +174,12 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.accepted().build();
     }
 
+    /**
+     * Get Favourite home page in App Store
+     * @param accept
+     * @param ifNoneMatch
+     * @return
+     */
     @Override
     public Response appsFavouritePageGet(String accept, String ifNoneMatch) {
         FavouritePageDTO favouritePageDTO = new FavouritePageDTO();
@@ -194,6 +213,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(favouritePageDTO).build();
     }
 
+    /**
+     * Set favourite page for currently logged in user in App Store
+     * @return
+     */
     @Override
     public Response appsFavouritePagePost() {
         boolean isTenantFlowStarted = false;
@@ -223,6 +246,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Remove favourite page of the currently logged i user in App Store
+     * @return
+     */
     @Override
     public Response appsFavouritePageDelete() {
         boolean isTenantFlowStarted = false;
@@ -258,7 +285,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param fileName          binary file name
      * @param ifMatch
      * @param ifUnmodifiedSince
-     * @return
+     * @return mobile app binary file content
      */
     @Override
     public Response appsMobileBinariesFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
@@ -339,13 +366,21 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     *
+     * @param appId
+     * @param uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsMobilePlistAppIdUuidGet(String appId, String uuid, String ifMatch, String ifUnmodifiedSince) {
 
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
-            if(oneTimeDownloadLink == null){
+            if (oneTimeDownloadLink == null) {
                 RestApiUtil.handleResourceNotFoundError("one-time download link uuid", uuid, log);
             }
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
@@ -357,6 +392,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (mobileApp == null) {
                 RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
             }
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+            }
             AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                     getAPIManagerConfigurationService().getAPIManagerConfiguration();
             String oneTimeDownloadLinkAPIPath =
@@ -367,12 +405,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());
             plistTemplateContext.setPackageName(mobileApp.getPackageName());
             plistTemplateContext.setOneTimeDownloadUrl(oneTimeDownloadLinkAPIPath);
-
             PlistTemplateBuilder plistTemplateBuilder = new PlistTemplateBuilder();
             String plistFileContent = plistTemplateBuilder.generatePlistConfig(plistTemplateContext);
-
+            return Response.ok().entity(plistFileContent).build();
         } catch (AppManagementException e) {
-            e.printStackTrace();
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid plist retrieval", appId, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving plist configuration for IOS mobile app '" + appId + "' installation", e, log);
+            }
         }
         return null;
     }
