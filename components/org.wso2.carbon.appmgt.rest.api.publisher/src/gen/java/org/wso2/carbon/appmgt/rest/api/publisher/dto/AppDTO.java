@@ -150,6 +150,9 @@ public class AppDTO  {
   
   private String createdTime = null;
 
+
+  private List<CustomPropertyDTO> customProperties = new ArrayList<CustomPropertyDTO>();
+
   
   /**
    * UUID of the app registry artifact
@@ -715,7 +718,19 @@ public class AppDTO  {
     this.createdTime = createdTime;
   }
 
-  
+
+  /**
+   * custom properties
+   **/
+  @ApiModelProperty(value = "custom properties")
+  @JsonProperty("customProperties")
+  public List<CustomPropertyDTO> getCustomProperties() {
+    return customProperties;
+  }
+  public void setCustomProperties(List<CustomPropertyDTO> customProperties) {
+    this.customProperties = customProperties;
+  }
+
 
   @Override
   public String toString()  {
@@ -767,6 +782,7 @@ public class AppDTO  {
     sb.append("  mediaType: ").append(mediaType).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
     sb.append("  createdTime: ").append(createdTime).append("\n");
+    sb.append("  customProperties: ").append(customProperties).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

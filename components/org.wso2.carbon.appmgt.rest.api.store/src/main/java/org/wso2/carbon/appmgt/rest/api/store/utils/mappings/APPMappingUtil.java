@@ -25,6 +25,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.CustomProperty;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
@@ -35,6 +36,7 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppSummaryDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.CustomPropertyDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -370,15 +372,33 @@ public class APPMappingUtil {
     }
 
     public static AppDTO fromAppToDTO(App app) {
+
+        AppDTO appDTO = null;
+
         //check if app visibility is permitted and the lifecycle status published
         if (isVisibilityAllowed(app) && APIStatus.PUBLISHED.equals(app.getLifeCycleStatus())) {
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-                return fromWebAppToDTO((WebApp) app);
+                appDTO = fromWebAppToDTO((WebApp) app);
             } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-                return fromMobileAppToDTO((MobileApp) app);
+                appDTO = fromMobileAppToDTO((MobileApp) app);
             }
         }
-        return null;
+
+        if(appDTO != null && app.getCustomProperties() != null){
+
+            List<CustomPropertyDTO> customPropertyDTOs = new ArrayList<CustomPropertyDTO>();
+
+            CustomPropertyDTO customPropertyDTO = null;
+            for(CustomProperty customProperty : app.getCustomProperties()){
+                customPropertyDTO = new CustomPropertyDTO();
+                customPropertyDTO.setName(customProperty.getName());
+                customPropertyDTO.setValue(customProperty.getValue());
+                customPropertyDTOs.add(customPropertyDTO);
+            }
+            appDTO.setCustomProperties(customPropertyDTOs);
+        }
+
+        return appDTO;
     }
 
     private static boolean isVisibilityAllowed(App app) {
