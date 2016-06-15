@@ -19,15 +19,23 @@
 package org.wso2.carbon.appmgt.impl;
 
 import com.google.gson.JsonObject;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.social.core.SocialActivityException;
 import org.wso2.carbon.social.core.service.SocialActivityService;
+
+import java.io.IOException;
 
 /**
  * Parent class for the factories for app types.
@@ -40,6 +48,7 @@ public abstract class AppFactory {
 
         App app = doCreateApp(artifact, registry);
         setRating(app);
+        setCustomProperties(app, artifact, registry);
 
         return app;
     }
@@ -72,6 +81,48 @@ public abstract class AppFactory {
             throw new AppManagementException(errorMessage, e);
         }
 
+    }
+
+    private void setCustomProperties(App app, GenericArtifact artifact, Registry registry) throws AppManagementException {
+
+        String customPropertyDefinitionsResourcePath = getCustomPropertyDefinitionsResourcePath(app.getType());
+
+        try {
+
+            if(registry.resourceExists(customPropertyDefinitionsResourcePath)){
+
+                String customPropertyDefinitions = IOUtils.toString(registry.get(customPropertyDefinitionsResourcePath).getContentStream());
+
+                JSONParser parser = new JSONParser();
+                JSONArray definitionsJson = (JSONArray) parser.parse(customPropertyDefinitions);
+
+                for(Object definition : definitionsJson){
+                    JSONObject definitionJson = (JSONObject) definition;
+
+                    String propertyName = (String) definitionJson.get("name");
+                    String propertyValue = artifact.getAttribute(propertyName);
+
+                    app.addCustomProperty(propertyName, propertyValue);
+                }
+            }
+        } catch (IOException e) {
+            String errorMessage = String.format("Can't read 'custom property definitions' registry resource from the path '%s'.", customPropertyDefinitionsResourcePath);
+            log.error(errorMessage, e);
+            throw new AppManagementException(e);
+        } catch (RegistryException e) {
+            String errorMessage = String.format("Can't read 'custom property definitions' registry resource from the path '%s'.", customPropertyDefinitionsResourcePath);
+            log.error(errorMessage, e);
+            throw new AppManagementException(e);
+        } catch (ParseException e) {
+            String errorMessage = String.format("Can't parse 'custom property definitions' registry resource in the path '%s'.", customPropertyDefinitionsResourcePath);
+            log.error(errorMessage, e);
+            throw new AppManagementException(e);
+        }
+    }
+
+    private String getCustomPropertyDefinitionsResourcePath(String appType) {
+        String resourceName = String.format(AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_FILE_PATTERN, appType);
+        return AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + resourceName;
     }
 
 }
