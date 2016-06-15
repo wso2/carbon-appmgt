@@ -48,11 +48,12 @@ var generateLeftNavJson = function (data, listPartial) {
     }
 
     var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, userManager);
+    var lifecycleState = data.artifact.lifecycleState;
+    if(lifecycleState == "Approved" || lifecycleState == "Published"){
+        editEnabled = false;
+    }
     if (user.hasRoles(["admin"])) {
         editEnabled = true;
-    }
-    if (data.artifact.lifecycleState == "Published") {
-        editEnabled = false;
     }
 
     if (editEnabled) {
