@@ -160,12 +160,21 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         }
 
         SynapseConfiguration initialSynapseConfig = SynapseConfigurationBuilder.getDefaultConfiguration();
+        InputStream in = null;
+        StAXOMBuilder builder = null;
+        SequenceMediatorFactory factory = new SequenceMediatorFactory();
         try {
             if (resourceMisMatchSequence == null) {
-                addSequenceFileName(resourceMisMatchSequence, resourceMisMatchSequenceName);
+                in = FileUtils.openInputStream(new File(synapseConfigRootPath + resourceMisMatchSequenceName + ".xml"));
+                builder = new StAXOMBuilder(in);
+                resourceMisMatchSequence = (SequenceMediator) factory.createMediator(builder.getDocumentElement(), new Properties());
+                resourceMisMatchSequence.setFileName(resourceMisMatchSequenceName + ".xml");
             }
             if (throttleOutSequence == null) {
-                addSequenceFileName(throttleOutSequence, throttleOutSequenceName);
+                in = FileUtils.openInputStream(new File(synapseConfigRootPath + throttleOutSequenceName + ".xml"));
+                builder = new StAXOMBuilder(in);
+                throttleOutSequence = (SequenceMediator) factory.createMediator(builder.getDocumentElement(), new Properties());
+                throttleOutSequence.setFileName(throttleOutSequenceName + ".xml");
             }
             FileUtils.copyFile(new File(synapseConfigRootPath + mainSequenceName + ".xml"),
                     new File(synapseConfigDir.getAbsolutePath() + File.separator + "sequences" + File.separator + mainSequenceName + ".xml"));
@@ -177,6 +186,10 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
 
         } catch (IOException e) {                                                             
             log.error("Error while reading WebApp manager specific synapse sequences" + e);
+        } catch (XMLStreamException e) {
+            log.error("Error while parsing WebApp manager specific synapse sequences" + e);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
 
         Registry registry = new WSO2Registry();
@@ -184,32 +197,11 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(synapseConfigDir
                                                                                                  .getAbsolutePath());
         try {
-            serializer.serializeSequence(authFailureHandlerSequence, initialSynapseConfig, null);
-            serializer.serializeSequence(sandboxKeyErrorSequence, initialSynapseConfig, null);
-            serializer.serializeSequence(productionKeyErrorSequence, initialSynapseConfig, null);
             serializer.serializeSequence(throttleOutSequence, initialSynapseConfig, null);
             serializer.serializeSequence(resourceMisMatchSequence, initialSynapseConfig, null);
             serializer.serializeSynapseRegistry(registry, initialSynapseConfig, null);
         } catch (Exception e) {
             handleException("Couldn't serialise the initial synapse configuration for the domain : " + tenantDomain, e);
-        }
-    }
-
-    private void addSequenceFileName(SequenceMediator sequenceMediator, String sequenceName) {
-        InputStream in = null;
-        try {
-            in = FileUtils.openInputStream(new File(synapseConfigRootPath + sequenceName + ".xml"));
-            StAXOMBuilder builder = new StAXOMBuilder(in);
-            SequenceMediatorFactory factory = new SequenceMediatorFactory();
-            sequenceMediator = (SequenceMediator) factory.createMediator(builder.getDocumentElement(), new Properties());
-            sequenceMediator.setFileName(sequenceName + ".xml");
-
-        } catch (IOException e) {
-            log.error("Error while reading WebApp manager specific synapse sequences" + e);
-        } catch (XMLStreamException e) {
-            log.error("Error while parsing WebApp manager specific synapse sequences" + e);
-        } finally {
-            IOUtils.closeQuietly(in);
         }
     }
 

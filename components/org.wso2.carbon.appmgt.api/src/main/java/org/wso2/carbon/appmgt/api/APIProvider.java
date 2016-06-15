@@ -373,11 +373,19 @@ public interface APIProvider extends APIManager {
     /**
      * Returns details of an WebApp
      *
-     * @param uuid uuid of the A
+     * @param uuid uuid of the App
      * @return An WebApp object related to the given identifier or null
      * @throws AppManagementException if failed get WebApp from APIIdentifier
      */
     public WebApp getWebApp(String uuid) throws AppManagementException;
+
+    /**
+     * Returns details of a Mobile App
+     * @param uuid  uuid of the App
+     * @return A MobileApp object related ro given identifier or null
+     * @throws AppManagementException
+     */
+    public MobileApp getMobileApp(String uuid) throws AppManagementException;
 
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException;
