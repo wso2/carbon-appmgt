@@ -592,6 +592,30 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return webApp;
     }
 
+    /**
+     * Retrieve webapp for the given uuid
+     * @param uuid uuid of the Application
+     * @return Webapp
+     * @throws AppManagementException
+     */
+    @Override
+    public MobileApp getMobileApp(String uuid) throws AppManagementException {
+        GenericArtifact artifact = null;
+        MobileApp mobileApp = null;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, AppMConstants.MOBILE_ASSET_TYPE);
+            artifact = artifactManager.getGenericArtifact(uuid);
+            if (artifact != null) {
+                mobileApp = AppManagerUtil.getMobileApp(artifact);
+            }
+
+        } catch (GovernanceException e) {
+            handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
+        }
+        return mobileApp;
+    }
+
 
     private String createWebAppArtifact(WebApp webApp) throws AppManagementException {
         String artifactId = null;

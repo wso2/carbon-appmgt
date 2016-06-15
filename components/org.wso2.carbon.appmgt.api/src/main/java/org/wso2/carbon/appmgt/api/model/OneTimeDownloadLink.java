@@ -27,7 +27,26 @@ public class OneTimeDownloadLink {
     private String UUID;
     private String fileName;
     private boolean isDownloaded;
+    private String createdUserName;
+    private int createdTenantID;
+    private String createdTenantDomain;
     private long createdTime;
+
+    public String getCreatedUserName() {
+        return createdUserName;
+    }
+
+    public void setCreatedUserName(String createdUserName) {
+        this.createdUserName = createdUserName;
+    }
+
+    public int getCreatedTenantID() {
+        return createdTenantID;
+    }
+
+    public void setCreatedTenantID(int createdTenantID) {
+        this.createdTenantID = createdTenantID;
+    }
 
     public long getCreatedTime() {
         return createdTime;
@@ -60,5 +79,13 @@ public class OneTimeDownloadLink {
 
     public void setDownloaded(boolean isDownloadable) {
         this.isDownloaded = isDownloadable;
+    }    public String getCreatedTenantDomain() {
+        return createdTenantDomain;
     }
+
+    public void setCreatedTenantDomain(String createdTenantDomain) {
+        this.createdTenantDomain = createdTenantDomain;
+    }
+
+
 }

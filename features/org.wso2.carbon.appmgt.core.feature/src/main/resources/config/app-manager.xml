@@ -370,7 +370,7 @@
             <Config name="AppDownloadURLHost">%http%</Config>
 
             <!-- Path of the Property List file generated using the PLIST template for iOS apps. -->
-            <Config name="IosPlistPath">publisher/api/mobileapp/getplist</Config>
+            <Config name="IosPlistPath">/api/appm/store/v1.1/apps/mobile/plist</Config>
 
             <!-- Ability to enable the enterprise-wide operations on mobile apps -->
             <Config name="EnterpriseOperations_Enabled">true</Config>

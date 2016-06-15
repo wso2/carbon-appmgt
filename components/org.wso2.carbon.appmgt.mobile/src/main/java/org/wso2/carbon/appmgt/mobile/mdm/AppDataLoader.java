@@ -61,18 +61,19 @@ public class AppDataLoader {
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
                 APIProvider appProvider = getLoggedInUserProvider();
                 String oneTimeDownloadUUID = appProvider.generateOneTimeDownloadLink(artifact.getId());
-                String oneTimeDownloadLink = MobileConfigurations.getInstance().getBinaryFileStorageConfig().get(
-                        MobileConfigurations.APP_BINARY_FILE_API_LOCATION);
                 app.setType(artifact.getAttribute("overview_type"));
                 if("install".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
+                        String oneTimeDownloadLink = MobileConfigurations.getInstance().getBinaryFileStorageConfig().get(
+                                MobileConfigurations.APP_BINARY_FILE_API_LOCATION);
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
                                 .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + oneTimeDownloadLink + oneTimeDownloadUUID);
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
-                        String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance()
-                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
+                                MobileConfigurations.getInstance().getInstance().getMDMConfigs()
+                                        .get(MobileConfigurations.IOS_PLIST_PATH) + File.separator + artifact.getId() +
+                                File.separator  + oneTimeDownloadUUID);
                     }
                 }
 

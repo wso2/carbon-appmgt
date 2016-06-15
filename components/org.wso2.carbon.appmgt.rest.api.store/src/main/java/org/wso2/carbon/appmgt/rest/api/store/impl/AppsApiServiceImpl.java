@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeObject;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -41,7 +42,9 @@ import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
+import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.*;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
@@ -56,6 +59,7 @@ import org.wso2.carbon.social.core.SocialActivityException;
 import org.wso2.carbon.social.core.service.SocialActivityService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.mobile.utils.utilities.PlistTemplateBuilder;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -70,9 +74,14 @@ public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
     BeanValidator beanValidator;
 
+    /**
+     * Download/Install mobile application
+     * @param contentType
+     * @param install InstallDTO
+     * @return
+     */
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         String username = RestApiUtil.getLoggedInUsername();
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -81,6 +90,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if(!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())){
+                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+            }
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -158,6 +174,12 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.accepted().build();
     }
 
+    /**
+     * Get Favourite home page in App Store
+     * @param accept
+     * @param ifNoneMatch
+     * @return
+     */
     @Override
     public Response appsFavouritePageGet(String accept, String ifNoneMatch) {
         FavouritePageDTO favouritePageDTO = new FavouritePageDTO();
@@ -191,6 +213,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(favouritePageDTO).build();
     }
 
+    /**
+     * Set favourite page for currently logged in user in App Store
+     * @return
+     */
     @Override
     public Response appsFavouritePagePost() {
         boolean isTenantFlowStarted = false;
@@ -220,6 +246,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Remove favourite page of the currently logged i user in App Store
+     * @return
+     */
     @Override
     public Response appsFavouritePageDelete() {
         boolean isTenantFlowStarted = false;
@@ -255,7 +285,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param fileName          binary file name
      * @param ifMatch
      * @param ifUnmodifiedSince
-     * @return
+     * @return mobile app binary file content
      */
     @Override
     public Response appsMobileBinariesFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
@@ -336,12 +366,60 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     *
+     * @param appId
+     * @param uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsMobilePlistAppIdUuidGet(String appId, String uuid, String ifMatch, String ifUnmodifiedSince) {
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if (oneTimeDownloadLink == null) {
+                RestApiUtil.handleResourceNotFoundError("one-time download link uuid", uuid, log);
+            }
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            carbonContext.setUsername(oneTimeDownloadLink.getCreatedUserName());
+            carbonContext.setTenantDomain(org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            carbonContext.setTenantId(oneTimeDownloadLink.getCreatedTenantID());
+            appProvider = RestApiUtil.getLoggedInUserProvider();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+            }
+            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            String oneTimeDownloadLinkAPIPath =
+                    HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
+                            appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION) + uuid;
+            PlistTemplateContext plistTemplateContext = new PlistTemplateContext();
+            plistTemplateContext.setAppName(mobileApp.getAppName());
+            plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());
+            plistTemplateContext.setPackageName(mobileApp.getPackageName());
+            plistTemplateContext.setOneTimeDownloadUrl(oneTimeDownloadLinkAPIPath);
+            PlistTemplateBuilder plistTemplateBuilder = new PlistTemplateBuilder();
+            String plistFileContent = plistTemplateBuilder.generatePlistConfig(plistTemplateContext);
+            return Response.ok().entity(plistFileContent).build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid plist retrieval", appId, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving plist configuration for IOS mobile app '" + appId + "' installation", e, log);
+            }
+        }
         return null;
     }
 
-    /**
+        /**
      * Retrieve a given static content from storage
      *
      * @param fileName          request file name

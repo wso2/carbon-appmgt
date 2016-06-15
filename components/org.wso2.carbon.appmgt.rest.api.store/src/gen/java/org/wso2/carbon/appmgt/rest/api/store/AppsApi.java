@@ -148,7 +148,7 @@ public class AppsApi  {
     @GET
     @Path("/mobile/plist/{appId}/{uuid}")
     @Consumes({"application/json"})
-    @Produces({"application/json"})
+    @Produces({"text/xml"})
     @io.swagger.annotations.ApiOperation(value = "Retrieving plist for ios app installation", notes = "Retrieving plist for ios mobile apps. ", response = File.class, tags = {"MobileApps",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK. IOS Mobile app plist content retrieved successfully. ", response = File.class),
