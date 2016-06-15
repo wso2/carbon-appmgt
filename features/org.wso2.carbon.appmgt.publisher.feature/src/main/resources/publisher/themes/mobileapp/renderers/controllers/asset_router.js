@@ -32,6 +32,9 @@ var render=function(theme,data,meta,require){
     var um=server.userManager(user.tenantId);
     var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
     var updateMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_update, um);
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var typeList = apiProvider.getEnabledAssetTypeList();
+    data.typeList = typeList;
 
     if(!updateMobileAppAuthorized){
         response.sendError(400);
