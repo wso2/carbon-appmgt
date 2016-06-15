@@ -188,12 +188,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isFavouriteApp = function (appName, version, provider) {
         var status = false;
         if (user) {
-            var tenantUsername;
-            if (tenantId == -1234) {
-                tenantUsername = ctx.user.username;
-            } else {
-                tenantUsername = ctx.user.username + "@" + ctx.user.tenantDomain;
-            }
+            var tenantUsername = ctx.user.username;
 
             // check whether this is favourite app of user.
             status = manager.isFavouriteApp(provider, appName, version, tenantUsername, ctx.user.tenantId,

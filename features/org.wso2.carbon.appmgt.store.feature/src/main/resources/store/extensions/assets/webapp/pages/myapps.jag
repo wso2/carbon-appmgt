@@ -54,15 +54,7 @@ require('/modules/store.js').exec(function (ctx) {
         social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     //set tenant aware username
-    var tenantUsername = null;
-    if (user != null) {
-        if (tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
-    }
-
+    var tenantUsername = user ? user.username : null;
 
     caramel = require('caramel');
     //Check whether to show register link in myapps page
