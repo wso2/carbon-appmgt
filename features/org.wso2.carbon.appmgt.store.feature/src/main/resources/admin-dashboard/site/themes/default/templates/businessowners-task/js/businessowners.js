@@ -284,7 +284,7 @@ $(document).on("click", ".owner-delete-button", function () {
                    contentType: 'application/json',
                    dataType: 'json',
                    success: function (response) {
-                       if(response) {
+                       if(response.response) {
                            updateOwners();
                            Showalert("Business Owner : " + ownerName + " Deleted Successfully ", "alert-success", "statusSuccess");
                            location.reload();
