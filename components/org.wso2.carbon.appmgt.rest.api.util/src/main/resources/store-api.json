@@ -64,7 +64,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "A search condition.\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
+                        "description": "A search condition.\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id, business_owner_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
                         "type": "string"
                     },
                     {
@@ -1393,11 +1393,11 @@
             }
         },
         "/administration/apps/uninstallation": {
-            "x-scope": "appm:administration",
-            "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation\"",
-            "x-wso2-response": "HTTP/1.1 200 OK",
-            "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
             "post": {
+                "x-scope": "appm:administration",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise uninstall App",
                 "description": "Enterprise uninstall an existing App\n",
                 "parameters": [

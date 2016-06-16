@@ -292,12 +292,7 @@ function setDefaultThumbnail(asset) {
 function isFavouriteApp(appName, version, provider, user, storeTenantDomain) {
     var status = false;
     if (user) {
-        var tenantUsername;
-        if (user.tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
+        var tenantUsername = user ? user.username : null;
 
         // check whether this is favourite app of user.
         status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
@@ -319,12 +314,7 @@ function isSubscribed(asset, user, subscriptionService) {
     appInfo["provider"] = asset.attributes.overview_provider;
 
     var defaultApplicationName = "DefaultApplication";
-    var tenantUsername;
-    if (user.tenantId == -1234) {
-        tenantUsername = user.username;
-    } else {
-        tenantUsername = user.username + "@" + user.tenantDomain;
-    }
+    var tenantUsername = user ? user.username : null;
     var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
                                                                      tenantUsername).subscription;
     if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
