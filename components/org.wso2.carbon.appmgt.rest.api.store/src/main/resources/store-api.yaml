@@ -64,7 +64,7 @@ paths:
 
 
             Supported attribute modifiers are [**provider, app_name,
-            app_version, app_id**]
+            app_version, app_id, business_owner_id**]
 
 
             If no advanced attribute modifier has been specified, the search
