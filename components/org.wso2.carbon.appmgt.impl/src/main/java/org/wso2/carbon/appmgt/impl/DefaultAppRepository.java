@@ -700,7 +700,7 @@ public class DefaultAppRepository implements AppRepository {
 
         GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
 
-        GenericArtifact updatedWebAppArtifact = buildWebAppRegistryArtifact(artifactManager, webApp);
+        GenericArtifact updatedWebAppArtifact = buildRegistryArtifact(artifactManager, AppMConstants.WEBAPP_ASSET_TYPE, webApp);
         updatedWebAppArtifact.setId(webApp.getUUID());
         artifactManager.updateGenericArtifact(updatedWebAppArtifact);
     }
@@ -917,7 +917,7 @@ public class DefaultAppRepository implements AppRepository {
 
         GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
 
-        GenericArtifact appArtifact = buildWebAppRegistryArtifact(artifactManager, webApp);
+        GenericArtifact appArtifact = buildRegistryArtifact(artifactManager, AppMConstants.WEBAPP_ASSET_TYPE, webApp);
         artifactManager.addGenericArtifact(appArtifact);
 
         artifactId = appArtifact.getId();
@@ -956,6 +956,24 @@ public class DefaultAppRepository implements AppRepository {
         }
 
         return artifactManager;
+    }
+
+    private GenericArtifact buildRegistryArtifact(GenericArtifactManager artifactManager, String type, App app) throws GovernanceException {
+
+        GenericArtifact artifact = null;
+
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(type)){
+            artifact = buildWebAppRegistryArtifact(artifactManager, (WebApp) app);
+        }
+
+        // Add custom properties.
+        if(app.getCustomProperties() != null &&  !app.getCustomProperties().isEmpty()){
+            for(CustomProperty customProperty : app.getCustomProperties()){
+                artifact.setAttribute(customProperty.getName(), customProperty.getValue());
+            }
+        }
+
+        return artifact;
     }
 
     private GenericArtifact buildWebAppRegistryArtifact(GenericArtifactManager artifactManager, WebApp webApp) throws GovernanceException {

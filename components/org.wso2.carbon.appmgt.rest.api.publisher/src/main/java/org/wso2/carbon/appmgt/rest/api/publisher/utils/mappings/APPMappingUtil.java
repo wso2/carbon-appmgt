@@ -333,14 +333,29 @@ public class APPMappingUtil {
 
     public static AppDTO fromAppToDTO(App app) {
 
+        AppDTO appDTO = null;
+
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-            return fromWebAppToDTO((WebApp) app);
+            appDTO = fromWebAppToDTO((WebApp) app);
         } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-            return fromMobileAppToDTO((MobileApp) app);
+            appDTO = fromMobileAppToDTO((MobileApp) app);
         }
 
-        return null;
+        if(appDTO != null && app.getCustomProperties() != null){
 
+            List<CustomPropertyDTO> customPropertyDTOs = new ArrayList<CustomPropertyDTO>();
+
+            CustomPropertyDTO customPropertyDTO = null;
+            for(CustomProperty customProperty : app.getCustomProperties()){
+                customPropertyDTO = new CustomPropertyDTO();
+                customPropertyDTO.setName(customProperty.getName());
+                customPropertyDTO.setValue(customProperty.getValue());
+                customPropertyDTOs.add(customPropertyDTO);
+            }
+            appDTO.setCustomProperties(customPropertyDTOs);
+        }
+
+        return appDTO;
     }
 
     private static AppDTO fromWebAppToDTO(WebApp webapp) {
@@ -689,6 +704,14 @@ public class APPMappingUtil {
         if(claimsList != null){
             webApp.setClaims(claimsList);
         }
+
+        if(appDTO.getCustomProperties() != null && !appDTO.getCustomProperties().isEmpty()){
+
+            for(CustomPropertyDTO customPropertyDTO : appDTO.getCustomProperties()){
+                webApp.addCustomProperty(customPropertyDTO.getName(), customPropertyDTO.getValue());
+            }
+        }
+
         return webApp;
     }
 

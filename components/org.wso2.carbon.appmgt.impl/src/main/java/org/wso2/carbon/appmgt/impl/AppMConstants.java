@@ -77,6 +77,8 @@ public final class AppMConstants {
 
     public static final String OAUTH_SCOPE_ROLE_MAPPING_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
+    public static final String CUSTOM_PROPERTY_DEFINITIONS_PATH = "custom-property-definitions";
+
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
 
