@@ -85,15 +85,15 @@ paths:
 
 
 
-            Supported attribute modifiers are [**provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id**]
 
 
 
 
 
-            If no advanced attribute modifier has been specified, the search will
-            match the
+            If no advanced attribute modifier has been specified, the search
+            will match the
 
             given query string against the App name.
           type: string
@@ -180,8 +180,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -237,7 +237,7 @@ paths:
             OK.
             Qualifying App is returned.
           schema:
-            $ref: '#/definitions/AppInfo'
+            $ref: '#/definitions/App'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -764,38 +764,6 @@ paths:
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/discover':
-    post:
-      x-scope: 'appm:create'
-      x-wso2-curl: ''
-      x-wso2-response: ''
-      x-wso2-request: ''
-      summary: Discover Apps
-      description: |
-        Discover Apps.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: |
-            OK.
-        '400':
-          description: |
-            Bad Request.
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: |
-            Unsupported Media Type.
-            The entity of the request was in an unsupported format.
-          schema:
-            $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/throttlingtiers':
     get:
       x-scope: 'appm:read'
@@ -1057,8 +1025,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created document object as the entity
-            in the body.
+            Successful response with the newly created document object as the
+            entity in the body.
 
             Location header contains the URL of the newly added document.
           schema:
@@ -1205,13 +1173,15 @@ paths:
         - $ref: '#/parameters/appType'
         - name: action
           description: >
-            The action determining whether to demote or promote the state of the App.
+            The action determining whether to demote or promote the state of the
+            App.
 
 
 
 
 
-            Supported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]
+            Supported actions are [**Publish, Approve, Reject, Unpublish,
+            Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]
           in: query
           type: string
           required: true
@@ -1244,9 +1214,8 @@ paths:
                 requests.
               type: string
             Last-Modified:
-              description: >
+              description: |
                 Date and time at which the App lifecycle was last modified.
-
                 Used by caches or in conditional requests.
               type: string
         '400':
@@ -1327,12 +1296,16 @@ paths:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/statType'
         - name: startTimeStamp
-          description: 'The start date and time of the stat analysis in the following format: 2016-04-19 10:32:00'
+          description: >-
+            The start date and time of the stat analysis in the following
+            format: 2016-04-19 10:32:00
           in: query
           type: string
           required: false
         - name: endTimeStamp
-          description: 'The end date and time of the stat analysis in the following format: 2016-04-19 10:32:00'
+          description: >-
+            The end date and time of the stat analysis in the following format:
+            2016-04-19 10:32:00
           in: query
           type: string
           required: false
@@ -1947,8 +1920,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -2036,9 +2009,8 @@ paths:
                 requests.
               type: string
             Last-Modified:
-              description: >
+              description: |
                 Date and time at which the App lifecycle was last modified.
-
                 Used by caches or in conditional requests.
               type: string
         '400':
@@ -2254,8 +2226,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -2551,8 +2523,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the
-      version.
+      The following combination is also accepted as a valid APP ID: the provider
+      of the app, name of the app and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -2577,8 +2549,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The following combination is also accepted as a valid App ID: the provider of the app, name of the app and the
-      version.
+      The following combination is also accepted as a valid App ID: the provider
+      of the app, name of the app and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -2592,7 +2564,9 @@ parameters:
   isGlobal:
     name: isGlobal
     in: query
-    description: Determines whether or not the policy is global. The default value is 'true'.
+    description: >-
+      Determines whether or not the policy is global. The default value is
+      'true'.
     required: false
     default: true
     type: boolean
@@ -2657,8 +2631,9 @@ parameters:
 
 
 
-      Supported stat types are
-      [**getAppUsagePerPage, getSubscriptionCountsPerApp, getSubscriptionsPerApp, getAppUsagePerUser, getAppResponseTime, getCacheHit**]
+      Supported stat types are [**getAppUsagePerPage,
+      getSubscriptionCountsPerApp, getSubscriptionsPerApp, getAppUsagePerUser,
+      getAppResponseTime, getCacheHit**]
     required: true
     type: string
     enum:
@@ -2702,8 +2677,10 @@ parameters:
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: |
-      Validator for conditional requests; based on the Last Modified header of the
+    description: >
+      Validator for conditional requests; based on the Last Modified header of
+      the
+
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -2739,12 +2716,16 @@ definitions:
           Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /app?limit=1&offset=0&query=
-      list:
+      appList:
         type: array
         items:
-          $ref: '#/definitions/AppInfo'
-  AppInfo:
-    title: App Info object with basic App details.
+          $ref: '#/definitions/App'
+      appSummaryList:
+        type: array
+        items:
+          $ref: '#/definitions/AppSummary'
+  AppSummary:
+    title: App summary object with basic App details.
     properties:
       id:
         type: string
@@ -3477,4 +3458,3 @@ definitions:
         type: string
         description: |
           Description about individual errors occurred
-
