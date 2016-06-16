@@ -94,16 +94,21 @@ public abstract class AppFactory {
                 String customPropertyDefinitions = IOUtils.toString(registry.get(customPropertyDefinitionsResourcePath).getContentStream());
 
                 JSONParser parser = new JSONParser();
-                JSONArray definitionsJson = (JSONArray) parser.parse(customPropertyDefinitions);
+                JSONObject definitionsJson = (JSONObject) parser.parse(customPropertyDefinitions);
 
-                for(Object definition : definitionsJson){
-                    JSONObject definitionJson = (JSONObject) definition;
+                JSONArray definitionsListJson = null;
+                if((definitionsListJson = (JSONArray) definitionsJson.get("customPropertyDefinitions")) != null){
+                    for(Object definition : definitionsListJson){
+                        JSONObject definitionJson = (JSONObject) definition;
 
-                    String propertyName = (String) definitionJson.get("name");
-                    String propertyValue = artifact.getAttribute(propertyName);
+                        String propertyName = (String) definitionJson.get("name");
+                        String propertyValue = artifact.getAttribute(propertyName);
 
-                    app.addCustomProperty(propertyName, propertyValue);
+                        app.addCustomProperty(propertyName, propertyValue);
+                    }
                 }
+
+
             }
         } catch (IOException e) {
             String errorMessage = String.format("Can't read 'custom property definitions' registry resource from the path '%s'.", customPropertyDefinitionsResourcePath);
@@ -121,8 +126,7 @@ public abstract class AppFactory {
     }
 
     private String getCustomPropertyDefinitionsResourcePath(String appType) {
-        String resourceName = String.format(AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_FILE_PATTERN, appType);
-        return AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + resourceName;
+        return String.format("%s/%s/%s.json", AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH, appType);
     }
 
 }

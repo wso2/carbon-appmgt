@@ -8,7 +8,7 @@ var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
 
-var render = function (theme, data, meta, require) {
+var render = function(theme, data, meta, require) {
 
     var log = new Log();
     var apiProvider = jagg.module('manager').getAPIProviderObj();
@@ -16,9 +16,9 @@ var render = function (theme, data, meta, require) {
     var um = server.userManager(user.tenantId);
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
+    var updateWebAppAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_update, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
     var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
-    //var _url = "/publisher/asset/"  + data.meta.shortName + "/" + data.info.id + "/edit"
     var listPartial = 'view-asset';
     var heading = "";
     var newViewData;
@@ -27,6 +27,7 @@ var render = function (theme, data, meta, require) {
     var typeList = apiProvider.getEnabledAssetTypeList();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
+
     //Determine what view to show
     switch (data.op) {
 
@@ -60,7 +61,7 @@ var render = function (theme, data, meta, require) {
             if (data.artifact.lifecycleState == "Published") {
                 editEnabled = false;
             }
-            if (user.hasRoles(["admin"])) {
+            if (user.hasRoles(["admin"]) || updateWebAppAuthorized) {
                 editEnabled = true;
             }
             if (!editEnabled) {
@@ -103,48 +104,37 @@ var render = function (theme, data, meta, require) {
 
     theme('single-col-fluid', {
         title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data
+        header: [{
+            partial: 'header',
+            context: data
+        }],
+        ribbon: [{
+            partial: 'ribbon',
+            context: {
+                active: listPartial,
+                createPermission: createActionAuthorized,
+                viewStats: viewStatsAuthorized,
+                um: um,
+                notifications: notifications,
+                notificationCount: notificationCount,
+                typeList: typeList
             }
-        ],
-        ribbon: [
-            {
-                partial: 'ribbon',
-                context: {
-                    active: listPartial,
-                    createPermission: createActionAuthorized,
-                    viewStats: viewStatsAuthorized,
-                    um: um,
-                    notifications: notifications,
-                    notificationCount: notificationCount,
-                    typeList: typeList
-                }
+        }],
+        leftnav: [{
+            partial: 'left-nav',
+            context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
+        }],
+        listassets: [{
+            partial: listPartial,
+            context: data
+        }],
+        heading: [{
+            partial: 'heading',
+            context: {
+                title: heading,
+                menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
             }
-        ],
-        leftnav: [
-            {
-                partial: 'left-nav',
-                context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
-            }
-        ],
-        listassets: [
-            {
-                partial: listPartial,
-                context: data
-            }
-        ],
-        heading: [
-            {
-                partial: 'heading',
-                context: {
-                    title: heading,
-                    menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
-                }
-            }
-        ]
+        }]
     });
-
 
 };

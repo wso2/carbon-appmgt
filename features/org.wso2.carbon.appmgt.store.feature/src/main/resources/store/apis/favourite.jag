@@ -21,12 +21,7 @@ require('/modules/store.js').exec(function (ctx) {
     var setFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.setFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
@@ -36,13 +31,7 @@ require('/modules/store.js').exec(function (ctx) {
     var removeFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
-
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.removeFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
@@ -55,14 +44,7 @@ require('/modules/store.js').exec(function (ctx) {
         var version = parameters.version;
         var provider = parameters.provider;
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
-
-
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
@@ -81,12 +63,7 @@ require('/modules/store.js').exec(function (ctx) {
         var version = parameters.version;
         var provider = parameters.provider;
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
@@ -103,12 +80,7 @@ require('/modules/store.js').exec(function (ctx) {
     var hasFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
         var content = favourites.hasFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
         return content;
@@ -118,12 +90,7 @@ require('/modules/store.js').exec(function (ctx) {
         var action = matcher.elements().action;
         response.status = 200;
         response.contentType = "application/json";
-        var userName;
-        if (user.tenantId == -1234) {
-            userName = user.username;
-        } else {
-            userName = user.username + "@" + user.tenantDomain;
-        }
+        var userName = user.username;
         var tenantIdOfUser = user.tenantId;
 
         switch (action) {

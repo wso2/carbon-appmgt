@@ -82,12 +82,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var searchQuery = {search: "", searchTerm: ""};
 
-    var tenantUsername;
-    if (user.tenantId == -1234) {
-        tenantUsername = user.username;
-    } else {
-        tenantUsername = user.username + "@" + user.tenantDomain;
-    }
+    var tenantUsername = user.username;
 
     var apps;
     if(query) {

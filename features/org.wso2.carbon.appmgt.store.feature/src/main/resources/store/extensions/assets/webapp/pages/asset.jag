@@ -356,12 +356,7 @@ require('/modules/store.js').exec(function (ctx) {
             var version = asset.attributes.overview_version;
             var provider = asset.attributes.overview_provider;
 
-            var tenantUsername;
-            if (tenantId == -1234) {
-                tenantUsername = user.username;
-            } else {
-                tenantUsername = user.username + "@" + user.tenantDomain;
-            }
+            var tenantUsername = user.username;
 
             var status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                                 tenantDomain).status;
