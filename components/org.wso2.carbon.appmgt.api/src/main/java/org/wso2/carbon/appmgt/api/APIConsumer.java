@@ -38,6 +38,15 @@ public interface APIConsumer extends APIManager {
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
+    /**
+     * Returns business owner Ids by a prefix of business owner name.
+     *
+     * @param searchPrefix
+     * @return
+     * @throws AppManagementException
+     */
+    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix) throws AppManagementException;
+
 
     /**
      * @param subscriberId id of the Subscriber

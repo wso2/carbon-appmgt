@@ -2505,6 +2505,28 @@ public class APIStoreHostObject extends ScriptableObject {
 
     }
 
+    /**
+     * Returns business owner Ids by a prefix of business owner name.
+     *
+     * @param cx      context
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return business owner Ids List.
+     * @throws AppManagementException
+     */
+    public static List<Integer> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
+            Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+        if (args == null || args.length != 1) {
+            handleException("Invalid number of parameters.");
+        }
+
+        String searchPrefix = args[0].toString();
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        List<Integer> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix);
+        return businessOwnersList;
+    }
+
     public static boolean jsFunction_removeSubscription(Context cx, Scriptable thisObj,
                                                         Object[] args,
                                                         Function funObj)

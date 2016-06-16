@@ -576,6 +576,43 @@ public class AppMDAO {
     }
 
     /**
+     * Search business owners.
+     * @param searchPrefix
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws AppManagementException {
+        Connection connection = null;
+        PreparedStatement statementToGetBusinessOwners = null;
+        List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
+        ResultSet businessOwnerResultSet = null;
+
+        List<Integer> businessOwnerIdsList = new ArrayList<>();
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            String queryToGetBusinessOwner = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME LIKE ? AND TENANT_ID = ? ";
+
+            statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
+            searchPrefix = "%" + searchPrefix + "%";
+            statementToGetBusinessOwners.setString(1, searchPrefix);
+            statementToGetBusinessOwners.setInt(2, tenantId);
+            businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
+
+            while (businessOwnerResultSet.next()) {
+                BusinessOwner businessOwner = new BusinessOwner();
+                int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
+                businessOwnerIdsList.add(businessOwnerId);
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve business Ids for the search value " + searchPrefix, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
+        }
+        return businessOwnerIdsList;
+    }
+
+    /**
 	 * Get Subscribed APIs for given userId
 	 *
 	 * @param userId

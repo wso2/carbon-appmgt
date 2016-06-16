@@ -120,6 +120,16 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
     }
 
+    /**
+     * Returns business owner Ids by a prefix of business owner name.
+     * @param searchPrefix
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix) throws AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+    }
 
     /**
      * Returns the set of APIs with the given tag from the taggedAPIs Map
