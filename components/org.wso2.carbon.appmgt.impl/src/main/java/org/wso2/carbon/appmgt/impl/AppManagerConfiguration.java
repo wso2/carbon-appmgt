@@ -286,7 +286,7 @@ public class AppManagerConfiguration {
         Iterator i = params.getChildElements();
         while(i.hasNext()) {
             OMElement param = (OMElement) i.next();
-            paramMap.put(param.getLocalName(), param.getText());
+            paramMap.put(param.getLocalName(), replaceSystemProperty(param.getText()));
         }
 
         return paramMap;
