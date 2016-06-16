@@ -301,7 +301,7 @@
     <SSOConfiguration>
 
         <!-- URL of the IDP use for SSO -->
-        <IdentityProviderUrl>https://localhost:9443/samlsso</IdentityProviderUrl>
+        <IdentityProviderUrl>https://${carbon.local.ip}:${mgt.transport.https.port}/samlsso</IdentityProviderUrl>
 
         <Configurators>
             <Configurator>
@@ -309,7 +309,7 @@
                 <version>5.0.0</version>
                 <providerClass>org.wso2.carbon.appmgt.impl.idp.sso.configurator.IS500SAMLSSOConfigurator</providerClass>
                 <parameters>
-                    <providerURL>https://localhost:9443</providerURL>
+                    <providerURL>https://${carbon.local.ip}:${mgt.transport.https.port}</providerURL>
                     <username>admin</username>
                     <password>admin</password>
                 </parameters>
@@ -324,7 +324,7 @@
     <EntitlementServiceConfiguration>
 
         <Parameters>
-            <ServerUrl>https://localhost:9443</ServerUrl>
+            <ServerUrl>https://${carbon.local.ip}:${mgt.transport.https.port}</ServerUrl>
             <Username>admin</Username>
             <Password>admin</Password>
         </Parameters>

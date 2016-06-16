@@ -414,6 +414,8 @@ public class DefaultAppRepository implements AppRepository {
             rxtAttributeName = AppMConstants.API_OVERVIEW_PROVIDER;
         }else if(searchKey.equalsIgnoreCase("VERSION")){
             rxtAttributeName = AppMConstants.API_OVERVIEW_VERSION;
+        }else if(searchKey.equalsIgnoreCase("BUSINESS_OWNER_ID")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_BUSS_OWNER;
         }
 
         return rxtAttributeName;

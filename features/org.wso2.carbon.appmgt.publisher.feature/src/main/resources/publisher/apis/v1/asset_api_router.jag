@@ -1197,7 +1197,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                     }
                 }
                 if(!meta.weburl){
-                    model.set('overview.url', meta.path);
+                    //Saved only 'package' section as the URL to prevent the data mismatch if URL got change
+                    //For the Android the full URL should be as https://play.google.com/store/apps/details?id={meta.package}
+                    //For the Android the full URL should be as https://itunes.apple.com/en/app/id{meta.package}
+                    if(ctx.markettype.toUpperCase() == 'ENTERPRISE') {
+                        model.set('overview.url', meta.path);
+                    } else if (ctx.markettype..toUpperCase() == 'PUBLIC') {
+                        model.set('overview.url', meta.package);
+                    }
                 }else{
 
                     if(url_reg(meta.weburl)){
@@ -1212,9 +1219,23 @@ require('/modules/publisher.js').exec(function(ctx) {
                     }
                 }
                 model.set('overview.version', version);
-                if(!checkNonSpecial(ctx.name)){
+                if(!ctx.name) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app name cannot be empty"]}})
+                    return;
+                } else if(!checkNonSpecial(ctx.name)) {
                     response.contentType = CONTENT_TYPE_JSON;
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}})
+                    return;
+                }
+                if(!ctx.displayName) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app display name cannot be empty"]}})
+                    return;
+                }
+                if(!ctx.description) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app description cannot be empty"]}})
                     return;
                 }
                 model.set('overview.name',ctx.name);
@@ -1376,7 +1397,17 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}});
                     return;
                 }
-                modelA.set('overview.name',originalArtifact.attributes.overview_name);
+                if(!ctx.displayName) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app display name cannot be empty"]}})
+                    return;
+                }
+                if(!ctx.description) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app description cannot be empty"]}})
+                    return;
+                }
+            modelA.set('overview.name',originalArtifact.attributes.overview_name);
 				modelA.set('overview.displayName', ctx.displayName);
                 modelA.set('overview.version', originalArtifact.attributes.overview_version);
                 modelA.set('overview.visibility',ctx.visibility);
