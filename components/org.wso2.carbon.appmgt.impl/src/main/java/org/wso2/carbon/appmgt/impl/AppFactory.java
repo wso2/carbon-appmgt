@@ -121,8 +121,7 @@ public abstract class AppFactory {
     }
 
     private String getCustomPropertyDefinitionsResourcePath(String appType) {
-        String resourceName = String.format(AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_FILE_PATTERN, appType);
-        return AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + resourceName;
+        return String.format("%s/%s/%s.json", AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH, appType);
     }
 
 }
