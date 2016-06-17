@@ -34,16 +34,18 @@ public class BusinessOwnerApiServiceImpl extends BusinessOwnerApiService {
             businessOwnerDTO.setSite(businessOwner.getBusinessOwnerSite());
             businessOwnerDTO.setId(businessOwner.getBusinessOwnerId());
             List<BusinessOwnerProperty> businessOwnerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
-            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = new ArrayList<>();
-            for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
-                BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
-                businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
-                businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
-                businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
-                businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
+            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = null;
+            if (businessOwnerPropertyList != null) {
+                businessOwnerPropertiesDTOList = new ArrayList<>();
+                for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
+                    BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
+                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                    businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
+                    businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
+                    businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
+                }
             }
             businessOwnerDTO.setProperties(businessOwnerPropertiesDTOList);
-
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving details of business owner Business owner Id : " +
                     businessOwnerId;
