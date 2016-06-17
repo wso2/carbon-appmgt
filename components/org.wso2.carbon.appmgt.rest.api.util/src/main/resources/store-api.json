@@ -963,7 +963,7 @@
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Download App",
@@ -1011,7 +1011,7 @@
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/uninstallation\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/uninstallation\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Uninstall App",
