@@ -343,7 +343,7 @@ $(function() {
 					if($('#autoConfig').is(':checked')){
 						var isCreateSP = true;
 
-						if(Boolean($('#overview_skipGateway').val()) && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false"){
+						if($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false"){
 							isCreateSP = false;
 						}
 						if(isCreateSP){

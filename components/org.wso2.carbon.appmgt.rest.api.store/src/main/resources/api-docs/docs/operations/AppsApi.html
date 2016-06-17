@@ -220,27 +220,37 @@
 
             <h4 class="section-heading">Scope</h4>
             
+                <code>appm:administration</code>
             
-                <p>Scope not required</p>
             
 
             <h4 class="section-heading">CURL Example</h4>
             
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [  &quot;admin&quot;, &quot;testuser&quot; ],&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation&quot;</code></div>
             
-                <p>Not Available</p>
             
 
+            
+                <div class="pointer" data-toggle="collapse" data-target="#request-administrationAppsUninstallationPost">
+                    <h4 class="section-heading">
+                        Sample Request
+                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </h4>
+                </div>
+                <div id="request-administrationAppsUninstallationPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [&quot;admin&quot;],&quot;appId&quot;: &quot;cec2027d-2dd6-4826-97c5-33be4eb83ae1&quot;}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationAppsUninstallationPost">
                 <h4 class="section-heading">
                     Sample Response
                     
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
             </h4>
             </div>
             
+                <div id="response-administrationAppsUninstallationPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
-                <p>Not Available</p>
             
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
@@ -501,7 +511,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">A search condition.\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n</p>
+                            <p class="param-description marked">A search condition.\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id, business_owner_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n</p>
                             
                         </td>
                         <td>

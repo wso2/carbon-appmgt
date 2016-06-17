@@ -68,7 +68,15 @@ $(function() {
 	        success: function(response) {
 			var providers_data = response;
                   	if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
- 				loadSelectedProviders(providers_data.response);
+						var isSPAwaiable = true;
+						if($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false"){
+							isSPAwaiable = false;
+						}
+						if(isSPAwaiable) {
+							loadSelectedProviders(providers_data.response);
+						}else{
+							$("#ssoTable").remove();
+						}
                   	} else {
 				$("#ssoTable").remove();
                   	}
@@ -137,17 +145,19 @@ $(function() {
 	          success: function(response) {
 	        	 
 	        	  var provider_data = response.response;
-	        	  var selected_claims = provider_data.claims;
-	        	  for(n=0;n<selected_claims.length;n++){
-	        		  var claim = selected_claims[n];
-	        		  if(claim == "http://wso2.org/claims/role"){
-	        			  addToClaimsTable(claim,false);  
-	        		  }else{
-	        			  addToClaimsTable(claim,true);  
-	        		  }
-	        		  
-	        		  
-	        	  }
+				  if(provider_data != null) {
+					  var selected_claims = provider_data.claims;
+					  for (n = 0; n < selected_claims.length; n++) {
+						  var claim = selected_claims[n];
+						  if (claim == "http://wso2.org/claims/role") {
+							  addToClaimsTable(claim, false);
+						  } else {
+							  addToClaimsTable(claim, true);
+						  }
+
+
+					  }
+				  }
 	  			
 	          },
 	          error: function(response) {
@@ -363,10 +373,15 @@ $(function() {
 	            			
         			})();
 
-			    	if($('#autoConfig').is(':checked')){
-						createServiceProvider();
+					var isCreateSP = true;
+					if ($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false") {
+						isCreateSP = false;
 					}
-
+					if (isCreateSP) {
+						createServiceProvider();
+					} else {
+						window.location = caramel.context + "/assets/webapp/";
+					}
 
 				} else {
                     alert(result.message);
