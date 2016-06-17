@@ -835,12 +835,12 @@ paths:
     post:
       x-scope: 'appm:subscribe'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -H
-        "Content-Type: application/json" -d '{"type": "user","appId":
-        "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        curl -X POST -H "Authorization: Bearer 3500931880f806ad2523c4ce7079c505"
+        -H "Content-Type: application/json" -d '{"type": "user","appId":
+        "fcf96617-093a-4d0f-9d27-6f41b0d0c8b8"}'
         "http://localhost:9763/api/appm/store/v1.1/apps/download"
-      x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"type": "user","appId": "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}'
+      x-wso2-response: HTTP/1.1 202 Accepted
+      x-wso2-request: '{"type": "user","appId": "fcf96617-093a-4d0f-9d27-6f41b0d0c8b8"}'
       summary: Download App
       description: |
         Download a new App
@@ -878,12 +878,12 @@ paths:
     post:
       x-scope: 'appm:subscribe'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -H
-        "Content-Type: application/json" -d '{"type": "user","appId":
-        "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        curl -X POST -H "Authorization: Bearer 3500931880f806ad2523c4ce7079c505"
+        -H "Content-Type: application/json" -d '{"type": "user","appId":
+        "fcf96617-093a-4d0f-9d27-6f41b0d0c8b8"}'
         "http://localhost:9763/api/appm/store/v1.1/apps/uninstallation"
-      x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"type": "user","appId": "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}'
+      x-wso2-response: HTTP/1.1 202 Accepted
+      x-wso2-request: '{"type": "user","appId": "fcf96617-093a-4d0f-9d27-6f41b0d0c8b8"}'
       summary: Uninstall App
       description: |
         Uninstall an existing App
@@ -928,6 +928,9 @@ paths:
   /apps/mobile/schedule-install:
     post:
       x-scope: 'appm:subscribe'
+      x-wso2-curl: "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/schedule-install\""
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n"
       summary: Schedule Install App
       description: |
         Schedule Install an App
@@ -945,25 +948,28 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
   /apps/mobile/schedule-update:
     post:
       x-scope: 'appm:create'
+      x-wso2-curl: "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/schedule-update\""
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n"
       summary: Schedule Update App
       description: |
         Schedule Update an App
@@ -981,26 +987,29 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
   /devices:
     get:
       x-scope: 'appm:read'
-      x-wso2-curl: 'curl -b cookies -X GET http://localhost:9763/store/api/devices'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer e0fb5670b87e2e83bbe563a7ba2c9610"
+        -H "Content-Type: application/json"
+        "http://localhost:9763/api/appm/store/v1.1/devices"
       x-wso2-response: >-
         {"next": "","previous": "","count": 2,"deviceList":[{"name": "My
         Nexus","id": "11","type": "phone","platform":
@@ -1079,7 +1088,7 @@ paths:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
         curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/roles"
+        "http://localhost:9763/api/appm/store/v1.1/administration/roles"
       x-wso2-response: >-
         {"roleIds": ["admin","Application/app_11_04_001",
         "Application/app_11_04_002","Application/app_11_04_011"]}
@@ -1182,9 +1191,9 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -H
-        "Content-Type: application/json" -d '{"type": "user","typeIds": [
-        "admin", "testuser" ],"appId": "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        curl -X POST -H "Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3"
+        -H "Content-Type: application/json" -d '{"type": "user",  "typeIds":
+        ["admin","user1"],  "appId": "5acd652e-9d6e-465f-86bf-e30838a16123"}'
         "http://localhost:9763/api/appm/store/v1.1/administration/apps/download"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
@@ -1227,10 +1236,10 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -H
-        "Content-Type: application/json" -d '{"type": "user","typeIds": [ 
-        "admin", "testuser" ],"appId": "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
-        "http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation"
+        curl -X POST -H "Authorization: Bearer 6d781e9fce073db36d6481054da46311"
+        -H "Content-Type: application/json" -d '{  "type": "role", "typeIds":
+        ["admin","role1"],  "appId": "5acd652e-9d6e-465f-86bf-e30838a16123"}'
+        "http://localhost:9763/api/appm/store/v1.1/administration/apps/uninstallation"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
         {"type": "user","typeIds": ["admin"],"appId":

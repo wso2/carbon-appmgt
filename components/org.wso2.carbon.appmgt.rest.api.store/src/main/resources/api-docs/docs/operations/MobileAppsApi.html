@@ -1010,21 +1010,41 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{
+  &quot;deviceIds&quot;: [&quot;{\&quot;id\&quot;:\&quot;358812061121105\&quot;,\&quot;type\&quot;:\&quot;ANDROID\&quot;}&quot;],
+  &quot;appId&quot;: &quot;35050dda-217f-4638-9e1d-bbcf5aebc09b&quot;,
+  &quot;scheduleTime&quot;:&quot;04-30-2016 11:25 am&quot;
+}
+&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/mobile/schedule-install&quot;</code></div>
             
-                <p>Not Available</p>
             
 
+            
+                <div class="pointer" data-toggle="collapse" data-target="#request-appsMobileScheduleInstallPost">
+                    <h4 class="section-heading">
+                        Sample Request
+                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </h4>
+                </div>
+                <div id="request-appsMobileScheduleInstallPost"class="pre collapse"><code class="json">{
+  &quot;deviceIds&quot;: [&quot;{\&quot;id\&quot;:\&quot;358812061121105\&quot;,\&quot;type\&quot;:\&quot;ANDROID\&quot;}&quot;],
+  &quot;appId&quot;: &quot;35050dda-217f-4638-9e1d-bbcf5aebc09b&quot;,
+  &quot;scheduleTime&quot;:&quot;04-30-2016 11:25 am&quot;
+}
+</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileScheduleInstallPost">
                 <h4 class="section-heading">
                     Sample Response
                     
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
             </h4>
             </div>
             
+                <div id="response-appsMobileScheduleInstallPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
-                <p>Not Available</p>
             
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
@@ -1141,7 +1161,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1154,7 +1174,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1167,7 +1187,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1202,21 +1222,41 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{
+  &quot;deviceIds&quot;: [&quot;{\&quot;id\&quot;:\&quot;358812061121105\&quot;,\&quot;type\&quot;:\&quot;ANDROID\&quot;}&quot;],
+  &quot;appId&quot;: &quot;35050dda-217f-4638-9e1d-bbcf5aebc09b&quot;,
+  &quot;scheduleTime&quot;:&quot;04-30-2016 11:25 am&quot;
+}
+&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/mobile/schedule-update&quot;</code></div>
             
-                <p>Not Available</p>
             
 
+            
+                <div class="pointer" data-toggle="collapse" data-target="#request-appsMobileScheduleUpdatePost">
+                    <h4 class="section-heading">
+                        Sample Request
+                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </h4>
+                </div>
+                <div id="request-appsMobileScheduleUpdatePost"class="pre collapse"><code class="json">{
+  &quot;deviceIds&quot;: [&quot;{\&quot;id\&quot;:\&quot;358812061121105\&quot;,\&quot;type\&quot;:\&quot;ANDROID\&quot;}&quot;],
+  &quot;appId&quot;: &quot;35050dda-217f-4638-9e1d-bbcf5aebc09b&quot;,
+  &quot;scheduleTime&quot;:&quot;04-30-2016 11:25 am&quot;
+}
+</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileScheduleUpdatePost">
                 <h4 class="section-heading">
                     Sample Response
                     
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
             </h4>
             </div>
             
+                <div id="response-appsMobileScheduleUpdatePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
-                <p>Not Available</p>
             
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
@@ -1333,7 +1373,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1346,7 +1386,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1359,7 +1399,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 

@@ -261,7 +261,9 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json">HTTP/1.1 202 OK
+Content-Type: application/json
+ {&quot;message&quot;: &quot;Lifecycle action : Recycle has been accepted for processing &quot;}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -3592,7 +3594,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 04b1607a56c2d51adb35912943335322&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/2/apps/webapp&quot;</code></div>
             
             
 
