@@ -3118,6 +3118,12 @@
                     "description": "asset created timestamp",
                     "type": "string",
                     "example": "00000001459919490157"
+                },
+                "customProperties":{
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -3717,6 +3723,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

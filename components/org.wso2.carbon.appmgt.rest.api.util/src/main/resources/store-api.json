@@ -2275,6 +2275,12 @@
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "customProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -2619,6 +2625,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }
