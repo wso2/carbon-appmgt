@@ -1557,8 +1557,8 @@
         "/apps/static-contents/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving images, pdf and document files",
                 "description": "Retrieving images for banners, screenshots, etc.\n",
                 "parameters": [
@@ -1623,8 +1623,8 @@
         "/apps/mobile/binaries/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/RKHktVsxjmFOZz1.apk\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binaries",
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -1685,8 +1685,8 @@
                     "text/xml"
                 ],
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/plist/f2d9703b-df65-4b8a-8250-0d033e969f55/50ba9a5e-a261-453d-a58f-c6b68d42150d\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving plist for ios app installation",
                 "description": "Retrieving plist for ios mobile apps.\n",
                 "parameters": [
@@ -1747,8 +1747,8 @@
         "/apps/mobile/binaries/one-time/{uuid}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/fa1f4634-77cb-4bd7-9100-f0dcf0a04d6a\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binary",
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -2275,6 +2275,12 @@
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "customProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -2619,6 +2625,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }
