@@ -1223,7 +1223,7 @@
         "/administration/roles": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/roles\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/store/v1.1/administration/roles\"",
                 "x-wso2-response": "{\"roleIds\": [\"admin\",\"Application/app_11_04_001\", \"Application/app_11_04_002\",\"Application/app_11_04_011\"]}",
                 "summary": "Get all roles",
                 "description": "Get a list of available roles.\n",
