@@ -206,8 +206,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 populateWebAppFromWebAppInfoDTO();
             }
 
-            // If this is an SLO request we need to respond to the client (IDP) without continuing the flow. 
-            if(isSLORequestFromIDP(messageContext)){
+            // If this is an SLO request we need to respond to the client (IDP) without continuing the flow.
+
+            // WSO2 IS send the SLO request even for the apps which are not configured for SLO.
+            // We will have to consider the root URL as a logout URL as a workaround.
+            String appRootUrl = String.format("%s/%s/", webAppContext, webAppVersion);
+
+            if((appRootUrl.equals(fullReqPath) || isLogoutRequest(messageContext)) && isSLORequestFromIDP(messageContext)){
                 if (log.isDebugEnabled()) {
                     log.debug("Request is an SLO request from the IDP");
                 }
