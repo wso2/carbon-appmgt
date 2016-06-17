@@ -76,7 +76,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "A search condition.\n\n\n\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
+                        "description": "A search condition.\n\n\n\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id, business_owner_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
                         "type": "string"
                     },
                     {
