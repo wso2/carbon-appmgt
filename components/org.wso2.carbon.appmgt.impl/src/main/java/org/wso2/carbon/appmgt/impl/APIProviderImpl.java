@@ -2644,14 +2644,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException {
+
         String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
         Resource resource = null;
         boolean isSubscribed = false;
         try {
-            if (!registry.resourceExists(path)) {
-                resource = registry.newResource();
+            UserRegistry sysRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                    .getGovernanceSystemRegistry(tenantId);
+            if (!sysRegistry.resourceExists(path)) {
+                resource = sysRegistry.newResource();
                 resource.setContent("");
-                registry.put(path, resource);
+                sysRegistry.put(path, resource);
                 isSubscribed = true;
             }
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
