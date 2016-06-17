@@ -23,6 +23,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.woden.WSDLFactory;
@@ -503,7 +504,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                    Function funObj) throws
                                                                     AppManagementException, ParseException {
         BusinessOwner businessOwner = new BusinessOwner();
-        List<BusinessOwnerProperty> businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
+        List<BusinessOwnerProperty> businessOwnerProperties = null;
 
         if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
@@ -514,25 +515,37 @@ public class APIProviderHostObject extends ScriptableObject {
 
         businessOwner.setBusinessOwnerName(args[0].toString());
         businessOwner.setBusinessOwnerEmail(args[1].toString());
-        businessOwner.setBusinessOwnerDescription(args[2].toString());
-        businessOwner.setBusinessOwnerSite(args[3].toString());
+        String businessOwnerDescription = args[2].toString();
+        if (StringUtils.isEmpty(businessOwnerDescription)) {
+            businessOwnerDescription = null;
+        }
+        String businessOwnerSite = args[3].toString();
+        if (StringUtils.isEmpty(businessOwnerSite)) {
+            businessOwnerSite = null;
+        }
+        businessOwner.setBusinessOwnerDescription(businessOwnerDescription);
+        businessOwner.setBusinessOwnerSite(businessOwnerSite);
 
         JSONParser parser = new JSONParser();
         JSONObject busiessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
 
         Set<Map.Entry> entries = busiessOwnerPropertyObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
-            String propertyValue = businessOwnerValuesObject.get(0).toString();
-            Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
-            BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
-            businessOwnerPropertiesValues.setPropertyId(key);
-            businessOwnerPropertiesValues.setPropertyValue(propertyValue);
-            businessOwnerPropertiesValues.setShowingInStore(showInStore);
+        if (entries.size() > 0) {
+            businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
+            for (Map.Entry entry : entries) {
+                String key = (String) entry.getKey();
+                JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
+                String propertyValue = businessOwnerValuesObject.get(0).toString();
+                Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
+                BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
+                businessOwnerPropertiesValues.setPropertyId(key);
+                businessOwnerPropertiesValues.setPropertyValue(propertyValue);
+                businessOwnerPropertiesValues.setShowingInStore(showInStore);
 
-            businessOwnerProperties.add(businessOwnerPropertiesValues);
+                businessOwnerProperties.add(businessOwnerPropertiesValues);
+            }
         }
+
         businessOwner.setBusinessOwnerPropertiesList(businessOwnerProperties);
         APIProvider apiProvider = getAPIProvider(thisObj);
         int businessOwnerId = apiProvider.saveBusinessOwner(businessOwner);
