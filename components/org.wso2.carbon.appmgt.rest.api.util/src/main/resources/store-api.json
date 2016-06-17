@@ -963,9 +963,9 @@
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/download\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
+                "x-wso2-response": "HTTP/1.1 202 Accepted",
+                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Download App",
                 "description": "Download a new App\n",
                 "parameters": [
@@ -1011,9 +1011,9 @@
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/uninstallation\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/uninstallation\"",
+                "x-wso2-response": "HTTP/1.1 202 Accepted",
+                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Uninstall App",
                 "description": "Uninstall an existing App\n",
                 "parameters": [
@@ -1065,6 +1065,9 @@
         "/apps/mobile/schedule-install": {
             "post": {
                 "x-scope": "appm:subscribe",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d \'{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-install\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
                 "summary": "Schedule Install App",
                 "description": "Schedule Install an App\n",
                 "parameters": [
@@ -1110,6 +1113,9 @@
         "/apps/mobile/schedule-update": {
             "post": {
                 "x-scope": "appm:create",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d \'{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-update\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
                 "summary": "Schedule Update App",
                 "description": "Schedule Update an App\n",
                 "parameters": [
@@ -1347,7 +1353,7 @@
         "/administration/apps/download": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [ \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/administration/apps/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",  \"typeIds\": [\"admin\",\"user1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise Download/Install App",
@@ -1395,7 +1401,7 @@
         "/administration/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 6d781e9fce073db36d6481054da46311\" -H \"Content-Type: application\/json\" -d \'{  \"type\": \"role\", \"typeIds\": [\"admin\",\"role1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/uninstallation\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise uninstall App",
