@@ -404,7 +404,7 @@
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags\"",
-                "x-wso2-response": "{\"tags\":[\"w1\",\"webapptag1\",\"webapptag2\"]}",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n {\"tags\":[\"tagA\",\"tagB\",\"tagC\"]}",
                 "summary": "Get all Tags of an App",
                 "description": "Get a list of available Tags relevant to the given App Internal ID.\n",
                 "parameters": [
@@ -463,11 +463,11 @@
             },
             "put": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" -H \"Content-Type: application/json\" -d '{\"tags\":[\"tag1\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb\" \n -H \"Content-Type: application/json\" \n -d '{\"tags\":[\"tagA\",\"tagB\",\"tagC\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/00fafc68-d8bb-498f-9ef3-afbb6db06826/tags\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"tags\":[\"tag1\"]}",
+                "x-wso2-request": "{\"tags\":[\"tagA\",\"tagB\",\"tagC\"]}",
                 "summary": "Add a new tag",
-                "description": "Add a new tag to the tag collection of a given application type.\n",
+                "description": "Add a new tag/tags to the tag collection of a given application type.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -529,7 +529,7 @@
             },
             "delete": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\"  -d '{\"tags\":[\"w2\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb\" -H \"Content-Type: application/json\" -d '{\"tags\":[\"tag1\",\"tag2\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/95e497dd-ebb0-414f-9718-88857a153780/tags\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Tags relevant to an App",
                 "description": "Delete Tags relevant to an App by AppId.\n",
@@ -1219,7 +1219,7 @@
                 "summary": "Change App Status",
                 "x-scope": "appm:publish",
                 "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-response": "HTTP/1.1 202 OK\nContent-Type: application/json\n {\"message\": \"Lifecycle action : Recycle has been accepted for processing \"}",
                 "description": "Change the lifecycle of an App.\n",
                 "parameters": [
                     {
@@ -1297,9 +1297,8 @@
         "/apps/{appType}/validate-context": {
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: application/json\" -d '{\"tags\":[\"aa\",\"bb\",\"cc\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/validate-context\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"tags\":[\"aa\",\"bb\",\"cc\"]}",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer f61b3bea0fdc1d31d464a40f7aec8282\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/validate-context?appContext=travelApp\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n{\"IsContextExists\":true}",
                 "summary": "Validate App Context",
                 "description": "Validate App context.\n",
                 "parameters": [

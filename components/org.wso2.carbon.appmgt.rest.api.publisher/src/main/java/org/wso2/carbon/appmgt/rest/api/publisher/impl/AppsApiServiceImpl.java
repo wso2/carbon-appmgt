@@ -1086,6 +1086,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
+        TagListDTO tagListDTO = new TagListDTO();
         List<String> tags = new ArrayList<>();
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
@@ -1094,6 +1095,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 for (Tag tag : appProvider.getAllTags(appType, appId)) {
                     tags.add(tag.getName());
                 }
+                tagListDTO.setTags(tags);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -1107,7 +1109,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return Response.ok().entity(tags).build();
+        return Response.ok().entity(tagListDTO).build();
     }
 
     /**
