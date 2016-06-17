@@ -738,7 +738,7 @@
         "/apps/favourite-page": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Set as a favourite page",
                 "description": "Set as a favourite page.\n",
@@ -777,7 +777,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "",
                 "summary": "Remove from the favourite page",
@@ -817,7 +817,7 @@
             },
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "{\"isDefaultPage\": true}",
                 "summary": "Check if it is a favourite page",
                 "description": "Check if it is a favourite page.\n",
@@ -917,7 +917,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/eaf2f81d-3580-4bde-a02b-18770ea035b8/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Remove from favourite Apps",
                 "description": "Remove from favourite Apps.\n",
