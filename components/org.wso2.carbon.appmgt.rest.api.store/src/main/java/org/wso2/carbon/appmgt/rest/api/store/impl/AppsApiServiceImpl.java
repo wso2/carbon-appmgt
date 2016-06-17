@@ -904,6 +904,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                       String ifModifiedSince) {
 
         APIConsumer apiConsumer = null;
+        Map<String,String> subscriptionData = new HashMap<>();
         boolean isTenantFlowStarted = false;
         String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
         try {
@@ -924,8 +925,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
                                                                     Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
             if (subscription != null) {
-
-
+                subscriptionData.put("Status" , subscription.getSubscriptionStatus());
+                subscriptionData.put("SubscrptionType" , subscription.getSubscriptionType());
             }
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError(
@@ -936,7 +937,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return Response.ok().build();
+        return Response.ok().entity(subscriptionData).build();
     }
 
     /**

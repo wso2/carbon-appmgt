@@ -4132,7 +4132,7 @@ public class AppMDAO {
             String prodURL = urlArray[0];
             String logoutURL = app.getLogoutURL();
             if (logoutURL != null && !"".equals(logoutURL.trim())) {
-                logoutURL = prodURL.concat(app.getContext()).concat("/" + app.getId().getVersion()).concat(logoutURL);
+                logoutURL = prodURL.concat(app.getContext()).concat("/" + app.getId().getVersion() + "/").concat(logoutURL);
             }
 
             int tenantId;
