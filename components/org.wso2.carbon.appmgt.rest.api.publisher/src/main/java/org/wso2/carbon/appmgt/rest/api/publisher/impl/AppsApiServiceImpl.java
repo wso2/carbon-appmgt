@@ -461,7 +461,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             appProvider.changeLifeCycleStatus(appType, appId, action);
 
-            responseMessageDTO.setMessage("Lifecycle status to be changed : " + action);
+            responseMessageDTO.setMessage("Lifecycle action : " + action + " has been accepted for processing ");
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -1435,6 +1435,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
                                                    String ifModifiedSince) {
         boolean isContextExists = false;
+        Map<String, Boolean> responseMap = new HashMap<>();
         try {
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 if (StringUtils.isEmpty(appContext)) {
@@ -1446,6 +1447,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 }
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 isContextExists = appProvider.isContextExist(appContext);
+                responseMap.put("IsContextExists", isContextExists);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -1453,7 +1455,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String errorMessage = "Error retrieving tags for " + appType + "s.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return Response.ok().entity(isContextExists).build();
+        return Response.ok().entity(responseMap).build();
     }
 
 

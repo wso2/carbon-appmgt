@@ -656,13 +656,15 @@ public abstract class AbstractAPIManager implements APIManager {
     public boolean isContextExist(String context) throws AppManagementException {
     	boolean isTenantFlowStarted = false;
         try {
-            GovernanceUtils.loadGovernanceArtifacts((UserRegistry)registry);
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GovernanceUtils.loadGovernanceArtifacts((UserRegistry) systemRegistry);
             if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
         		isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
         	}
-            GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
+            GenericArtifactManager artifactManager = new GenericArtifactManager(systemRegistry,
                                                                                 AppMConstants.API_KEY);
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
