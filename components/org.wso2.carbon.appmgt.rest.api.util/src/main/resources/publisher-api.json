@@ -908,7 +908,7 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content\" > sample.pdf",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02\" -H \"Content-Type: multipart/form-data\" -F \"file=@sample.pdf\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Uploading document",
                 "description": "Uploading document files against an App.\n",
@@ -1044,7 +1044,7 @@
             },
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -H \"Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b\" -H \"Content-Type: application/json\" -X POST -d @data.json \"http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents\"",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" -H \"Content-Type:application/json\" -X POST -d @data.json \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
                 "x-wso2-request": "{\n    \"visibility\": \"API_LEVEL\",\n    \"sourceType\": \"INLINE\",\n    \"sourceUrl\": null,\n    \"otherTypeName\": null,\n    \"summary\": \"This is a sample documentation\",\n    \"name\": \"Introduction to PhoneVerification API\",\n    \"type\": \"HOWTO\"\n}",
                 "x-wso2-response": "HTTP/1.1 201 Created\nLocation: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"Introduction to PhoneVerification API\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Add a new document",
