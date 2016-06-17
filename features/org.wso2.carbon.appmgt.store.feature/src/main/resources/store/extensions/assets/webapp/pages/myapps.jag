@@ -54,15 +54,7 @@ require('/modules/store.js').exec(function (ctx) {
         social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     //set tenant aware username
-    var tenantUsername = null;
-    if (user != null) {
-        if (tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
-    }
-
+    var tenantUsername = user ? user.username : null;
 
     caramel = require('caramel');
     //Check whether to show register link in myapps page
@@ -157,17 +149,52 @@ require('/modules/store.js').exec(function (ctx) {
             options.lifecycleState = ["published"];
             assets = store.taggeds(type, options, paging);
         } else if (query) { // if search from search box
-            urlQuery = 'query=' + query + '&';
-            query = require('/modules/search.js').build(query);
-            query.overview_treatAsASite = 'FALSE';
-            if (!isMultipleVersionDisplayEnabled) {
-                query.overview_makeAsDefaultVersion = 'true';
+            var searchParameter;
+            var searchValue;
+            var splitQuery = query.split(":");
+            searchParameter = splitQuery[0];
+            // This is a registry based search. In search box, user wants to search by business owner name. But
+            // in registry, there is only business owner Id. Therefore, it is necessary to get business owner Ids
+            // related to search prefix from DB.
+            if (!searchParameter.equals("Business Owner")) {
+                urlQuery = 'query=' + query + '&';
+                query = require('/modules/search.js').build(query);
+                query.overview_treatAsASite = 'FALSE';
+                if (!isMultipleVersionDisplayEnabled) {
+                    query.overview_makeAsDefaultVersion = 'true';
+                }
+                options = {
+                    type: type,
+                    attributes: query
+                };
+                assets = store.search(options, paging);
+            } else {
+                searchValue = splitQuery[1];
+                var initialQuery = "businessOwner:" + searchValue;
+                var resultIdsList =storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchValue.split("\"")[1]);
+                if (resultIdsList){
+                    var resultAssets = [];
+                    resultIdsList = resultIdsList.toArray();
+                    for(var key in resultIdsList) {
+                        var businessOwnerId = resultIdsList[key];
+                        query = "businessOwner:\"" + businessOwnerId + "\"";
+                        query = require('/modules/search.js').build(query);
+                        query.overview_treatAsASite = 'FALSE';
+                        if (!isMultipleVersionDisplayEnabled) {
+                            query.overview_makeAsDefaultVersion = 'true';
+                        }
+                        options = {
+                            type: type,
+                            attributes: query
+                        };
+                        resultAssets = resultAssets.concat(store.search(options, paging));
+                    }
+                    assets = resultAssets;
+                }
+                query = initialQuery;
+                urlQuery = 'query=' + initialQuery + '&';
+                query = require('/modules/search.js').build(query);
             }
-            options = {
-                type: type,
-                attributes: query
-            };
-            assets = store.search(options, paging);
         } else { // sort by popularity in myapps page
             if (paging.sort == 'popular') {
                 urlQuery = 'sort=' + paging.sort + '&';

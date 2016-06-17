@@ -299,7 +299,7 @@ Store.prototype.assetsPagingOverrided = function (request,availablePages) {
     var page = request.getParameter('page'),
     size = this.getPageSize();
     page = page ? page - 1 : 0;
-    if(page < 0){
+    if(page <= 0){
         page = 0
     }else if(page >= availablePages){
         page = availablePages -1;

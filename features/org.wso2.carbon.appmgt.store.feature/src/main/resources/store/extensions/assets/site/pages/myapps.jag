@@ -57,11 +57,7 @@ require('/modules/store.js').exec(function (ctx) {
     //set tenant aware username
     var tenantUsername = null;
     if (user != null) {
-        if (tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
+        tenantUsername = user.username;
     }
 
 

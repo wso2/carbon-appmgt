@@ -1200,7 +1200,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                     //Saved only 'package' section as the URL to prevent the data mismatch if URL got change
                     //For the Android the full URL should be as https://play.google.com/store/apps/details?id={meta.package}
                     //For the Android the full URL should be as https://itunes.apple.com/en/app/id{meta.package}
-                    model.set('overview.url', meta.package);
+                    if (ctx.markettype.toUpperCase() == 'ENTERPRISE') {
+                        model.set('overview.url', meta.path);
+                    } else if (ctx.markettype.toUpperCase() == 'PUBLIC') {
+                        model.set('overview.url', meta.package);
+                    }
                 }else{
 
                     if(url_reg(meta.weburl)){
