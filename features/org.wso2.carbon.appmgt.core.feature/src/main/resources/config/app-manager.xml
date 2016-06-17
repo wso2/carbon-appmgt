@@ -300,6 +300,9 @@
     -->
     <SSOConfiguration>
 
+        <!--Is service providers are created for skip-gateway enabled apps -->
+        <CreateServiceProviderForSkipGatewayApps>false</CreateServiceProviderForSkipGatewayApps>
+
         <!-- URL of the IDP use for SSO -->
         <IdentityProviderUrl>https://${carbon.local.ip}:${mgt.transport.https.port}/samlsso</IdentityProviderUrl>
 

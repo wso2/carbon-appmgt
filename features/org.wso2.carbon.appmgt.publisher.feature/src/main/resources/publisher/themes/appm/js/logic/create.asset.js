@@ -341,7 +341,14 @@ $(function() {
                     			}
 
 					if($('#autoConfig').is(':checked')){
-						createServiceProvider();
+						var isCreateSP = true;
+
+						if($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false"){
+							isCreateSP = false;
+						}
+						if(isCreateSP){
+							createServiceProvider();
+						}
 					}
 
 				} else {

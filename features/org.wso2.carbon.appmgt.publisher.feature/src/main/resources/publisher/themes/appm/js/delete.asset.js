@@ -15,7 +15,7 @@ $(function () {
         var name = $(this).data("name");
         var version = $(this).data("version");
         var parent = $(this).parent();
-
+        var btnDelete = $(this);
 
         var status = isExistInExternalStore(provider, name, version);
         if(status) {
@@ -41,7 +41,11 @@ $(function () {
                 success: function (response) {
                     var result = response;
                     if (result.isDeleted) {
-                        showDeleteModel(result.message, result.message, type);
+                        btnDelete.closest('tr').remove();
+                        //if no apps, reload page
+                        if(btnDelete.closest('tbody').find('tr').length == 0) {
+                            window.location = caramel.context + '/assets/' + type + '/';
+                        }
                     } else if (result.isDeleted == false) {
                         showDeleteModel(result.message, result.message, type);
                         $(parent).children().attr('disabled', false);

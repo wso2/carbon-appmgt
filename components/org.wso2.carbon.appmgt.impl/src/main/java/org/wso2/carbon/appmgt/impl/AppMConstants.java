@@ -436,6 +436,7 @@ public final class AppMConstants {
 
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
     public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
+    public static final String SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS = SSO_CONFIGURATION + "CreateServiceProviderForSkipGatewayApps";
     public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";
     public static final String SSO_CONFIGURATOR_NAME = SSO_CONFIGURATOR + "name";
     public static final String SSO_CONFIGURATOR_VERSION = SSO_CONFIGURATOR + "version";

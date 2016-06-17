@@ -242,6 +242,11 @@
                     <input type='hidden' value="[]" name="uritemplate_policyGroupIds" id="uritemplate_policyGroupIds"/>
                     <input type='hidden' value="[]" name="uritemplate_javaPolicyIds"
                            id="uritemplate_javaPolicyIds"/>
+                    {{#if isCreateSPForSkipGatewayAppsEnabled}}
+                        <input type='hidden' value="true" id="isCreateSPForSkipGatewayAppsEnabled"/>
+                    {{else}}
+                        <input type='hidden' value="false" id="isCreateSPForSkipGatewayAppsEnabled"/>
+                    {{/if}}
                     <table class="table table-striped" id="policyGroupsTable">
                         <thead>
                         <tr>
