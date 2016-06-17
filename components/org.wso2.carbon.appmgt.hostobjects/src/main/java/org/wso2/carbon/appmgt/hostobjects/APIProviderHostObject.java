@@ -4174,6 +4174,20 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Is Service Provider Create is enabled for skip gateway apps
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isSPCreateEnabledForSkipGatewayApps(Context cx, Scriptable thisObj, Object[] args,
+                                                                         Function funObj) throws AppManagementException{
+        return HostObjectUtils.isServiceProviderCreateEnabledForSkipGatewayApp();
+    }
+
+    /**
      * Remove mobile application binary files
      * @param cx
      * @param thisObj

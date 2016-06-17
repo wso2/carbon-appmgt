@@ -100,6 +100,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var output = model.export('form');
         var title = shortName;
         var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var isCreateSPForSkipGatewayAppsEnabled = apiProvider.isSPCreateEnabledForSkipGatewayApps();
         var isSubscriptionEnabled;
         if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
             isSubscriptionEnabled = false;
@@ -109,6 +110,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         output.sso_provider = getIdentityProviderUrl();
         caramel.render({
             isSubscriptionEnabled:isSubscriptionEnabled,
+            isCreateSPForSkipGatewayAppsEnabled:isCreateSPForSkipGatewayAppsEnabled,
             op: operation,
             cuser: server.current(session),
             shortName: shortName,

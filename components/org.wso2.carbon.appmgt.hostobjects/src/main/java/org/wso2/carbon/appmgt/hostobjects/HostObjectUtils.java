@@ -226,4 +226,17 @@ public class HostObjectUtils {
         String binaryStorageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
         return binaryStorageLocation;
     }
+
+    /**
+     * Get the configuration for create service provider for skip gateway enabled apps
+     * @return is create service provider for skip gateway apps enabled or disabled
+     */
+    public static boolean isServiceProviderCreateEnabledForSkipGatewayApp(){
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        boolean isCreateServiceProviderForSkipGatewayApps =
+                Boolean.parseBoolean(config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS));
+        return isCreateServiceProviderForSkipGatewayApps;
+    }
+
+
 }
