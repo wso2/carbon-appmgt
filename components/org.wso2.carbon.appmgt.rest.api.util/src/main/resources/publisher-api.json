@@ -2282,7 +2282,7 @@
             },
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Content-Type: application/json\" -d '{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 56bbab397e7baa757e6e5847e789727d\" -H \"Host: 127.0.0.1:9763\" -H \"Content-Type:application/json\" -d '{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
                 "x-wso2-response": "{\"id\": 4}",
                 "x-wso2-request": "{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
                 "summary": "Create a new Business Owner",
@@ -2403,7 +2403,7 @@
             },
             "put": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -H \"Content-Type: application/json\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -H \"Content-Type: application/json\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"site\": \"newSysUser.lk\",\"email\": \"newSysUser@gmail.com\",\"description\":\"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
                 "summary": "Update an existing business owner",
@@ -2466,7 +2466,7 @@
             },
             "delete": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Business Owner",
                 "description": "Delete an existing business owner.\n",
