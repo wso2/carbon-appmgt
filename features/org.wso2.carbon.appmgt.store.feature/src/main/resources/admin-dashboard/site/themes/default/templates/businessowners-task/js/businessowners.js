@@ -98,8 +98,6 @@ $(document).ready(function() {
 
 //save event
 $(document).on("click", "#btn-owner-save", function () {
-
-
     var businessOwnerName = $('#businessOwnerName').val();
     var businessOwnerEmail = $('#businessOwnerEmail').val();
     var businessOwnerDescription = $('#businessOwnerDescription').val();
@@ -108,19 +106,22 @@ $(document).on("click", "#btn-owner-save", function () {
 
     if (extraFieldCount > 0) {
         var i = extraFieldCount;
-        while (i > 1) {
+        while (i > 0) {
             var key_id = "#key-".concat(i - 1);
             var val_id = "#value-".concat(i - 1);
             var showInStoreId = "showInStore-".concat(i - 1);
-            var key = $(key_id).val();
-            var value = [];
-            value.push($(val_id).val());
-            if(document.getElementById(showInStoreId).checked) {
-                value.push(true);
-            } else {
-                value.push(false);
+            var showInStoreElement = document.getElementById(showInStoreId);
+            if (showInStoreElement != null) {
+                var key = $(key_id).val();
+                var value = [];
+                value.push($(val_id).val());
+                if(document.getElementById(showInStoreId).checked) {
+                    value.push(true);
+                } else {
+                    value.push(false);
+                }
+                ownerProperties[key] = value;
             }
-            ownerProperties[key] = value;
             i--;
         }
     }
@@ -217,7 +218,11 @@ function removeFields(index) {
 
 $(document).on("click", "#btn-owner-add-field", function () {
     var div = $("<div />");
-    div.html(GetDynamicTextBox(extraFieldCount, "", "", ""));
+    var hasHeader = false;
+    if(extraFieldCount != 0) {
+        hasHeader = true;
+    }
+    div.html(GetDynamicTextBox(hasHeader, extraFieldCount, "", "", ""));
     $("#businessOwnerOther").append(div);
     extraFieldCount++;
 });
