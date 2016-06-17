@@ -778,8 +778,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-
-
     private void updateApiArtifact(WebApp api, boolean updateMetadata,boolean updatePermissions) throws
                                                                                                  AppManagementException {
 
@@ -901,6 +899,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         }
     }
+
+
 
     /**
      * Create WebApp Definition in JSON and save in the registry
