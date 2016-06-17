@@ -107,9 +107,14 @@ require('/modules/publisher.js').exec(function(ctx) {
         webApp.setTransports(params.app_transport);
 
         var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-        if(type == 'editConfig'){
-            ssoConfigUtil.createSSOProvider(webApp, true);
-        }else {
+        if (type == 'editConfig') {
+            var currentServiceProvider = ssoConfigUtil.getSSOProvider(ssoProvider.getProviderName(), ssoProvider.getProviderVersion(), ssoProvider.getIssuerName());
+            if(currentServiceProvider) {
+                ssoConfigUtil.createSSOProvider(webApp, true);
+            }else{
+                ssoConfigUtil.createSSOProvider(webApp, false);
+            }
+        } else {
             ssoConfigUtil.createSSOProvider(webApp, false);
         }
     }

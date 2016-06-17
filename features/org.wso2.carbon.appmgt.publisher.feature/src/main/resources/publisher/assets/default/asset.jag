@@ -34,8 +34,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var publisher = require('/modules/publisher.js').publisher(request, session);
     var storageModule = require('/modules/data/storage.js').storageModule();
     var storageConfig = require('/config/storage.json');
-
-
+    var isCreateSPForSkipGatewayAppsEnabled = apiProvider.isSPCreateEnabledForSkipGatewayApps();
     var router = require('/modules/router-g.js').router();
     var routeManager = new router.Router();
 
@@ -100,7 +99,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         var output = model.export('form');
         var title = shortName;
         var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
-        var isCreateSPForSkipGatewayAppsEnabled = apiProvider.isSPCreateEnabledForSkipGatewayApps();
         var isSubscriptionEnabled;
         if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
             isSubscriptionEnabled = false;
@@ -352,6 +350,7 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             } else {
                 caramel.render({
                     isSubscriptionEnabled: isSubscriptionEnabled,
+                    isCreateSPForSkipGatewayAppsEnabled:isCreateSPForSkipGatewayAppsEnabled,
                     op: operation,
                     cuser: user,
                     shortName: shortName,
