@@ -123,6 +123,11 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
             }
 
+            if(ssoProvider.getLogoutUrl() != null && !ssoProvider.getLogoutUrl().trim().isEmpty()){
+                String fullLogoutUrl = SSOConfiguratorUtil.getGatewayUrl(webApp) + ssoProvider.getLogoutUrl();
+                ssoProvider.setLogoutUrl(fullLogoutUrl);
+            }
+
             ServiceProvider serviceProvider;
             SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
             try {
@@ -211,6 +216,12 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             } else {
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
             }
+
+            if(ssoProvider.getLogoutUrl() != null && !ssoProvider.getLogoutUrl().trim().isEmpty()){
+                String fullLogoutUrl = SSOConfiguratorUtil.getGatewayUrl(application) + ssoProvider.getLogoutUrl();
+                ssoProvider.setLogoutUrl(fullLogoutUrl);
+            }
+
             SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
             ServiceProvider serviceProvider = null;
             try {
