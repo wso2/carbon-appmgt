@@ -772,8 +772,8 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers"
+        curl -X GET -H "Authorization: Bearer 0b236aa97005945bd9796149e54cd0b7"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/throttlingtiers"
       x-wso2-response: >-
         {"tierList":[{"tierSortKey":1,"tierName":"Bronze","tierDisplayName":"Bronze","tierDescription":"Allows
         1 request(s) per
