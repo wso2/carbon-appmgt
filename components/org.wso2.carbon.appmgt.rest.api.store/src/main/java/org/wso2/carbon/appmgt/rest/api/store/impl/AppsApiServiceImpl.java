@@ -325,7 +325,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+           String activityId =   mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response.toString()).build();
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -334,7 +339,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         }
-        return Response.ok().build();
+        return Response.serverError().build();
     }
 
     @Override
@@ -375,7 +380,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response.toString()).build();
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -384,7 +394,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         }
-        return Response.ok().build();
+        return Response.serverError().build();
     }
 
 

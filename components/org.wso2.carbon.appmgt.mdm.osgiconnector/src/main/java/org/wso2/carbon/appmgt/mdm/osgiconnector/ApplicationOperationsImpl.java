@@ -73,7 +73,9 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 									getDevicesOfUser(userName);
 
 					for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
-						deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
+						if(applicationOperationAction.getApp().getPlatform().equalsIgnoreCase(device.getType())){
+							deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
+						}
 					}
 				}
 			} catch (DeviceManagementException devEx) {
@@ -155,9 +157,10 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			properties.put(MDMAppConstants.IOSConstants.IS_REMOVE_APP, true);
 		}
 		mobileApp.setProperties(properties);
+		Activity activity = null;
 		try {
-			for (DeviceIdentifier deviceIdentifier : deviceIdentifiers) {
-				if (deviceIdentifier.getType().equalsIgnoreCase(Platform.ANDROID.toString())) {
+			if (deviceIdentifiers.size() > 0) {
+				if (deviceIdentifiers.get(0).getType().equalsIgnoreCase(Platform.ANDROID.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
 								.createInstallAppOperation(mobileApp, applicationOperationAction.getSchedule());
@@ -168,7 +171,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						operation = AndroidApplicationOperationUtil
 								.createAppUninstallOperation(mobileApp, applicationOperationAction.getSchedule());
 					}
-				} else if (deviceIdentifier.getType().equalsIgnoreCase(Platform.IOS.toString())) {
+				} else if (deviceIdentifiers.get(0).getType().equalsIgnoreCase(Platform.IOS.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation =
 								IOSApplicationOperationUtil.createInstallAppOperation(mobileApp);
@@ -177,11 +180,18 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 								IOSApplicationOperationUtil.createAppUninstallOperation(mobileApp);
 					}
 				}
-				Activity activity = MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
+				activity = MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
 				                  .installApplicationForDevices(operation, deviceIdentifiers);
 
+
+			}
+
+			if(activity != null){
 				return activity.getActivityId();
 			}
+
+			return null;
+
 		} catch (DeviceApplicationException mdmExce) {
 			log.error("Error in creating operation object using app.", mdmExce);
 			throw new MobileApplicationException(mdmExce);
@@ -189,7 +199,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			log.error("Error in app installation.", appMgtExce);
 			throw new MobileApplicationException(appMgtExce);
 		}
-		return null;
+
 	}
 
 	/**
