@@ -48,7 +48,7 @@
   	<module>features/org.wso2.carbon.appmgt.mdm.restconnector.feature</module>
   	<module>features/org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
   	<module>features/org.wso2.carbon.appmgt.services.api.feature</module>
-    <module>features/org.wso2.carbon.appmgt.mdm.osgiconnector.feature</module>
+    <!--module>features/org.wso2.carbon.appmgt.mdm.osgiconnector.feature</module-->
     <module>components/org.wso2.carbon.appmgt.rest.api.util</module>
     <module>components/org.wso2.carbon.appmgt.rest.api.publisher</module>
     <module>components/org.wso2.carbon.appmgt.rest.api.store</module>
