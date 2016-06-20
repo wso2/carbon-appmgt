@@ -1022,10 +1022,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 JSONObject lifecycleHistoryStateObj = (JSONObject) historyResourceJsonArray.get(i);
                 LifeCycleHistoryDTO lifeCycleHistoryDTO = new LifeCycleHistoryDTO();
                 lifeCycleHistoryDTO.setOrder(Integer.parseInt(lifecycleHistoryStateObj.get("order").toString()));
-                lifeCycleHistoryDTO.setState(lifecycleHistoryStateObj.get("state").toString());
-                lifeCycleHistoryDTO.setTargetState(lifecycleHistoryStateObj.get("targetState").toString());
-                lifeCycleHistoryDTO.setTimestamp(lifecycleHistoryStateObj.get("timestamp").toString());
-                lifeCycleHistoryDTO.setUser(lifecycleHistoryStateObj.get("user").toString());
+                lifeCycleHistoryDTO.setState((String) lifecycleHistoryStateObj.get("state"));
+                lifeCycleHistoryDTO.setTargetState((String) lifecycleHistoryStateObj.get("targetState"));
+                lifeCycleHistoryDTO.setTimestamp((String) lifecycleHistoryStateObj.get("timestamp"));
+                lifeCycleHistoryDTO.setUser((String) lifecycleHistoryStateObj.get("user"));
                 lifeCycleHistoryDTOList.add(lifeCycleHistoryDTO);
             }
             lifeCycleHistoryListDTO.setLifeCycleHistoryList(lifeCycleHistoryDTOList);
