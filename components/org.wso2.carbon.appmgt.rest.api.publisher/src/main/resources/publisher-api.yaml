@@ -449,8 +449,8 @@ paths:
     put:
       x-scope: 'appm:create'
       x-wso2-curl: |-
-        curl -X PUT -H "Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb"
-         -H "Content-Type: application/json"
+        curl -X PUT -H "Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb" 
+         -H "Content-Type: application/json" 
          -d '{"tags":["tagA","tagB","tagC"]}' "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/00fafc68-d8bb-498f-9ef3-afbb6db06826/tags"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: '{"tags":["tagA","tagB","tagC"]}'
@@ -768,12 +768,12 @@ paths:
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/throttlingtiers':
+  '/apps/{appType}/throttlingtiers':
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers"
+        curl -X GET -H "Authorization: Bearer 0b236aa97005945bd9796149e54cd0b7"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/throttlingtiers"
       x-wso2-response: >-
         {"tierList":[{"tierSortKey":1,"tierName":"Bronze","tierDisplayName":"Bronze","tierDescription":"Allows
         1 request(s) per
@@ -788,7 +788,6 @@ paths:
         Get a list of tiers.
       parameters:
         - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
       tags:
@@ -833,10 +832,9 @@ paths:
         - multipart/form-data
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -k -H "Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -H
-        "Content-Type: application/json"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content"
-        > sample.pdf
+        curl -X POST -H "Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02"
+        -H "Content-Type: multipart/form-data" -F "file=@sample.pdf"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Uploading document
       description: |
@@ -894,7 +892,7 @@ paths:
       x-scope: 'appm:read'
       x-wso2-curl: >-
         curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a"
-        "http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs"
       x-wso2-response: |-
         HTTP/1.1 200 OK
         Content-Type: application/json
@@ -976,9 +974,9 @@ paths:
     post:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b" -H
-        "Content-Type: application/json" -X POST -d @data.json
-        "http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents"
+        curl -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3" -H
+        "Content-Type:application/json" -X POST -d @data.json
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs"
       x-wso2-request: |-
         {
             "visibility": "API_LEVEL",
@@ -1063,8 +1061,8 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a"
-        "http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5"
+        curl -X GET -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/e27c144f-0be9-430c-a621-21fd58864f56"
       x-wso2-response: |-
         HTTP/1.1 200 OK
         Content-Type: application/json
@@ -1130,9 +1128,9 @@ paths:
     delete:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -X
+        curl -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3" -X
         DELETE
-        http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/8150c757-ba7f-4751-8020-71d7ee3e5d76"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Document
       description: |
@@ -1823,11 +1821,11 @@ paths:
         curl -X POST -H "Authorization: Bearer 04b1607a56c2d51adb35912943335322"
         -H "Content-Type: application/json"  -d '{ "policyPartial":
         "<Condition>\n      <Apply
-        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n        
         <Function
-        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n        
         <AttributeValue
-        DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n
+        DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n        
         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\"
         Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\"
         DataType=\"http://www.w3.org/2001/XMLSchema#string\"
@@ -2182,10 +2180,11 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Content-Type: application/json" -d '{"site":
-        "testUser.lk","email": "testUser@gmail.com","description": "this is a
-        test description","name":"testUser","properties": [{"isVisible":
-        true,"value": "0112345678","key": "telephone"}]}'
+        curl -X POST -H "Authorization: Bearer 56bbab397e7baa757e6e5847e789727d"
+        -H "Host: 127.0.0.1:9763" -H "Content-Type:application/json" -d
+        '{"site": "testUser.lk","email": "testUser@gmail.com","description":
+        "this is a test description","name":"testUser","properties":
+        [{"isVisible": true,"value": "0112345678","key": "telephone"}]}'
         "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner"
       x-wso2-response: '{"id": 4}'
       x-wso2-request: >-
@@ -2304,7 +2303,7 @@ paths:
         "sysUser@gmail.com","description": "this is a test description","name":
         "sysUser","properties": [{"isVisible": true,"value": "0112345678","key":
         "telephone"}],"id": 1}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner"
+        "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
         {"site": "newSysUser.lk","email":
@@ -2361,7 +2360,8 @@ paths:
     delete:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer 68f8872882b2dca493328564942251b6"
+        curl -X DELETE -H "Authorization: Bearer
+        68f8872882b2dca493328564942251b6"
         "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Business Owner
@@ -2978,6 +2978,10 @@ definitions:
         description: asset created timestamp
         type: string
         example: 00000001459919490157
+      customProperties:
+        type: array
+        items:
+          $ref: '#/definitions/CustomProperty'
   DocumentList:
     title: Document List
     properties:
@@ -3444,3 +3448,13 @@ definitions:
         type: string
         description: |
           Description about individual errors occurred
+  CustomProperty:
+    title: The DTO for a custom app property
+    required:
+      - name
+      - value
+    properties:
+      name:
+        type: string
+      value:
+        type: string

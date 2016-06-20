@@ -43,12 +43,14 @@ var generateLeftNavJson = function(data, listPartial) {
     if (data.artifact) {
 
         editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
-        if (data.artifact.lifecycleState == "Published") {
-            editEnabled = false;
-        } else if (user.hasRoles(["admin"]) || webAppUpdateAuthorized) {
+
+        if(user.hasRoles(["admin"]) || (webAppUpdateAuthorized &&  !(data.artifact.lifecycleState == "Published"))){
             editEnabled = true;
+        } else {
+            editEnabled = false;
         }
 
+        log.info("Editable : "+editEnabled)
         if (createActionAuthorized) {
             if (editEnabled) {
                 leftNavItems = {
