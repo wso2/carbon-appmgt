@@ -146,7 +146,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters,
+                mobileOperation.performAction(user.toString(), action, tenantId, "user", appId, parameters,
                                               null);
             } else {
                 return RestApiUtil.buildNotFoundException("Users", null).getResponse();
@@ -271,7 +271,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters,
+                mobileOperation.performAction(user.toString(), action, tenantId, "user", appId, parameters,
                                               null);
             } else {
                 return RestApiUtil.buildNotFoundException("Users", null).getResponse();
