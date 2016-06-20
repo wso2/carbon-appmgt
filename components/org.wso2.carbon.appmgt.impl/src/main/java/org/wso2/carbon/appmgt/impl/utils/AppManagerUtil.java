@@ -3771,16 +3771,16 @@ public final class AppManagerUtil {
                 return;
             }
 
-            String tenantConfLocation = CarbonUtils.getCarbonHome() + File.separator +
+            String oauthScopeRoleMappingFilePath = CarbonUtils.getCarbonHome() + File.separator +
                                             AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
                                             AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
-            File tenantConfFile = new File(tenantConfLocation);
+            File oauthScopeRoleMappingFile = new File(oauthScopeRoleMappingFilePath);
 
             byte[] data;
 
-            if (tenantConfFile.exists()) { // Load conf from resources directory in pack if it exists
-                FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
+            if (oauthScopeRoleMappingFile.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(oauthScopeRoleMappingFile);
                 data = IOUtils.toByteArray(fileInputStream);
 
                 Resource resource = registry.newResource();
@@ -3797,9 +3797,9 @@ public final class AppManagerUtil {
                 log.warn(String.format("Can't find OAuth scope role mapping file in '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
             }
         } catch (RegistryException e) {
-            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+            throw new AppManagementException("Error while saving OAuth scope role mapping to the registry", e);
         } catch (IOException e) {
-            throw new AppManagementException("Error while reading tenant conf file content", e);
+            throw new AppManagementException("Error while reading OAuth scope role mapping file content", e);
         }
     }
 
