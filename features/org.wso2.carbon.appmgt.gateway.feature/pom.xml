@@ -141,8 +141,6 @@
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
                                 <!--importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
-                                .stub:${carbon.mediation.version}</importBundleDef>
-                                <importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
                                 .stub:${carbon.mediation.version}</importBundleDef-->
                             </importFeatures>
                         </configuration>
