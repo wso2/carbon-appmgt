@@ -3704,6 +3704,58 @@ public final class AppManagerUtil {
 
     public static void loadTenantConf(int tenantID) throws AppManagementException {
         loadOAuthScopeRoleMapping(tenantID);
+        loadCustomAppPropertyDefinitions(tenantID);
+    }
+
+    private static void loadCustomAppPropertyDefinitions(int tenantID) throws AppManagementException {
+
+        RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
+        try {
+            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            loadCustomAppPropertyDefinitionsForAppType(AppMConstants.WEBAPP_ASSET_TYPE, registry);
+            loadCustomAppPropertyDefinitionsForAppType(AppMConstants.MOBILE_ASSET_TYPE, registry);
+        } catch (RegistryException e) {
+            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+        } catch (IOException e) {
+            throw new AppManagementException("Error while reading tenant conf file content", e);
+        }
+    }
+
+    private static void loadCustomAppPropertyDefinitionsForAppType(String appType, UserRegistry registry) throws RegistryException, IOException {
+
+        if(!registry.resourceExists(getCustomPropertyDefinitionsResourcePath(appType))){
+
+            String customPropertyDefinitions = CarbonUtils.getCarbonHome() + File.separator +
+                                                AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                                                AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH + File.separator +
+                                                appType + ".json";
+
+            File customPropertyDefinitionsFile = new File(customPropertyDefinitions);
+
+            byte[] data;
+
+            if (customPropertyDefinitionsFile.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(customPropertyDefinitionsFile);
+                data = IOUtils.toByteArray(fileInputStream);
+
+                Resource resource = registry.newResource();
+                resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+                resource.setContent(data);
+
+                String customPropertyDefinitionsRegistryPath = getCustomPropertyDefinitionsResourcePath(appType);
+                registry.put(customPropertyDefinitionsRegistryPath, resource);
+
+                log.debug(String.format("Added custom property mapping ('%s') for '%s'", customPropertyDefinitionsRegistryPath, appType));
+
+            }else{
+                log.warn(String.format("Can't find custom property definitions file ('%s') for '%s'", customPropertyDefinitionsFile, AppMConstants.WEBAPP_ASSET_TYPE));
+            }
+        }
+    }
+
+    private static String getCustomPropertyDefinitionsResourcePath(String appType) {
+        return String.format("%s/%s/%s.json", AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH, appType);
     }
 
     private static void loadOAuthScopeRoleMapping(int tenantID) throws AppManagementException {
