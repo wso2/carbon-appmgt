@@ -4,14 +4,14 @@
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdThrottlingtiersGet"></a>Get all Tiers</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeThrottlingtiersGet"></a>Get all Tiers</h3>
 
             <p class="marked"></p>
 
             <p class="marked">Get a list of tiers.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/throttlingtiers</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/throttlingtiers</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -30,7 +30,7 @@
 
             
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdThrottlingtiersGet">
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeThrottlingtiersGet">
                 <h4 class="section-heading">
                     Sample Response
                     
@@ -39,7 +39,7 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdThrottlingtiersGet" class="pre collapse"><code class="json">{&quot;tierList&quot;:[{&quot;tierSortKey&quot;:1,&quot;tierName&quot;:&quot;Bronze&quot;,&quot;tierDisplayName&quot;:&quot;Bronze&quot;,&quot;tierDescription&quot;:&quot;Allows 1 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:20,&quot;tierName&quot;:&quot;Gold&quot;,&quot;tierDisplayName&quot;:&quot;Gold&quot;,&quot;tierDescription&quot;:&quot;Allows 20 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:5,&quot;tierName&quot;:&quot;Silver&quot;,&quot;tierDisplayName&quot;:&quot;Silver&quot;,&quot;tierDescription&quot;:&quot;Allows 5 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:10000,&quot;tierName&quot;:&quot;Unlimited&quot;,&quot;tierDisplayName&quot;:&quot;Unlimited&quot;,&quot;tierDescription&quot;:&quot;Allows unlimited requests&quot;}]}</code></div>
+                <div id="response-appsAppTypeThrottlingtiersGet" class="pre collapse"><code class="json">{&quot;tierList&quot;:[{&quot;tierSortKey&quot;:1,&quot;tierName&quot;:&quot;Bronze&quot;,&quot;tierDisplayName&quot;:&quot;Bronze&quot;,&quot;tierDescription&quot;:&quot;Allows 1 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:20,&quot;tierName&quot;:&quot;Gold&quot;,&quot;tierDisplayName&quot;:&quot;Gold&quot;,&quot;tierDescription&quot;:&quot;Allows 20 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:5,&quot;tierName&quot;:&quot;Silver&quot;,&quot;tierDisplayName&quot;:&quot;Silver&quot;,&quot;tierDescription&quot;:&quot;Allows 5 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:10000,&quot;tierName&quot;:&quot;Unlimited&quot;,&quot;tierDisplayName&quot;:&quot;Unlimited&quot;,&quot;tierDescription&quot;:&quot;Allows unlimited requests&quot;}]}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -78,36 +78,6 @@
                         </td>
                         <td>
                             <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appId</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
