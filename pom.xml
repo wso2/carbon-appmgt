@@ -792,7 +792,7 @@
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
-    <carbon.store.version>1.4.2-SNAPSHOT</carbon.store.version>
+    <carbon.store.version>1.4.2</carbon.store.version>
 
      <!--carbon.commons.version_4.4.8>4.4.8</carbon.commons.version_4.4.8-->
 
