@@ -840,7 +840,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/throttlingtiers": {
+        "/apps/{appType}/throttlingtiers": {
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers\"",
@@ -850,9 +850,6 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
                     },
                     {
                         "$ref": "#/parameters/Accept"

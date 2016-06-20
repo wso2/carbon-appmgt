@@ -1180,8 +1180,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdThrottlingtiersGet(String appType, String appId, String accept,
-                                                         String ifNoneMatch) {
+    public Response appsAppTypeThrottlingtiersGet(String appType, String accept,
+                                                  String ifNoneMatch) {
         TierListDTO tierListDTO = new TierListDTO();
         try {
             //check appType validity (currently support only webApps)
