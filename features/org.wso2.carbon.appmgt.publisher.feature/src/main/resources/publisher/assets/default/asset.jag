@@ -478,9 +478,9 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             username = username + "@" + tenantDomain;
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
             appMgtProviderObj.generateEntitlementPolicies(webappId);
-
+            var tenantAwareUserName =  jagg.getUser().username;
             if (oldVersion == null || oldVersion == '') {
-                auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
                                                                                    ", apiName='" + webappId.name + '\''
@@ -490,7 +490,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                                                                                    '}', "", "");
             }
             else {
-                auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
                                                                                     ", apiName='" + webappId.name + '\''

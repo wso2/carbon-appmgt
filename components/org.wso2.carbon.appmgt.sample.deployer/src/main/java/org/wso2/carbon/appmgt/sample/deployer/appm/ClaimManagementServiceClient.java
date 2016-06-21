@@ -23,6 +23,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceStub;
+import org.wso2.carbon.claim.mgt.stub.dto.ClaimAttributeDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimMappingDTO;
 
@@ -64,7 +65,8 @@ public class ClaimManagementServiceClient {
     public void addClaim(String description, String claimURI, boolean isRequired) throws RemoteException,
             ClaimManagementServiceException {
         ClaimDTO claimDTO = new ClaimDTO();
-        claimDTO.setDialectURI("http://wso2.org/claims");
+        String dialectURI = "http://wso2.org/claims";
+        claimDTO.setDialectURI(dialectURI);
         claimDTO.setClaimUri(claimURI);
         claimDTO.setDisplayTag(description);
         claimDTO.setDescription(description);
@@ -75,6 +77,16 @@ public class ClaimManagementServiceClient {
         ClaimMappingDTO claimMappingDTO = new ClaimMappingDTO();
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
-        claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+        // check whether claim already exits or not.
+        ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
+                .getClaimMappings();
+        for (ClaimMappingDTO claimMapping : claimMappingDTOList) {
+            ClaimDTO claim = claimMapping.getClaim();
+            String claimUri = claim.getClaimUri();
+            if (claimUri.equals(claimURI)) {
+                claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+                break;
+            }
+        }
     }
 }

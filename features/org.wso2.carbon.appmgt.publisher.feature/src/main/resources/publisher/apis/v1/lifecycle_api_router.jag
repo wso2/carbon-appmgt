@@ -363,6 +363,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // promote lifecycle of this app (current artifact)
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
                                                    appType, action);
+
+        // Workaround for APPM-1263
+        var registryCacheCleanerClass = Packages.org.wso2.carbon.appmgt.impl.utils.RegistryCacheHelper;
+        var registryCacheCleaner = new registryCacheCleanerClass();
+        registryCacheCleaner.cleanRegistryResourceCache(currentArtifact.path);
+
         if (operationResult.isSuccess) {
             content.messages.push(operationResult.message);
         } else {
@@ -379,6 +385,9 @@ require('/modules/publisher.js').exec(function (ctx) {
             // ignore errors when reverting changes
             promoteArtifactLifeCycle(artifactManager, currentArtifact, appType,
                                      "Re-Publish");
+
+            // Workaround for APPM-1263
+            registryCacheCleaner.cleanRegistryResourceCache(currentArtifact.path);
 
             response.status = 500;
             response.contentType = CONTENT_TYPE_JSON;
@@ -482,7 +491,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
         var originalArtifact = artifactManager.get(uuid);
         var attributes = originalArtifact.attributes;
-        auditLog.writeLog(tenantId, username, action, appType, "{" +
+        auditLog.writeLog(tenantId, username, "LifecycleActionPerformed-"+action, appType, "{" +
                                                                "providerName='" + attributes["overview_provider"] + '\''
                                                                +
                                                                ", apiName='" + attributes["overview_name"] + '\'' +

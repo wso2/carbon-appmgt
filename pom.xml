@@ -37,7 +37,7 @@
     <module>components/org.wso2.carbon.appmgt.services.api</module>
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
-    <module>components/org.wso2.carbon.appmgt.mdm.osgiconnector</module>
+    <!--<module>components/org.wso2.carbon.appmgt.mdm.osgiconnector</module>-->
     <module>components/org.wso2.carbon.appmgt.publisher</module>
     <module>features/org.wso2.carbon.appmgt.core.feature</module>
   	<module>features/org.wso2.carbon.appmgt.gateway.feature</module>
@@ -193,11 +193,6 @@
         <groupId>org.eclipse.osgi</groupId>
         <artifactId>org.eclipse.osgi.services</artifactId>
         <version>${eclipse.osgi.service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.wso2.carbon.devicemgt</groupId>
-        <artifactId>org.wso2.carbon.policy.mgt.core</artifactId>
-        <version>${carbon.device.mgt.version}</version>
       </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple.wso2</groupId>
@@ -654,16 +649,6 @@
         <version>${carbon.commons.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon.devicemgt</groupId>
-        <artifactId>org.wso2.carbon.device.mgt.common</artifactId>
-        <version>${carbon.device.mgt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.wso2.carbon.devicemgt</groupId>
-        <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
-        <version>${carbon.device.mgt.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.ws.commons.axiom.wso2</groupId>
         <artifactId>axiom</artifactId>
         <version>${axiom.wso2.version}</version>
@@ -761,10 +746,6 @@
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
     <carbon.appmgt.server.version>1.2.0-SNAPSHOT</carbon.appmgt.server.version>
 
-    <carbon.device.mgt.version>1.1.1-SNAPSHOT</carbon.device.mgt.version>
-    <carbon.device.mgt.version.range>[0.8.0, 2.0.0)</carbon.device.mgt.version.range>
-
-
     <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
     <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
 
@@ -792,7 +773,7 @@
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
-    <carbon.store.version>1.4.2-SNAPSHOT</carbon.store.version>
+    <carbon.store.version>1.4.2</carbon.store.version>
 
      <!--carbon.commons.version_4.4.8>4.4.8</carbon.commons.version_4.4.8-->
 
