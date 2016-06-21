@@ -491,7 +491,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
         var originalArtifact = artifactManager.get(uuid);
         var attributes = originalArtifact.attributes;
-        auditLog.writeLog(tenantId, username, action, appType, "{" +
+        auditLog.writeLog(tenantId, username, "LifecycleActionPerformed-"+action, appType, "{" +
                                                                "providerName='" + attributes["overview_provider"] + '\''
                                                                +
                                                                ", apiName='" + attributes["overview_name"] + '\'' +
