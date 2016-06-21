@@ -810,7 +810,7 @@
     <carbon.claim.mgt.stub>5.0.7</carbon.claim.mgt.stub>
     <carbon.identity.user.profile.stub>5.1.0</carbon.identity.user.profile.stub>
     <carbon.mediation.security.stub>4.6.1-BETA3</carbon.mediation.security.stub>
-    <carbon.webapp.mgt.stub>4.6.2-SNAPSHOT</carbon.webapp.mgt.stub>
+    <carbon.webapp.mgt.stub>4.2.0</carbon.webapp.mgt.stub>
 
     <!-- P2 Plugin Version -->
     <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
