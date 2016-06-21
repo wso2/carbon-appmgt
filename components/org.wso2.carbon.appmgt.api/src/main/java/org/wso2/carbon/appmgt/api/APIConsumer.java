@@ -39,6 +39,16 @@ public interface APIConsumer extends APIManager {
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
+     * Returns the details of the owner for a given owner Id in public store.
+     *
+     * @param businessOwnerId
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int tenantId) throws AppManagementException;
+
+    /**
      * Returns business owner Ids by a prefix of business owner name.
      *
      * @param searchPrefix
