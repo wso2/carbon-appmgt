@@ -817,8 +817,8 @@
     <es.feature.version>1.0.0</es.feature.version>
 
     <!-- Jaggery Version -->
-    <jaggery.js.version>0.12.5</jaggery.js.version>
-    <jaggery.version>0.12.5</jaggery.version>
+    <jaggery.js.version>0.12.6-SNAPSHOT</jaggery.js.version>
+    <jaggery.version>0.12.6-SNAPSHOT</jaggery.version>
     <jaggery.scxml.executors.version>1.4.0</jaggery.scxml.executors.version>
     <jaggeryjs.markdown.feature.version>1.0.0</jaggeryjs.markdown.feature.version>
     <jaggeryjs.caramel.feature.version>1.0.1</jaggeryjs.caramel.feature.version>
