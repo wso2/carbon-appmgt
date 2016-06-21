@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [ &quot;admin&quot;, &quot;testuser&quot; ],&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/administration/apps/download&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,  &quot;typeIds&quot;: [&quot;admin&quot;,&quot;user1&quot;],  &quot;appId&quot;: &quot;5acd652e-9d6e-465f-86bf-e30838a16123&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/administration/apps/download&quot;</code></div>
             
             
 
@@ -226,7 +226,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [  &quot;admin&quot;, &quot;testuser&quot; ],&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 6d781e9fce073db36d6481054da46311&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{  &quot;type&quot;: &quot;role&quot;, &quot;typeIds&quot;: [&quot;admin&quot;,&quot;role1&quot;],  &quot;appId&quot;: &quot;5acd652e-9d6e-465f-86bf-e30838a16123&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/administration/apps/uninstallation&quot;</code></div>
             
             
 
@@ -2253,7 +2253,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/download&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 3500931880f806ad2523c4ce7079c505&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/download&quot;</code></div>
             
             
 
@@ -2264,7 +2264,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-appsDownloadPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;cec2027d-2dd6-4826-97c5-33be4eb83ae1&quot;}</code></div>
+                <div id="request-appsDownloadPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsDownloadPost">
@@ -2276,7 +2276,7 @@
             </h4>
             </div>
             
-                <div id="response-appsDownloadPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-appsDownloadPost" class="pre collapse"><code class="json">HTTP/1.1 202 Accepted</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -3101,7 +3101,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/uninstallation&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 3500931880f806ad2523c4ce7079c505&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/uninstallation&quot;</code></div>
             
             
 
@@ -3112,7 +3112,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-appsUninstallationPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;cec2027d-2dd6-4826-97c5-33be4eb83ae1&quot;}</code></div>
+                <div id="request-appsUninstallationPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsUninstallationPost">
@@ -3124,7 +3124,7 @@
             </h4>
             </div>
             
-                <div id="response-appsUninstallationPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-appsUninstallationPost" class="pre collapse"><code class="json">HTTP/1.1 202 Accepted</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>

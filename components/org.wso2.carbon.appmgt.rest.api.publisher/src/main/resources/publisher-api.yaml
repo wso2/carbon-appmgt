@@ -398,7 +398,10 @@ paths:
       x-wso2-curl: >-
         curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags"
-      x-wso2-response: '{"tags":["w1","webapptag1","webapptag2"]}'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+         {"tags":["tagA","tagB","tagC"]}
       summary: Get all Tags of an App
       description: |
         Get a list of available Tags relevant to the given App Internal ID.
@@ -445,15 +448,15 @@ paths:
             $ref: '#/definitions/Error'
     put:
       x-scope: 'appm:create'
-      x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
-        -H "Content-Type: application/json" -d '{"tags":["tag1"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+      x-wso2-curl: |-
+        curl -X PUT -H "Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb"
+         -H "Content-Type: application/json"
+         -d '{"tags":["tagA","tagB","tagC"]}' "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/00fafc68-d8bb-498f-9ef3-afbb6db06826/tags"
       x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"tags":["tag1"]}'
+      x-wso2-request: '{"tags":["tagA","tagB","tagC"]}'
       summary: Add a new tag
       description: |
-        Add a new tag to the tag collection of a given application type.
+        Add a new tag/tags to the tag collection of a given application type.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -503,8 +506,9 @@ paths:
       x-scope: 'appm:create'
       x-wso2-curl: >-
         curl -X DELETE -H "Authorization: Bearer
-        e099014668a524870c2895fe0595f125"  -d '{"tags":["w2"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+        4be7890951f36d5c44a68d5a35227ceb" -H "Content-Type: application/json" -d
+        '{"tags":["tag1","tag2"]}'
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/95e497dd-ebb0-414f-9718-88857a153780/tags"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Tags relevant to an App
       description: |
@@ -1166,7 +1170,10 @@ paths:
         curl -X POST -H "Authorization: Bearer 31b72e5a9158a413187532b052953f68"
         -H "Content-Type: application/json"
         "http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish"
-      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-response: |-
+        HTTP/1.1 202 OK
+        Content-Type: application/json
+         {"message": "Lifecycle action : Recycle has been accepted for processing "}
       description: |
         Change the lifecycle of an App.
       parameters:
@@ -1242,11 +1249,12 @@ paths:
     post:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 31b72e5a9158a413187532b052953f68"
-        -H "Content-Type: application/json" -d '{"tags":["aa","bb","cc"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/validate-context"
-      x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"tags":["aa","bb","cc"]}'
+        curl -X POST -H "Authorization: Bearer f61b3bea0fdc1d31d464a40f7aec8282"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/validate-context?appContext=travelApp"
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        {"IsContextExists":true}
       summary: Validate App Context
       description: |
         Validate App context.
@@ -1757,8 +1765,9 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b"
-        "http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp"
+        curl -X GET -H "Authorization: Bearer 04b1607a56c2d51adb35912943335322"
+        -H "Content-Type: application/json"
+        "http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/2/apps/webapp"
       x-wso2-response: >-
         {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get all Apps mapped to a policy partial
@@ -1811,15 +1820,18 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition></Rule>"}'
+        curl -X POST -H "Authorization: Bearer 04b1607a56c2d51adb35912943335322"
+        -H "Content-Type: application/json"  -d '{ "policyPartial":
+        "<Condition>\n      <Apply
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n
+        <Function
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n
+        <AttributeValue
+        DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n
+        <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\"
+        Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\"
+        DataType=\"http://www.w3.org/2001/XMLSchema#string\"
+        MustBePresent=\"true\"/>\n      </Apply>\n</Condition>"}'
         "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: |-
@@ -1864,20 +1876,7 @@ paths:
   /administration/xacmlpolicies/:
     post:
       x-scope: 'appm:administration'
-      x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>","policyPartialName": "ddd",  "isSharedPartial": true,
-        "policyPartialDesc": null}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies"
+      x-wso2-curl: "curl -X POST -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"/>\\n         <AttributeValue DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\">admin</AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http://wso2.org/claims/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\" MustBePresent=\\\"true\\\"/>\\n      </Apply>\\n</Condition>\\n</Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/\"\r\n"
       x-wso2-response: >-
         {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
               <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
@@ -1955,20 +1954,7 @@ paths:
   '/administration/xacmlpolicies/{policyPartialId}':
     put:
       x-scope: 'appm:administration'
-      x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>", "policyPartialName": "ddd", "isSharedPartial":
-        true,"policyPartialDesc": null}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40"
+      x-wso2-curl: "curl -X PUT -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"/>\\n         <AttributeValue DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\">admin</AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http://wso2.org/claims/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\" MustBePresent=\\\"true\\\"/>\\n      </Apply>\\n</Condition>\\n</Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/1\"\r\n"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
         {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>

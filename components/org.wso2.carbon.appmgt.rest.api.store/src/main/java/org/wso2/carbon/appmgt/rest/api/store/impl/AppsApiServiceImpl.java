@@ -26,11 +26,20 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeObject;
-import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.PlistTemplateContext;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Subscription;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
@@ -46,7 +55,16 @@ import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.store.dto.*;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ScheduleDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -67,7 +85,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
@@ -76,8 +101,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Download/Install mobile application
+     *
      * @param contentType
-     * @param install InstallDTO
+     * @param install     InstallDTO
      * @return
      */
     @Override
@@ -94,8 +120,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (mobileApp == null) {
                 RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
             }
-            if(!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())){
-                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
             }
             Operations mobileOperation = new Operations();
             String action = "install";
@@ -105,10 +133,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length,
+                                           String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                            log);
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -124,7 +153,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
 
             appProvider.subscribeMobileApp(username, appId);
-            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters, null);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                              appId, parameters, null);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -176,6 +206,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Get Favourite home page in App Store
+     *
      * @param accept
      * @param ifNoneMatch
      * @return
@@ -215,6 +246,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Set favourite page for currently logged in user in App Store
+     *
      * @return
      */
     @Override
@@ -248,6 +280,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Remove favourite page of the currently logged i user in App Store
+     *
      * @return
      */
     @Override
@@ -339,14 +372,14 @@ public class AppsApiServiceImpl extends AppsApiService {
             OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
             if (oneTimeDownloadLink.isDownloaded()) {
                 RestApiUtil.handleForbiddenRequest("App binary one-time download API resource access with uuid '" +
-                        uuid + "' is forbidden", log);
+                                                           uuid + "' is forbidden", log);
             }
             String fileName = oneTimeDownloadLink.getFileName();
             binaryFile = RestApiUtil.readFileFromStorage(fileName);
             contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
             if (!contentType.startsWith("application")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
-                        log);
+                                             log);
             }
             Response.ResponseBuilder response = Response.ok((Object) binaryFile);
             response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
@@ -360,14 +393,14 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleResourceNotFoundError("Invalid downloadable link uuid", uuid, e, log);
             } else {
                 RestApiUtil.handleInternalServerError(
-                        "Error occurred while retrieving mobile binary via one-time download link with uuid" + uuid, e, log);
+                        "Error occurred while retrieving mobile binary via one-time download link with uuid" + uuid, e,
+                        log);
             }
         }
         return null;
     }
 
     /**
-     *
      * @param appId
      * @param uuid
      * @param ifMatch
@@ -385,7 +418,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             carbonContext.setUsername(oneTimeDownloadLink.getCreatedUserName());
-            carbonContext.setTenantDomain(org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            carbonContext.setTenantDomain(
+                    org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
             carbonContext.setTenantId(oneTimeDownloadLink.getCreatedTenantID());
             appProvider = RestApiUtil.getLoggedInUserProvider();
             MobileApp mobileApp = appProvider.getMobileApp(appId);
@@ -393,13 +427,17 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
             }
             if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
-                RestApiUtil.handleBadRequest("Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state", log);
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
             }
             AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                     getAPIManagerConfigurationService().getAPIManagerConfiguration();
             String oneTimeDownloadLinkAPIPath =
-                    HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
-                            appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION) + uuid;
+                    HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(
+                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
+                            appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION) +
+                            uuid;
             PlistTemplateContext plistTemplateContext = new PlistTemplateContext();
             plistTemplateContext.setAppName(mobileApp.getAppName());
             plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());
@@ -413,13 +451,14 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleResourceNotFoundError("Invalid plist retrieval", appId, e, log);
             } else {
                 RestApiUtil.handleInternalServerError(
-                        "Error occurred while retrieving plist configuration for IOS mobile app '" + appId + "' installation", e, log);
+                        "Error occurred while retrieving plist configuration for IOS mobile app '" + appId +
+                                "' installation", e, log);
             }
         }
         return null;
     }
 
-        /**
+    /**
      * Retrieve a given static content from storage
      *
      * @param fileName          request file name
@@ -498,10 +537,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length,
+                                           String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                            log);
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -520,7 +560,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters, null);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                              appId, parameters, null);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -565,10 +606,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 
             AppListDTO appListDTO = null;
-            if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
+            if (fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)) {
                 appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
 
-            }else{
+            } else {
                 appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
 
@@ -904,6 +945,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                       String ifModifiedSince) {
 
         APIConsumer apiConsumer = null;
+        Map<String, String> subscriptionData = new HashMap<>();
         boolean isTenantFlowStarted = false;
         String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
         try {
@@ -924,8 +966,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
                                                                     Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
             if (subscription != null) {
-
-
+                subscriptionData.put("Status", subscription.getSubscriptionStatus());
+                subscriptionData.put("SubscrptionType", subscription.getSubscriptionType());
             }
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError(
@@ -936,7 +978,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return Response.ok().build();
+        return Response.ok().entity(subscriptionData).build();
     }
 
     /**
@@ -1186,10 +1228,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                    String[].class);
+                                       String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                        log);
+                                             log);
             }
             String scheduleTime = schedule.getScheduleTime();
 
@@ -1198,7 +1240,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId,
+                                                              parameters, scheduleTime);
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -1236,10 +1281,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                    String[].class);
+                                       String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                        log);
+                                             log);
             }
             String scheduleTime = schedule.getScheduleTime();
 
@@ -1248,7 +1293,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId,
+                                                              parameters, scheduleTime);
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);

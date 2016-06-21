@@ -908,7 +908,7 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content\" > sample.pdf",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02\" -H \"Content-Type: multipart/form-data\" -F \"file=@sample.pdf\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Uploading document",
                 "description": "Uploading document files against an App.\n",
@@ -981,7 +981,7 @@
         "/apps/{appType}/id/{appId}/docs": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3\"",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
                 "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
                 "summary": "Get App Documents",
                 "description": "Get a list of documents belonging to an App.\n",
@@ -1044,7 +1044,7 @@
             },
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -H \"Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b\" -H \"Content-Type: application/json\" -X POST -d @data.json \"http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents\"",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" -H \"Content-Type:application/json\" -X POST -d @data.json \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
                 "x-wso2-request": "{\n    \"visibility\": \"API_LEVEL\",\n    \"sourceType\": \"INLINE\",\n    \"sourceUrl\": null,\n    \"otherTypeName\": null,\n    \"summary\": \"This is a sample documentation\",\n    \"name\": \"Introduction to PhoneVerification API\",\n    \"type\": \"HOWTO\"\n}",
                 "x-wso2-response": "HTTP/1.1 201 Created\nLocation: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"Introduction to PhoneVerification API\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Add a new document",
@@ -1108,7 +1108,7 @@
         "/apps/{appType}/id/{appId}/docs/{documentId}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/e27c144f-0be9-430c-a621-21fd58864f56\"",
                 "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Retrieving document",
                 "description": "Retrieving the document.\n",
@@ -1171,7 +1171,7 @@
             },
             "delete": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -X DELETE http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" -X DELETE \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/8150c757-ba7f-4751-8020-71d7ee3e5d76\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Document",
                 "description": "Delete an existing document.\n",
@@ -1938,7 +1938,7 @@
         "/administration/xacmlpolicies/validate": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 04b1607a56c2d51adb35912943335322\" -H \"Content-Type: application\/json\"  -d \'{ \"policyPartial\": \"<Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\"}\' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/validate\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 04b1607a56c2d51adb35912943335322\" -H \"Content-Type: application\/json\"  -d '{ \"policyPartial\": \"<Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\"}' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/validate\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}",
                 "summary": "Validate policy content",
@@ -1985,7 +1985,7 @@
         "/administration/xacmlpolicies/": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application\/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d \'{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\\n<\/Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}\' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/\"\r\n",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application\/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\\n<\/Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/\"\r\n",
                 "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null,\"policyPartialIc\": 2}",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null}",
                 "summary": "Create a new Policy Partial",
@@ -2049,7 +2049,7 @@
         "/administration/xacmlpolicies/{policyPartialId}": {
             "put": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application\/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d \'{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\\n<\/Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}\' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/1\"\r\n",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application\/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"\/>\\n         <AttributeValue DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\">admin<\/AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http:\/\/wso2.org\/claims\/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http:\/\/www.w3.org\/2001\/XMLSchema#string\\\" MustBePresent=\\\"true\\\"\/>\\n      <\/Apply>\\n<\/Condition>\\n<\/Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http:\/\/localhost:9763\/api\/appm\/publisher\/v1.1\/administration\/xacmlpolicies\/1\"\r\n",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null}",
                 "summary": "Update an existing policy partial",
@@ -3118,6 +3118,12 @@
                     "description": "asset created timestamp",
                     "type": "string",
                     "example": "00000001459919490157"
+                },
+                "customProperties":{
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -3717,6 +3723,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

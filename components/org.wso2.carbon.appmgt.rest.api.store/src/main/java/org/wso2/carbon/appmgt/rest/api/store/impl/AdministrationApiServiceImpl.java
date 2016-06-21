@@ -146,8 +146,12 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters,
-                                              null);
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                                  appId, parameters, null);
+                JSONObject response = new JSONObject();
+                response.put("activityId", activityId);
+
+                return Response.ok().entity(response.toString()).build();
             } else {
                 return RestApiUtil.buildNotFoundException("Users", null).getResponse();
             }
@@ -271,8 +275,10 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters,
-                                              null);
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                                  appId, parameters, null);
+                JSONObject response = new JSONObject();
+                response.put("activityId", activityId);
             } else {
                 return RestApiUtil.buildNotFoundException("Users", null).getResponse();
             }

@@ -963,7 +963,7 @@
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
                 "x-wso2-response": "HTTP/1.1 202 Accepted",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Download App",
@@ -1011,7 +1011,7 @@
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/uninstallation\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/uninstallation\"",
                 "x-wso2-response": "HTTP/1.1 202 Accepted",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Uninstall App",
@@ -1065,7 +1065,7 @@
         "/apps/mobile/schedule-install": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d \'{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-install\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-install\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
                 "summary": "Schedule Install App",
@@ -1113,7 +1113,7 @@
         "/apps/mobile/schedule-update": {
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d \'{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-update\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-update\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
                 "summary": "Schedule Update App",
@@ -1353,7 +1353,7 @@
         "/administration/apps/download": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3\" -H \"Content-Type: application\/json\" -d \'{\"type\": \"user\",  \"typeIds\": [\"admin\",\"user1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",  \"typeIds\": [\"admin\",\"user1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise Download/Install App",
@@ -1401,7 +1401,7 @@
         "/administration/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 6d781e9fce073db36d6481054da46311\" -H \"Content-Type: application\/json\" -d \'{  \"type\": \"role\", \"typeIds\": [\"admin\",\"role1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}\' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/uninstallation\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 6d781e9fce073db36d6481054da46311\" -H \"Content-Type: application\/json\" -d '{  \"type\": \"role\", \"typeIds\": [\"admin\",\"role1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/uninstallation\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise uninstall App",
@@ -1557,8 +1557,8 @@
         "/apps/static-contents/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving images, pdf and document files",
                 "description": "Retrieving images for banners, screenshots, etc.\n",
                 "parameters": [
@@ -1623,8 +1623,8 @@
         "/apps/mobile/binaries/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/RKHktVsxjmFOZz1.apk\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binaries",
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -1685,8 +1685,8 @@
                     "text/xml"
                 ],
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/plist/f2d9703b-df65-4b8a-8250-0d033e969f55/50ba9a5e-a261-453d-a58f-c6b68d42150d\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving plist for ios app installation",
                 "description": "Retrieving plist for ios mobile apps.\n",
                 "parameters": [
@@ -1747,8 +1747,8 @@
         "/apps/mobile/binaries/one-time/{uuid}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/fa1f4634-77cb-4bd7-9100-f0dcf0a04d6a\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binary",
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -2275,6 +2275,12 @@
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "customProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -2619,6 +2625,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

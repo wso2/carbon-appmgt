@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer e099014668a524870c2895fe0595f125&quot;  -d &#39;{&quot;tags&quot;:[&quot;w2&quot;]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;tags&quot;:[&quot;tag1&quot;,&quot;tag2&quot;]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/95e497dd-ebb0-414f-9718-88857a153780/tags&quot;</code></div>
             
             
 
@@ -323,7 +323,9 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdTagsGet" class="pre collapse"><code class="json">{&quot;tags&quot;:[&quot;w1&quot;,&quot;webapptag1&quot;,&quot;webapptag2&quot;]}</code></div>
+                <div id="response-appsAppTypeIdAppIdTagsGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK
+Content-Type: application/json
+ {&quot;tags&quot;:[&quot;tagA&quot;,&quot;tagB&quot;,&quot;tagC&quot;]}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -544,7 +546,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Add a new tag to the tag collection of a given application type.\n</p>
+            <p class="marked">Add a new tag/tags to the tag collection of a given application type.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/tags</code>
@@ -560,7 +562,9 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer e099014668a524870c2895fe0595f125&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;tags&quot;:[&quot;tag1&quot;]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb&quot;
+ -H &quot;Content-Type: application/json&quot;
+ -d &#39;{&quot;tags&quot;:[&quot;tagA&quot;,&quot;tagB&quot;,&quot;tagC&quot;]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/00fafc68-d8bb-498f-9ef3-afbb6db06826/tags&quot;</code></div>
             
             
 
@@ -571,7 +575,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-appsAppTypeIdAppIdTagsPut"class="pre collapse"><code class="json">{&quot;tags&quot;:[&quot;tag1&quot;]}</code></div>
+                <div id="request-appsAppTypeIdAppIdTagsPut"class="pre collapse"><code class="json">{&quot;tags&quot;:[&quot;tagA&quot;,&quot;tagB&quot;,&quot;tagC&quot;]}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdTagsPut">
