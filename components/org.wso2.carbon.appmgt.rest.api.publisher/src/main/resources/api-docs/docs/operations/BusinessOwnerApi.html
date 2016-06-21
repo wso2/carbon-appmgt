@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3&quot;</code></div>
             
             
 
@@ -468,7 +468,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1&quot;</code></div>
             
             
 
@@ -965,7 +965,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 56bbab397e7baa757e6e5847e789727d&quot; -H &quot;Host: 127.0.0.1:9763&quot; -H &quot;Content-Type:application/json&quot; -d &#39;{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 

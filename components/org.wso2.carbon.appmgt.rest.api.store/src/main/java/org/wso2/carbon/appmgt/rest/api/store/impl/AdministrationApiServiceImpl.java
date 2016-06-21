@@ -146,7 +146,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, "user",
                                                                   appId, parameters, null);
                 JSONObject response = new JSONObject();
                 response.put("activityId", activityId);
@@ -275,7 +275,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
             if (!userList.isEmpty()) {
                 parameters = userList.toArray(new String[0]);
-                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, "user",
                                                                   appId, parameters, null);
                 JSONObject response = new JSONObject();
                 response.put("activityId", activityId);
