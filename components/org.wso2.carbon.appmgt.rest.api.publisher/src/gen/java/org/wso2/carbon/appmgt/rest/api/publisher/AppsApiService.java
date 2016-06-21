@@ -1,13 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
 
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
@@ -34,7 +33,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdTagsGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdTagsPut(String appType,String appId,TagListDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdTagsDelete(String appType,String appId,TagListDTO body,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsAppTypeIdAppIdThrottlingtiersGet(String appType,String appId,String accept,String ifNoneMatch);
+    public abstract Response appsAppTypeThrottlingtiersGet(String appType, String accept, String ifNoneMatch);
     public abstract Response appsAppTypeStatsStatTypeGet(String appType,String statType,String startTimeStamp,String endTimeStamp,Integer limit,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeValidateContextPost(String appType,String appContext,String contentType,String ifModifiedSince);
