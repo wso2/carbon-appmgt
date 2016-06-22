@@ -386,6 +386,8 @@ public class APPMappingUtil {
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
+        dto.setBanner(webapp.getBanner());
+        dto.setScreenshots(null);
         dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
