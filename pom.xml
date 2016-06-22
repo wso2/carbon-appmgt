@@ -861,7 +861,6 @@
     <httpmime.version>4.3.6</httpmime.version>
     <jackson.version>1.4.0</jackson.version>
     <googlecode.plist.version>1.8</googlecode.plist.version>
-    <bcprov.wso2.version>1.49.wso2v1</bcprov.wso2.version>
 
     <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
     <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
