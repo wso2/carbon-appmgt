@@ -411,11 +411,6 @@ public class APPMappingUtil {
         }
 
         dto.setCreatedTime(webapp.getCreatedTime());
-
-        AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
-        appAppmetaDTO.setPath(webapp.getPath());
-        appAppmetaDTO.setVersion(webapp.getId().getVersion());
-        dto.setAppmeta(appAppmetaDTO);
         dto.setMediaType(webapp.getMediaType());
 
         // Set policy groups.
