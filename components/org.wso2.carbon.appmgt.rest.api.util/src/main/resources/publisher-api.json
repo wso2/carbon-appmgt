@@ -978,9 +978,9 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02\" -H \"Content-Type: multipart/form-data\" -F \"file=@sample.pdf\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 0c28ea242609cdbaef56c80452e0c843\" -H \"Content-Type: multipart/form-data\" -F \"file=@@sample.pdf\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e/content\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "summary": "Uploading document",
+                "summary": "Uploading document Content",
                 "description": "Uploading document files against an App.\n",
                 "parameters": [
                     {
@@ -1052,7 +1052,7 @@
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
-                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
                 "summary": "Get App Documents",
                 "description": "Get a list of documents belonging to an App.\n",
                 "parameters": [
@@ -1115,8 +1115,8 @@
             "post": {
                 "x-scope": "appm:create",
                 "x-wso2-curl": "curl -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" -H \"Content-Type:application/json\" -X POST -d @data.json \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
-                "x-wso2-request": "{\n    \"visibility\": \"API_LEVEL\",\n    \"sourceType\": \"INLINE\",\n    \"sourceUrl\": null,\n    \"otherTypeName\": null,\n    \"summary\": \"This is a sample documentation\",\n    \"name\": \"Introduction to PhoneVerification API\",\n    \"type\": \"HOWTO\"\n}",
-                "x-wso2-response": "HTTP/1.1 201 Created\nLocation: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"Introduction to PhoneVerification API\",\n   \"type\": \"HOWTO\"\n}",
+                "x-wso2-request": "{\n    \"sourceType\": \"INLINE\",\n    \"sourceUrl\": null,\n    \"otherTypeName\": null,\n    \"summary\": \"This is a sample documentation\",\n    \"name\": \"Introduction to PhoneVerification API\",\n    \"type\": \"HOWTO\"\n}",
+                "x-wso2-response": "HTTP/1.1 201 Created\nContent-Type: application/json\n\n{\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"Introduction to PhoneVerification API\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Add a new document",
                 "description": "Add a new document to an API\n",
                 "parameters": [
@@ -1178,8 +1178,8 @@
         "/apps/{appType}/id/{appId}/docs/{documentId}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/e27c144f-0be9-430c-a621-21fd58864f56\"",
-                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification Documentation\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Retrieving document",
                 "description": "Retrieving the document.\n",
                 "parameters": [
@@ -1285,9 +1285,9 @@
             },
             "put": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -H \"Content-Type: application/json\" -X PUT -d data.json \"http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents\"",
-                "x-wso2-request": "{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation for v1.0.0\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
-                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation for v1.0.0\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
+                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -H \"Content-Type: application/json\" -X PUT -d data.json \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/4cbbafc6-2327-49fc-9c3f-34ea36599091\"",
+                "x-wso2-request": "{\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation for v1.0.0\",\n   \"name\": \"PhoneVerification Documentation\",\n   \"type\": \"HOWTO\"\n}",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation for v1.0.0\",\n   \"name\": \"PhoneVerification Documentation\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Update an Webapp Document",
                 "description": "Update document details.\n",
                 "parameters": [

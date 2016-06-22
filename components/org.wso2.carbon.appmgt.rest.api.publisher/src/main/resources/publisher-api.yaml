@@ -916,11 +916,11 @@ paths:
         - multipart/form-data
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02"
-        -H "Content-Type: multipart/form-data" -F "file=@sample.pdf"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content"
+        curl -X POST -H "Authorization: Bearer 0c28ea242609cdbaef56c80452e0c843"
+        -H "Content-Type: multipart/form-data" -F "file=@@sample.pdf"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e/content"
       x-wso2-response: HTTP/1.1 200 OK
-      summary: Uploading document
+      summary: Uploading document Content
       description: |
         Uploading document files against an App.
       parameters:
@@ -984,8 +984,7 @@ paths:
         {
            "previous": "",
            "list":    [
-                    {
-                 "visibility": "API_LEVEL",
+              {
                  "sourceType": "INLINE",
                  "sourceUrl": null,
                  "otherTypeName": null,
@@ -994,8 +993,7 @@ paths:
                  "name": "PhoneVerification App Documentation",
                  "type": "HOWTO"
               },
-                    {
-                 "visibility": "API_LEVEL",
+              {
                  "sourceType": "URL",
                  "sourceUrl": "http://wiki.cdyne.com/index.php/Phone_Verification",
                  "otherTypeName": null,
@@ -1063,7 +1061,6 @@ paths:
         "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs"
       x-wso2-request: |-
         {
-            "visibility": "API_LEVEL",
             "sourceType": "INLINE",
             "sourceUrl": null,
             "otherTypeName": null,
@@ -1073,15 +1070,9 @@ paths:
         }
       x-wso2-response: >-
         HTTP/1.1 201 Created
-
-        Location:
-        http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
-
         Content-Type: application/json
 
-
         {
-           "visibility": "API_LEVEL",
            "sourceType": "INLINE",
            "sourceUrl": null,
            "otherTypeName": null,
@@ -1146,7 +1137,7 @@ paths:
       x-scope: 'appm:read'
       x-wso2-curl: >-
         curl -X GET -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/e27c144f-0be9-430c-a621-21fd58864f56"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e"
       x-wso2-response: |-
         HTTP/1.1 200 OK
         Content-Type: application/json
@@ -1249,16 +1240,15 @@ paths:
       x-wso2-curl: >-
         curl -k -H "Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -H
         "Content-Type: application/json" -X PUT -d data.json
-        "http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/4cbbafc6-2327-49fc-9c3f-34ea36599091"
       x-wso2-request: |-
         {
-           "visibility": "API_LEVEL",
            "sourceType": "INLINE",
            "sourceUrl": null,
            "otherTypeName": null,
            "documentId": "0bcb7f05-599d-4e1a-adce-5cb89bfe58d5",
            "summary": "This is a sample documentation for v1.0.0",
-           "name": "PhoneVerification API Documentation",
+           "name": "PhoneVerification Documentation",
            "type": "HOWTO"
         }
       x-wso2-response: |-
@@ -1272,7 +1262,7 @@ paths:
            "otherTypeName": null,
            "documentId": "0bcb7f05-599d-4e1a-adce-5cb89bfe58d5",
            "summary": "This is a sample documentation for v1.0.0",
-           "name": "PhoneVerification API Documentation",
+           "name": "PhoneVerification Documentation",
            "type": "HOWTO"
         }
       summary: Update an Webapp Document
@@ -1293,7 +1283,7 @@ paths:
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
       tags:
-        - API Document
+        - App Document
       responses:
         '200':
           description: |
