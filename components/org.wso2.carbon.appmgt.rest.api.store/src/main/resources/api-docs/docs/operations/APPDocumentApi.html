@@ -11,7 +11,7 @@
             <p class="marked">Get a list of documents belonging to an App.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/docs</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs&quot;</code></div>
+                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs&quot;</code></div>
             
             
 
@@ -45,7 +45,7 @@ Content-Type: application/json
 {
    &quot;previous&quot;: &quot;&quot;,
    &quot;list&quot;:    [
-      {
+            {
          &quot;sourceType&quot;: &quot;INLINE&quot;,
          &quot;sourceUrl&quot;: null,
          &quot;otherTypeName&quot;: null,
@@ -54,7 +54,7 @@ Content-Type: application/json
          &quot;name&quot;: &quot;PhoneVerification App Documentation&quot;,
          &quot;type&quot;: &quot;HOWTO&quot;
       },
-      {
+            {
          &quot;sourceType&quot;: &quot;URL&quot;,
          &quot;sourceUrl&quot;: &quot;http://wiki.cdyne.com/index.php/Phone_Verification&quot;,
          &quot;otherTypeName&quot;: null,
@@ -134,7 +134,7 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>

@@ -36,7 +36,6 @@ public abstract class AppsApiService {
     public abstract Response appsUninstallationPost(String contentType, InstallDTO install);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
-    public abstract Response appsAppTypeIdAppIdDocsFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdFavouriteAppPost(String appType,String appId,String contentType);
     public abstract Response appsAppTypeIdAppIdFavouriteAppDelete(String appType,String appId,String contentType);
     public abstract Response appsAppTypeIdAppIdRateGet(String appType,String appId,Integer limit,Integer offset,String accept,String ifNoneMatch,String ifModifiedSince);
@@ -50,6 +49,9 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
     public abstract Response appsMobileScheduleInstallPost(String contentType, ScheduleDTO schedule,
                                                            SecurityContext securityContext);
+    public abstract Response appsAppTypeIdAppIdDocsDocumentIdContentGet(String appId,String documentId,String appType,String accept,String ifNoneMatch,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType,String appId,String documentId,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsGet(String appType,String appId,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsMobileScheduleUpdatePost(String contentType, ScheduleDTO schedule,
                                                           SecurityContext securityContext);
 }
