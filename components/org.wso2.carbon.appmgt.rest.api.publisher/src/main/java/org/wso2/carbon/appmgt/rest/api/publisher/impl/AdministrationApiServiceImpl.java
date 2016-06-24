@@ -103,6 +103,12 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             if (StringUtils.isEmpty(ownerEmail)) {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
+            int businessOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
+            if (businessOwnerId != -1) {
+                String message =  "Business owner with owner Name: " + ownerName + " and email: " + ownerEmail +
+                        " already exists.";
+                RestApiUtil.handleBadRequest(message, log);
+            }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerName(ownerName.trim());
             businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
@@ -192,6 +198,12 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             }
             if (StringUtils.isEmpty(ownerEmail)) {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
+            }
+            int ExistsOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
+            if ((ExistsOwnerId != businessOwnerId) || (ExistsOwnerId != -1)) {
+                String message =  "Business owner with owner Name: " + ownerName + " and email: " + ownerEmail +
+                        " already exists.";
+                RestApiUtil.handleBadRequest(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerId(businessOwnerId);
