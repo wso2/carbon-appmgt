@@ -46,6 +46,23 @@ public class AppsApi  {
     {
     return delegate.appsDownloadPost(contentType,install);
     }
+
+    @POST
+    @Path("/mobile/id/{appId}/download")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Subscribe to app and get app url", notes = "Download a new App ", response = void.class, tags={ "Apps",  })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. Invalid request or validation error. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. The request must be conditional but no condition has been specified. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. Resource to be deleted does not exist. ", response = void.class) })
+    public Response appsMobileIdAppIdDownloadPost(
+            @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version. Should be formatted as **provider-name-version**. ",required=true) @PathParam("appId") String appId,
+            @ApiParam(value = "Media type of the entity in the body. Default is JSON. " ,required=true, defaultValue="JSON")@HeaderParam("Content-Type") String contentType){
+        return delegate.appsMobileIdAppIdDownloadPost(appId,contentType);
+    }
+
     @POST
     @Path("/event-publish")
     @Consumes({ "application/json" })

@@ -423,12 +423,12 @@
             </MDM>
             -->
         </MDMProperties>
-        <BinaryFileStorage>
-            <FilePreciseLocation>${carbon.home}/repository/resources/mobileapps/</FilePreciseLocation>
-            <FileAPILocation>/api/appm/store/v1.1/apps/mobile/binaries/one-time/</FileAPILocation>
-        </BinaryFileStorage>
 
     </MobileAppsConfiguration>
+
+    <BinaryFileStorage>
+        <AbsoluteLocation>${carbon.home}/repository/resources/mobileapps/</AbsoluteLocation>
+    </BinaryFileStorage>
 
     <!-- Configuration to secure mobile app services.-->
     <ServicesAPI>
@@ -444,6 +444,10 @@
     </EnabledAssetTypeList>
 
     <RESTAPI>
+        <!--Configure publisher and store REST API context path-->
+        <PublisherAPIContextPath>/api/appm/publisher/v1.1</PublisherAPIContextPath>
+        <StoreAPIContextPath>/api/appm/store/v1.1</StoreAPIContextPath>
+
         <!--Configure white-listed URIs of REST API. Accessing white-listed URIs does not require credentials (does not require Authorization header). -->
         <WhiteListedURIs>
             <WhiteListedURI>
