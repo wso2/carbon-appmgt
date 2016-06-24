@@ -105,9 +105,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             }
             int businessOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
             if (businessOwnerId != -1) {
-                String message =  "Business owner with owner Name: " + ownerName + " and email: " + ownerEmail +
-                        " already exists.";
-                RestApiUtil.handleBadRequest(message, log);
+                String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
+                        " and owner email " + ownerEmail;
+                RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerName(ownerName.trim());
@@ -201,9 +201,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             }
             int ExistsOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
             if ((ExistsOwnerId != businessOwnerId) || (ExistsOwnerId != -1)) {
-                String message =  "Business owner with owner Name: " + ownerName + " and email: " + ownerEmail +
-                        " already exists.";
-                RestApiUtil.handleBadRequest(message, log);
+                String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
+                        " and owner email " + ownerEmail;
+                RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerId(businessOwnerId);
