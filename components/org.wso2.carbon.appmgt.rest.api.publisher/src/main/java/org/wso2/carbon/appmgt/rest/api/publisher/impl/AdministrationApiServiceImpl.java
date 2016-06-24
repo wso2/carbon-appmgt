@@ -103,6 +103,8 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             if (StringUtils.isEmpty(ownerEmail)) {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
+            ownerName = ownerName.trim();
+            ownerEmail = ownerEmail.trim();
             int businessOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
             if (businessOwnerId != -1) {
                 String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
@@ -110,8 +112,8 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
-            businessOwner.setBusinessOwnerName(ownerName.trim());
-            businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
+            businessOwner.setBusinessOwnerName(ownerName);
+            businessOwner.setBusinessOwnerEmail(ownerEmail);
             businessOwner.setBusinessOwnerDescription(ownerDescription);
             businessOwner.setBusinessOwnerSite(ownerSite);
             List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = body.getProperties();
@@ -199,16 +201,18 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             if (StringUtils.isEmpty(ownerEmail)) {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
-            int existsOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
-            if ((existsOwnerId != businessOwnerId) || (existsOwnerId != -1)) {
+            ownerName = ownerName.trim();
+            ownerEmail = ownerEmail.trim();
+            int existingOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
+            if ((existingOwnerId != businessOwnerId) || (existingOwnerId != -1)) {
                 String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
                         " and owner email " + ownerEmail;
                 RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerId(businessOwnerId);
-            businessOwner.setBusinessOwnerName(ownerName.trim());
-            businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
+            businessOwner.setBusinessOwnerName(ownerName);
+            businessOwner.setBusinessOwnerEmail(ownerEmail);
             businessOwner.setBusinessOwnerDescription(ownerDescription);
             businessOwner.setBusinessOwnerSite(ownerSite);
             List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = body.getProperties();
