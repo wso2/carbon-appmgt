@@ -1,9 +1,0 @@
-<%
-jagg.initializer("editBusinessOwner", {
-
-    preInitialize:function () {
-        jagg.addFooterJS("application", "jagg", "templates/editBusinessOwner/js/editBusinessOwners.js");
-    }
-});
-%>
-

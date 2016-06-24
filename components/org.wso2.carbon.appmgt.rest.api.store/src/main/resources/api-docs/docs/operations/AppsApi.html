@@ -2551,7 +2551,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Download a new App\n</p>
+            <p class="marked">Subscribe to a mobile App\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/mobile/id/{appId}/download</code>
@@ -2572,14 +2572,6 @@
             
 
             
-                <div class="pointer" data-toggle="collapse" data-target="#request-appsMobileIdAppIdDownloadPost">
-                    <h4 class="section-heading">
-                        Sample Request
-                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    </h4>
-                </div>
-                <div id="request-appsMobileIdAppIdDownloadPost"class="pre collapse"><code class="json">{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileIdAppIdDownloadPost">
                 <h4 class="section-heading">
@@ -2590,7 +2582,10 @@
             </h4>
             </div>
             
-                <div id="response-appsMobileIdAppIdDownloadPost" class="pre collapse"><code class="json">HTTP/1.1 202 Accepted</code></div>
+                <div id="response-appsMobileIdAppIdDownloadPost" class="pre collapse"><code class="json">HTTP/1.1 200 Ok
+ {
+   &quot;appUrl&quot;:&quot;http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/07463547-c3dd-469b-9027-80da107ad101&quot;
+}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -2767,7 +2762,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp&quot;</code></div>
             
             
 
@@ -2782,7 +2777,7 @@
             </h4>
             </div>
             
-                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json"></code></div>
+                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
