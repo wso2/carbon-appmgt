@@ -160,12 +160,19 @@ $(document).on("click", "#btn-owner-save", function () {
                    "businessOwnerProperties": details
                },
                success: function (data) {
-                   Showalert("Business Owner Saved Successfully","alert-success", "statusError");
+                   var obj = JSON.parse(data);
+                   var isSucceed = obj.success;
+                   if (isSucceed) {
+                       Showalert("Business Owner Saved Successfully","alert-success", "statusError");
+                       location.replace(context + "/tasks?task=businessowners");
+                   } else {
+                       var response = obj.response;
+                       var respondMessage = response.message;
+                       Showalert(respondMessage,"alert-error", "statusError");
+                   }
                },
                error: function () {
                    Showalert("Error occured while adding business owner","alert-error", "statusError");
                }
            });
-
-location.replace(context + "/tasks?task=businessowners");
    });
