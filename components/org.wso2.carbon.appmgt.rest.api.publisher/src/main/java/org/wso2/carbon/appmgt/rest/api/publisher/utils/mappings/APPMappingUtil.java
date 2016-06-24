@@ -386,6 +386,8 @@ public class APPMappingUtil {
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
+        dto.setBanner(webapp.getBanner());
+        dto.setScreenshots(null);
         dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
@@ -409,11 +411,6 @@ public class APPMappingUtil {
         }
 
         dto.setCreatedTime(webapp.getCreatedTime());
-
-        AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
-        appAppmetaDTO.setPath(webapp.getPath());
-        appAppmetaDTO.setVersion(webapp.getId().getVersion());
-        dto.setAppmeta(appAppmetaDTO);
         dto.setMediaType(webapp.getMediaType());
 
         // Set policy groups.

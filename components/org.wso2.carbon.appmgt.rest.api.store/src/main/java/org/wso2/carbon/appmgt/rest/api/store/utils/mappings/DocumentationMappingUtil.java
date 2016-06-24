@@ -18,13 +18,13 @@
  *
  */
 
-package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
+package org.wso2.carbon.appmgt.rest.api.store.utils.mappings;
 
 
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
 
 import java.util.ArrayList;
