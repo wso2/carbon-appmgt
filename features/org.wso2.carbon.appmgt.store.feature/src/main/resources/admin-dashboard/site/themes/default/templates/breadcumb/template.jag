@@ -77,5 +77,14 @@
                     </li>
 
                     <% } %>
+                     <% if(request.getParameter("task")=="editBusinessowner"){%>
+                    <li>
+                    <a href="<%=listMappedUrl%>?task=businessowners"><%=i18n.localize("businessOwners")%> </a><span class="divider">/</span>
+                    </li>
+                    <li>
+                    <a href="<%=listMappedUrl%>?task=editBusinessowner" onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl%>',e:event})"><%=i18n.localize("businessOwnerNew")%></a>
+                    </li>
+
+                    <% } %>
                 </ul>
 <% }); %>

@@ -25,15 +25,35 @@ function deleteOwner(ownerId){
 }
 
 function saveOwner(ownerName, ownerMail, description, sitelink, ownerDetails) {
-    var partialId = apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails);
-    var response = {"id": partialId};
+    var existOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerMail);
+    var response;
+    if (existOwnerId == -1) {
+        var partialId = apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails);
+        if (partialId != null) {
+            response = {"success": true, "response":{"id": partialId, "message":"Business owner saved successfully."}};
+        } else {
+            response = {'success': false, "response":{"message":"Business owner id can't be null."}};
+        }
+    } else {
+        var message = "Business owner with owner Name: " + ownerName + " and email: " + ownerMail + " is already"
+                      + " exists."
+        response = {'success': false, "response":{"message":message}};
+    }
     return response;
 }
 
-function updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails) {
-    var partialId = apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
-    var response = {"id": partialId};
-    return response;
+ function updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails) {
+     var existOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
+     var response;
+     if ((existOwnerId == businessOwnerId) || (existOwnerId == -1)) {
+        var partialId = apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail,
+                                                     businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
+         response = {"success": true, "response":{"message":"Business owner updated successfully."}};
+     } else {
+        var message = "Business owner with owner Name: " + businessOwnerName + " and email: " + businessOwnerEmail +
+                      " is already exists."
+        response = {'success': false, "response":{"message":message}};
+    }return response;
 }
 
 function searchBusinessOwners(start, length, draw, search) {
