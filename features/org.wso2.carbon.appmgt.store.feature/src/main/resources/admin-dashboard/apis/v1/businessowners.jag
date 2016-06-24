@@ -89,7 +89,7 @@ if (method == 'POST') {
         } catch (e) {
             log.error("Error while saving Business Owners.");
         }
-        print(createResponseObject(result));
+        print(result);
     }
 }
 if (method == 'POST') {
@@ -109,7 +109,7 @@ if (method == 'POST') {
             log.error("Error while updating Business Owners.");
         }
 
-        print(createResponseObject(result));
+        print(result);
     }
 }
 

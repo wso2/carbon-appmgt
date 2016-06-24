@@ -28,6 +28,8 @@ if(pageName=="subscription"){
     middlePage = "businessowners-new";
 }else if(pageName=="businessowners"){
     middlePage="businessowners-task";
+}else if(pageName=="editBusinessOwner"){
+    middlePage="editBusinessOwner";
 }
 
 (function () {

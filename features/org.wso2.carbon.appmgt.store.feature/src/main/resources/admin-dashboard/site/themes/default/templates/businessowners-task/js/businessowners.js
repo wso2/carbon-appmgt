@@ -86,8 +86,9 @@ $(document).ready(function() {
               },
              {
                 "render": function (data, type, row) {
+                    var editUrl = "tasks?task=editBusinessOwner&businessOwnerId=" + row[0];
                     return '<a data-target="" ' +
-                           'data-toggle="modal" data-owner-id="' + row[0] + '" class="owner-edit-button">' +
+                           'data-toggle="modal" data-owner-id="' + row[0] + '" class="owner-edit-button" href="' + editUrl + '">' +
                            '<i class="icon-edit"></i></a> &nbsp<a'
                            +' class="owner-delete-button" data-owner-id="' + row[0] + '"><i class="icon-trash"></i></a>';
                 },
