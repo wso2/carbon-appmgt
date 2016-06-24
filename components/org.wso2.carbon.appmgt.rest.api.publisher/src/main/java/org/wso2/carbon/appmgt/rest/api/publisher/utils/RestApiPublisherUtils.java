@@ -65,7 +65,7 @@ public class RestApiPublisherUtils {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String directoryLocation =
-                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION);
         File binaryFile = new File(directoryLocation);
         //Generate UUID for the uploading file
         RestApiUtil.transferFile(fileContent.getContent(), fileContent.getFileName(), binaryFile.getAbsolutePath());

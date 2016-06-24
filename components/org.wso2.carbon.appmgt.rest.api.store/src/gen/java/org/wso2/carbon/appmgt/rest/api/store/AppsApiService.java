@@ -25,6 +25,7 @@ import javax.ws.rs.core.SecurityContext;
 
 public abstract class AppsApiService {
     public abstract Response appsDownloadPost(String contentType,InstallDTO install);
+    public abstract Response appsMobileIdAppIdDownloadPost(String appId,String contentType);
     public abstract Response appsEventPublishPost(EventsDTO events,String contentType);
     public abstract Response appsFavouritePageGet(String accept,String ifNoneMatch);
     public abstract Response appsFavouritePagePost();
