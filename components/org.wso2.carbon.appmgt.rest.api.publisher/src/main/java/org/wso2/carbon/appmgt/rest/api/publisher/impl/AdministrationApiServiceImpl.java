@@ -199,8 +199,8 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             if (StringUtils.isEmpty(ownerEmail)) {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
-            int ExistsOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
-            if ((ExistsOwnerId != businessOwnerId) || (ExistsOwnerId != -1)) {
+            int existsOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
+            if ((existsOwnerId != businessOwnerId) || (existsOwnerId != -1)) {
                 String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
                         " and owner email " + ownerEmail;
                 RestApiUtil.handleConflictException(message, log);
