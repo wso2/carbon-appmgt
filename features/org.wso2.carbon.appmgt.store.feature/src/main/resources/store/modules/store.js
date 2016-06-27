@@ -442,8 +442,10 @@ Store.prototype.searchSubscriptions = function (type, searchAttribute, searchVal
     var appIdPaths = registry.content(path);
     appIdPaths.forEach(function (path) {
         var app = that.asset(type, path.substr(path.lastIndexOf('/') + 1));
-        if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
-            apps.push(app);
+        if (app != null) {
+            if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
+                apps.push(app);
+            }
         }
     });
     result[type] = apps;
