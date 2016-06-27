@@ -25,13 +25,10 @@ import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
-import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
-import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is responsible for mapping APPM core documentation related objects into REST API documentation
