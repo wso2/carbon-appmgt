@@ -754,11 +754,11 @@
     <carbon.kernel.base.version>4.4.6</carbon.kernel.base.version>
     <carbon.kernel.pkg.version>[4.4.0,4.7.0)</carbon.kernel.pkg.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
-    <carbon.mediation.version>4.6.1-BETA3</carbon.mediation.version>
+    <carbon.mediation.version>4.6.1-SNAPSHOT</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
-    <carbon.identity.version>5.1.0</carbon.identity.version>
-    <carbon.identity.version_5.1.1>5.1.0</carbon.identity.version_5.1.1>
-    <carbon.identity.base.version>5.1.0</carbon.identity.base.version>
+    <carbon.identity.version>5.1.1-SNAPSHOT</carbon.identity.version>
+    <carbon.identity.version_5.1.1>5.1.1-SNAPSHOT</carbon.identity.version_5.1.1>
+    <carbon.identity.base.version>5.1.1-SNAPSHOT</carbon.identity.base.version>
     <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
     <carbon.identity.thrift.auth.version>${carbon.identity.version}</carbon.identity.thrift.auth.version>
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
