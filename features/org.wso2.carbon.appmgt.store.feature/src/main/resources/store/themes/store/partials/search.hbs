@@ -26,24 +26,12 @@
                                     data-toggle="dropdown"
                                     aria-haspopup="true"
                                     aria-expanded="false"
-                                {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
-                                    value="Provider"
-                                {{else}}
-                                    {{#ifCond searchQuery.searchTerm "==" "overview_businessOwner"}}
-                                        value="Business Owner"
-                                    {{else}}
-                                    value="Name"
-                                    {{/ifCond}}
-                                {{/ifCond}}>
-                                {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
-                                    By Provider
-                                {{else}}
-                                    {{#ifCond searchQuery.searchTerm "==" "overview_businessOwner"}}
-                                        By Business Owner
-                                    {{else}}
-                                       By Name
-                                    {{/ifCond}}
-                                {{/ifCond}}
+                                {{#compare "overview_provider" searchQuery.searchTerm}}value="Provider"{{/compare}}
+                                {{#compare "overview_businessOwner" searchQuery.searchTerm}}value="Business Owner"{{/compare}}
+                                {{#compare "overview_displayName" searchQuery.searchTerm}}value="Name"{{/compare}}>
+                                {{#compare "overview_provider" searchQuery.searchTerm}}By Provider{{/compare}}
+                                {{#compare "overview_businessOwner" searchQuery.searchTerm}}By Business Owner{{/compare}}
+                                {{#compare "overview_displayName" searchQuery.searchTerm}}By Name{{/compare}}
                                 <span class="caret"></span>
                             </button>
 
