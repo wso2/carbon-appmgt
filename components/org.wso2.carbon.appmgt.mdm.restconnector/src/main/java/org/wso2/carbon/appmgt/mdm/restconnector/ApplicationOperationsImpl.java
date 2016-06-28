@@ -20,18 +20,21 @@
 
 package org.wso2.carbon.appmgt.mdm.restconnector;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.mdm.restconnector.beans.RemoteServer;
 import org.wso2.carbon.appmgt.mdm.restconnector.utils.RestUtils;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
@@ -45,11 +48,14 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ApplicationOperationsImpl implements ApplicationOperations {
 
@@ -165,17 +171,15 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		requestObj.put(Constants.APPLICATION, requestApp);
 
-		HttpClient httpClient = new HttpClient();
-		StringRequestEntity requestEntity = null;
+
+		StringEntity requestEntity = null;
 
 		if (log.isDebugEnabled()) {
 			log.debug("Request Payload for MDM: " + requestObj.toJSONString());
 		}
 
 		try {
-			requestEntity = new StringRequestEntity(requestObj.toJSONString(),
-			                                        Constants.RestConstants.APPLICATION_JSON,
-			                                        "UTF-8");
+			requestEntity = new StringEntity(requestObj.toJSONString());
 		} catch (UnsupportedEncodingException e) {
 			log.error(e);
 			throw new MobileApplicationException(e);
@@ -192,10 +196,12 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			actionURL = String.format(Constants.API_UNINSTALL_APP, tenantDomain);
 		}
 
-		PostMethod postMethod = new PostMethod(requestURL + actionURL);
-		postMethod.setRequestEntity(requestEntity);
+		HttpClient httpClient = AppManagerUtil.getHttpClient(requestURL + actionURL);
+		HttpPost postMethod = new HttpPost(requestURL + actionURL);
+		postMethod.setHeader(Constants.RestConstants.CONTENT_TYPE, Constants.RestConstants.APPLICATION_JSON);
+		postMethod.setEntity(requestEntity);
 		String action = applicationOperationAction.getAction();
-		if (RestUtils.executeMethod(remoteServer, httpClient, postMethod)) {
+		if (RestUtils.executeMethod(remoteServer, httpClient, postMethod) != null) {
 			if (log.isDebugEnabled()) {
 				log.debug(action + " operation performed successfully on " + type + " " +
 				          params.toString());
@@ -225,20 +231,18 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		String tenantDomain =
 				PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
 		String[] params = applicationOperationDevice.getParams();
-		GetMethod getMethod = new GetMethod();
 		List<NameValuePair> nameValuePairs = new ArrayList<>();
 		String platform = applicationOperationDevice.getPlatform();
 		String platformVersion = applicationOperationDevice.getPlatformVersion();
 		if(platform != null) {
-			nameValuePairs.add(new NameValuePair(Constants.PLATFORM, platform));
+			nameValuePairs.add(new BasicNameValuePair(Constants.PLATFORM, platform));
 		}
 
 		if(platformVersion != null) {
-			nameValuePairs.add(new NameValuePair(Constants.PLATFORM_VERSION, platform));
+			nameValuePairs.add(new BasicNameValuePair(Constants.PLATFORM_VERSION, platform));
 		}
-
-		getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-		return getDevicesOfUser(getMethod, params[0], tenantDomain);
+		String queryString = URLEncodedUtils.format(nameValuePairs, "utf-8");
+		return getDevicesOfUser(params[0], tenantDomain, queryString);
 
 	}
 
@@ -265,32 +269,26 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		return deviceIdentifiers;
 	}
 
-	private JSONArray getDevices(String requestURL, GetMethod getMethod)
+	private JSONArray getDevices(String requestURL, HttpGet getMethod)
 			throws MobileApplicationException {
 
 		JSONArray jsonArray = null;
-		HttpClient httpClient = new HttpClient();
+		HttpClient httpClient =  AppManagerUtil.getHttpClient(requestURL);
 
 		if (getMethod == null) {
-			getMethod = new GetMethod(requestURL);
+			getMethod = new HttpGet(requestURL);
 		}
 
-		getMethod.setRequestHeader(Constants.RestConstants.ACCEPT,
-		                           Constants.RestConstants.APPLICATION_JSON);
+		getMethod.addHeader(Constants.RestConstants.ACCEPT,
+		                    Constants.RestConstants.APPLICATION_JSON);
 
-		if (RestUtils.executeMethod(remoteServer, httpClient, getMethod)) {
-			try {
-				jsonArray =
-						(JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
-				if (jsonArray != null) {
-					if (log.isDebugEnabled()) {
-						log.debug("Devices received from MDM: " + jsonArray.toJSONString());
-					}
+		String responseString = RestUtils.executeMethod(remoteServer, httpClient, getMethod);
+		if (responseString != null ) {
+			jsonArray = (JSONArray) new JSONValue().parse(responseString);
+			if (jsonArray != null) {
+				if (log.isDebugEnabled()) {
+					log.debug("Devices received from MDM: " + jsonArray.toJSONString());
 				}
-			} catch (IOException e) {
-				String errorMessage = "Invalid response from the devices API";
-				log.error(errorMessage, e);
-				throw new MobileApplicationException(e);
 			}
 		} else {
 			log.error("Getting devices from MDM API failed");
@@ -352,26 +350,23 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			throws MobileApplicationException {
 		List<NameValuePair> nameValuePairs = new ArrayList<>();
 		for (String type : types) {
-			nameValuePairs.add(new NameValuePair(Constants.TYPES, type));
+			nameValuePairs.add(new BasicNameValuePair(Constants.TYPES, type));
 		}
 		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_TYPES, typeName, tenantDomain);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
 
-		GetMethod getMethod = new GetMethod(requestURL);
-		getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-
+		HttpGet getMethod = new HttpGet(requestURL + "?" + URLEncodedUtils.format(nameValuePairs, "utf-8"));
 		return this.getDevices(requestURL, getMethod);
 
 	}
 
-	private List<Device> getDevicesOfUser(GetMethod getMethod, String user, String tenantDomain)
+	private List<Device> getDevicesOfUser(String user, String tenantDomain, String queryString)
 			throws MobileApplicationException {
-
 		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USER, user, tenantDomain);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
-		getMethod.setPath(requestURL);
+		HttpGet getMethod = new HttpGet(requestURL + "?" + queryString);
 		return convertJSONToDevices(this.getDevices(requestURL, getMethod));
 	}
 
