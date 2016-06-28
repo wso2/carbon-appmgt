@@ -53,6 +53,18 @@ public interface AppRepository {
     App getApp(String type, String uuid) throws AppManagementException;
 
     /**
+     *
+     * Returns the web app which has the give context and the version.
+     *
+     * @param context
+     * @param version
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException;
+
+    /**
      * Searches and returns the apps for the given search terms.
      *
      * @param appType

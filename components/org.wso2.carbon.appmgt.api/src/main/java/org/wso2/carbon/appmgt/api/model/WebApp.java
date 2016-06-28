@@ -30,6 +30,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class WebApp extends App{
 
+    private int databaseId;
     private APIIdentifier id;
 
     private String description;
@@ -129,6 +130,14 @@ public class WebApp extends App{
     private String originVersion;
 
     public WebApp() {
+    }
+
+    public int getDatabaseId() {
+        return databaseId;
+    }
+
+    public void setDatabaseId(int databaseId) {
+        this.databaseId = databaseId;
     }
 
     public WebApp(APIIdentifier id) {

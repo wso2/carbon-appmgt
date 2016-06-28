@@ -1485,6 +1485,44 @@ public final class AppManagerUtil {
 		return gatewayURLs;
 	}
 
+    /**
+     *
+     * Returns the HTTP URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                                                    .getAPIManagerConfiguration()
+                                                    .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpGatewayURL = gatewayURLs.split(",")[0];
+
+        return httpGatewayURL;
+    }
+
+    /**
+     *
+     * Returns the HTTPS URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPSURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration()
+                .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpsGatewayURL = gatewayURLs.split(",")[1];
+
+        return httpsGatewayURL;
+    }
+
 	/**
 	 * Gateway endpoint has HTTP and HTTPS endpoints.
 	 * If both are defined pick HTTPS only. Else, pick whatever available.

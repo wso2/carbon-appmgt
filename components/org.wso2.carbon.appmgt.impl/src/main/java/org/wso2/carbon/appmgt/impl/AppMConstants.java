@@ -582,9 +582,14 @@ public final class AppMConstants {
     public static final String APP_CONTEXT_VERSION_CONFIG_CACHE = "APP_CONTEXT_VERSION_CONFIG_CACHE";
     public static final String APP_CONTEXT_VERSION_CACHE_KEY = "APP_CONTEXT_VERSION_CACHE_KEY";
 
+    // Gateway caching constants
+    public static final String GATEWAY_CACHE_MANAGER = "APPMGT.GATEWAY";
+    public static final String GATEWAY_SESSION_CACHE = "sessionCache";
+
+
     public static final String SAML2_COOKIE = "appmanager_sso";
     public static final String SAML_SSO_TOKENID = "samlssoTokenId";
-    public static final String APPM_SAML2_COOKIE = "appmSamlSsoTokenId";
+    public static final String APPM_SAML2_COOKIE = "APPMSESSIONID";
     public static final String APPM_SAML2_RESPONSE = "AppMgtSAML2Response";
 
     public static final String APPM_SAML_REQUEST = "SAMLRequest";
@@ -651,6 +656,7 @@ public final class AppMConstants {
     public static final String GATEWAY_ENV_TYPE_HYBRID = "hybrid";
     public static final String GATEWAY_ENV_TYPE_PRODUCTION = "production";
     public static final String GATEWAY_ENV_TYPE_SANDBOX = "sandbox";
+    public static final String GATEWAY_ACS_RELATIVE_URL = "acs";
 
     public static final String API_RESPONSE_CACHE_ENABLED = "Enabled";
     public static final String API_RESPONSE_CACHE_DISABLED = "Disabled";

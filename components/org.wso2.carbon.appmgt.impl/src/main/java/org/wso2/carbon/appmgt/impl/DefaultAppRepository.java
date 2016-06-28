@@ -85,20 +85,71 @@ public class DefaultAppRepository implements AppRepository {
     @Override
     public App getApp(String type, String uuid) throws AppManagementException {
 
-        Map<String, String> searchTerms = new HashMap<String, String>();
-        searchTerms.put("id", uuid);
 
-        List<App> result = searchApps(type, searchTerms);
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, type);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(uuid);
 
-        if(result.size() == 1){
-            return result.get(0);
-        }else if(result.isEmpty()) {
-            return null;
-        }else{
-            //flag an error.
-            throw new AppManagementException("Duplicate entries found for the given uuid.");
+            if(artifact != null){
+                return getApp(type, artifact);
+            }else{
+                return null;
+            }
+        } catch (GovernanceException e) {
+            throw new AppManagementException(String.format("Error while querying registry for '%s':'%s'", type, uuid));
+        }
+    }
+
+    @Override
+    public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
+
+        Connection connection;
+        PreparedStatement  preparedStatement;
+        ResultSet resultSet;
+
+        WebApp webApp = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+
+            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ? AND TENANT_ID = ?";
+            preparedStatement = connection.prepareStatement(basicQuery);
+            preparedStatement.setString(1, context);
+            preparedStatement.setString(2, version);
+            preparedStatement.setInt(3, tenantId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next()){
+
+                String appName = resultSet.getString("APP_NAME");
+                String appProvider = resultSet.getString("APP_PROVIDER");
+                APIIdentifier id = new APIIdentifier(appProvider, appName, version);
+                webApp = new WebApp(id);
+
+                webApp.setDatabaseId(resultSet.getInt("APP_ID"));
+                webApp.setUUID(resultSet.getString("UUID"));
+
+                webApp.setVersion(version);
+                webApp.setContext(context);
+                webApp.setTrackingCode(resultSet.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSet.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSet.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSet.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSet.getString("APP_ENDPOINT"));
+
+                // There should be only one app for the given combination
+                break;
+            }
+
+            return webApp;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
+
+        return null;
     }
 
     @Override
