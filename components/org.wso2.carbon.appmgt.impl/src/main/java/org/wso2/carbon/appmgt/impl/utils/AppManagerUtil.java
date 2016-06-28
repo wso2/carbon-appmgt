@@ -354,6 +354,7 @@ public final class AppManagerUtil {
             mobileApp.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
             mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            mobileApp.setType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
             mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
           //  mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));

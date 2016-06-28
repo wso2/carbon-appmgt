@@ -1148,6 +1148,49 @@
                 }
             }
         },
+        "/apps/mobile/id/{appId}/download": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
+                "x-wso2-response": "HTTP/1.1 200 Ok \n {\n   \"appUrl\":\"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/07463547-c3dd-469b-9027-80da107ad101\"   \n}",
+                "summary": "Subscribe to app and get app url",
+                "description": "Subscribe to a mobile App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",

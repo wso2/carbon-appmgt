@@ -82,12 +82,23 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public  int getBusinessOwnersCount() throws AppManagementException;
+
     /**
      * Save a Business Owner.
      * @return Integer
      * @throws AppManagementException
      */
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+
+    /**
+     * Get Business owner Id by owner name and email.
+     * @param businessOwnerName
+     * @param businessOwnerEmail
+     * @return
+     * @throws AppManagementException
+     */
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException;
+
     /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *

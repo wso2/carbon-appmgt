@@ -553,6 +553,36 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Get Business owner by owner name and email.
+     * @param ctx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     * @throws ScriptException
+     */
+    public static int jsFunction_getBusinessOwnerId(Context ctx, Scriptable thisObj,Object[] args, Function funObj)
+            throws AppManagementException, ScriptException {
+
+        if (args == null || args.length != 2) {
+            handleException("Invalid number of input parameters.");
+        }
+
+        if (args[0] == null || args[1] == null) {
+            handleException("Error while checking for existence of business owner: NULL value in expected parameters ->"
+                                    + "[business owner name:" + args[0] + ",email:" + args[1] + "]");
+
+        }
+        String businessOwnerName = (String) args[0];
+        String businessOwnerEmail = (String) args[1];
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        int businessOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
+        return businessOwnerId;
+    }
+
+    /**
      * Check whether the application with a given name, provider and version already exists
      *
      * @param ctx Rhino context

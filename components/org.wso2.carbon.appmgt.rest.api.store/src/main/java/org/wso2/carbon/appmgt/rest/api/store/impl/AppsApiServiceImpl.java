@@ -149,6 +149,63 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     }
 
+    /**
+     *
+     * @param appId
+     * @param contentType
+     * @return
+     */
+    @Override
+    public Response appsMobileIdAppIdDownloadPost(String appId, String contentType) {
+        String username = RestApiUtil.getLoggedInUsername();
+        Map<String, String> appURLResponse = new HashMap<>();
+        String appURL = null;
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
+            }
+
+            //Make user subscription, it the subscription is not available
+            appProvider.subscribeMobileApp(username, appId);
+
+            if (AppMConstants.MobileAppTypes.ENTERPRISE.equals(mobileApp.getType())) {
+                String oneTimeDownloadUUID = appProvider.generateOneTimeDownloadLink(appId);
+                if (AppMConstants.MOBILE_APPS_PLATFORM_ANDROID.equals(mobileApp.getPlatform())) {
+                    appURL = HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(
+                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath() +
+                            AppMConstants.MOBILE_ONE_TIME_DOWNLOAD_API_PATH + File.separator + oneTimeDownloadUUID;
+                } else if (AppMConstants.MOBILE_APPS_PLATFORM_IOS.equals(mobileApp.getPlatform())) {
+                    appURL = HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
+                            .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath()
+                            + AppMConstants.MOBILE_PLIST_API_PATH + File.separator + appId + File.separator + oneTimeDownloadUUID;
+                }
+            } else if (AppMConstants.MOBILE_APPS_PLATFORM_WEBAPP.equals(mobileApp.getType()) ||
+                    AppMConstants.MobileAppTypes.PUBLIC.equals(mobileApp.getType())) {
+                appURL = mobileApp.getAppUrl();
+            }
+            Map<String,String> response = new HashMap<>();
+            response.put("appUrl", appURL);
+            return Response.ok().entity(response).build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(AppMConstants.MOBILE_ASSET_TYPE, appId, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while subscribing to mobile app with uuid : " + appId, e, log);
+            }
+        }
+        return null;
+
+    }
+
     @Override
     public Response appsEventPublishPost(EventsDTO events, String contentType) {
         beanValidator = new BeanValidator();
@@ -408,13 +465,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
                         log);
             }
-            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
             String oneTimeDownloadLinkAPIPath =
                     HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(
-                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
-                            appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION) +
-                            uuid;
+                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath() +
+                            AppMConstants.MOBILE_ONE_TIME_DOWNLOAD_API_PATH +  File.separator + uuid;
             PlistTemplateContext plistTemplateContext = new PlistTemplateContext();
             plistTemplateContext.setAppName(mobileApp.getAppName());
             plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());

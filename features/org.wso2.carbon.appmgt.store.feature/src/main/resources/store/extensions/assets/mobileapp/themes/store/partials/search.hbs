@@ -23,7 +23,7 @@
                         {{#compare "overview_platform" searchQuery.searchTerm}}By Platform{{/compare}}
                         {{#compare "overview_category" searchQuery.searchTerm}}By Category{{/compare}}
                         {{#compare "overview_provider" searchQuery.searchTerm}}By Provider{{/compare}}
-                        {{#compare "overview_name" searchQuery.searchTerm}}By Name{{/compare}}
+                        {{#compare "overview_displayName" searchQuery.searchTerm}}By Name{{/compare}}
                         <span class="caret"></span>
                     </button>
                     <button type="button" class="btn" id="searchBtn">
@@ -38,7 +38,7 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" value="Name"
-                                           {{#compare "overview_name" searchQuery.searchTerm}}checked{{/compare}} />
+                                           {{#compare "overview_displayName" searchQuery.searchTerm}}checked{{/compare}} />
                                     By Name
                                 </label>
                             </div>

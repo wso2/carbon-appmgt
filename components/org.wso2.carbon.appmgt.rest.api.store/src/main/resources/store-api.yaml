@@ -1055,6 +1055,49 @@ paths:
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
+  '/apps/mobile/id/{appId}/download':
+    post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer 3500931880f806ad2523c4ce7079c505"
+        -H "Content-Type: application/json" -d '{"type": "user","appId":
+        "fcf96617-093a-4d0f-9d27-6f41b0d0c8b8"}'
+        "http://localhost:9763/api/appm/store/v1.1/apps/download"
+      x-wso2-response: |-
+        HTTP/1.1 200 Ok
+         {
+           "appUrl":"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/07463547-c3dd-469b-9027-80da107ad101"
+        }
+      summary: Subscribe to app and get app url
+      description: |
+        Subscribe to a mobile App
+      parameters:
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
   /apps/uninstallation:
     post:
       x-scope: 'appm:subscribe'
@@ -1556,8 +1599,10 @@ paths:
   '/apps/static-contents/{fileName}':
     get:
       x-scope: 'appm:read'
-      x-wso2-curl: ''
-      x-wso2-response: ''
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: 'Retrieving images, pdf and document files'
       description: |
         Retrieving images for banners, screenshots, etc.
@@ -1613,8 +1658,10 @@ paths:
   '/apps/mobile/binaries/{fileName}':
     get:
       x-scope: 'appm:read'
-      x-wso2-curl: ''
-      x-wso2-response: ''
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/RKHktVsxjmFOZz1.apk"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Retrieving mobile application binaries
       description: |
         Retrieving .apk and .ipa binaries for mobile apps.
@@ -1667,8 +1714,10 @@ paths:
       produces:
         - text/xml
       x-scope: 'appm:read'
-      x-wso2-curl: ''
-      x-wso2-response: ''
+      x-wso2-curl: >-
+        curl -X GET
+        "http://localhost:9763/api/appm/store/v1.1/apps/mobile/plist/f2d9703b-df65-4b8a-8250-0d033e969f55/50ba9a5e-a261-453d-a58f-c6b68d42150d"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Retrieving plist for ios app installation
       description: |
         Retrieving plist for ios mobile apps.
@@ -1720,8 +1769,10 @@ paths:
   '/apps/mobile/binaries/one-time/{uuid}':
     get:
       x-scope: 'appm:read'
-      x-wso2-curl: ''
-      x-wso2-response: ''
+      x-wso2-curl: >-
+        curl -X GET -H
+        "http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/fa1f4634-77cb-4bd7-9100-f0dcf0a04d6a"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Retrieving mobile application binary
       description: |
         Retrieving .apk and .ipa binaries for mobile apps.
