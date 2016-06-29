@@ -114,7 +114,7 @@
         if(isMDMOperationsEnabled){
             var operationsClass = Packages.org.wso2.carbon.appmgt.mobile.store.Operations;
             var operations = new operationsClass();
-            operations.performAction(stringify(currentUser), action, tenantId, type, app, params);
+            operations.performAction(stringify(currentUser), action, tenantId, type, app, params, null);
         }
 
 

@@ -67,7 +67,6 @@
                             </adviceFile>
                             <bundles>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.mdm.restconnector:${carbon.appmgt.version}</bundleDef>
-				<bundleDef>org.bouncycastle.wso2:bcprov-jdk15on:${bcprov.wso2.version}</bundleDef>
 				<bundleDef>com.googlecode.plist:dd-plist:${googlecode.plist.version}</bundleDef>
                             </bundles>
                             <importFeatures>

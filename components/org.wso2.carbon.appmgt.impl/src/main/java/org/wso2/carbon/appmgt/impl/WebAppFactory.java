@@ -70,7 +70,6 @@ public class WebAppFactory extends AppFactory {
             webApp.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
             webApp.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
             webApp.setStatus(AppManagerUtil.getApiStatus(artifact.getLifecycleState().toUpperCase()));
-            webApp.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
             webApp.setWsdlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WSDL));
             webApp.setWadlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WADL));
             webApp.setTechnicalOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER));
@@ -89,6 +88,7 @@ public class WebAppFactory extends AppFactory {
             webApp.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             webApp.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             webApp.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
+            webApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             webApp.setTrackingCode(artifact.getAttribute(AppMConstants.APP_TRACKING_CODE));
             webApp.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             webApp.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));

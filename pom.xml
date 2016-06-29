@@ -750,23 +750,23 @@
     <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
 
 	<!-- Carbon kernel version -->
-    <carbon.kernel.version>4.4.5</carbon.kernel.version>
-    <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
-    <carbon.kernel.pkg.version>[4.4.0,4.5.0)</carbon.kernel.pkg.version>
+    <carbon.kernel.version>4.4.6</carbon.kernel.version>
+    <carbon.kernel.base.version>4.4.6</carbon.kernel.base.version>
+    <carbon.kernel.pkg.version>[4.4.0,4.7.0)</carbon.kernel.pkg.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.6.1-BETA3</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
-    <carbon.identity.version>5.1.0</carbon.identity.version>
-    <carbon.identity.version_5.1.1>5.1.0</carbon.identity.version_5.1.1>
-    <carbon.identity.base.version>5.1.0</carbon.identity.base.version>
-    <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
+    <carbon.identity.version>5.1.1-SNAPSHOT</carbon.identity.version>
+    <carbon.identity.version_5.1.1>5.1.1-SNAPSHOT</carbon.identity.version_5.1.1>
+    <carbon.identity.base.version>5.1.1-SNAPSHOT</carbon.identity.base.version>
+    <carbon.identity.auth.version>5.1.1-SNAPSHOT</carbon.identity.auth.version>
     <carbon.identity.thrift.auth.version>${carbon.identity.version}</carbon.identity.thrift.auth.version>
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
     <carbon.identity.oauth.version>${carbon.identity.version}</carbon.identity.oauth.version>
     <carbon.identity.pkg.version>[5.1.0, 6.0.0)</carbon.identity.pkg.version>
     <carbon.user.mgt.pkg.version>[5.1.0, 6.0.0)</carbon.user.mgt.pkg.version>
     <carbon.multitenancy.version>4.5.2</carbon.multitenancy.version>
-    <carbon.deployment.version>4.6.0</carbon.deployment.version>
+    <carbon.deployment.version>4.6.2-SNAPSHOT</carbon.deployment.version>
     <carbon.commons.version>4.5.3</carbon.commons.version>
     <carbon.registry.version>4.5.3</carbon.registry.version>
     <carbon.governance.version>4.6.2</carbon.governance.version>
@@ -817,8 +817,8 @@
     <es.feature.version>1.0.0</es.feature.version>
 
     <!-- Jaggery Version -->
-    <jaggery.js.version>0.12.5</jaggery.js.version>
-    <jaggery.version>0.12.5</jaggery.version>
+    <jaggery.js.version>0.12.6-SNAPSHOT</jaggery.js.version>
+    <jaggery.version>0.12.6-SNAPSHOT</jaggery.version>
     <jaggery.scxml.executors.version>1.4.0</jaggery.scxml.executors.version>
     <jaggeryjs.markdown.feature.version>1.0.0</jaggeryjs.markdown.feature.version>
     <jaggeryjs.caramel.feature.version>1.0.1</jaggeryjs.caramel.feature.version>
@@ -861,7 +861,6 @@
     <httpmime.version>4.3.6</httpmime.version>
     <jackson.version>1.4.0</jackson.version>
     <googlecode.plist.version>1.8</googlecode.plist.version>
-    <bcprov.wso2.version>1.49.wso2v1</bcprov.wso2.version>
 
     <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
     <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>

@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.appmgt.api.*;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -41,7 +40,6 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.uri.template.URITemplate;
 import org.wso2.uri.template.URITemplateException;
 
@@ -541,7 +539,7 @@ public class RestApiUtil {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String filePath =
-                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
+                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION) + fileName;
         storageFile = new File(filePath);
         return storageFile;
     }
@@ -654,9 +652,9 @@ public class RestApiUtil {
         AppManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();
         List<String> uriList = apiManagerConfiguration
-                .getProperty(AppMConstants.API_RESTAPI_WHITELISTED_URI_URI);
+                .getProperty(AppMConstants.APPM_RESTAPI_WHITELISTED_URI_URI);
         List<String> methodsList = apiManagerConfiguration
-                .getProperty(AppMConstants.API_RESTAPI_WHITELISTED_URI_HTTPMethods);
+                .getProperty(AppMConstants.APPM_RESTAPI_WHITELISTED_URI_HTTPMethods);
 
         if (uriList != null && methodsList != null) {
             if (uriList.size() != methodsList.size()) {
@@ -681,5 +679,16 @@ public class RestApiUtil {
             }
         }
         return uriToMethodsMap;
+    }
+
+    /**
+     * Get Store REST API context path
+     * @return context path of store REST APIs
+     */
+    public static String getStoreRESTAPIContextPath(){
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return appManagerConfiguration.getFirstProperty(
+                AppMConstants.APPM_RESTAPI_STORE_API_CONTEXT_PATH);
     }
 }

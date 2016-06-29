@@ -4,7 +4,7 @@
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdContentPost"></a>Uploading document</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdContentPost"></a>Uploading document Content</h3>
 
             <p class="marked"></p>
 
@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 2f3c7a76e66036504acc6f6961d61d02&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file=@sample.pdf&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/3a5d7701-1c31-4fb1-bd3f-777f53667e67/content&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 0c28ea242609cdbaef56c80452e0c843&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file=@@sample.pdf&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e/content&quot;</code></div>
             
             
 
@@ -353,7 +353,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 4fc0a364a336a37c663790364da307a3&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/e27c144f-0be9-430c-a621-21fd58864f56&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 4fc0a364a336a37c663790364da307a3&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e&quot;</code></div>
             
             
 
@@ -658,7 +658,6 @@ Content-Type: application/json
                     </h4>
                 </div>
                 <div id="request-appsAppTypeIdAppIdDocsPost"class="pre collapse"><code class="json">{
-    &quot;visibility&quot;: &quot;API_LEVEL&quot;,
     &quot;sourceType&quot;: &quot;INLINE&quot;,
     &quot;sourceUrl&quot;: null,
     &quot;otherTypeName&quot;: null,
@@ -677,12 +676,8 @@ Content-Type: application/json
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdDocsPost" class="pre collapse"><code class="json">HTTP/1.1 201 Created
-Location: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
-Content-Type: application/json
-
+                <div id="response-appsAppTypeIdAppIdDocsPost" class="pre collapse"><code class="json">HTTP/1.1 201 Created Content-Type: application/json
 {
-   &quot;visibility&quot;: &quot;API_LEVEL&quot;,
    &quot;sourceType&quot;: &quot;INLINE&quot;,
    &quot;sourceUrl&quot;: null,
    &quot;otherTypeName&quot;: null,

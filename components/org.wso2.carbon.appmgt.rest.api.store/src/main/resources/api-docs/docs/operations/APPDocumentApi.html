@@ -1,0 +1,346 @@
+<div class="main-content">
+    <h1><a name="APPDocumentApi"></a>APPDocumentApi</h1>
+
+    
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsGet"></a>Get App Documents</h3>
+
+            <p class="marked"></p>
+
+            <p class="marked">Get a list of documents belonging to an App.\n</p>
+
+            <h4 class="section-heading">URL</h4>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/docs</code>
+
+            <h4 class="section-heading">HTTP Method</h4>
+            <code>GET</code>
+
+            <h4 class="section-heading">Scope</h4>
+            
+                <code>appm:read</code>
+            
+            
+
+            <h4 class="section-heading">CURL Example</h4>
+            
+                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs&quot;</code></div>
+            
+            
+
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsGet">
+                <h4 class="section-heading">
+                    Sample Response
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
+            </h4>
+            </div>
+            
+                <div id="response-appsAppTypeIdAppIdDocsGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+   &quot;previous&quot;: &quot;&quot;,
+   &quot;list&quot;:    [
+            {
+         &quot;sourceType&quot;: &quot;INLINE&quot;,
+         &quot;sourceUrl&quot;: null,
+         &quot;otherTypeName&quot;: null,
+         &quot;documentId&quot;: &quot;0bcb7f05-599d-4e1a-adce-5cb89bfe58d5&quot;,
+         &quot;summary&quot;: &quot;This is a sample documentation for v1.0.0&quot;,
+         &quot;name&quot;: &quot;PhoneVerification App Documentation&quot;,
+         &quot;type&quot;: &quot;HOWTO&quot;
+      },
+            {
+         &quot;sourceType&quot;: &quot;URL&quot;,
+         &quot;sourceUrl&quot;: &quot;http://wiki.cdyne.com/index.php/Phone_Verification&quot;,
+         &quot;otherTypeName&quot;: null,
+         &quot;documentId&quot;: &quot;4145df31-04f1-440c-8d08-68952874622c&quot;,
+         &quot;summary&quot;: &quot;This is the URL for online documentation&quot;,
+         &quot;name&quot;: &quot;Online Documentation&quot;,
+         &quot;type&quot;: &quot;SAMPLES&quot;
+      }
+   ],
+   &quot;next&quot;: &quot;&quot;,
+   &quot;count&quot;: 2
+}</code></div>
+            
+            
+            <h4 class="section-heading">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appType</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appId</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>limit</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                Integer
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked">25</p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>offset</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                Integer
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked">0</p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>Accept</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked">JSON</p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-None-Match</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">OK.\nDocument list is returned.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#DocumentList">DocumentList</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">304</p></td>
+                        <td class="parameter"><p class="marked">Not Modified.\nEmpty body because the client already has the latest version of the requested resource.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nRequested resource does not exist.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">406</p></td>
+                        <td class="parameter"><p class="marked">Not Acceptable.\nThe requested media type is not supported.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+    
+</div>
