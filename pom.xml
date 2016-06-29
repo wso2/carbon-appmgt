@@ -759,7 +759,7 @@
     <carbon.identity.version>5.1.1-SNAPSHOT</carbon.identity.version>
     <carbon.identity.version_5.1.1>5.1.1-SNAPSHOT</carbon.identity.version_5.1.1>
     <carbon.identity.base.version>5.1.1-SNAPSHOT</carbon.identity.base.version>
-    <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
+    <carbon.identity.auth.version>5.1.1-SNAPSHOT</carbon.identity.auth.version>
     <carbon.identity.thrift.auth.version>${carbon.identity.version}</carbon.identity.thrift.auth.version>
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
     <carbon.identity.oauth.version>${carbon.identity.version}</carbon.identity.oauth.version>

@@ -111,7 +111,7 @@ its own partion sinceit does not support tags--}}
                                 </div>
                             {{else}}
                                 {{#ifCond ../../../assetType "==" "mobileapp"}}
-                                    <img src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
+                                    <img src="{{url "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
                                 {{else}}
                                     <img src="{{attributes.images_thumbnail}}" />
                                 {{/ifCond}}
