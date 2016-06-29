@@ -294,13 +294,14 @@ public final class AppMConstants {
     public static final String APP_LIFE_CYCLE="AppLifeCycle";
     public static final String APP_LC_PUBLISHED = "Published";
 
-    // ReST API constants
+    // REST API constants
     public static final String REST_API_SCOPES_CONFIG = "RESTAPIScopes";
-    public static final String API_RESTAPI = "RESTAPI.";
-    public static final String API_RESTAPI_WHITELISTED_URI = API_RESTAPI + "WhiteListedURIs.WhiteListedURI.";
-    public static final String API_RESTAPI_WHITELISTED_URI_URI = API_RESTAPI_WHITELISTED_URI + "URI";
-    public static final String API_RESTAPI_WHITELISTED_URI_HTTPMethods = API_RESTAPI_WHITELISTED_URI + "HTTPMethods";
-
+    public static final String APPM_RESTAPI = "RESTAPI.";
+    public static final String APPM_RESTAPI_PUBLISHER_API_CONTEXT_PATH = APPM_RESTAPI + "PublisherAPIContextPath";
+    public static final String APPM_RESTAPI_STORE_API_CONTEXT_PATH = APPM_RESTAPI + "StoreAPIContextPath";
+    public static final String APPM_RESTAPI_WHITELISTED_URI = APPM_RESTAPI + "WhiteListedURIs.WhiteListedURI.";
+    public static final String APPM_RESTAPI_WHITELISTED_URI_URI = APPM_RESTAPI_WHITELISTED_URI + "URI";
+    public static final String APPM_RESTAPI_WHITELISTED_URI_HTTPMethods = APPM_RESTAPI_WHITELISTED_URI + "HTTPMethods";
 
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
@@ -420,9 +421,8 @@ public final class AppMConstants {
     public static final String SELF_SIGN_UP_CREATE_ROLE = SELF_SIGN_UP + "CreateSubscriberRole";
 
     public static final String MOBILE_APPS_CONFIGURATION = "MobileAppsConfiguration.";
-    public static final String MOBILE_APPS_BINARY_FILE_STORAGE = MOBILE_APPS_CONFIGURATION + "BinaryFileStorage.";
-    public static final String MOBILE_APPS_FILE_PRECISE_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FilePreciseLocation";
-    public static final String MOBILE_APPS_FILE_API_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FileAPILocation";
+    public static final String BINARY_FILE_STORAGE =  "BinaryFileStorage.";
+    public static final String BINARY_FILE_STORAGE_ABSOLUTE_LOCATION = BINARY_FILE_STORAGE + "AbsoluteLocation";
 
 
     public static final String STATUS_OBSERVERS = "StatusObservers.";
@@ -671,6 +671,8 @@ public final class AppMConstants {
     public static final String REFERER = "Referer";
     public static final String HTTP = "http://";
     public static final String URL_DELIMITER = "://";
+    public static final String HTTPS_PROTOCOL = "https";
+    public static final String HTTP_PROTOCOL = "http";
 
     // constants related to Statistics
     public static class Statistics {
@@ -692,6 +694,9 @@ public final class AppMConstants {
     public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";
     public static final String MOBILE_APPS_PLATFORM_IOS = "ios";
     public static final String MOBILE_APPS_PLATFORM_WEBAPP = "webapp";
+
+    public static final String MOBILE_ONE_TIME_DOWNLOAD_API_PATH = "/apps/mobile/binaries/one-time";
+    public static final String MOBILE_PLIST_API_PATH = "/apps/mobile/plist";
 
 
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
@@ -744,6 +749,11 @@ public final class AppMConstants {
         public static final String PUBLISH = "Publish";
         public static final String RE_PUBLISH = "Re-Publish";
         public static final String CREATE = "Create";
+    }
+
+    public static class MobileAppTypes{
+        public static final String ENTERPRISE = "enterprise";
+        public static final String PUBLIC = "public";
     }
 
 }

@@ -27,11 +27,22 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.URL;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -113,13 +124,27 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -354,6 +379,7 @@ public final class AppManagerUtil {
             mobileApp.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
             mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            mobileApp.setType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
             mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
           //  mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
@@ -3830,6 +3856,53 @@ public final class AppManagerUtil {
     private static void handleException(String msg) throws AppManagementException {
         log.error(msg);
         throw new AppManagementException(msg);
+    }
+
+    /**
+     * Return a http client instance
+     *
+     * @param port      - server port
+     * @param protocol  - service endpoint protocol http/https
+     * @return
+     */
+    public static HttpClient getHttpClient(int port, String protocol) {
+        SchemeRegistry registry = new SchemeRegistry();
+        SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+        String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
+        if (ignoreHostnameVerification != null && "true".equalsIgnoreCase(ignoreHostnameVerification)) {
+            X509HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            socketFactory.setHostnameVerifier(hostnameVerifier);
+        }
+        if (AppMConstants.HTTPS_PROTOCOL.equalsIgnoreCase(protocol)) {
+            if (port >= 0) {
+                registry.register(new Scheme(AppMConstants.HTTPS_PROTOCOL, port, socketFactory));
+            } else {
+                registry.register(new Scheme(AppMConstants.HTTPS_PROTOCOL, 443, socketFactory));
+            }
+        } else if (AppMConstants.HTTP_PROTOCOL.equalsIgnoreCase(protocol)) {
+            if (port >= 0) {
+                registry.register(new Scheme(AppMConstants.HTTP_PROTOCOL, port, PlainSocketFactory.getSocketFactory()));
+            } else {
+                registry.register(new Scheme(AppMConstants.HTTP_PROTOCOL, 80, PlainSocketFactory.getSocketFactory()));
+            }
+        }
+        HttpParams params = new BasicHttpParams();
+        ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
+        return new DefaultHttpClient(tcm, params);
+    }
+
+    /**
+     * Return a http client instance. This http client is configured according to the
+     * org.wso2.ignoreHostnameVerification system property.
+     *
+     * @param url      - server endpoint
+     * @return HttpClient
+     */
+    public static HttpClient getHttpClient(String url) {
+        URL ulrEndpoint = new URL(url);
+        int port = ulrEndpoint.getPort();
+        String protocol = ulrEndpoint.getProtocol();
+        return getHttpClient(port, protocol);
     }
 
 

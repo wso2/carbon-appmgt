@@ -180,6 +180,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Get Business owner Id by owner name and email.
+     * @param businessOwnerName
+     * @param businessOwnerEmail
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException {
+        return appMDAO.getBusinessOwnerId(businessOwnerName, businessOwnerEmail, tenantId);
+    }
+
+    /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *
      * @return Set<Provider>

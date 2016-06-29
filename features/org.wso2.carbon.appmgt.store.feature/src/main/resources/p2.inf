@@ -2,4 +2,3 @@ instructions.configure = \
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.store_${feature.version}/store/,target:${installFolder}/../../deployment/server/jaggeryapps/store,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.store_${feature.version}/jaggery-modules/apistore/,target:${installFolder}/../../../modules/apistore,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.store_${feature.version}/social/,target:${installFolder}/../../deployment/server/jaggeryapps/social,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.store_${feature.version}/admin-dashboard/,target:${installFolder}/../../deployment/server/jaggeryapps/admin-dashboard,overwrite:true);\

@@ -23,12 +23,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -55,9 +59,9 @@ public class HttpHandler {
      * @throws java.io.IOException Throws this when failed to retrieve web page
      */
     public static String getHtml(String url) throws IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpClient = AppManagerUtil.getHttpClient(url);
         HttpGet httpget = new HttpGet(url);
-        HttpResponse response = httpclient.execute(httpget);
+        HttpResponse response = httpClient.execute(httpget);
         HttpEntity entity = response.getEntity();
         InputStream content = entity.getContent();
         BufferedReader in = new BufferedReader(
@@ -185,7 +189,7 @@ public class HttpHandler {
      * @throws java.io.IOException - Throws this when failed to fulfill a http put request
      */
     public String doPut(String url, String sessionId) throws IOException {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = AppManagerUtil.getHttpClient(url);
         StringBuilder result = new StringBuilder();
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");

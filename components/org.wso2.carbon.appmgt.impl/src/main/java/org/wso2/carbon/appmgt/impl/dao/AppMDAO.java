@@ -613,6 +613,44 @@ public class AppMDAO {
     }
 
     /**
+     * Get Businesss owner Id by owner name, email and tenant Id
+     * @param businessOwnerName
+     * @param businessOwnerEmail
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId) throws
+                                                                                                AppManagementException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet businessOwnerResultSet = null;
+
+        String query = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME = ? AND OWNER_EMAIL = ? AND " +
+                "TENANT_ID = ?";
+
+        int businessOwnerId = -1; // if any business owner doesn't exit for the input parameters, return owner id as -1
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, businessOwnerName);
+            preparedStatement.setString(2, businessOwnerEmail);
+            preparedStatement.setInt(3, tenantId);
+            businessOwnerResultSet = preparedStatement.executeQuery();
+
+            if (businessOwnerResultSet.next()) {
+                businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve business owners.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, businessOwnerResultSet);
+
+        }
+        return businessOwnerId;
+    }
+
+    /**
 	 * Get Subscribed APIs for given userId
 	 *
 	 * @param userId

@@ -757,288 +757,6 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsFileNameGet"></a>Retrieving document</h3>
-
-            <p class="marked"></p>
-
-            <p class="marked">Retrieving document.\n</p>
-
-            <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/docs/{fileName}</code>
-
-            <h4 class="section-heading">HTTP Method</h4>
-            <code>GET</code>
-
-            <h4 class="section-heading">Scope</h4>
-            
-                <code>appm:read</code>
-            
-            
-
-            <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash"></code></div>
-            
-            
-
-            
-
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsFileNameGet">
-                <h4 class="section-heading">
-                    Sample Response
-                    
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
-            </h4>
-            </div>
-            
-                <div id="response-appsAppTypeIdAppIdDocsFileNameGet" class="pre collapse"><code class="json"></code></div>
-            
-            
-            <h4 class="section-heading">Parameters</h4>
-            <table class="table table-hover">
-                <colgroup>
-                    <col style="width: 10%;"/>
-                    <col style="width: 20%;"/>
-                    <col style="width: 40%;"/>
-                    <col style="width: 10%;"/>
-                    <col style="width: 20%;"/>
-                </colgroup>
-                <thead>
-                <tr class="active">
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Schema</th>
-                    <th>Default</th>
-                </tr>
-                </thead>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appType</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appId</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>fileName</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">The file name.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            
-                            <span class="param-in">Header </span>
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>If-Match</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            
-                            <span class="param-in">Header </span>
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>If-Unmodified-Since</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-            </table>
-
-            <h4 class="section-heading">Responses</h4>
-
-            <table class="table table-hover">
-                <colgroup>
-                    <col style="width: 15%;"/>
-                    <col style="width: 70%;"/>
-                    <col style="width: 15%;"/>
-                </colgroup>
-                <thead>
-                <tr class="active">
-                    <th>HTTP Code</th>
-                    <th>Description</th>
-                    <th>Schema</th>
-                </tr>
-                </thead>
-                <tbody>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nDocument Retrieved successfully.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#file">file</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#Error">Error</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#Error">Error</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#Error">Error</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                </tbody>
-            </table>
-        
-            <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdGet"></a>Get app details</h3>
 
             <p class="marked"></p>
@@ -2829,6 +2547,201 @@
             </table>
         
             <hr/>
+            <h3 class="operation-heading"><a name="appsMobileIdAppIdDownloadPost"></a>Subscribe to app and get app url</h3>
+
+            <p class="marked"></p>
+
+            <p class="marked">Subscribe to a mobile App\n</p>
+
+            <h4 class="section-heading">URL</h4>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/mobile/id/{appId}/download</code>
+
+            <h4 class="section-heading">HTTP Method</h4>
+            <code>POST</code>
+
+            <h4 class="section-heading">Scope</h4>
+            
+                <code>appm:subscribe</code>
+            
+            
+
+            <h4 class="section-heading">CURL Example</h4>
+            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 3500931880f806ad2523c4ce7079c505&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;fcf96617-093a-4d0f-9d27-6f41b0d0c8b8&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/download&quot;</code></div>
+            
+            
+
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileIdAppIdDownloadPost">
+                <h4 class="section-heading">
+                    Sample Response
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
+            </h4>
+            </div>
+            
+                <div id="response-appsMobileIdAppIdDownloadPost" class="pre collapse"><code class="json">HTTP/1.1 200 Ok
+ {
+   &quot;appUrl&quot;:&quot;http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/07463547-c3dd-469b-9027-80da107ad101&quot;
+}</code></div>
+            
+            
+            <h4 class="section-heading">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appId</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>Content-Type</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked">JSON</p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">403</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
             <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf and document files</h3>
 
             <p class="marked"></p>
@@ -2849,7 +2762,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp&quot;</code></div>
             
             
 
@@ -2864,7 +2777,7 @@
             </h4>
             </div>
             
-                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json"></code></div>
+                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>

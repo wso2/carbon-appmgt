@@ -158,10 +158,12 @@
         <div id="menu4" class="tab-pane fade">
             <div class="row">
                 {{#each businessOwnerData}}
-                    <div class="row">
-                        <div class="col-sm-3"><b>{{name}}</b></div>
-                        <div class="col-sm-9">{{value}}</div>
-                    </div>
+                    {{#if value}}
+                        <div class="row">
+                            <div class="col-sm-3"><b>{{name}}</b></div>
+                            <div class="col-sm-9">{{value}}</div>
+                        </div>
+                    {{/if}}
                 {{/each}}
             </div>
         </div>

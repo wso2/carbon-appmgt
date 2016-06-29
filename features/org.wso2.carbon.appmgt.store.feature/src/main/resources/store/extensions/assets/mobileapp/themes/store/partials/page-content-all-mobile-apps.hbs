@@ -15,7 +15,7 @@
                             </div>
                         {{else}}
                             <div class="ratio-responsive-img">
-                                <img src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
+                                <img src="{{url "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
                             </div>
                         {{/if}}
                         {{#ifCond attributes.overview_platform "==" "android"}}
