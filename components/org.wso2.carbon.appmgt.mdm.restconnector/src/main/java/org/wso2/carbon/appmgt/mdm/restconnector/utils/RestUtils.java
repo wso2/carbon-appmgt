@@ -22,9 +22,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
@@ -35,7 +35,7 @@ import org.wso2.carbon.appmgt.mdm.restconnector.Constants;
 import org.wso2.carbon.appmgt.mdm.restconnector.beans.RemoteServer;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +60,7 @@ public class RestUtils {
 		}
 
 		HttpClient httpClient = AppManagerUtil.getHttpClient(remoteServer.getTokenApiURL());
-		HttpPost postMethod = new HttpPost(remoteServer.getTokenApiURL());
+		HttpPost postMethod = null;
 		HttpResponse response = null;
 		String responseString = "";
 		try {
@@ -71,7 +71,10 @@ public class RestUtils {
 			                                          remoteServer.getAuthUser()));
 			nameValuePairs.add(new BasicNameValuePair(Constants.RestConstants.PASSWORD,
 			                                          remoteServer.getAuthPass()));
-			postMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			URIBuilder uriBuilder = new URIBuilder(remoteServer.getTokenApiURL());
+			uriBuilder.addParameters(nameValuePairs);
+			postMethod = new HttpPost(uriBuilder.build());
+
 			postMethod.setHeader(Constants.RestConstants.AUTHORIZATION,
 			                     Constants.RestConstants.BASIC + new String(
 					                     Base64.encodeBase64(
@@ -80,7 +83,7 @@ public class RestUtils {
 									                     .getBytes())));
 			postMethod.setHeader(Constants.RestConstants.CONTENT_TYPE,
 			                     Constants.RestConstants.APPLICATION_FORM_URL_ENCODED);
-		} catch (UnsupportedEncodingException e) {
+		} catch (URISyntaxException e) {
 			String errorMessage = "Cannot construct the Httppost. Url Encoded error.";
 			log.error(errorMessage, e);
 			return null;
@@ -118,7 +121,7 @@ public class RestUtils {
 			log.error(errorMessage, e);
 			return null;
 		}
-		JSONObject token = (JSONObject) JSONValue.parse(responseString);
+		JSONObject token = (JSONObject) new JSONValue().parse(responseString);
 
 		AuthHandler.authKey = String.valueOf(token.get(Constants.RestConstants.ACCESS_TOKEN));
 		return AuthHandler.authKey;

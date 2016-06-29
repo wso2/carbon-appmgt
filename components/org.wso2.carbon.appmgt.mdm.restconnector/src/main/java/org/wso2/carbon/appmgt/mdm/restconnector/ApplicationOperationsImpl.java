@@ -79,17 +79,15 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		String[] params = applicationOperationAction.getParams();
 		int tenantId = applicationOperationAction.getTenantId();
 		PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-		String tenantDomain =
-				PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
 
 		if (Constants.USER.equals(type)) {
 			List<String> users = new ArrayList<>(Arrays.asList(params));
-			JSONArray devicesOfUsers = getDevicesOfTypes(users, Constants.USERS, tenantDomain);
+			JSONArray devicesOfUsers = getDevicesOfTypes(users, Constants.USERS);
 			requestObj.put(Constants.DEVICE_IDENTIFIERS, getDeviceIdsFromDevices(devicesOfUsers));
 
 		} else if (Constants.ROLE.equals(type)) {
 			List<String> roles =  new ArrayList<>(Arrays.asList(params));
-			JSONArray devicesOfRoles = getDevicesOfTypes(roles, Constants.ROLES, tenantDomain);
+			JSONArray devicesOfRoles = getDevicesOfTypes(roles, Constants.ROLES);
 			requestObj.put(Constants.DEVICE_IDENTIFIERS, getDeviceIdsFromDevices(devicesOfRoles));
 
 		} else {
@@ -168,9 +166,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		//make type to uppercase
 		requestApp.put(Constants.TYPE, requestApp.get(Constants.TYPE).toString().toUpperCase());
-
 		requestObj.put(Constants.APPLICATION, requestApp);
-
 
 		StringEntity requestEntity = null;
 
@@ -179,7 +175,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		}
 
 		try {
-			requestEntity = new StringEntity(requestObj.toJSONString());
+			requestEntity = new StringEntity(requestObj.toJSONString(), "UTF-8");
+			requestEntity.setContentType(Constants.RestConstants.APPLICATION_JSON);
 		} catch (UnsupportedEncodingException e) {
 			log.error(e);
 			throw new MobileApplicationException(e);
@@ -189,16 +186,15 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		String actionURL;
 		if (Constants.INSTALL.equals(applicationOperationAction.getAction())) {
-			actionURL = String.format(Constants.API_INSTALL_APP, tenantDomain);
+			actionURL = String.format(Constants.API_INSTALL_APP);
 		} else if (Constants.UPDATE.equals(applicationOperationAction.getAction())){
-			actionURL = String.format(Constants.API_UPDATE_APP, tenantDomain);
+			actionURL = String.format(Constants.API_UPDATE_APP);
 		} else {
-			actionURL = String.format(Constants.API_UNINSTALL_APP, tenantDomain);
+			actionURL = String.format(Constants.API_UNINSTALL_APP);
 		}
 
 		HttpClient httpClient = AppManagerUtil.getHttpClient(requestURL + actionURL);
 		HttpPost postMethod = new HttpPost(requestURL + actionURL);
-		postMethod.setHeader(Constants.RestConstants.CONTENT_TYPE, Constants.RestConstants.APPLICATION_JSON);
 		postMethod.setEntity(requestEntity);
 		String action = applicationOperationAction.getAction();
 		if (RestUtils.executeMethod(remoteServer, httpClient, postMethod) != null) {
@@ -225,11 +221,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		if (remoteServer.isEmpty()) {
 			setRemoteServer(this.remoteServer);
 		}
-		//List<Device> filteredDevices = new ArrayList<>();
 		int tenantId = applicationOperationDevice.getTenantId();
 		PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-		String tenantDomain =
-				PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
 		String[] params = applicationOperationDevice.getParams();
 		List<NameValuePair> nameValuePairs = new ArrayList<>();
 		String platform = applicationOperationDevice.getPlatform();
@@ -242,7 +235,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			nameValuePairs.add(new BasicNameValuePair(Constants.PLATFORM_VERSION, platform));
 		}
 		String queryString = URLEncodedUtils.format(nameValuePairs, "utf-8");
-		return getDevicesOfUser(params[0], tenantDomain, queryString);
+
+		return getDevicesOfUser(params[0], queryString);
 
 	}
 
@@ -342,17 +336,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	 *
 	 * @param types Type list which for devices to be retrieved. ex: user list or role list
 	 * @param typeName Type name which for devices to be retrieved ex: user or role
-	 * @param tenantDomain Tenant domain
 	 * @return Device list which retrieved for user set or role set
 	 * @throws MobileApplicationException
 	 */
-	private JSONArray getDevicesOfTypes(List<String> types, String typeName, String tenantDomain)
+	private JSONArray getDevicesOfTypes(List<String> types, String typeName)
 			throws MobileApplicationException {
 		List<NameValuePair> nameValuePairs = new ArrayList<>();
 		for (String type : types) {
 			nameValuePairs.add(new BasicNameValuePair(Constants.TYPES, type));
 		}
-		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_TYPES, typeName, tenantDomain);
+		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_TYPES, typeName);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
 
@@ -361,9 +354,9 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 	}
 
-	private List<Device> getDevicesOfUser(String user, String tenantDomain, String queryString)
+	private List<Device> getDevicesOfUser(String user, String queryString)
 			throws MobileApplicationException {
-		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USER, user, tenantDomain);
+		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USER, user);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
 		HttpGet getMethod = new HttpGet(requestURL + "?" + queryString);

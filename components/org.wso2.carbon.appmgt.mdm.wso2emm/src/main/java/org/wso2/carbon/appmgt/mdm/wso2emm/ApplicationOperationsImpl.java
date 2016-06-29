@@ -128,6 +128,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
         try {
             requestEntity = new StringEntity(requestObj.toJSONString(), "UTF-8");
+            requestEntity.setContentType(Constants.RestConstants.APPLICATION_JSON);
         } catch (UnsupportedEncodingException e) {
             String errorMessage = "JSON encoding not supported";
             if(log.isDebugEnabled()){
@@ -141,7 +142,6 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
         postMethod.setEntity(requestEntity);
         postMethod.setHeader(Constants.RestConstants.AUTHORIZATION, Constants.RestConstants.BASIC +
                 new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
-        postMethod.setHeader(Constants.RestConstants.CONTENT_TYPE, Constants.RestConstants.APPLICATION_JSON);
 
         try {
             if(log.isDebugEnabled()) log.debug("Sending POST request to perform operation on MDM. Request path:  "  + requestURL);

@@ -23,11 +23,11 @@ package org.wso2.carbon.appmgt.mdm.restconnector;
 public class Constants {
 
     public static final String MDM_NAME = "WSO2MDM";
-    public static final String API_DEVICE_LIST_OF_USER = "/devices/user/%s/%s";
-    public static final String API_DEVICE_LIST_OF_TYPES = "/devices/%s/%s";
-    public static final String API_INSTALL_APP = "/operations/installApp/%s";
-    public static final String API_UPDATE_APP = "/operations/updateApp/%s";
-    public static final String API_UNINSTALL_APP = "/operations/uninstallApp/%s";
+    public static final String API_DEVICE_LIST_OF_USER = "/api/device-mgt/v1.0/devices?user=%s";
+    public static final String API_DEVICE_LIST_OF_TYPES = "/api/device-mgt/v1.0/devices?type=%s";
+    public static final String API_INSTALL_APP = "/admin/applications/install-application";
+    public static final String API_UPDATE_APP = "/admin/applications/install-application";
+    public static final String API_UNINSTALL_APP = "/admin/applications/uninstall-application";
 
     public static final String PROPERTY_SERVER_URL = "ServerURL";
     public static final String PROPERTY_TOKEN_API_URL = "TokenApiURL";
