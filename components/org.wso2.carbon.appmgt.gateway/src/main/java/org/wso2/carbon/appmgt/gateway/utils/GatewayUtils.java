@@ -80,6 +80,6 @@ public class GatewayUtils {
             return mostSpecificTemplate.getPolicyGroup().isAllowAnonymous();
         }
 
-        return true;
+        return false;
     }
 }

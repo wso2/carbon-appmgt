@@ -44,6 +44,7 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.SessionStore;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.IDPCallback;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
+import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
@@ -61,6 +62,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private static final Log log = LogFactory.getLog(SAML2AuthenticationHandler.class);
     private static final String SET_COOKIE_PATTERN = "%s=%s; Path=%s;";
+    private static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
+    public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
 
     // A Synapse handler is instantiated per Synapse API.
     // So the web app for the relevant Synapse API can be fetched and stored as an instance variable.
@@ -148,6 +151,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 session.setAuthenticationContext(authenticationContext);
+                session.addAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpCallback.getRawSAMLResponse());
+
                 SessionStore.getInstance().updateSession(session);
 
                 redirectToURL(messageContext, session.getRequestedURL());
@@ -185,6 +190,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if(log.isDebugEnabled()){
                     log.debug(String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
                 }
+
+                if(shouldSendSAMLResponseToBackend()){
+                    addSAMLResponseAsHeader(messageContext, (String) session.getAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
+                }
+
                 return true;
             }
         }
@@ -229,17 +239,30 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private void setSessionCookie(MessageContext messageContext, String cookieValue) {
 
-        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        Map<String, Object> headers = (Map<String, Object>) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-
         String setCookieString = String.format(SET_COOKIE_PATTERN, AppMConstants.APPM_SAML2_COOKIE, cookieValue, "/");
 
-        headers.put(HTTPConstants.HEADER_SET_COOKIE, setCookieString);
-        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+        addTransportHeader(messageContext, HTTPConstants.HEADER_SET_COOKIE, setCookieString);
 
         if(log.isDebugEnabled()){
             log.debug(String.format("Cookie '%s' has been set in the response", AppMConstants.APPM_SAML2_COOKIE));
         }
+    }
+
+    private void addSAMLResponseAsHeader(MessageContext messageContext, String samlResponse) {
+
+        addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, samlResponse);
+
+        if(log.isDebugEnabled()){
+            log.debug("SAML response has been set in the request to the backend.");
+        }
+
+    }
+
+    private void addTransportHeader(MessageContext messageContext, String headerName, String headerValue){
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        Map<String, Object> headers = (Map<String, Object>) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        headers.put(headerName, headerValue);
+        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
     }
 
     private void requestAuthentication(MessageContext messageContext) {
@@ -296,6 +319,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private boolean isACSURL(String relativeResourceURL) {
         return relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL) ||
                 relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL + "/");
+    }
+
+    private boolean shouldSendSAMLResponseToBackend() {
+        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG));
     }
 
     private void logAndThrowException(String errorMessage, Exception e) {

@@ -23,6 +23,7 @@ package org.wso2.carbon.appmgt.gateway.handlers.security;
 
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ public class Session {
     public Session() {
         uuid = UUID.randomUUID().toString();
         authenticationContext = new AuthenticationContext();
+        attributes = new HashMap<String, Object>();
     }
 
     private String uuid;
@@ -67,5 +69,13 @@ public class Session {
 
     public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
+    }
+
+    public Object getAttribute(String attributeName) {
+        return attributes.get(attributeName);
+    }
+
+    public void addAttribute(String attributeName, Object attributeValue) {
+        attributes.put(attributeName, attributeValue);
     }
 }

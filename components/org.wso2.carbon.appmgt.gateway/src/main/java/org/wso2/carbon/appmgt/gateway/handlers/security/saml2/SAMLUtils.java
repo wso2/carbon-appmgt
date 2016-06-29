@@ -164,6 +164,7 @@ public class SAMLUtils {
             if(samlResponse != null){
                     XMLObject unmarshalledResponse = decodeAndUnmarshallSAMLResponse(samlResponse.getText());
                     idpCallback.setSAMLResponse((org.opensaml.saml2.core.impl.ResponseImpl) unmarshalledResponse);
+                    idpCallback.setRawSAMLResponse(samlResponse.getText());
             }
 
             OMElement authenticatedIdPs = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_AUTHENTICATED_IDPS));

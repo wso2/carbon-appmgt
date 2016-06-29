@@ -32,6 +32,7 @@ public class IDPCallback {
     private ResponseImpl samlResponse;
     private List<String> authenticatedIDPs;
     private String relayState;
+    private String rawSAMLResponse;
 
     public ResponseImpl getSAMLResponse() {
         return samlResponse;
@@ -55,5 +56,13 @@ public class IDPCallback {
 
     public String getRelayState() {
         return relayState;
+    }
+
+    public void setRawSAMLResponse(String rawSAMLResponse) {
+        this.rawSAMLResponse = rawSAMLResponse;
+    }
+
+    public String getRawSAMLResponse() {
+        return rawSAMLResponse;
     }
 }
