@@ -41,6 +41,7 @@ public class URITemplate {
     private List<EntitlementPolicyPartialMapping> entitlementPolicyPartialMappings;
 	private int policyGroupId;
 	private String policyGroupName;
+	private EntitlementPolicyGroup policyGroup;
 
 	public void setId(int id) {
 		this.id = id;
@@ -242,4 +243,11 @@ public class URITemplate {
 		this.policyGroupId = policyGroupId;
 	}
 
+	public void setPolicyGroup(EntitlementPolicyGroup policyGroup) {
+		this.policyGroup = policyGroup;
+	}
+
+	public EntitlementPolicyGroup getPolicyGroup() {
+		return policyGroup;
+	}
 }

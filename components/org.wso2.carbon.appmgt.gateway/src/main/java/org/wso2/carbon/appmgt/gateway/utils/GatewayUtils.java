@@ -23,9 +23,12 @@ package org.wso2.carbon.appmgt.gateway.utils;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.utils.UrlPatternMatcher;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,5 +53,33 @@ public class GatewayUtils {
         return appRootURL.toString();
 
 
+    }
+
+    public static boolean isAnonymousAccessAllowed(WebApp webApp, String httpVerb, String relativeResourceURL) {
+
+        if(webApp.getAllowAnonymous()){
+            return true;
+        }
+
+        URITemplate mostSpecificTemplate = null;
+
+        for(URITemplate  uriTemplate : webApp.getUriTemplates()){
+
+            if(UrlPatternMatcher.match(String.format("%s:%s", uriTemplate.getHTTPVerb(), uriTemplate.getUriTemplate()),
+                                        String.format("%s:/%s", httpVerb, relativeResourceURL))){
+
+                if(mostSpecificTemplate == null){
+                    mostSpecificTemplate = uriTemplate;
+                }else if(mostSpecificTemplate.getUriTemplate().split("/").length < uriTemplate.getUriTemplate().split("/").length){
+                    mostSpecificTemplate = uriTemplate;
+                }
+            }
+        }
+
+        if(mostSpecificTemplate != null){
+            return mostSpecificTemplate.getPolicyGroup().isAllowAnonymous();
+        }
+
+        return true;
     }
 }

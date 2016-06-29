@@ -17,12 +17,7 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provider's & system's view of WebApp
@@ -764,5 +759,14 @@ public class WebApp extends App{
 
     public String getOriginVersion() {
         return originVersion;
+    }
+
+    public void addURITemplate(URITemplate uriTemplate) {
+
+        if(uriTemplates == null){
+            uriTemplates = new HashSet<URITemplate>();
+        }
+
+        uriTemplates.add(uriTemplate);
     }
 }

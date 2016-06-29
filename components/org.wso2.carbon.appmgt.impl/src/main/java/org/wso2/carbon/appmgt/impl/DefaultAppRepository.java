@@ -103,9 +103,11 @@ public class DefaultAppRepository implements AppRepository {
     @Override
     public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
 
-        Connection connection;
-        PreparedStatement  preparedStatement;
-        ResultSet resultSet;
+        Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicInfo = null;
+        PreparedStatement preparedStatementToGetURLMappings = null;
+        ResultSet resultSetOfBasicInfo = null;
+        ResultSet resultSetOfURLMappings  = null;
 
         WebApp webApp = null;
 
@@ -113,39 +115,67 @@ public class DefaultAppRepository implements AppRepository {
             connection = getRDBMSConnectionWithoutAutoCommit();
 
             String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ? AND TENANT_ID = ?";
-            preparedStatement = connection.prepareStatement(basicQuery);
-            preparedStatement.setString(1, context);
-            preparedStatement.setString(2, version);
-            preparedStatement.setInt(3, tenantId);
+            preparedStatementToGetBasicInfo = connection.prepareStatement(basicQuery);
+            preparedStatementToGetBasicInfo.setString(1, context);
+            preparedStatementToGetBasicInfo.setString(2, version);
+            preparedStatementToGetBasicInfo.setInt(3, tenantId);
 
-            resultSet = preparedStatement.executeQuery();
+            resultSetOfBasicInfo = preparedStatementToGetBasicInfo.executeQuery();
 
-            while(resultSet.next()){
+            while(resultSetOfBasicInfo.next()){
 
-                String appName = resultSet.getString("APP_NAME");
-                String appProvider = resultSet.getString("APP_PROVIDER");
+                String appName = resultSetOfBasicInfo.getString("APP_NAME");
+                String appProvider = resultSetOfBasicInfo.getString("APP_PROVIDER");
                 APIIdentifier id = new APIIdentifier(appProvider, appName, version);
                 webApp = new WebApp(id);
 
-                webApp.setDatabaseId(resultSet.getInt("APP_ID"));
-                webApp.setUUID(resultSet.getString("UUID"));
+                webApp.setDatabaseId(resultSetOfBasicInfo.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicInfo.getString("UUID"));
 
                 webApp.setVersion(version);
                 webApp.setContext(context);
-                webApp.setTrackingCode(resultSet.getString("TRACKING_CODE"));
-                webApp.setSaml2SsoIssuer(resultSet.getString("SAML2_SSO_ISSUER"));
-                webApp.setLogoutURL(resultSet.getString("LOG_OUT_URL"));
-                webApp.setAllowAnonymous(resultSet.getBoolean("APP_ALLOW_ANONYMOUS"));
-                webApp.setUrl(resultSet.getString("APP_ENDPOINT"));
+                webApp.setTrackingCode(resultSetOfBasicInfo.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicInfo.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicInfo.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicInfo.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicInfo.getString("APP_ENDPOINT"));
 
                 // There should be only one app for the given combination
                 break;
             }
 
+            String urlMappingQuery = "SELECT * from APM_APP_URL_MAPPING URL, APM_POLICY_GROUP POLICY " +
+                                        "WHERE URL.POLICY_GRP_ID = POLICY.POLICY_GRP_ID AND URL.APP_ID = ?";
+
+            preparedStatementToGetURLMappings = connection.prepareStatement(urlMappingQuery);
+            preparedStatementToGetURLMappings.setInt(1, webApp.getDatabaseId());
+            resultSetOfURLMappings = preparedStatementToGetURLMappings.executeQuery();
+
+            while (resultSetOfURLMappings.next()){
+
+                EntitlementPolicyGroup policyGroup = new EntitlementPolicyGroup();
+                policyGroup.setPolicyGroupName(resultSetOfURLMappings.getString("POLICY.NAME"));
+                policyGroup.setPolicyGroupId(resultSetOfURLMappings.getInt("POLICY.POLICY_GRP_ID"));
+                policyGroup.setUserRoles(resultSetOfURLMappings.getString("POLICY.USER_ROLES"));
+                policyGroup.setAllowAnonymous(resultSetOfURLMappings.getBoolean("POLICY.URL_ALLOW_ANONYMOUS"));
+
+                URITemplate uriTemplate = new URITemplate();
+                uriTemplate.setPolicyGroup(policyGroup);
+                uriTemplate.setHTTPVerb(resultSetOfURLMappings.getString("URL.HTTP_METHOD"));
+                uriTemplate.setUriTemplate(resultSetOfURLMappings.getString("URL.URL_PATTERN"));
+
+                webApp.addURITemplate(uriTemplate);
+            }
+
+
             return webApp;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+           handleException(String.format("Error occured while fetch the web app from database for context:'%s', version:'%s'", context, version), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicInfo, null, resultSetOfBasicInfo);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetURLMappings, null, resultSetOfURLMappings);
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
         }
 
 

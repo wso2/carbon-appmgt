@@ -79,11 +79,18 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     @Override
     public boolean handleRequest(MessageContext messageContext) {
 
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
         String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
         String baseURL = String.format("%s/%s/", webAppContext, webAppVersion);
         String relativeResourceURL = StringUtils.substringAfter(fullResourceURL, baseURL);
+
+        String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
+        if(httpVerb == null) {
+            httpVerb =   (String) axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD);
+        }
 
         if(log.isDebugEnabled()){
             log.debug(String.format("Request received : '%s'", fullResourceURL));
@@ -105,7 +112,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if(isACSURL(relativeResourceURL)){
 
             // Build the message.
-            org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
             try {
                 RelayUtils.buildMessage(axis2MessageContext);
             } catch (IOException e) {
@@ -154,6 +160,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return false;
             }
         }else{
+
+            if(GatewayUtils.isAnonymousAccessAllowed(webApp, httpVerb, relativeResourceURL)){
+                if(log.isDebugEnabled()){
+                    log.debug(String.format("Request to '%s' is allowed for anonymous access", fullResourceURL));
+                }
+                return true;
+            }
 
             AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
