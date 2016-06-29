@@ -36,22 +36,32 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.impl.ResponseImpl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
 import org.wso2.carbon.appmgt.gateway.handlers.security.SessionStore;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.IDPCallback;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.gateway.token.JWTGenerator;
+import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
+import org.wso2.carbon.appmgt.impl.SAMLConstants;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.HttpCookie;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,15 +73,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final Log log = LogFactory.getLog(SAML2AuthenticationHandler.class);
     private static final String SET_COOKIE_PATTERN = "%s=%s; Path=%s;";
     private static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
+    private static final String SESSION_ATTRIBUTE_JWT = "jwt";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
+
 
     // A Synapse handler is instantiated per Synapse API.
     // So the web app for the relevant Synapse API can be fetched and stored as an instance variable.
     private WebApp webApp;
 
+    private AppManagerConfiguration configuration;
+
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {
-
+        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
     }
 
     @Override
@@ -153,6 +167,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 session.setAuthenticationContext(authenticationContext);
                 session.addAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpCallback.getRawSAMLResponse());
 
+                Map<String, Object> userAttributes = getUserAttributes(idpCallback.getSAMLResponse());
+
+                // Generate the JWT and store in the session.
+                if(isJWTEnabled()){
+                    try {
+                        session.addAttribute(SESSION_ATTRIBUTE_JWT, getJWTGenerator().generateToken(userAttributes, webApp, messageContext));
+                    } catch (AppManagementException e) {
+                        String errorMessage = String.format("Can't generate JWT for the subject : '%s'",
+                                                                authenticationContext.getSubject());
+                        logAndThrowException(errorMessage, e);
+                    }
+                }
+
                 SessionStore.getInstance().updateSession(session);
 
                 redirectToURL(messageContext, session.getRequestedURL());
@@ -192,7 +219,23 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 if(shouldSendSAMLResponseToBackend()){
-                    addSAMLResponseAsHeader(messageContext, (String) session.getAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
+
+                    addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, (String) session.getAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
+
+                    if(log.isDebugEnabled()){
+                        log.debug("SAML response has been set in the request to the backend.");
+                    }
+                }
+
+                if(isJWTEnabled()){
+
+                    String jwtHeaderName = configuration.getFirstProperty(APISecurityConstants.API_SECURITY_CONTEXT_HEADER);
+
+                    addTransportHeader(messageContext, jwtHeaderName, (String) session.getAttribute(SESSION_ATTRIBUTE_JWT));
+
+                    if(log.isDebugEnabled()){
+                        log.debug("JWT has been set in the request to the backend.");
+                    }
                 }
 
                 return true;
@@ -246,16 +289,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if(log.isDebugEnabled()){
             log.debug(String.format("Cookie '%s' has been set in the response", AppMConstants.APPM_SAML2_COOKIE));
         }
-    }
-
-    private void addSAMLResponseAsHeader(MessageContext messageContext, String samlResponse) {
-
-        addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, samlResponse);
-
-        if(log.isDebugEnabled()){
-            log.debug("SAML response has been set in the request to the backend.");
-        }
-
     }
 
     private void addTransportHeader(MessageContext messageContext, String headerName, String headerValue){
@@ -322,8 +355,46 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     private boolean shouldSendSAMLResponseToBackend() {
-        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
-                getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG));
+        return Boolean.valueOf(configuration.getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG));
+    }
+
+    private TokenGenerator getJWTGenerator() {
+        TokenGenerator tokenGeneratorFromService = ServiceReferenceHolder.getInstance().getTokenGenerator();
+        if(tokenGeneratorFromService != null) {
+            return tokenGeneratorFromService;
+        }
+        return new JWTGenerator();
+    }
+
+    private Map<String, Object> getUserAttributes(ResponseImpl samlResponse) {
+
+        Map<String, Object> userAttributes = new HashMap<>();
+
+        // Add 'Subject'
+        Assertion assertion = samlResponse.getAssertions().get(0);
+        userAttributes.put(SAMLConstants.SAML2_ASSERTION_SUBJECT, assertion.getSubject().getNameID().getValue());
+
+        // Add other user attributes.
+        List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
+        if (attributeStatements != null) {
+            for(AttributeStatement attributeStatement : attributeStatements){
+                List<Attribute> attributes = attributeStatement.getAttributes();
+                for(Attribute attribute : attributes){
+                    userAttributes.put(attribute.getName(), attribute.getAttributeValues().get(0).getDOM().getTextContent());
+                }
+            }
+        }
+
+        return userAttributes;
+    }
+
+    private boolean isJWTEnabled() {
+
+        if (configuration != null) {
+            return configuration.isJWTEnabled();
+        }
+
+        return false;
     }
 
     private void logAndThrowException(String errorMessage, Exception e) {
