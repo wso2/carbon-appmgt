@@ -20,7 +20,9 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.saml2;
 
+import org.apache.axiom.om.OMElement;
 import org.opensaml.saml2.core.impl.ResponseImpl;
+import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
 import java.util.List;
 
@@ -30,7 +32,7 @@ import java.util.List;
 public class IDPCallback {
 
     private ResponseImpl samlResponse;
-    private List<String> authenticatedIDPs;
+    private List<AuthenticatedIDP> authenticatedIDPs;
     private String relayState;
     private String rawSAMLResponse;
 
@@ -42,11 +44,11 @@ public class IDPCallback {
         this.samlResponse = samlResponse;
     }
 
-    public List<String> getAuthenticatedIDPs() {
+    public List<AuthenticatedIDP> getAuthenticatedIDPs() {
         return authenticatedIDPs;
     }
 
-    public void setAuthenticatedIDPs(List<String> authenticatedIDPs) {
+    public void setAuthenticatedIDPs(List<AuthenticatedIDP> authenticatedIDPs) {
         this.authenticatedIDPs = authenticatedIDPs;
     }
 

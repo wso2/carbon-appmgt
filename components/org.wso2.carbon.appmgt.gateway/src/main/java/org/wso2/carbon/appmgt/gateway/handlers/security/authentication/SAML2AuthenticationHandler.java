@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
@@ -42,6 +41,7 @@ import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.impl.ResponseImpl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
@@ -75,23 +75,16 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
     private static final String SESSION_ATTRIBUTE_JWT = "jwt";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
+    private static final String SESSION_ATTRIBUTE_AUTHENTICATED_IDPS = "authenticatedIDPs";
 
 
     // A Synapse handler is instantiated per Synapse API.
     // So the web app for the relevant Synapse API can be fetched and stored as an instance variable.
     private WebApp webApp;
 
+    private Subscription enterpriseSubscription;
+
     private AppManagerConfiguration configuration;
-
-    @Override
-    public void init(SynapseEnvironment synapseEnvironment) {
-        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-    }
-
-    @Override
-    public void destroy() {
-
-    }
 
     @Override
     public boolean handleRequest(MessageContext messageContext) {
@@ -122,21 +115,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
         } catch (AppManagementException e) {
             String errorMessage = String.format("Can't fetch the web for '%s' from the repository.", fullResourceURL);
-            logAndThrowException(errorMessage, e);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
         // If the request comes to the ACS URL, then it should be the SAML response from the IDP.
-        if(isACSURL(relativeResourceURL)){
+            if(isACSURL(relativeResourceURL)){
 
             // Build the message.
             try {
                 RelayUtils.buildMessage(axis2MessageContext);
             } catch (IOException e) {
                 String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                logAndThrowException(errorMessage, e);
+                GatewayUtils.logAndThrowException(log, errorMessage, e);
             } catch (XMLStreamException e) {
                 String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                logAndThrowException(errorMessage, e);
+                GatewayUtils.logAndThrowException(log, errorMessage, e);
             }
 
             IDPCallback idpCallback = null;
@@ -145,11 +138,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
                 if(idpCallback.getSAMLResponse() == null){
                     String errorMessage = String.format("A SAML response was not there in the request to the ACS URL ('%s')", fullResourceURL);
-                    logAndThrowException(errorMessage, null);
+                    GatewayUtils.logAndThrowException(log, errorMessage, null);
                 }
             } catch (SAMLException e) {
                 String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-                logAndThrowException(errorMessage, null);
+                GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
 
             if(log.isDebugEnabled()){
@@ -175,13 +168,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                         session.addAttribute(SESSION_ATTRIBUTE_JWT, getJWTGenerator().generateToken(userAttributes, webApp, messageContext));
                     } catch (AppManagementException e) {
                         String errorMessage = String.format("Can't generate JWT for the subject : '%s'",
-                                                                authenticationContext.getSubject());
-                        logAndThrowException(errorMessage, e);
+                                authenticationContext.getSubject());
+                        GatewayUtils.logAndThrowException(log, errorMessage, e);
                     }
                 }
 
                 SessionStore.getInstance().updateSession(session);
-
                 redirectToURL(messageContext, session.getRequestedURL());
                 return false;
             }else{
@@ -200,7 +192,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return true;
             }
 
-            AuthenticationContext authenticationContext = session.getAuthenticationContext();
+                AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
             if(!authenticationContext.isAuthenticated()){
 
@@ -217,6 +209,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if(log.isDebugEnabled()){
                     log.debug(String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
                 }
+
+                // Set the session as a message context property.
+                messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, session.getUuid());
 
                 if(shouldSendSAMLResponseToBackend()){
 
@@ -241,6 +236,16 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return true;
             }
         }
+    }
+
+    @Override
+    public void init(SynapseEnvironment synapseEnvironment) {
+        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+    }
+
+    @Override
+    public void destroy() {
+
     }
 
     @Override
@@ -397,13 +402,5 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         return false;
     }
 
-    private void logAndThrowException(String errorMessage, Exception e) {
-        log.error(errorMessage);
 
-        if(e == null){
-            throw new SynapseException(errorMessage);
-        }else {
-            throw new SynapseException(errorMessage, e);
-        }
-    }
 }

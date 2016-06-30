@@ -26,11 +26,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.joda.time.DateTime;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.*;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.util.Base64;
+import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
@@ -43,8 +47,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -169,7 +176,8 @@ public class SAMLUtils {
 
             OMElement authenticatedIdPs = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_AUTHENTICATED_IDPS));
             if(authenticatedIdPs != null){
-                // Need to decode authenticated IDPs
+                List<AuthenticatedIDP>  authenticatedIDPsList = getAuthenticatedIDPs(authenticatedIdPs.getText());
+                idpCallback.setAuthenticatedIDPs(authenticatedIDPsList);
             }
 
             OMElement relayState = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE));
@@ -181,6 +189,42 @@ public class SAMLUtils {
         }
 
         return idpCallback;
+    }
+
+    private static List<AuthenticatedIDP> getAuthenticatedIDPs(String encodedIDPs) throws SAMLException {
+
+        List<AuthenticatedIDP> authenticatedIDPs = new ArrayList<AuthenticatedIDP>();
+
+        if (encodedIDPs != null) {
+
+            String authenticatedIDPJson = encodedIDPs.split("\\.")[1];
+
+            // Sample JSON : {"iss":"wso2","exp":14051608961853000,"iat":1405160896185,
+            //                  "idps":[{"idp":"enterprise1","authenticator":"GoogleOpenIDAuthenticator"}]}
+
+            try {
+                authenticatedIDPJson = URLDecoder.decode(authenticatedIDPJson, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+               throw new SAMLException("Can't decode authenticated IDPs");
+            }
+            authenticatedIDPJson = new String(Base64.decode(authenticatedIDPJson));
+
+                JSONObject parsedJson = (JSONObject) JSONValue.parse(authenticatedIDPJson);
+                JSONArray idps = (JSONArray) parsedJson.get("idps");
+
+                for(int i = 0; i < idps.size(); i++){
+                    JSONObject authenticatedIDPJSON = (JSONObject) idps.get(i);
+
+                    AuthenticatedIDP authenticatedIDP = new AuthenticatedIDP();
+                    authenticatedIDP.setIdpName(authenticatedIDPJSON.get("idp").toString());
+
+                    authenticatedIDPs.add(authenticatedIDP);
+                }
+                return authenticatedIDPs;
+
+        }
+
+        return null;
     }
 
     /**
@@ -222,6 +266,8 @@ public class SAMLUtils {
         }else{
             authenticationContext.setSubject(assertion.getSubject().getNameID().getValue());
        }
+
+       authenticationContext.setAuthenticatedIDPs(idpCallback.getAuthenticatedIDPs());
 
        return authenticationContext;
     }

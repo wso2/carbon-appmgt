@@ -20,14 +20,23 @@
 
 package org.wso2.carbon.appmgt.gateway.utils;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.Constants;
+import org.apache.commons.logging.Log;
+import org.apache.http.HttpStatus;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.RESTConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.UrlPatternMatcher;
 
 import java.net.MalformedURLException;
@@ -81,5 +90,49 @@ public class GatewayUtils {
         }
 
         return false;
+    }
+
+    public static void logAndThrowException(Log log, String errorMessage, Exception e) {
+
+        if(e == null){
+            log.error(errorMessage);
+            throw new SynapseException(errorMessage);
+        }else {
+            log.error(errorMessage, e);
+            throw new SynapseException(errorMessage, e);
+        }
+    }
+
+    public static void send401(MessageContext messageContext, String reason) {
+
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
+        OMElement payload = fac.createOMElement("fault", ns);
+
+        OMElement errorMessage = fac.createOMElement("message", ns);
+        errorMessage.setText(reason);
+
+        payload.addChild(errorMessage);
+
+        OMElement firstChild = messageContext.getEnvelope().getBody().getFirstElement();
+        if (firstChild != null) {
+            firstChild.insertSiblingAfter(payload);
+            firstChild.detach();
+        } else {
+            messageContext.getEnvelope().getBody().addChild(payload);
+        }
+
+        axis2MessageContext.setProperty(NhttpConstants.HTTP_SC, HttpStatus.SC_UNAUTHORIZED);
+        messageContext.setResponse(true);
+        messageContext.setProperty("RESPONSE", "true");
+        messageContext.setTo(null);
+        axis2MessageContext.removeProperty("NO_ENTITY_BODY");
+
+        axis2MessageContext.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/xml");
+        axis2MessageContext.removeProperty(Constants.Configuration.CONTENT_TYPE);
+
+        Axis2Sender.sendBack(messageContext);
     }
 }

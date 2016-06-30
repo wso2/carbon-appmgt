@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -440,6 +441,23 @@ public class DefaultAppRepository implements AppRepository {
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
+    }
+
+    @Override
+    public Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException {
+
+        Connection connection = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            return new AppMDAO().getEnterpriseSubscription(webAppContext, webAppVersion, connection);
+        } catch (SQLException e) {
+            handleException(String.format("Can't enterprise subscription for '%s':'%s'", webAppContext, webAppVersion), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+
+        return null;
     }
     // ------------------- END : Repository API implementation methods. ----------------------------------
 

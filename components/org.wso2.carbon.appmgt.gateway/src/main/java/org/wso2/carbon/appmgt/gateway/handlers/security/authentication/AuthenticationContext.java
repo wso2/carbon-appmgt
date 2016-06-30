@@ -20,6 +20,10 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.authentication;
 
+import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
+
+import java.util.List;
+
 /**
  * Represents an authenticated user and the context.
  */
@@ -27,6 +31,7 @@ public class AuthenticationContext {
 
     private boolean authenticated;
     private String subject;
+    private List<AuthenticatedIDP> authenticatedIDPs;
 
     public AuthenticationContext() {
         setAuthenticated(false);
@@ -49,5 +54,13 @@ public class AuthenticationContext {
 
     public String getSubject() {
         return subject;
+    }
+
+    public void setAuthenticatedIDPs(List<AuthenticatedIDP> authenticatedIDPs) {
+        this.authenticatedIDPs = authenticatedIDPs;
+    }
+
+    public List<AuthenticatedIDP> getAuthenticatedIDPs() {
+        return authenticatedIDPs;
     }
 }

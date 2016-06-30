@@ -47,6 +47,7 @@ import java.util.Map;
 
 public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implements SSOConfigurator {
 
+    public static final String LOCAL_IDP_NAME = "LOCAL";
     private static Log log = LogFactory.getLog(IS500SAMLSSOConfigurator.class);
 
     private static String APP_DESC = "WSO2 Application Manager generated service provider.";
@@ -120,7 +121,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             if (acsUrl != null && acsUrl.length() > 0) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
-                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(webApp));
             }
 
             if(ssoProvider.getLogoutUrl() != null && !ssoProvider.getLogoutUrl().trim().isEmpty()){
@@ -214,7 +215,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             if (acsUrl != null && acsUrl.length() > 0) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
-                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(application));
             }
 
             if(ssoProvider.getLogoutUrl() != null && !ssoProvider.getLogoutUrl().trim().isEmpty()){
@@ -318,6 +319,10 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             IdentityProvider[] providers;
             if(authenticationSteps != null){
                 for(AuthenticationStep step : authenticationSteps){
+
+                    if(step.getLocalAuthenticatorConfigs() != null){
+                        identityProviders.add(LOCAL_IDP_NAME);
+                    }
 
                     providers = step.getFederatedIdentityProviders();
 
