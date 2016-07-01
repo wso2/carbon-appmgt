@@ -41,7 +41,7 @@ import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.impl.ResponseImpl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.Subscription;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
@@ -75,19 +75,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
     private static final String SESSION_ATTRIBUTE_JWT = "jwt";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
-    private static final String SESSION_ATTRIBUTE_AUTHENTICATED_IDPS = "authenticatedIDPs";
-
 
     // A Synapse handler is instantiated per Synapse API.
     // So the web app for the relevant Synapse API can be fetched and stored as an instance variable.
     private WebApp webApp;
-
-    private Subscription enterpriseSubscription;
-
     private AppManagerConfiguration configuration;
 
     @Override
+    public void init(SynapseEnvironment synapseEnvironment) {
+        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+    }
+
+    @Override
     public boolean handleRequest(MessageContext messageContext) {
+
+        Session session = getSession(messageContext);
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
@@ -96,17 +98,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
         String baseURL = String.format("%s/%s/", webAppContext, webAppVersion);
         String relativeResourceURL = StringUtils.substringAfter(fullResourceURL, baseURL);
-
-        String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
-        if(httpVerb == null) {
-            httpVerb =   (String) axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD);
-        }
-
-        if(log.isDebugEnabled()){
-            log.debug(String.format("Request received : '%s'", fullResourceURL));
-        }
-
-        Session session = getSession(messageContext);
+        String httpVerb =   (String) axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD);
 
         // Fetch the web app for the requested context and version.
         try {
@@ -118,8 +110,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
+        // Find a matched URI template.
+        URITemplate matchedTemplate = GatewayUtils.findMatchedURITemplate(webApp, httpVerb, relativeResourceURL);
+        messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE, matchedTemplate);
+
         // If the request comes to the ACS URL, then it should be the SAML response from the IDP.
-            if(isACSURL(relativeResourceURL)){
+        if(isACSURL(relativeResourceURL)){
 
             // Build the message.
             try {
@@ -145,22 +141,30 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
 
-            if(log.isDebugEnabled()){
-                log.debug("SAMLResponse is available in request.");
-            }
+            GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLResponse is available in request.");
 
             AuthenticationContext authenticationContext = getAuthenticationContextFromIDPCallback(idpCallback);
 
             if(authenticationContext.isAuthenticated()){;
 
                 if(log.isDebugEnabled()){
-                    log.debug(String.format("SAML response is authenticated. Subject = '%s'", authenticationContext.getSubject()));
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("SAML response is authenticated. Subject = '%s'", authenticationContext.getSubject()));
                 }
 
                 session.setAuthenticationContext(authenticationContext);
                 session.addAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpCallback.getRawSAMLResponse());
 
                 Map<String, Object> userAttributes = getUserAttributes(idpCallback.getSAMLResponse());
+                session.getAuthenticationContext().setAttributes(userAttributes);
+
+                String roleAttributeValue = (String) userAttributes.get("http://wso2.org/claims/role");
+
+                if(roleAttributeValue != null){
+                    String[] roles = roleAttributeValue.split(",");
+                    for(String role : roles){
+                        session.getAuthenticationContext().addRole(role);
+                    }
+                }
 
                 // Generate the JWT and store in the session.
                 if(isJWTEnabled()){
@@ -177,27 +181,32 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 redirectToURL(messageContext, session.getRequestedURL());
                 return false;
             }else{
+
                 if(log.isDebugEnabled()){
-                    log.debug("SAML response is not authenticated.");
+                    GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response is not authenticated.");
                 }
+
                 requestAuthentication(messageContext);
                 return false;
             }
         }else{
 
-            if(GatewayUtils.isAnonymousAccessAllowed(webApp, httpVerb, relativeResourceURL)){
+            if(GatewayUtils.isAnonymousAccessAllowed(webApp, matchedTemplate)){
+
                 if(log.isDebugEnabled()){
-                    log.debug(String.format("Request to '%s' is allowed for anonymous access", fullResourceURL));
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is allowed for anonymous access", fullResourceURL));
                 }
+
+                messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_GATEWAY_SKIP_SECURITY, true);
                 return true;
             }
 
-                AuthenticationContext authenticationContext = session.getAuthenticationContext();
+            AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
             if(!authenticationContext.isAuthenticated()){
 
                 if(log.isDebugEnabled()){
-                    log.debug(String.format("Request to '%s' is not authenticated", fullResourceURL));
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is not authenticated", fullResourceURL));
                 }
 
                 session.setRequestedURL(fullResourceURL);
@@ -207,7 +216,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }else {
 
                 if(log.isDebugEnabled()){
-                    log.debug(String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
                 }
 
                 // Set the session as a message context property.
@@ -218,7 +227,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, (String) session.getAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
 
                     if(log.isDebugEnabled()){
-                        log.debug("SAML response has been set in the request to the backend.");
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response has been set in the request to the backend.");
                     }
                 }
 
@@ -229,7 +238,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     addTransportHeader(messageContext, jwtHeaderName, (String) session.getAttribute(SESSION_ATTRIBUTE_JWT));
 
                     if(log.isDebugEnabled()){
-                        log.debug("JWT has been set in the request to the backend.");
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "JWT has been set in the request to the backend.");
                     }
                 }
 
@@ -239,20 +248,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     @Override
-    public void init(SynapseEnvironment synapseEnvironment) {
-        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-    }
-
-    @Override
-    public void destroy() {
-
-    }
-
-    @Override
     public boolean handleResponse(MessageContext messageContext) {
         return true;
     }
 
+   @Override
+    public void destroy() {
+
+    }
 
     // ----------------------------------------------------------------------------------------------------------
 
@@ -263,26 +266,31 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         String cookieHeaderValue = (String) headers.get(HTTPConstants.HEADER_COOKIE);
 
+        boolean isCookiePresent = false;
         if(cookieHeaderValue != null){
             List<HttpCookie> cookies = HttpCookie.parse(cookieHeaderValue);
 
             for(HttpCookie cookie : cookies){
                 if(AppMConstants.APPM_SAML2_COOKIE.equals(cookie.getName())){
 
-                    if(log.isDebugEnabled()){
-                        log.debug(String.format("Cookie '%s' is available in the request.", AppMConstants.APPM_SAML2_COOKIE));
-                    }
+                    messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, cookie.getValue());
+                    isCookiePresent = true;
 
-                    return SessionStore.getInstance().getSession(cookie.getValue());
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is available in the request.", AppMConstants.APPM_SAML2_COOKIE));
+                    }
                 }
             }
         }
 
-        if(log.isDebugEnabled()){
-            log.debug(String.format("Cookie '%s' is not available in the request.", AppMConstants.APPM_SAML2_COOKIE));
+        if(!isCookiePresent){
+            if(log.isDebugEnabled()){
+                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is not available in the request.", AppMConstants.APPM_SAML2_COOKIE));
+            }
         }
 
-        return SessionStore.getInstance().getSession(null);
+
+        return GatewayUtils.getSession(messageContext);
     }
 
     private void setSessionCookie(MessageContext messageContext, String cookieValue) {
@@ -292,8 +300,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         addTransportHeader(messageContext, HTTPConstants.HEADER_SET_COOKIE, setCookieString);
 
         if(log.isDebugEnabled()){
-            log.debug(String.format("Cookie '%s' has been set in the response", AppMConstants.APPM_SAML2_COOKIE));
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' has been set in the response", AppMConstants.APPM_SAML2_COOKIE));
         }
+
     }
 
     private void addTransportHeader(MessageContext messageContext, String headerName, String headerValue){
@@ -340,13 +349,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         headerMap.put("Location", url);
 
         if(log.isDebugEnabled()){
-            log.debug(String.format("Sending HTTP redirect to '%s'", url));
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Sending HTTP redirect to '%s'", url));
         }
 
         removeIrrelevantHeadersBeforeReponding(headerMap);
-
         Axis2Sender.sendBack(messageContext);
-
     }
 
     private void removeIrrelevantHeadersBeforeReponding(Map headerMap) {
@@ -401,6 +408,4 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         return false;
     }
-
-
 }

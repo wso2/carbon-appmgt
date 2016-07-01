@@ -34,10 +34,8 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
-import org.wso2.carbon.appmgt.gateway.handlers.security.SessionStore;
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 
@@ -57,25 +55,16 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
     @Override
     public boolean handleRequest(MessageContext messageContext) {
 
+        GatewayUtils.logRequest(log, messageContext);
+
         if(!isHandlerApplicable()){
             return true;
         }
 
-        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-        String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
-        String baseURL = String.format("%s/%s/", webAppContext, webAppVersion);
-        String relativeResourceURL = StringUtils.substringAfter(fullResourceURL, baseURL);
 
-        String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
-        if(httpVerb == null) {
-            httpVerb =   (String) axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD);
-        }
-
-
-        Session session = SessionStore.getInstance().getSession((String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE));
+        Session session = GatewayUtils.getSession(messageContext);
         AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
         if(configuration.isEnterpriseSubscriptionEnabled()){
@@ -96,8 +85,10 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
                         authenticatedIDPNames.append(authenticatedIDP.getIdpName());
                     }
 
-                    log.debug(String.format("User '%s' has an enterprise subscription (IDP(s) : ['%s']) for '%s':'%s'",
-                                                authenticationContext.getSubject(), authenticatedIDPNames, webAppContext, webAppVersion));
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, String.format("User '%s' has an enterprise subscription (IDP(s) : ['%s']) for '%s':'%s'",
+                            authenticationContext.getSubject(), authenticatedIDPNames, webAppContext, webAppVersion));
+                    }
 
                 }
                 return true;
@@ -112,7 +103,7 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
         }
 
         if(log.isDebugEnabled()){
-            log.debug(String.format("User '%s' has no subscriptions for '%s':'%s'",
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("User '%s' has no subscriptions for '%s':'%s'",
                     authenticationContext.getSubject(), webAppContext, webAppVersion));
         }
 

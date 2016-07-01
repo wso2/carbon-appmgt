@@ -32,16 +32,19 @@ import java.util.UUID;
  */
 public class Session {
 
+
+    private String uuid;
+    private boolean isNew;
+    private AuthenticationContext authenticationContext;
+    private String requestedURL;
+    private Map<String, Object> attributes;
+
     public Session() {
         uuid = UUID.randomUUID().toString();
         authenticationContext = new AuthenticationContext();
         attributes = new HashMap<String, Object>();
+        isNew = true;
     }
-
-    private String uuid;
-    private AuthenticationContext authenticationContext;
-    private String requestedURL;
-    private Map<String, Object> attributes;
 
     public String getUuid() {
         return uuid;
@@ -77,5 +80,13 @@ public class Session {
 
     public void addAttribute(String attributeName, Object attributeValue) {
         attributes.put(attributeName, attributeValue);
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew){
+        this.isNew = isNew;
     }
 }

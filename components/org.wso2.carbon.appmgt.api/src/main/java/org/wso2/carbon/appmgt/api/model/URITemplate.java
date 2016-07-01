@@ -20,6 +20,7 @@ package org.wso2.carbon.appmgt.api.model;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -249,5 +250,32 @@ public class URITemplate {
 
 	public EntitlementPolicyGroup getPolicyGroup() {
 		return policyGroup;
+	}
+
+	public boolean isRoleRestricted() {
+
+		if(policyGroup != null){
+			String allowedRolesString = policyGroup.getUserRoles();
+			if(allowedRolesString != null && !allowedRolesString.trim().isEmpty()){
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	public List<String> getAllowedRoles() {
+
+		List<String> allowedRoles = new ArrayList<String>();
+
+		if(policyGroup != null){
+			String allowedRolesString = policyGroup.getUserRoles();
+			if(allowedRolesString != null && !allowedRolesString.trim().isEmpty()){
+				allowedRoles = Arrays.asList(allowedRolesString.split(","));
+			}
+		}
+
+		return allowedRoles;
 	}
 }

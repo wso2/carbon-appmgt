@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.gateway.handlers.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import javax.cache.Cache;
@@ -57,14 +58,30 @@ public class SessionStore {
 
     public Session getSession(String uuid){
 
-        Session session;
+        Session session = null;
 
-        if(uuid == null || (session = sessionCache.get(uuid)) == null){
+        if(uuid != null){
+
+            session = sessionCache.get(uuid);
+
+            if(session == null){
+                session = new Session();
+                sessionCache.put(session.getUuid(), session);
+
+                if(log.isDebugEnabled()){
+                    log.debug(String.format("{%s} - A session is not available for '%s'. Created a new session with a new session ID.",
+                            GatewayUtils.getMD5Hash(session.getUuid()), uuid));
+                }
+            }else{
+                session.setNew(false);
+            }
+        }else{
             session = new Session();
             sessionCache.put(session.getUuid(), session);
 
             if(log.isDebugEnabled()){
-                log.debug("New session created.");
+                log.debug(String.format("{%s} - Initiated a new session.",
+                                        GatewayUtils.getMD5Hash(session.getUuid())));
             }
         }
 

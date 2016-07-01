@@ -22,7 +22,9 @@ package org.wso2.carbon.appmgt.gateway.handlers.security.authentication;
 
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an authenticated user and the context.
@@ -30,11 +32,14 @@ import java.util.List;
 public class AuthenticationContext {
 
     private boolean authenticated;
-    private String subject;
     private List<AuthenticatedIDP> authenticatedIDPs;
+    private String subject;
+    private List<String> roles;
+    private Map<String, Object> attributes;
 
     public AuthenticationContext() {
         setAuthenticated(false);
+        roles = new ArrayList<String>();
     }
 
     public boolean isAuthenticated() {
@@ -62,5 +67,21 @@ public class AuthenticationContext {
 
     public List<AuthenticatedIDP> getAuthenticatedIDPs() {
         return authenticatedIDPs;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void addRole(String role) {
+        roles.add(role);
     }
 }
