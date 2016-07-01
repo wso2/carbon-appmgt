@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.Date;
 
 /**
@@ -50,14 +52,13 @@ import java.util.Date;
 public class RestApiPublisherUtils {
 
     private static final Log log = LogFactory.getLog(RestApiPublisherUtils.class);
-    final static String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 
     public static String generateBinaryUUID() {
-
-        String uuid = "";
-        for (int i = 0; i < 15; i++) {
-            uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));
-        }
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[8];
+        secRandom.nextBytes(result);
+        String uuid = String.valueOf(Hex.encodeHex(result));
         return uuid;
     }
 

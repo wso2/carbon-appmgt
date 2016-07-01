@@ -156,16 +156,6 @@ class SampleData {
         return apis;
     }
 
-    //for adding sample data for apis
-    public void addDataForAPIs() {
-        WebApp[] apiArray = {api1, api2, api3, api4};
-        for (int x = 1; x < apiArray.length; x++) {
-            apiArray[x].setRating((int) Math.random() * 5);
-            apiArray[x].setUrl("http://myapi.com");
-        }
-
-    }
-
 
 }
 
