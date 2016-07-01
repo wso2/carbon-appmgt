@@ -15,20 +15,27 @@
  */
 package org.wso2.carbon.appmgt.mdm.restconnector.utils;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.ssl.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.mdm.restconnector.AuthHandler;
 import org.wso2.carbon.appmgt.mdm.restconnector.Constants;
 import org.wso2.carbon.appmgt.mdm.restconnector.beans.RemoteServer;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,31 +59,43 @@ public class RestUtils {
 			}
 		}
 
-		HttpClient httpClient = new HttpClient();
-		PostMethod postMethod = new PostMethod(remoteServer.getTokenApiURL());
+		HttpClient httpClient = AppManagerUtil.getHttpClient(remoteServer.getTokenApiURL());
+		HttpPost postMethod = null;
+		HttpResponse response = null;
+		String responseString = "";
+		try {
+			List<NameValuePair> nameValuePairs = new ArrayList<>();
+			nameValuePairs.add(new BasicNameValuePair(Constants.RestConstants.GRANT_TYPE,
+			                                          Constants.RestConstants.PASSWORD));
+			nameValuePairs.add(new BasicNameValuePair(Constants.RestConstants.USERNAME,
+			                                          remoteServer.getAuthUser()));
+			nameValuePairs.add(new BasicNameValuePair(Constants.RestConstants.PASSWORD,
+			                                          remoteServer.getAuthPass()));
+			URIBuilder uriBuilder = new URIBuilder(remoteServer.getTokenApiURL());
+			uriBuilder.addParameters(nameValuePairs);
+			postMethod = new HttpPost(uriBuilder.build());
 
-		List<NameValuePair> nameValuePairs = new ArrayList<>();
-		nameValuePairs.add(new NameValuePair(Constants.RestConstants.GRANT_TYPE,
-		                                     Constants.RestConstants.PASSWORD));
-		nameValuePairs.add(new NameValuePair(Constants.RestConstants.USERNAME,
-		                                     remoteServer.getAuthUser()));
-		nameValuePairs.add(new NameValuePair(Constants.RestConstants.PASSWORD,
-		                                     remoteServer.getAuthPass()));
-		postMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-		postMethod.addRequestHeader(Constants.RestConstants.AUTHORIZATION,
-		                            Constants.RestConstants.BASIC + new String(
-				                            Base64.encodeBase64((remoteServer.getClientKey() + Constants.RestConstants.COLON +
-				                                                 remoteServer.getClientSecret())
-						                                                .getBytes())));
-		postMethod.addRequestHeader(Constants.RestConstants.CONTENT_TYPE,
-		                            Constants.RestConstants.APPLICATION_FORM_URL_ENCODED);
+			postMethod.setHeader(Constants.RestConstants.AUTHORIZATION,
+			                     Constants.RestConstants.BASIC + new String(
+					                     Base64.encodeBase64(
+							                     (remoteServer.getClientKey() + Constants.RestConstants.COLON +
+									                     remoteServer.getClientSecret())
+									                     .getBytes())));
+			postMethod.setHeader(Constants.RestConstants.CONTENT_TYPE,
+			                     Constants.RestConstants.APPLICATION_FORM_URL_ENCODED);
+		} catch (URISyntaxException e) {
+			String errorMessage = "Cannot construct the Httppost. Url Encoded error.";
+			log.error(errorMessage, e);
+			return null;
+		}
 		try {
 			if (log.isDebugEnabled()) {
 				log.debug("Sending POST request to API Token endpoint. Request path:  " +
 				          remoteServer.getTokenApiURL());
 			}
 
-			int statusCode = httpClient.executeMethod(postMethod);
+			response = httpClient.execute(postMethod);
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (log.isDebugEnabled()) {
 				log.debug("Status code " + statusCode +
@@ -89,16 +108,20 @@ public class RestUtils {
 			return null;
 		}
 
-		String response;
 		try {
-			response = postMethod.getResponseBodyAsString();
+			HttpEntity entity = response.getEntity();
+
+			if (entity != null) {
+				responseString = EntityUtils.toString(entity, "UTF-8");
+				EntityUtils.consume(entity);
+			}
+
 		} catch (IOException e) {
 			String errorMessage = "Cannot get response body for auth.";
 			log.error(errorMessage, e);
 			return null;
 		}
-
-		JSONObject token = (JSONObject) new JSONValue().parse(response);
+		JSONObject token = (JSONObject) new JSONValue().parse(responseString);
 
 		AuthHandler.authKey = String.valueOf(token.get(Constants.RestConstants.ACCESS_TOKEN));
 		return AuthHandler.authKey;
@@ -109,12 +132,14 @@ public class RestUtils {
 	 *
 	 * @param remoteServer Bean that holds information about remote server
 	 * @param httpClient HTTP client object
-	 * @param httpMethod HTTP method which should be executed
+	 * @param httpRequestBase HTTP method which should be executed
 	 * @return true if HTTP method successfully executed false if not
 	 */
-	public static boolean executeMethod(RemoteServer remoteServer, HttpClient httpClient,
-	                              HttpMethodBase httpMethod) {
+	public static String executeMethod(RemoteServer remoteServer, HttpClient httpClient,
+	                                    HttpRequestBase httpRequestBase) {
 		String authKey = getAPIToken(remoteServer, false);
+		HttpResponse response = null;
+		String responseString = null;
 		if (log.isDebugEnabled()) {
 			log.debug("Access token received : " + authKey);
 		}
@@ -128,22 +153,22 @@ public class RestUtils {
 					log.debug("Trying to call API : trying for " + (tries + 1) + " time(s).");
 				}
 
-				httpMethod.setRequestHeader(Constants.RestConstants.AUTHORIZATION,
-				                            Constants.RestConstants.BEARER + authKey);
+				httpRequestBase.setHeader(Constants.RestConstants.AUTHORIZATION,
+				                  Constants.RestConstants.BEARER + authKey);
 				if (log.isDebugEnabled()) {
-					log.debug("Sending " + httpMethod.getName() + " request to " +
-					          httpMethod.getURI());
+					log.debug("Sending " + httpRequestBase.getMethod() + " request to " +
+					          httpRequestBase.getURI());
 				}
 
-				statusCode = httpClient.executeMethod(httpMethod);
+				response = httpClient.execute(httpRequestBase);
+				statusCode = response.getStatusLine().getStatusCode();
 				if (log.isDebugEnabled()) {
 					log.debug("Status code received : " + statusCode);
 				}
 
 				if (++tries >= 3) {
-					log.info(
-							"API Call failed for the 3rd time: No or Unauthorized Access Aborting.");
-					return false;
+					log.info("API Call failed for the 3rd time: No or Unauthorized Access Aborting.");
+					return null;
 				}
 				if (statusCode == 401) {
 					authKey = getAPIToken(remoteServer, true);
@@ -154,11 +179,17 @@ public class RestUtils {
 					}
 				}
 			}
-			return true;
+			HttpEntity entity = response.getEntity();
+
+			if (entity != null) {
+				responseString = EntityUtils.toString(entity, "UTF-8");
+				EntityUtils.consume(entity);
+			}
+			return responseString;
 		} catch (IOException e) {
 			String errorMessage = "No OK response received form the API.";
 			log.error(errorMessage, e);
-			return false;
+			return null;
 		}
 	}
 

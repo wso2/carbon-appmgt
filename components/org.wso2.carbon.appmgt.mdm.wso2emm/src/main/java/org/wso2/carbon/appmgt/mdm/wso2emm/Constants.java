@@ -29,4 +29,11 @@ public class Constants {
     public static final String PROPERTY_AUTH_USER = "AuthUser";
     public static final String PROPERTY_AUTH_PASS = "AuthPass";
 
+    public class RestConstants {
+        public static final String AUTHORIZATION = "Authorization";
+        public static final String BASIC = "Basic ";
+        public static final String CONTENT_TYPE = "Content-Type";
+        public static final String APPLICATION_JSON = "application/json";
+    }
+
 }
