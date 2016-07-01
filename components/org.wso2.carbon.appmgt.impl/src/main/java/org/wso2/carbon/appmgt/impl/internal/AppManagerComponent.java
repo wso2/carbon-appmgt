@@ -44,6 +44,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.util.GovernanceConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
@@ -107,6 +108,9 @@ import java.util.Set;
  * @scr.reference name="app.manager.default.stat.usageClient"
  * interface="org.wso2.carbon.appmgt.api.AppUsageStatisticsClient" cardinality="0..n"
  * policy="dynamic" bind="setAppUsageStatisticsClient" unbind="unsetAppUsageStatisticsClient"
+ *  @scr.reference name="org.wso2.carbon.identity.core.util"
+ * interface="org.wso2.carbon.identity.core.util.IdentityUtil"
+ * cardinality="1..1" policy="dynamic" bind="setIdentityUtilService" unbind="unsetIdentityUtilService"
  */
 public class AppManagerComponent {
     //TODO refactor caching implementation
@@ -277,6 +281,18 @@ public class AppManagerComponent {
     protected void unsetApplicationMgtService(ApplicationManagementService registryService) {
         if (registryService != null && log.isDebugEnabled()) {
             log.debug("Application mgt service destroyed.");
+        }
+    }
+
+    protected void setIdentityUtilService(IdentityUtil identityUtilService) {
+        if (identityUtilService != null && log.isDebugEnabled()) {
+            log.debug("IdentityUtil service initialized.");
+        }
+    }
+
+    protected void unsetIdentityUtilService(IdentityUtil identityUtilService) {
+        if (identityUtilService != null && log.isDebugEnabled()) {
+            log.debug("IdentityUtil service destroyed.");
         }
     }
 

@@ -671,6 +671,8 @@ public final class AppMConstants {
     public static final String REFERER = "Referer";
     public static final String HTTP = "http://";
     public static final String URL_DELIMITER = "://";
+    public static final String HTTPS_PROTOCOL = "https";
+    public static final String HTTP_PROTOCOL = "http";
 
     // constants related to Statistics
     public static class Statistics {
