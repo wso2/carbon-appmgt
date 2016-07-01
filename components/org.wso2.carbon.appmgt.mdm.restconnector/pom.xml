@@ -112,6 +112,11 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.mobile</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${orbit.version.httpcomponents}</version>
+        </dependency>
     </dependencies>
 
 </project>

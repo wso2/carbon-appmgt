@@ -125,7 +125,7 @@ var getWorkflowCookie = function(username,password) {
             //check isBPSEnabled property value. If enabled(true), then check the connectivity
             if (site.workflows.isBPSEnabled == "true") {
                 //check BPS connectivity
-                var httpClient = new Packages.org.apache.http.impl.client.DefaultHttpClient();
+                var httpClient = new Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil.getHttpClient(endpoint);
                 var httpPost = new Packages.org.apache.http.client.methods.HttpPost(endpoint);
                 var response = httpClient.execute(httpPost);
                 BPSRunning = true;
