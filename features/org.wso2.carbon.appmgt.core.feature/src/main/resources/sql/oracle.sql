@@ -1,8 +1,10 @@
 declare
-v_sql LONG;
+    v_sql LONG;
+    sequence_sql LONG;
+    trigger_sql LONG;
 begin
 
-v_sql:='CREATE TABLE IDN_OAUTH_CONSUMER_APPS (
+    v_sql:='CREATE TABLE IDN_OAUTH_CONSUMER_APPS (
         ID INTEGER,
         CONSUMER_KEY VARCHAR2 (255),
         CONSUMER_SECRET VARCHAR2 (512),
@@ -15,28 +17,30 @@ v_sql:='CREATE TABLE IDN_OAUTH_CONSUMER_APPS (
         GRANT_TYPES VARCHAR (1024),
         CONSTRAINT CONSUMER_KEY_CONSTRAINT UNIQUE (CONSUMER_KEY),
         PRIMARY KEY (ID))';
-execute immediate v_sql;
 
-EXCEPTION
-    WHEN OTHERS THEN
-      IF SQLCODE = -955 THEN
-        NULL; -- suppresses ORA-00955 exception
-      ELSE
-         RAISE;
-      END IF;
-END;
-/
+    sequence_sql:='CREATE SEQUENCE IDN_OAUTH_CONSUMER_APPS_SEQ START WITH 1 INCREMENT BY 1 NOCACHE';
 
-CREATE SEQUENCE IDN_OAUTH_CONSUMER_APPS_SEQ START WITH 1 INCREMENT BY 1 NOCACHE
-/
-CREATE OR REPLACE TRIGGER IDN_OAUTH_CONSUMER_APPS_TRIG
+    trigger_sql:= 'CREATE OR REPLACE TRIGGER IDN_OAUTH_CONSUMER_APPS_TRIG
             BEFORE INSERT
             ON IDN_OAUTH_CONSUMER_APPS
             REFERENCING NEW AS NEW
             FOR EACH ROW
               BEGIN
                 SELECT IDN_OAUTH_CONSUMER_APPS_SEQ.nextval INTO :NEW.ID FROM dual;
-              END;
+              END';
+
+    execute immediate v_sql;
+    execute immediate sequence_sql;
+    execute immediate trigger_sql;
+
+    EXCEPTION
+    WHEN OTHERS THEN
+    IF SQLCODE = -955 THEN
+        NULL; -- suppresses ORA-00955 exception
+    ELSE
+        RAISE;
+    END IF;
+END;
 /
 
 CREATE TABLE APM_SUBSCRIBER (
