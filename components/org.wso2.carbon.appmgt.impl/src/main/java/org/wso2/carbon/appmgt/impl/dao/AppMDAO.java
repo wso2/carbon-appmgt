@@ -459,7 +459,7 @@ public class AppMDAO {
 
             String queryToInsertRecordTwo =
                     "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
-                            "(LAST_INSERT_ID(),?,?,?)";
+                            "(?,?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
@@ -468,9 +468,10 @@ public class AppMDAO {
                     BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
                     if(!StringUtils.isEmpty(propertyId)) {
-                        statementToInsertBusinessOwnerDetails.setString(1, propertyId);
-                        statementToInsertBusinessOwnerDetails.setString(2, businessOwnerProperties.getPropertyValue());
-                        statementToInsertBusinessOwnerDetails.setBoolean(3, businessOwnerProperties.isShowingInStore());
+                        statementToInsertBusinessOwnerDetails.setInt(1, businessOwnerId);
+                        statementToInsertBusinessOwnerDetails.setString(2, propertyId);
+                        statementToInsertBusinessOwnerDetails.setString(3, businessOwnerProperties.getPropertyValue());
+                        statementToInsertBusinessOwnerDetails.setBoolean(4, businessOwnerProperties.isShowingInStore());
                         statementToInsertBusinessOwnerDetails.executeUpdate();
                     }
                 }
@@ -511,7 +512,7 @@ public class AppMDAO {
             String queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
                     "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? ";
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                queryToGetBusinessOwner += "WHERE ROWNUM >= ? AND ROWNUM <= ?";
+                queryToGetBusinessOwner += "AND ROWNUM >= ? AND ROWNUM <= ?";
             } else {
                 queryToGetBusinessOwner += "LIMIT ? , ? ";
             }
