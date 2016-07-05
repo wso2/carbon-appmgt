@@ -8491,24 +8491,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
+            String query = null;
 
             if (sortOption == WebAppSortOption.SORT_BY_CREATED_TIME_DESC) {
-                query = query + " ORDER BY FAV_APP.CREATED_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_CREATED_TIME_DESC);
             } else {
-                query = query + " ORDER BY APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_APP_NAME_ASC);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8558,25 +8548,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
 
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APP.APP_PROVIDER LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_PROVIDER);
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
-                query = query + " AND  APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8629,18 +8608,12 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (sortOption == WebAppSortOption.SORT_BY_SUBSCRIBED_TIME_DESC) {
-                query = query + " ORDER BY APM_SUBSCRIPTION.SUBSCRIPTION_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_SUBSCRIPTION_TIME);
             } else {
-                query = query + " ORDER BY APM_APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setBoolean(1,treatAsSite);
             ps.setInt(2,tenantIdOfStore);
             ps.setInt(3,applicationId);
@@ -8697,19 +8670,14 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
-                query = query + " AND  APM_APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setBoolean(1,treatAsSite);
             ps.setInt(2,tenantIdOfStore);
             ps.setInt(3,applicationId);
