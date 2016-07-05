@@ -23,27 +23,25 @@ package org.wso2.carbon.appmgt.gateway.handlers.security;
 
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a gateway user session.
  */
 public class Session {
 
+private String uuid;
 
-    private String uuid;
-    private boolean isNew;
     private AuthenticationContext authenticationContext;
     private String requestedURL;
     private Map<String, Object> attributes;
+    private List<String> accessedWebAppUUIDs;
 
     public Session() {
         uuid = UUID.randomUUID().toString();
         authenticationContext = new AuthenticationContext();
         attributes = new HashMap<String, Object>();
-        isNew = true;
+        accessedWebAppUUIDs = new ArrayList<String>();
     }
 
     public String getUuid() {
@@ -82,11 +80,11 @@ public class Session {
         attributes.put(attributeName, attributeValue);
     }
 
-    public boolean isNew() {
-        return isNew;
+    public void addAccessedWebAppUUID(String webAppUUID){
+        accessedWebAppUUIDs.add(webAppUUID);
     }
 
-    public void setNew(boolean isNew){
-        this.isNew = isNew;
+    public boolean hasBeenAccessed(String webAppUUID) {
+        return accessedWebAppUUIDs.contains(webAppUUID);
     }
 }

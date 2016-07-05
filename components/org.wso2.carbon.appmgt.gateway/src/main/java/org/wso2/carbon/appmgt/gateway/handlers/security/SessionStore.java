@@ -56,33 +56,21 @@ public class SessionStore {
         return instance;
     }
 
-    public Session getSession(String uuid){
+    public Session getSession(String uuid, boolean createIfNotExists){
 
         Session session = null;
 
-        if(uuid != null){
+        if(createIfNotExists && (uuid == null || (session = sessionCache.get(uuid)) == null)){
 
-            session = sessionCache.get(uuid);
-
-            if(session == null){
-                session = new Session();
-                sessionCache.put(session.getUuid(), session);
-
-                if(log.isDebugEnabled()){
-                    log.debug(String.format("{%s} - A session is not available for '%s'. Created a new session with a new session ID.",
-                            GatewayUtils.getMD5Hash(session.getUuid()), uuid));
-                }
-            }else{
-                session.setNew(false);
-            }
-        }else{
             session = new Session();
             sessionCache.put(session.getUuid(), session);
 
             if(log.isDebugEnabled()){
-                log.debug(String.format("{%s} - Initiated a new session.",
-                                        GatewayUtils.getMD5Hash(session.getUuid())));
+                log.debug(String.format("{%s} - A session is not available for '%s'. Created a new session.",
+                        GatewayUtils.getMD5Hash(session.getUuid()), uuid));
             }
+        }else if(uuid != null){
+            session = sessionCache.get(uuid);
         }
 
         return session;

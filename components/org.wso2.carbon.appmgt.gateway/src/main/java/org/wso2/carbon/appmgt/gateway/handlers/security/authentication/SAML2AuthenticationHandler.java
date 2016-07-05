@@ -20,20 +20,21 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.authentication;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpHeaders;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
@@ -46,7 +47,7 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
 import org.wso2.carbon.appmgt.gateway.handlers.security.SessionStore;
-import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.IDPCallback;
+import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.IDPMessage;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
@@ -61,6 +62,7 @@ import org.wso2.carbon.appmgt.impl.SAMLConstants;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.HttpCookie;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private static final Log log = LogFactory.getLog(SAML2AuthenticationHandler.class);
     private static final String SET_COOKIE_PATTERN = "%s=%s; Path=%s;";
-    private static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
     private static final String SESSION_ATTRIBUTE_JWT = "jwt";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
 
@@ -89,6 +90,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     @Override
     public boolean handleRequest(MessageContext messageContext) {
 
+        // Check per-app anonymous access first.
         Session session = getSession(messageContext);
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
@@ -114,36 +116,164 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         URITemplate matchedTemplate = GatewayUtils.findMatchedURITemplate(webApp, httpVerb, relativeResourceURL);
         messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE, matchedTemplate);
 
-        // If the request comes to the ACS URL, then it should be the SAML response from the IDP.
+        // If the request comes to the ACS URL, then it should be a SAML response or a request from the IDP.
         if(isACSURL(relativeResourceURL)){
+            if(handleRequestToACSEndpoint(messageContext, session)){
+                return false;
+            }
+        }
 
-            // Build the message.
-            try {
-                RelayUtils.buildMessage(axis2MessageContext);
-            } catch (IOException e) {
-                String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                GatewayUtils.logAndThrowException(log, errorMessage, e);
-            } catch (XMLStreamException e) {
-                String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                GatewayUtils.logAndThrowException(log, errorMessage, e);
+        if(GatewayUtils.isAnonymousAccessAllowed(webApp, matchedTemplate)){
+
+            if(log.isDebugEnabled()){
+                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is allowed for anonymous access", fullResourceURL));
             }
 
-            IDPCallback idpCallback = null;
-            try {
-                idpCallback = SAMLUtils.processIDPCallback(messageContext);
+            messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_GATEWAY_SKIP_SECURITY, true);
+            return true;
+        }
 
-                if(idpCallback.getSAMLResponse() == null){
-                    String errorMessage = String.format("A SAML response was not there in the request to the ACS URL ('%s')", fullResourceURL);
-                    GatewayUtils.logAndThrowException(log, errorMessage, null);
+        AuthenticationContext authenticationContext = session.getAuthenticationContext();
+
+        if(!authenticationContext.isAuthenticated()){
+
+            // WORKAROUND : SLO requested is sent by the IDP has no session. So we need to skip authentication for SLO requests.
+            if(GatewayUtils.isLogoutURL(webApp, relativeResourceURL)){
+
+                // Build the message.
+                try {
+                    RelayUtils.buildMessage(axis2MessageContext);
+                } catch (IOException e) {
+                    String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+                    GatewayUtils.logAndThrowException(log, errorMessage, e);
+                } catch (XMLStreamException e) {
+                    String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+                    GatewayUtils.logAndThrowException(log, errorMessage, e);
                 }
-            } catch (SAMLException e) {
-                String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
+
+                try {
+                    IDPMessage idpMessage = SAMLUtils.processIDPMessage(messageContext);
+
+                    if(idpMessage.isSLORequest()){
+
+
+                        OMFactory fac = OMAbstractFactory.getOMFactory();
+                        OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
+                        OMElement payload = fac.createOMElement("SLOResponse", ns);
+
+                        OMElement errorMessage = fac.createOMElement("message", ns);
+                        errorMessage.setText("SLORequest has been successfully processed by WSO2 App Manager");
+
+                        payload.addChild(errorMessage);
+
+                        GatewayUtils.send200(messageContext, payload);
+                        return false;
+                    }
+
+                } catch (SAMLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+            if(log.isDebugEnabled()){
+                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is not authenticated", fullResourceURL));
+            }
+
+            session.setRequestedURL(fullResourceURL);
+            setSessionCookie(messageContext, session.getUuid());
+            requestAuthentication(messageContext);
+            return false;
+        }else {
+
+            if(log.isDebugEnabled()){
+                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
+            }
+
+            // If this web app has not been access before in this session, redirect to the IDP.
+            // This is done to make sure SLO works.
+
+            if(!session.hasBeenAccessed(webApp.getUUID())){
+                GatewayUtils.logWithRequestInfo(log, messageContext, "This web app has not been accessed before in the current session. Doing SSO through IDP since it is needed to make SLO work.");
+                requestAuthentication(messageContext);
+            }
+
+            // Set the session as a message context property.
+            messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, session.getUuid());
+
+            if(shouldSendSAMLResponseToBackend()){
+
+                addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, (String) session.getAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
+
+                if(log.isDebugEnabled()){
+                    GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response has been set in the request to the backend.");
+                }
+            }
+
+            if(isJWTEnabled()){
+
+                String jwtHeaderName = configuration.getFirstProperty(APISecurityConstants.API_SECURITY_CONTEXT_HEADER);
+
+                addTransportHeader(messageContext, jwtHeaderName, (String) session.getAttribute(SESSION_ATTRIBUTE_JWT));
+
+                if(log.isDebugEnabled()){
+                    GatewayUtils.logWithRequestInfo(log, messageContext, "JWT has been set in the request to the backend.");
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private boolean handleRequestToACSEndpoint(MessageContext messageContext, Session session) {
+
+        String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+
+        // Build the message.
+        try {
+            RelayUtils.buildMessage(axis2MessageContext);
+        } catch (IOException e) {
+            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } catch (XMLStreamException e) {
+            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        }
+
+        IDPMessage idpMessage = null;
+        try {
+            idpMessage = SAMLUtils.processIDPMessage(messageContext);
+
+            if(idpMessage.getSAMLResponse() == null && idpMessage.getSAMLRequest() == null){
+                String errorMessage = String.format("A SAML request or response was not there in the request to the ACS URL ('%s')", fullResourceURL);
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
+        } catch (SAMLException e) {
+            String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, null);
+        }
 
-            GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLResponse is available in request.");
+        GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));
 
-            AuthenticationContext authenticationContext = getAuthenticationContextFromIDPCallback(idpCallback);
+        // If not configured, the SLO request URL and the SLO response URL is the ACS URL by default.
+        // So handle this properly.
+        if(idpMessage.isSLOResponse()){
+            try {
+                GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLResponse in an SLO response.");
+                GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
+                return true;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }else if(idpMessage.isSLORequest()){
+            GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLRequest in an SLO request.");
+
+            // Logout handler will handle the rest.
+        }else{
+            AuthenticationContext authenticationContext = getAuthenticationContextFromIDPCallback(idpMessage);
+
 
             if(authenticationContext.isAuthenticated()){;
 
@@ -152,9 +282,17 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 session.setAuthenticationContext(authenticationContext);
-                session.addAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpCallback.getRawSAMLResponse());
+                session.addAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpMessage.getRawSAMLResponse());
 
-                Map<String, Object> userAttributes = getUserAttributes(idpCallback.getSAMLResponse());
+                // Get the SAML session index.
+                String sessionIndex = (String) SAMLUtils.getSessionIndex((ResponseImpl) idpMessage.getSAMLResponse());
+                session.addAttribute(SAMLUtils.SESSION_ATTRIBUTE_SAML_SESSION_INDEX, sessionIndex);
+                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Session index : %s", sessionIndex));
+
+                // Mark this web app as an access web app in this session.
+                session.addAccessedWebAppUUID(webApp.getUUID());
+
+                Map<String, Object> userAttributes = getUserAttributes((ResponseImpl) idpMessage.getSAMLResponse());
                 session.getAuthenticationContext().setAttributes(userAttributes);
 
                 String roleAttributeValue = (String) userAttributes.get("http://wso2.org/claims/role");
@@ -178,8 +316,18 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 SessionStore.getInstance().updateSession(session);
-                redirectToURL(messageContext, session.getRequestedURL());
-                return false;
+                if(session.getRequestedURL() != null){
+                    GatewayUtils.redirectToURL(messageContext, session.getRequestedURL());
+                }else{
+                    try {
+                        log.warn(String.format("Original requested URL in the session is null. Redirecting to the app root URL."));
+                        GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return true;
             }else{
 
                 if(log.isDebugEnabled()){
@@ -187,64 +335,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 requestAuthentication(messageContext);
-                return false;
-            }
-        }else{
-
-            if(GatewayUtils.isAnonymousAccessAllowed(webApp, matchedTemplate)){
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is allowed for anonymous access", fullResourceURL));
-                }
-
-                messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_GATEWAY_SKIP_SECURITY, true);
-                return true;
-            }
-
-            AuthenticationContext authenticationContext = session.getAuthenticationContext();
-
-            if(!authenticationContext.isAuthenticated()){
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is not authenticated", fullResourceURL));
-                }
-
-                session.setRequestedURL(fullResourceURL);
-                setSessionCookie(messageContext, session.getUuid());
-                requestAuthentication(messageContext);
-                return false;
-            }else {
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is authenticated. Subject = '%s'", fullResourceURL, authenticationContext.getSubject()));
-                }
-
-                // Set the session as a message context property.
-                messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, session.getUuid());
-
-                if(shouldSendSAMLResponseToBackend()){
-
-                    addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, (String) session.getAttribute(SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
-
-                    if(log.isDebugEnabled()){
-                        GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response has been set in the request to the backend.");
-                    }
-                }
-
-                if(isJWTEnabled()){
-
-                    String jwtHeaderName = configuration.getFirstProperty(APISecurityConstants.API_SECURITY_CONTEXT_HEADER);
-
-                    addTransportHeader(messageContext, jwtHeaderName, (String) session.getAttribute(SESSION_ATTRIBUTE_JWT));
-
-                    if(log.isDebugEnabled()){
-                        GatewayUtils.logWithRequestInfo(log, messageContext, "JWT has been set in the request to the backend.");
-                    }
-                }
-
                 return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -289,8 +383,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
         }
 
-
-        return GatewayUtils.getSession(messageContext);
+        return GatewayUtils.getSession(messageContext, true);
     }
 
     private void setSessionCookie(MessageContext messageContext, String cookieValue) {
@@ -313,52 +406,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     private void requestAuthentication(MessageContext messageContext) {
-
         AuthnRequest authenticationRequest = SAMLUtils.buildAuthenticationRequest(messageContext, webApp);
-
-        String encodedAuthenticationRequest = null;
-        try {
-            encodedAuthenticationRequest = SAMLUtils.marshallAndEncodeSAMLRequest(authenticationRequest);
-        } catch (SAMLException e) {
-            e.printStackTrace();
-        }
-
-        String samlRequestURL = GatewayUtils.getIDPUrl() + "?SAMLRequest=" + encodedAuthenticationRequest;
-        redirectToURL(messageContext, samlRequestURL);
+        GatewayUtils.redirectToIDPWithSAMLRequest(messageContext, authenticationRequest);
     }
 
-    private AuthenticationContext getAuthenticationContextFromIDPCallback(IDPCallback idpCallback) {
-        AuthenticationContext authenticationContext = SAMLUtils.getAuthenticationContext(idpCallback);
+    private AuthenticationContext getAuthenticationContextFromIDPCallback(IDPMessage idpMessage) {
+        AuthenticationContext authenticationContext = SAMLUtils.getAuthenticationContext(idpMessage);
         return authenticationContext;
-    }
-
-    private void redirectToURL(MessageContext messageContext, String url){
-
-        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext). getAxis2MessageContext();
-        axis2MessageContext.setProperty(NhttpConstants.HTTP_SC, "302");
-
-        messageContext.setResponse(true);
-        messageContext.setProperty("RESPONSE", "true");
-        messageContext.setTo(null);
-        axis2MessageContext.removeProperty("NO_ENTITY_BODY");
-
-        /* Always remove the ContentType - Let the formatter do its thing */
-        axis2MessageContext.removeProperty(Constants.Configuration.CONTENT_TYPE);
-
-        Map headerMap = (Map) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        headerMap.put("Location", url);
-
-        if(log.isDebugEnabled()){
-            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Sending HTTP redirect to '%s'", url));
-        }
-
-        removeIrrelevantHeadersBeforeReponding(headerMap);
-        Axis2Sender.sendBack(messageContext);
-    }
-
-    private void removeIrrelevantHeadersBeforeReponding(Map headerMap) {
-        headerMap.remove(HttpHeaders.HOST);
-        headerMap.remove(HTTPConstants.HEADER_COOKIE);
     }
 
     private boolean isACSURL(String relativeResourceURL) {

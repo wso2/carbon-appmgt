@@ -21,6 +21,10 @@
 package org.wso2.carbon.appmgt.gateway.handlers.security.saml2;
 
 import org.apache.axiom.om.OMElement;
+import org.opensaml.saml2.core.LogoutRequest;
+import org.opensaml.saml2.core.LogoutResponse;
+import org.opensaml.saml2.core.RequestAbstractType;
+import org.opensaml.saml2.core.StatusResponseType;
 import org.opensaml.saml2.core.impl.ResponseImpl;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
@@ -29,18 +33,28 @@ import java.util.List;
 /**
  * Represents the call back request from the IDP.
  */
-public class IDPCallback {
+public class IDPMessage {
 
-    private ResponseImpl samlResponse;
+    private RequestAbstractType samlRequest;
+    private StatusResponseType samlResponse;
     private List<AuthenticatedIDP> authenticatedIDPs;
     private String relayState;
     private String rawSAMLResponse;
+    private String rawSAMLRequest;
 
-    public ResponseImpl getSAMLResponse() {
+    public RequestAbstractType getSAMLRequest() {
+        return samlRequest;
+    }
+
+    public void setSAMLRequest(RequestAbstractType samlRequest) {
+        this.samlRequest = samlRequest;
+    }
+
+    public StatusResponseType getSAMLResponse() {
         return samlResponse;
     }
 
-    public void setSAMLResponse(ResponseImpl samlResponse) {
+    public void setSAMLResponse(StatusResponseType samlResponse) {
         this.samlResponse = samlResponse;
     }
 
@@ -66,5 +80,21 @@ public class IDPCallback {
 
     public String getRawSAMLResponse() {
         return rawSAMLResponse;
+    }
+
+    public String getRawSAMLRequest() {
+        return rawSAMLRequest;
+    }
+
+    public void setRawSAMLRequest(String rawSAMLRequest) {
+        this.rawSAMLRequest = rawSAMLRequest;
+    }
+
+    public boolean isSLOResponse() {
+        return samlResponse != null && samlResponse instanceof LogoutResponse;
+    }
+
+    public boolean isSLORequest() {
+        return samlRequest != null && samlRequest instanceof LogoutRequest;
     }
 }

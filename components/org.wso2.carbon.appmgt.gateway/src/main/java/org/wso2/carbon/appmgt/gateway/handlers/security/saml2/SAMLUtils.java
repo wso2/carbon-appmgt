@@ -36,6 +36,7 @@ import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.util.Base64;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -52,6 +53,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -63,8 +65,12 @@ public class SAMLUtils {
     private static final Log log = LogFactory.getLog(SAMLUtils.class);
 
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE = "SAMLResponse";
+    private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST = "SAMLRequest";
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_AUTHENTICATED_IDPS = "AuthenticatedIdPs";
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
+
+    public static final String SESSION_ATTRIBUTE_SAML_SESSION_INDEX = "samlSessionIndex";
+    public static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
 
     /**
      * Builds and returns a SAML authentication request to the IDP.
@@ -156,9 +162,9 @@ public class SAMLUtils {
      * @return
      * @throws SAMLException
      */
-    public static IDPCallback processIDPCallback(MessageContext messageContext) throws SAMLException {
+    public static IDPMessage processIDPMessage(MessageContext messageContext) throws SAMLException {
 
-        IDPCallback idpCallback = new IDPCallback();
+        IDPMessage idpMessage = new IDPMessage();
 
         Iterator iterator = messageContext.getEnvelope().getBody().getChildElements();
 
@@ -169,26 +175,34 @@ public class SAMLUtils {
             OMElement samlResponse = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE));
 
             if(samlResponse != null){
-                    XMLObject unmarshalledResponse = decodeAndUnmarshallSAMLResponse(samlResponse.getText());
-                    idpCallback.setSAMLResponse((org.opensaml.saml2.core.impl.ResponseImpl) unmarshalledResponse);
-                    idpCallback.setRawSAMLResponse(samlResponse.getText());
+                    XMLObject unmarshalledResponse = decodeAndUnmarshallSAMLRequestOrResponse(samlResponse.getText());
+                    idpMessage.setSAMLResponse((StatusResponseType) unmarshalledResponse);
+                    idpMessage.setRawSAMLResponse(samlResponse.getText());
+            }
+
+            OMElement samlRequest = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST));
+
+            if(samlRequest != null){
+                XMLObject unmarshalledRequest = decodeAndUnmarshallSAMLRequestOrResponse(samlRequest.getText());
+                idpMessage.setSAMLRequest((RequestAbstractType) unmarshalledRequest);
+                idpMessage.setRawSAMLRequest(samlRequest.getText());
             }
 
             OMElement authenticatedIdPs = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_AUTHENTICATED_IDPS));
             if(authenticatedIdPs != null){
                 List<AuthenticatedIDP>  authenticatedIDPsList = getAuthenticatedIDPs(authenticatedIdPs.getText());
-                idpCallback.setAuthenticatedIDPs(authenticatedIDPsList);
+                idpMessage.setAuthenticatedIDPs(authenticatedIDPsList);
             }
 
             OMElement relayState = formData.getFirstChildWithName (new QName(IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE));
             if(relayState != null){
-                idpCallback.setRelayState(relayState.getText());
+                idpMessage.setRelayState(relayState.getText());
             }
 
             break;
         }
 
-        return idpCallback;
+        return idpMessage;
     }
 
     private static List<AuthenticatedIDP> getAuthenticatedIDPs(String encodedIDPs) throws SAMLException {
@@ -234,7 +248,7 @@ public class SAMLUtils {
      * @return
      * @throws SAMLException
      */
-    public static XMLObject decodeAndUnmarshallSAMLResponse(String encodedSAMLResponse) throws SAMLException {
+    public static XMLObject decodeAndUnmarshallSAMLRequestOrResponse(String encodedSAMLResponse) throws SAMLException {
 
         try {
             return SAMLSSOUtil.unmarshall(new String(Base64.decode(encodedSAMLResponse), "UTF-8") );
@@ -249,12 +263,12 @@ public class SAMLUtils {
      *
      * Build and returns the authentication context using the given IDP callback.
      *
-     * @param idpCallback
+     * @param idpMessage
      * @return
      */
-    public static AuthenticationContext getAuthenticationContext(IDPCallback idpCallback) {
+    public static AuthenticationContext getAuthenticationContext(IDPMessage idpMessage) {
 
-        ResponseImpl response = idpCallback.getSAMLResponse();
+        ResponseImpl response = (ResponseImpl) idpMessage.getSAMLResponse();
         Assertion assertion = response.getAssertions().get(0);
 
         AuthenticationContext authenticationContext =  new AuthenticationContext();
@@ -267,7 +281,7 @@ public class SAMLUtils {
             authenticationContext.setSubject(assertion.getSubject().getNameID().getValue());
        }
 
-       authenticationContext.setAuthenticatedIDPs(idpCallback.getAuthenticatedIDPs());
+       authenticationContext.setAuthenticatedIDPs(idpMessage.getAuthenticatedIDPs());
 
        return authenticationContext;
     }
@@ -288,4 +302,39 @@ public class SAMLUtils {
         return assertionConsumerUrl;
     }
 
+    public static LogoutRequest buildLogoutRequest(String issuerName, Session session) {
+
+        LogoutRequest logoutRequest = new LogoutRequestBuilder().buildObject();
+
+        logoutRequest.setID(UUID.randomUUID().toString());
+        logoutRequest.setDestination(GatewayUtils.getIDPUrl());
+
+        DateTime issueInstant = new DateTime();
+        logoutRequest.setIssueInstant(issueInstant);
+        logoutRequest.setNotOnOrAfter(new DateTime(issueInstant.getMillis() + 5 * 60 * 1000));
+
+        IssuerBuilder issuerBuilder = new IssuerBuilder();
+        Issuer issuer = issuerBuilder.buildObject();
+        issuer.setValue(issuerName);
+        logoutRequest.setIssuer(issuer);
+
+        NameID nameId = new NameIDBuilder().buildObject();
+        nameId.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:entity");
+        nameId.setValue(session.getAuthenticationContext().getSubject());
+        logoutRequest.setNameID(nameId);
+
+        SessionIndex sessionIndex = new SessionIndexBuilder().buildObject();
+        sessionIndex.setSessionIndex((String) session.getAttribute(SESSION_ATTRIBUTE_SAML_SESSION_INDEX));
+        logoutRequest.getSessionIndexes().add(sessionIndex);
+
+        logoutRequest.setReason("Single Logout");
+
+        return logoutRequest;
+    }
+
+    public static Object getSessionIndex(ResponseImpl samlResponse) {
+        Assertion assertion = samlResponse.getAssertions().get(0);
+        String sessionIndex = assertion.getAuthnStatements().get(0).getSessionIndex();
+        return sessionIndex;
+    }
 }
