@@ -3039,8 +3039,10 @@ public class AppMDAO {
 
             ps = connection.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
-            ps.setString(2, fromDate);
-            ps.setString(3, toDate);
+            if (fromDate != null && toDate != null) {
+                ps.setString(2, fromDate);
+                ps.setString(3, toDate);
+            }
             result = ps.executeQuery();
             if (result == null) {
                 return users;
@@ -9003,12 +9005,12 @@ public class AppMDAO {
         return status;
     }
 
-    private String addRangeCondition(String rangeField, boolean andNeeded, String connection) {
+    private String addRangeCondition(String rangeField, boolean andNeeded, String connectionType) {
         String query = "";
         if (andNeeded) {
             query += " AND ";
         }
-        if (!connection.contains("Oracle")) {
+        if (!connectionType.contains("Oracle")) {
             query += rangeField + " BETWEEN ? AND ? ";
         } else {
             query += rangeField + " BETWEEN TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
