@@ -97,16 +97,14 @@ public class GatewayUtils {
 
     public static void send401(MessageContext messageContext, String reason) {
 
+        // TODO : remove reason from the method signature since we don't send a reason for 401.
+
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
         OMElement payload = fac.createOMElement("fault", ns);
-
-        OMElement errorMessage = fac.createOMElement("message", ns);
-        errorMessage.setText(reason);
-
-        payload.addChild(errorMessage);
+        payload.setText("Unauthorized");
 
         OMElement firstChild = messageContext.getEnvelope().getBody().getFirstElement();
         if (firstChild != null) {
