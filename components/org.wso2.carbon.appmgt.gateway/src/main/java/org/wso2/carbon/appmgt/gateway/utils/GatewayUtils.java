@@ -193,6 +193,14 @@ public class GatewayUtils {
                     mostSpecificTemplate = uriTemplate;
                 }else if(mostSpecificTemplate.getUriTemplate().split("/").length < uriTemplate.getUriTemplate().split("/").length){
                     mostSpecificTemplate = uriTemplate;
+                }else if(mostSpecificTemplate.getUriTemplate().split("/").length == uriTemplate.getUriTemplate().split("/").length){
+
+                    // If the number of segments of the current the previous templates are the same, give less priority to wildcard
+                    String[] urlSegments = uriTemplate.getUriTemplate().split("/");
+
+                    if (!urlSegments[urlSegments.length - 1].equals("*")){
+                        mostSpecificTemplate = uriTemplate;
+                    }
                 }
             }
         }
