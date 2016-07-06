@@ -2944,32 +2944,26 @@ public class AppMDAO {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate, int tenantId) throws
-                                                                                      AppManagementException {
+                                                                                                AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
-        // List<WebAppInfoDTO> webAppInfoDTOList;
         List<Subscriber> subscribers;
-
-        String sqlQuery =
-                "SELECT SUBR.USER_ID AS USER_ID, API.APP_NAME AS API,API.APP_VERSION, " +
-                        "API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME " +
-                        "FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, " +
-                        "APM_APP API " +
-                        "WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = " +
-                        "APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? ";
-        if (fromDate != null && toDate != null) {
-            sqlQuery += addRangeCondition("SUB.SUBSCRIPTION_TIME", true);
-        }
-
-        sqlQuery += "GROUP BY SUBR.USER_ID, API.APP_NAME, API.APP_VERSION";
-
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
 
         try {
             connection = APIMgtDBUtil.getConnection();
+            String sqlQuery = "SELECT SUBR.USER_ID AS USER_ID,API.APP_NAME AS API, API.APP_VERSION, API.APP_PROVIDER " +
+                    "AS PROVIDER, SUB.SUBSCRIPTION_TIME as TIME  FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, " +
+                    "APM_SUBSCRIPTION SUB, APM_APP API WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND " +
+                    "SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? ";
+
+            if (fromDate != null && toDate != null) {
+                sqlQuery += addRangeCondition("SUB.SUBSCRIPTION_TIME", true, connection.getMetaData().getDriverName());
+            }
+
+            sqlQuery += "GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,SUB.SUBSCRIPTION_TIME";
 
             ps = connection.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
@@ -2981,7 +2975,6 @@ public class AppMDAO {
             if (result == null) {
                 return users;
             }
-
 
             while (result.next()) {
                 String app = result.getString("API")+"/"+result.getString("APP_VERSION");
@@ -3001,8 +2994,7 @@ public class AppMDAO {
                 }
             }
         } catch (SQLException e) {
-            handleException("Failed to get subscribed apps by users for the period " + fromDate + "to " +
-                    toDate, e);
+            handleException("Failed to get subscribed apps by users for the period " + fromDate + "to " + toDate, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
@@ -8862,12 +8854,17 @@ public class AppMDAO {
         return status;
     }
 
-    private String addRangeCondition(String rangeField, boolean andNeeded){
+    private String addRangeCondition(String rangeField, boolean andNeeded, String connectionType) {
         String query = "";
         if (andNeeded) {
             query += " AND ";
         }
-        query += rangeField + " BETWEEN ? AND ?";
+        if (!connectionType.contains("Oracle")) {
+            query += rangeField + " BETWEEN ? AND ? ";
+        } else {
+            query += rangeField + " BETWEEN TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
+                    "HH24:MI:SS') ";
+        }
         return query;
     }
 }
