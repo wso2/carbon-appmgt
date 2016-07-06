@@ -45,10 +45,13 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
-import org.wso2.carbon.appmgt.gateway.handlers.security.AuthenticationContext;
+import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
+import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
+import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.context.CarbonContext;
@@ -163,19 +166,18 @@ public class APIThrottleHandler extends AbstractHandler {
 
 		}
 
-		APPResourceManager resourceManager = new APPResourceManager();
-		VerbInfoDTO verbInfo = getVerbInfo(messageContext, resourceManager);
-		if (verbInfo == null || !verbInfo.isSkipThrottling()) {
+		URITemplate matchedURITemplate = (URITemplate) messageContext.getProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE);
+
+		//VerbInfoDTO verbInfo = getVerbInfo(messageContext, resourceManager);
+
+		if (!matchedURITemplate.isSkipThrottling()) {
 			canAccess = doThrottleByConcurrency(isResponse);
 			// if the access is success through concurrency throttle and if this
 			// is
 			// a request message
 			// then do access rate based throttling
 			if (canAccess && !isResponse && throttle != null) {
-				canAccess =
-				            throttleByAccessRate(axis2MC, cc) &&
-				                    doRoleBasedAccessThrottling(messageContext, cc, verbInfo,
-				                                                resourceManager);
+				canAccess = throttleByAccessRate(axis2MC, cc) && doRoleBasedAccessThrottling(messageContext, cc, matchedURITemplate);
                 if (!canAccess) {
                     handleThrottleOut(messageContext);
                     return false;
@@ -505,127 +507,52 @@ public class APIThrottleHandler extends AbstractHandler {
 		return canAccess;
 	}
 
-	private boolean doRoleBasedAccessThrottling(MessageContext synCtx, ConfigurationContext cc,
-	                                            VerbInfoDTO verbInfo,
-	                                            APPResourceManager resourceManager) {
+	private boolean doRoleBasedAccessThrottling(MessageContext synCtx, ConfigurationContext cc, URITemplate matchedURITemplate) {
 
 		boolean canAccess = true;
 
-		if (throttle.getThrottleContext(ThrottleConstants.ROLE_BASED_THROTTLE_KEY) == null) {
-			// there is no throttle configuration for RoleBase Throttling
-			// skip role base throttling
-			return canAccess;
-		}
+		if (throttle.getThrottleContext(ThrottleConstants.ROLE_BASED_THROTTLE_KEY) != null) {
 
-		ConcurrentAccessController cac = null;
-		if (isClusteringEnable) {
-			// for clustered env.,gets it from axis configuration context
-			cac = (ConcurrentAccessController) cc.getProperty(key);
-		}
 
-		if (!synCtx.isResponse()) {
-			// gets the remote caller role name
-			AuthenticationContext authContext;
-			try {
-				authContext = APPThrottleUtil.getAuthenticationContext(synCtx, resourceManager);
-			} catch (APISecurityException e1) {
-				log.error(e1);
-				return false;
-			}
-			String roleID;
-			String applicationId;
-			String accessToken;
-
-			if (authContext != null) {
-				// Although the method says getApiKey, what is actually returned
-				// is the Bearer header (accessToken)
-				// accessToken = authContext.getApiKey();
-				// roleID = authContext.getTier();
-				applicationId = authContext.getApplicationId();
-				roleID = authContext.getTier();
-				// Application ID is considered as the access token in the
-				// application scenario. If we consider cookies as the access
-				// token, then if the user changes the browser, then he can
-				// access the application with a different cookie.
-				accessToken = applicationId;
-
-			} else {
-				log.warn("No authentication context information found on the request - "
-				         + "ThrottliAPISecurityUtil not applied");
-				return true;
+			ConcurrentAccessController cac = null;
+			if (isClusteringEnable) {
+				// for clustered env.,gets it from axis configuration context
+				cac = (ConcurrentAccessController) cc.getProperty(key);
 			}
 
-			// Domain name based throttling
-			// check whether a configuration has been defined for this role name
-			// or not
-			// loads the ThrottleContext
-			ThrottleContext resourceContext =
-			                                  throttle.getThrottleContext(ThrottleConstants.ROLE_BASED_THROTTLE_KEY);
-			if (resourceContext == null) {
-				log.warn("Unable to load throttle context");
-				return true;
-			}
-			// Loads the ThrottleConfiguration
-			ThrottleConfiguration config = resourceContext.getThrottleConfiguration();
-			if (config != null) {
+			if (!synCtx.isResponse()) {
 
-				AccessInformation info = null;
-				// ==============================Start of Resource level
-				// throttling=========================================
-				String resourceLevelRoleId = null;
-				// no data related to verb information data
-				if (verbInfo == null) {
-					canAccess = false;
-					log.warn("Error while getting throttling information for resource and http verb");
+				Session session = GatewayUtils.getSession(synCtx);
 
-                    synCtx.setProperty(SynapseConstants.ERROR_CODE, HttpStatus.SC_FORBIDDEN);
-                    synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE);
+				AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
-                    Mediator sequence =
-                            synCtx.getSequence(APISecurityConstants.API_AUTH_FAILURE_HANDLER);
-                    if (sequence != null && !sequence.mediate(synCtx)) {
-                        return false;
-                    }
+				ThrottleContext resourceContext = throttle.getThrottleContext(ThrottleConstants.ROLE_BASED_THROTTLE_KEY);
 
-                    org.apache.axis2.context.MessageContext axis2MC =
-                            ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+				if (resourceContext == null) {
+					log.warn("Unable to load throttle context");
+					return true;
+				}
 
-                    try {
-                        RelayUtils.buildMessage(axis2MC);
-                    } catch (IOException e) {
-                        log.error("Error While building message.", e);
-                    } catch (XMLStreamException e) {
-                        log.error("Error While building message.", e);
-                    }
+				ThrottleConfiguration config = resourceContext.getThrottleConfiguration();
 
+				if (config != null) {
 
-                    Utils.setSOAPFault(synCtx, "Server", "Resource not found",
-                            APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE);
+					AccessInformation info = null;
 
+					String resourceLevelRoleId = null;
 
-                    if (Utils.isCORSEnabled()) {
-                        Map<String, String> headers =
-                                (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
-                                Utils.getAllowedOrigin((String) headers.get("Origin")));
-                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_METHODS,
-                                Utils.getAllowedMethods());
-                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
-                                Utils.getAllowedHeaders());
-                        axis2MC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
-                    }
-                    Utils.sendFault(synCtx, HttpStatus.SC_FORBIDDEN);
-                    return canAccess;
-                } else {
 					// Not only we can proceed
-					String resourceAndHTTPVerbThrottlingTier = verbInfo.getThrottling();
+					String resourceAndHTTPVerbThrottlingTier = matchedURITemplate.getPolicyGroup().getThrottlingTier();
+
 					// If there no any tier then we need to set it as unlimited
 					if (resourceAndHTTPVerbThrottlingTier == null) {
-						log.warn("Unable to find throttling information for resource and http verb. Throttling will not apply");
+						log.warn(String.format("Unable to find throttling information for the requested resource '%s:%s'. Throttling will not apply.", matchedURITemplate.getHTTPVerb(), matchedURITemplate.getUriTemplate()));
 					} else {
 						resourceLevelRoleId = resourceAndHTTPVerbThrottlingTier;
 					}
-					String resourceAndHTTPVerbKey = verbInfo.getRequestKey() + "-" + accessToken;
+
+					String resourceAndHTTPVerbKey = matchedURITemplate.getHTTPVerb() + matchedURITemplate.getUriTemplate() + "-" + authenticationContext.getSubject();
+
 					// resourceLevelTier should get from auth context or request
 					// synapse context
 					// getResourceAuthenticationScheme(apiContext, apiVersion,
@@ -644,16 +571,16 @@ public class APIThrottleHandler extends AbstractHandler {
 							// Unlimited Tier and
 							// if application level throttling has passed
 							if (!AppMConstants.UNLIMITED_TIER.equals(resourceLevelRoleId) &&
-							    (info == null || info.isAccessAllowed())) {
+									(info == null || info.isAccessAllowed())) {
 								// Throttle by resource and http verb
 								info =
-								       roleBasedAccessController.canAccess(resourceContext,
-								                                           resourceAndHTTPVerbKey,
-								                                           resourceAndHTTPVerbThrottlingTier);
+										roleBasedAccessController.canAccess(resourceContext,
+												resourceAndHTTPVerbKey,
+												resourceAndHTTPVerbThrottlingTier);
 							}
 						} catch (ThrottleException e) {
 							log.warn("Exception occurred while performing resource"
-							         + "based throttling", e);
+									+ "based throttling", e);
 							canAccess = false;
 							return canAccess;
 						}
@@ -679,7 +606,7 @@ public class APIThrottleHandler extends AbstractHandler {
 										Replicator.replicate(cc, new String[] { key });
 									} catch (ClusteringFault clusteringFault) {
 										log.error("Error during replicating states",
-										          clusteringFault);
+												clusteringFault);
 									}
 								}
 							}
@@ -688,91 +615,10 @@ public class APIThrottleHandler extends AbstractHandler {
 						}
 					} else {
 						log.warn("Unable to find the throttle policy for role: " +
-						         resourceLevelRoleId);
-					}
-				}
-				// ==============================End of Resource level
-				// throttling=========================================
-
-				// ---------------Start of WebApp level
-				// throttling------------------
-
-				// Domain name based throttling
-				// check whether a configuration has been defined for this role
-				// name or not
-				// loads the ThrottleContext
-				ThrottleContext context =
-				                          throttle.getThrottleContext(ThrottleConstants.ROLE_BASED_THROTTLE_KEY);
-				if (context == null) {
-					log.warn("Unable to load throttle context");
-					return true;
-				}
-
-				if (AppMConstants.UNLIMITED_TIER.equals(roleID)) {
-					return canAccess;
-				}
-
-				// check for configuration role of the caller
-				String consumerRoleID = config.getConfigurationKeyOfCaller(roleID);
-				if (consumerRoleID != null) {
-					// If this is a clustered env.
-					// if (isClusteringEnable) {
-					// context.setConfigurationContext(cc);
-					context.setThrottleId(id);
-					// }
-
-					try {
-						// If the application has not been subscribed to the
-						// Unlimited Tier and
-						// if application level throttling has passed
-						if (!AppMConstants.UNLIMITED_TIER.equals(roleID) &&
-						    (info == null || info.isAccessAllowed())) {
-							// Throttle by access token
-							String apiContext =
-							                    (String) synCtx.getProperty(RESTConstants.REST_API_CONTEXT);
-							String apiVersion =
-							                    (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-
-							info =
-							       roleBasedAccessController.canAccess(context, apiContext +
-							                                                    apiVersion +
-							                                                    accessToken,
-							                                           consumerRoleID);
-						}
-					} catch (ThrottleException e) {
-						log.warn("Exception occurred while performing role " + "based throttling",
-						         e);
-						canAccess = false;
+								resourceLevelRoleId);
 					}
 
-					// check for the permission for access
-					if (info != null && !info.isAccessAllowed()) {
 
-						// In the case of both of concurrency throttling and
-						// rate based throttling have enabled ,
-						// if the access rate less than maximum concurrent
-						// access ,
-						// then it is possible to occur death situation.To avoid
-						// that reset,
-						// if the access has denied by rate based throttling
-						if (cac != null) {
-							cac.incrementAndGet();
-							// set back if this is a clustered env
-							if (isClusteringEnable) {
-								cc.setProperty(key, cac);
-								// replicate the current state of
-								// ConcurrentAccessController
-								try {
-									Replicator.replicate(cc, new String[] { key });
-								} catch (ClusteringFault clusteringFault) {
-									log.error("Error during replicating states", clusteringFault);
-								}
-							}
-						}
-						canAccess = false;
-					}
-				} else {
-					log.warn("Unable to find the throttle policy for role: " + roleID);
 				}
 			}
 		}
