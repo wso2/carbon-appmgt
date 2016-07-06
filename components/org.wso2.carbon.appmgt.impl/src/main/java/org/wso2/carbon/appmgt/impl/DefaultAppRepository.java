@@ -159,6 +159,7 @@ public class DefaultAppRepository implements AppRepository {
                 policyGroup.setPolicyGroupId(resultSetOfURLMappings.getInt("POLICY_GRP_ID"));
                 policyGroup.setUserRoles(resultSetOfURLMappings.getString("USER_ROLES"));
                 policyGroup.setAllowAnonymous(resultSetOfURLMappings.getBoolean("URL_ALLOW_ANONYMOUS"));
+                policyGroup.setThrottlingTier(resultSetOfURLMappings.getString("THROTTLING_TIER"));
 
                 URITemplate uriTemplate = new URITemplate();
                 uriTemplate.setPolicyGroup(policyGroup);
