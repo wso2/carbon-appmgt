@@ -165,7 +165,8 @@ public class AppMDAO {
 
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
             statementToDeleteRecord.setString(1, businessOwnerId);
-            int i = statementToDeleteRecord.executeUpdate();
+            statementToDeleteRecord.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             if (connection != null) {
                 try {
@@ -203,8 +204,10 @@ public class AppMDAO {
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
                 String artifactContext = artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER);
-                if (artifactContext.equalsIgnoreCase(businessOwnerId)) {
-                    return true;
+                if (artifactContext != null) {
+                    if (artifactContext.equalsIgnoreCase(businessOwnerId)) {
+                        return true;
+                    }
                 }
             }
         } catch (RegistryException e) {
