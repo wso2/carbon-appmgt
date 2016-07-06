@@ -39,6 +39,7 @@ import org.wso2.carbon.user.core.UserRealm;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -109,7 +110,10 @@ public final class SelfSignUpUtil {
 
                 Resource resource = registry.get(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION);
                 // build config from registry resource
-                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+
                 String configXml = new String((byte[]) resource.getContent());
                 InputSource configInputSource = new InputSource();
                 configInputSource.setCharacterStream(new StringReader(configXml.trim()));

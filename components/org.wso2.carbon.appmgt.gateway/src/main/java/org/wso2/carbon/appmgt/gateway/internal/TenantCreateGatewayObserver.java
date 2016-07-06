@@ -165,13 +165,13 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         SequenceMediatorFactory factory = new SequenceMediatorFactory();
         try {
             if (resourceMisMatchSequence == null) {
-                in = FileUtils.openInputStream(new File(synapseConfigRootPath + resourceMisMatchSequenceName + ".xml"));
+                in = FileUtils.openInputStream(new File(synapseConfigRootPath, resourceMisMatchSequenceName + ".xml"));
                 builder = new StAXOMBuilder(in);
                 resourceMisMatchSequence = (SequenceMediator) factory.createMediator(builder.getDocumentElement(), new Properties());
                 resourceMisMatchSequence.setFileName(resourceMisMatchSequenceName + ".xml");
             }
             if (throttleOutSequence == null) {
-                in = FileUtils.openInputStream(new File(synapseConfigRootPath + throttleOutSequenceName + ".xml"));
+                in = FileUtils.openInputStream(new File(synapseConfigRootPath, throttleOutSequenceName + ".xml"));
                 builder = new StAXOMBuilder(in);
                 throttleOutSequence = (SequenceMediator) factory.createMediator(builder.getDocumentElement(), new Properties());
                 throttleOutSequence.setFileName(throttleOutSequenceName + ".xml");
