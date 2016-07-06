@@ -396,7 +396,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if(cookieTokens != null && cookieTokens.length > 0){
                 for(String cookieToken : cookieTokens){
                     String[] cookieNameAndValue = cookieToken.split("=");
-                    cookies.put(cookieNameAndValue[0].trim(), cookieNameAndValue[1].trim());
+                    if(cookieNameAndValue != null && cookieNameAndValue.length == 2){
+                        cookies.put(cookieNameAndValue[0].trim(), cookieNameAndValue[1].trim());
+                    }
                 }
             }
         }
