@@ -36,14 +36,7 @@ public class SessionStore {
 
     private static SessionStore instance;
 
-    private Cache<String, Session> sessionCache;
-
     private static Log log = LogFactory.getLog(SessionStore.class);
-
-    private SessionStore(){
-        sessionCache = Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).
-                                getCache(AppMConstants.GATEWAY_SESSION_CACHE);
-    }
 
     public static SessionStore getInstance() {
         if (instance == null) {
@@ -60,27 +53,32 @@ public class SessionStore {
 
         Session session = null;
 
-        if(createIfNotExists && (uuid == null || (session = sessionCache.get(uuid)) == null)){
+        if(createIfNotExists && (uuid == null || (session = getSessionCache().get(uuid)) == null)){
 
             session = new Session();
-            sessionCache.put(session.getUuid(), session);
+            getSessionCache().put(session.getUuid(), session);
 
             if(log.isDebugEnabled()){
                 log.debug(String.format("{%s} - A session is not available for '%s'. Created a new session.",
                         GatewayUtils.getMD5Hash(session.getUuid()), uuid));
             }
         }else if(uuid != null){
-            session = sessionCache.get(uuid);
+            session = getSessionCache().get(uuid);
         }
 
         return session;
     }
 
     public void updateSession(Session session){
-        sessionCache.put(session.getUuid(), session);
+        getSessionCache().put(session.getUuid(), session);
     }
 
     public void removeSession(String uuid) {
-        sessionCache.remove(uuid);
+        getSessionCache().remove(uuid);
+    }
+
+    private Cache<String, Session> getSessionCache() {
+        return Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).
+                getCache(AppMConstants.GATEWAY_SESSION_CACHE);
     }
 }
