@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -85,20 +86,101 @@ public class DefaultAppRepository implements AppRepository {
     @Override
     public App getApp(String type, String uuid) throws AppManagementException {
 
-        Map<String, String> searchTerms = new HashMap<String, String>();
-        searchTerms.put("id", uuid);
 
-        List<App> result = searchApps(type, searchTerms);
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, type);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(uuid);
 
-        if(result.size() == 1){
-            return result.get(0);
-        }else if(result.isEmpty()) {
-            return null;
-        }else{
-            //flag an error.
-            throw new AppManagementException("Duplicate entries found for the given uuid.");
+            if(artifact != null){
+                return getApp(type, artifact);
+            }else{
+                return null;
+            }
+        } catch (GovernanceException e) {
+            throw new AppManagementException(String.format("Error while querying registry for '%s':'%s'", type, uuid));
+        }
+    }
+
+    @Override
+    public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicInfo = null;
+        PreparedStatement preparedStatementToGetURLMappings = null;
+        ResultSet resultSetOfBasicInfo = null;
+        ResultSet resultSetOfURLMappings  = null;
+
+        WebApp webApp = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+
+            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ? AND TENANT_ID = ?";
+            preparedStatementToGetBasicInfo = connection.prepareStatement(basicQuery);
+            preparedStatementToGetBasicInfo.setString(1, context);
+            preparedStatementToGetBasicInfo.setString(2, version);
+            preparedStatementToGetBasicInfo.setInt(3, tenantId);
+
+            resultSetOfBasicInfo = preparedStatementToGetBasicInfo.executeQuery();
+
+            while(resultSetOfBasicInfo.next()){
+
+                String appName = resultSetOfBasicInfo.getString("APP_NAME");
+                String appProvider = resultSetOfBasicInfo.getString("APP_PROVIDER");
+                APIIdentifier id = new APIIdentifier(appProvider, appName, version);
+                webApp = new WebApp(id);
+
+                webApp.setDatabaseId(resultSetOfBasicInfo.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicInfo.getString("UUID"));
+
+                webApp.setVersion(version);
+                webApp.setContext(context);
+                webApp.setTrackingCode(resultSetOfBasicInfo.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicInfo.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicInfo.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicInfo.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicInfo.getString("APP_ENDPOINT"));
+
+                // There should be only one app for the given combination
+                break;
+            }
+
+            String urlMappingQuery = "SELECT * from APM_APP_URL_MAPPING URL, APM_POLICY_GROUP POLICY " +
+                                        "WHERE URL.POLICY_GRP_ID = POLICY.POLICY_GRP_ID AND URL.APP_ID = ?";
+
+            preparedStatementToGetURLMappings = connection.prepareStatement(urlMappingQuery);
+            preparedStatementToGetURLMappings.setInt(1, webApp.getDatabaseId());
+            resultSetOfURLMappings = preparedStatementToGetURLMappings.executeQuery();
+
+            while (resultSetOfURLMappings.next()){
+
+                EntitlementPolicyGroup policyGroup = new EntitlementPolicyGroup();
+                policyGroup.setPolicyGroupName(resultSetOfURLMappings.getString("NAME"));
+                policyGroup.setPolicyGroupId(resultSetOfURLMappings.getInt("POLICY_GRP_ID"));
+                policyGroup.setUserRoles(resultSetOfURLMappings.getString("USER_ROLES"));
+                policyGroup.setAllowAnonymous(resultSetOfURLMappings.getBoolean("URL_ALLOW_ANONYMOUS"));
+
+                URITemplate uriTemplate = new URITemplate();
+                uriTemplate.setPolicyGroup(policyGroup);
+                uriTemplate.setHTTPVerb(resultSetOfURLMappings.getString("HTTP_METHOD"));
+                uriTemplate.setUriTemplate(resultSetOfURLMappings.getString("URL_PATTERN"));
+
+                webApp.addURITemplate(uriTemplate);
+            }
+
+
+            return webApp;
+
+        } catch (SQLException e) {
+           handleException(String.format("Error occured while fetch the web app from database for context:'%s', version:'%s'", context, version), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicInfo, null, resultSetOfBasicInfo);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetURLMappings, null, resultSetOfURLMappings);
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
         }
 
+
+        return null;
     }
 
     @Override
@@ -359,6 +441,23 @@ public class DefaultAppRepository implements AppRepository {
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
+    }
+
+    @Override
+    public Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException {
+
+        Connection connection = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            return new AppMDAO().getEnterpriseSubscription(webAppContext, webAppVersion, connection);
+        } catch (SQLException e) {
+            handleException(String.format("Can't enterprise subscription for '%s':'%s'", webAppContext, webAppVersion), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+
+        return null;
     }
     // ------------------- END : Repository API implementation methods. ----------------------------------
 

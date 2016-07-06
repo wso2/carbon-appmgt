@@ -31,46 +31,16 @@ import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIKey;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.Application;
-import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
-import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.JavaPolicy;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Subscription;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
-import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
-import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
+import org.wso2.carbon.appmgt.impl.dto.*;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
-import org.wso2.carbon.appmgt.impl.utils.APIVersionComparator;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.LRUCache;
-import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
+import org.wso2.carbon.appmgt.impl.utils.*;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
@@ -96,31 +66,11 @@ import org.wso2.carbon.utils.xml.StringUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -6162,7 +6112,7 @@ public class AppMDAO {
      * @param connection SQL Connection to the data store
      * @return The enterprise subscription if there is one. Null otherwise.
      */
-    private Subscription getEnterpriseSubscription(String appContext, String appVersion, Connection connection){
+    public Subscription getEnterpriseSubscription(String appContext, String appVersion, Connection connection){
 
         Subscription subscription = null;
 
