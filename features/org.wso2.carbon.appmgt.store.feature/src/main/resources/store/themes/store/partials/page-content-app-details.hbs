@@ -72,15 +72,18 @@
                                 <i class="fw fw-heart"></i>{{t "Add to Favorites"}}
                             </a>
                         {{/if}}
-                        {{#if isSelfSubscriptionEnabled}}
-                            {{#if isSubscribed}}
-                                <a href="#" id="btnUnsubscribe" class="btn btn-default">
-                                    {{t "Un-Subscribe"}}
-                                </a>
-                            {{else}}
-                                <a href="#" id="btnSubscribe" class="btn btn-subscribe">
-                                    <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
-                                </a>
+                        {{#if asset.attributes.overview_allowAnonymous}}
+                        {{else}}
+                            {{#if isSelfSubscriptionEnabled}}
+                                {{#if isSubscribed}}
+                                    <a href="#" id="btnUnsubscribe" class="btn btn-default">
+                                        {{t "Un-Subscribe"}}
+                                    </a>
+                                {{else}}
+                                    <a href="#" id="btnSubscribe" class="btn btn-subscribe">
+                                        <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
+                                    </a>
+                                {{/if}}
                             {{/if}}
                         {{/if}}
                     {{else}}
