@@ -95,9 +95,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             if (fileInputStream != null) {
                 if ("application".equals(fileDetail.getContentType().getType())) {
+                    String fileName = fileDetail.getContentDisposition().getParameter("filename");
+
+                    if(!RestApiUtil.isValidFileName(fileName)){
+                        RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' has been provided to upload", log);
+                    }
 
                     String fileExtension =
-                            FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter("filename"));
+                            FilenameUtils.getExtension(fileName);
                     if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                             AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
@@ -154,6 +159,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         File binaryFile = null;
         String contentType = null;
         try {
+            if(!RestApiUtil.isValidFileName(fileName)){
+                RestApiUtil.handleBadRequest("Invalid filename '"+fileName +"' is provided", log);
+            }
+
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
@@ -211,8 +220,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                 FileContent fileContent = new FileContent();
                 if ("image".equals(fileDetail.getContentType().getType()) ||
                         "application".equals(fileDetail.getContentType().getType())) {
-                    String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
-                            RestApiConstants.CONTENT_DISPOSITION_FILENAME));
+                    String fileName = fileDetail.getContentDisposition().getParameter(
+                            RestApiConstants.CONTENT_DISPOSITION_FILENAME);
+                    if(!RestApiUtil.isValidFileName(fileName)){
+                        RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' has been provided to upload", log);
+                    }
+
+                    String fileExtension = FilenameUtils.getExtension(fileName);
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     fileContent.setFileName(filename);
                     fileContent.setContent(fileInputStream);

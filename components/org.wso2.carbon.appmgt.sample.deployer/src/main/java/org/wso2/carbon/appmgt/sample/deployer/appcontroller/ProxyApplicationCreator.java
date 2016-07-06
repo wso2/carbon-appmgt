@@ -36,6 +36,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
@@ -56,7 +57,7 @@ public class ProxyApplicationCreator {
     private ConcurrentHashMap<String, String> trackingCodes;
     private InvokeStatistcsJavascriptBuilder invokeStatistcsJavascriptBuilder;
     private String ipAddress = "localhost";
-    private Random random;
+    private SecureRandom random;
     private String adminPublisherSession;
     private ApplicationPublisher applicationPublisher;
     private ApplicationSubscriber applicationSubscriber;
@@ -75,7 +76,7 @@ public class ProxyApplicationCreator {
         trackingCodes = new ConcurrentHashMap<String, String>();
         applicationPublisher = new ApplicationPublisher();
         applicationSubscriber = new ApplicationSubscriber();
-        random = new Random();
+        random = new SecureRandom();
         String errorMessage = "Error while creating a WSRegistryServiceClient";
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);

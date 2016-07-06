@@ -28,6 +28,7 @@ import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
@@ -518,7 +519,7 @@ public class RestApiUtil {
         FileOutputStream outFileStream = null;
 
         try {
-            outFileStream = new FileOutputStream(new File(storageLocation, newFileName));
+            outFileStream = new FileOutputStream(new File(AppManagerUtil.resolvePath(storageLocation, newFileName)));
             int read;
             byte[] bytes = new byte[1024];
             while ((read = uploadedInputStream.read(bytes)) != -1) {
@@ -538,10 +539,17 @@ public class RestApiUtil {
         File storageFile = null;
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String filePath =
-                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION) + fileName;
-        storageFile = new File(filePath);
+        storageFile = new File(AppManagerUtil.resolvePath(
+                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION), fileName));
         return storageFile;
+    }
+
+    public static boolean isValidFileName(String fileName){
+        boolean isValid = true;
+        if(fileName == null || StringUtils.isEmpty(fileName) || (fileName.indexOf('\u0000') > 0)){
+            isValid = false;
+        }
+        return isValid;
     }
 
     public static String readFileContentType(String filePath) throws AppManagementException{

@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -230,7 +231,8 @@ public class APPMgtGoogleAnalayticsHandler extends AbstractHandler {
      * @return
      */
     private static String getRandomNumber() {
-        return Integer.toString((int) (Math.random() * 0x7fffffff));
+        SecureRandom secureRandom = new SecureRandom();
+        return Integer.toString((int) (secureRandom.nextInt() * 0x7fffffff));
     }
 
     /**

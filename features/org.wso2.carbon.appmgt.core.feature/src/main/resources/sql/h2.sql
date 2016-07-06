@@ -282,7 +282,16 @@ INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DI
 VALUES ('Reverse Proxy Handler','org.wso2.carbon.appmgt.gateway.handlers.proxy.ReverseProxyHandler','',1,TRUE,TRUE);
 
 INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DISPLAY_ORDER_SEQ_NO,IS_MANDATORY,IS_GLOBAL)
-VALUES ('SAML2 Authentication Handler','org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAML2AuthenticationHandler','',2,TRUE,TRUE);
+VALUES ('SAML2 Authentication Handler','org.wso2.carbon.appmgt.gateway.handlers.security.authentication.SAML2AuthenticationHandler','',2,TRUE,TRUE);
+
+INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DISPLAY_ORDER_SEQ_NO,IS_MANDATORY,IS_GLOBAL)
+VALUES ('Subscription Handler', 'org.wso2.carbon.appmgt.gateway.handlers.subscription.SubscriptionsHandler', '', 3,TRUE,TRUE);
+
+INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DISPLAY_ORDER_SEQ_NO,IS_MANDATORY,IS_GLOBAL)
+VALUES ('Authorization Handler', 'org.wso2.carbon.appmgt.gateway.handlers.security.entitlement.AuthorizationHandler','',4,TRUE,TRUE);
+
+INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DISPLAY_ORDER_SEQ_NO,IS_MANDATORY,IS_GLOBAL)
+VALUES ('Logout Handler', 'org.wso2.carbon.appmgt.gateway.handlers.security.authentication.SAML2LogoutHandler','',5,TRUE,TRUE);
 
 INSERT INTO APM_APP_JAVA_POLICY(DISPLAY_NAME, FULL_QUALIFI_NAME, DESCRIPTION, DISPLAY_ORDER_SEQ_NO,IS_MANDATORY,IS_GLOBAL)
 VALUES ('Entitlement Handler','org.wso2.carbon.appmgt.gateway.handlers.security.entitlement.EntitlementHandler','',3,TRUE,TRUE);

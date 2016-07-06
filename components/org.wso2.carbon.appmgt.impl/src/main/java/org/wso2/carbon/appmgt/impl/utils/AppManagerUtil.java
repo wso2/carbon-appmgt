@@ -132,6 +132,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1510,6 +1512,44 @@ public final class AppManagerUtil {
 
 		return gatewayURLs;
 	}
+
+    /**
+     *
+     * Returns the HTTP URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                                                    .getAPIManagerConfiguration()
+                                                    .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpGatewayURL = gatewayURLs.split(",")[0];
+
+        return httpGatewayURL;
+    }
+
+    /**
+     *
+     * Returns the HTTPS URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPSURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration()
+                .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpsGatewayURL = gatewayURLs.split(",")[1];
+
+        return httpsGatewayURL;
+    }
 
 	/**
 	 * Gateway endpoint has HTTP and HTTPS endpoints.
@@ -3905,5 +3945,30 @@ public final class AppManagerUtil {
         return getHttpClient(port, protocol);
     }
 
+    /**
+     * Resolve file path avoiding Potential Path Traversals
+     *
+     * @param baseDirPath base directory file path
+     * @param fileName    filename
+     * @return
+     */
+    public static String resolvePath(String baseDirPath, String fileName) {
+        final Path basePath = Paths.get(baseDirPath);
+        final Path filePath = Paths.get(fileName);
+        if (!basePath.isAbsolute()) {
+            throw new IllegalArgumentException("Base directory path '" + baseDirPath + "' must be absolute");
+        }
+        if (filePath.isAbsolute()) {
+            throw new IllegalArgumentException("Invalid file name '" + fileName + "' with an absolute file path is provided");
+        }
+        // Join the two paths together, then normalize so that any ".." elements
+        final Path resolvedPath = basePath.resolve(filePath).normalize();
 
+        // Make sure the resulting path is still within the required directory.
+        if (!resolvedPath.startsWith(baseDirPath)) {
+            throw new IllegalArgumentException("File '" + fileName + "' is not within the required directory.");
+        }
+
+        return String.valueOf(resolvedPath);
+    }
 }
