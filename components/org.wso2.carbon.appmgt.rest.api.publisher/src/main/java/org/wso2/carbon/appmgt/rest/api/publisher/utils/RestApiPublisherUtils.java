@@ -35,6 +35,7 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -124,7 +125,7 @@ public class RestApiPublisherUtils {
             }
 
             RestApiUtil.transferFile(inputStream, filename, docFile.getAbsolutePath());
-            docInputStream = new FileInputStream(docFile.getAbsolutePath() + File.separator + filename);
+            docInputStream = new FileInputStream(AppManagerUtil.resolvePath(docFile.getAbsolutePath(), filename));
             String mediaType = fileDetails.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
             mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
             apiProvider.addFileToDocumentation(webApp, documentation, filename, docInputStream, mediaType);
