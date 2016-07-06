@@ -351,8 +351,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     }
 
-    // ----------------------------------------------------------------------------------------------------------
-
     private Session getSession(MessageContext messageContext) {
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
@@ -360,30 +358,42 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         String cookieHeaderValue = (String) headers.get(HTTPConstants.HEADER_COOKIE);
 
-        boolean isCookiePresent = false;
         if(cookieHeaderValue != null){
-            List<HttpCookie> cookies = HttpCookie.parse(cookieHeaderValue);
 
-            for(HttpCookie cookie : cookies){
-                if(AppMConstants.APPM_SAML2_COOKIE.equals(cookie.getName())){
+            Map<String, String> cookies = parseRequestCookieHeader(cookieHeaderValue);
 
-                    messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, cookie.getValue());
-                    isCookiePresent = true;
-
-                    if(log.isDebugEnabled()){
-                        GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is available in the request.", AppMConstants.APPM_SAML2_COOKIE));
-                    }
+            if(cookies.get(AppMConstants.APPM_SAML2_COOKIE) != null){
+                if(log.isDebugEnabled()){
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is available in the request.", AppMConstants.APPM_SAML2_COOKIE));
+                }
+                messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, cookies.get(AppMConstants.APPM_SAML2_COOKIE));
+            }else{
+                if(log.isDebugEnabled()){
+                    GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is not available in the request.", AppMConstants.APPM_SAML2_COOKIE));
                 }
             }
         }
 
-        if(!isCookiePresent){
-            if(log.isDebugEnabled()){
-                GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Cookie '%s' is not available in the request.", AppMConstants.APPM_SAML2_COOKIE));
+        return GatewayUtils.getSession(messageContext, true);
+    }
+
+    private Map<String, String> parseRequestCookieHeader(String cookieHeaderValue) {
+
+        Map<String, String> cookies = new HashMap<String, String>();
+
+        if(cookieHeaderValue != null){
+
+            String [] cookieTokens = cookieHeaderValue.split(";");
+
+            if(cookieTokens != null && cookieTokens.length > 0){
+                for(String cookieToken : cookieTokens){
+                    String[] cookieNameAndValue = cookieToken.split("=");
+                    cookies.put(cookieNameAndValue[0].trim(), cookieNameAndValue[1].trim());
+                }
             }
         }
 
-        return GatewayUtils.getSession(messageContext, true);
+        return cookies;
     }
 
     private void setSessionCookie(MessageContext messageContext, String cookieValue) {
