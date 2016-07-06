@@ -171,7 +171,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     }
 
                 } catch (SAMLException e) {
-                    e.printStackTrace();
+                    GatewayUtils.logAndThrowException(log, "Can't build SLO response to be sent to the IDP.", e);
                 }
 
             }
@@ -269,11 +269,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
         }else if(idpMessage.isSLORequest()){
             GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLRequest in an SLO request.");
-
             // Logout handler will handle the rest.
         }else{
-            AuthenticationContext authenticationContext = getAuthenticationContextFromIDPCallback(idpMessage);
 
+            if(idpMessage.isResponseValidityPeriodExpired()){
+
+                if(log.isDebugEnabled()){
+                    GatewayUtils.logWithRequestInfo(log, messageContext, "The validity period of the SAML Response is expired.");
+                }
+                requestAuthentication(messageContext);
+                return false;
+            }
+
+            AuthenticationContext authenticationContext = getAuthenticationContextFromIDPCallback(idpMessage);
 
             if(authenticationContext.isAuthenticated()){;
 
@@ -388,7 +396,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if(cookieTokens != null && cookieTokens.length > 0){
                 for(String cookieToken : cookieTokens){
                     String[] cookieNameAndValue = cookieToken.split("=");
-                    cookies.put(cookieNameAndValue[0].trim(), cookieNameAndValue[1].trim());
+                    if(cookieNameAndValue != null && cookieNameAndValue.length == 2){
+                        cookies.put(cookieNameAndValue[0].trim(), cookieNameAndValue[1].trim());
+                    }
                 }
             }
         }

@@ -20,12 +20,8 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.saml2;
 
-import org.apache.axiom.om.OMElement;
-import org.opensaml.saml2.core.LogoutRequest;
-import org.opensaml.saml2.core.LogoutResponse;
-import org.opensaml.saml2.core.RequestAbstractType;
-import org.opensaml.saml2.core.StatusResponseType;
-import org.opensaml.saml2.core.impl.ResponseImpl;
+import org.joda.time.DateTime;
+import org.opensaml.saml2.core.*;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
 import java.util.List;
@@ -96,5 +92,24 @@ public class IDPMessage {
 
     public boolean isSLORequest() {
         return samlRequest != null && samlRequest instanceof LogoutRequest;
+    }
+
+    public boolean isResponseValidityPeriodExpired() {
+
+        DateTime notOnOrAfterTimestamp = null;
+
+        if(samlResponse != null){
+            Response response = (Response) samlResponse;
+            Assertion assertion = response.getAssertions().get(0);
+            if(assertion != null){
+                notOnOrAfterTimestamp = assertion.getConditions().getNotOnOrAfter();
+            }
+        }
+
+        if(notOnOrAfterTimestamp != null && notOnOrAfterTimestamp.compareTo(new DateTime()) < 1){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
