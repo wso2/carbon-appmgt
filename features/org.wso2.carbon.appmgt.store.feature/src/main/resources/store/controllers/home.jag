@@ -316,7 +316,7 @@ function isSubscribed(asset, user, subscriptionService) {
     var defaultApplicationName = "DefaultApplication";
     var tenantUsername = user ? user.username : null;
     var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
-                                                                     tenantUsername).subscription;
+                                                                     String(tenantUsername)).subscription;
     if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
         return true;
     }
