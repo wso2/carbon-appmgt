@@ -65,7 +65,9 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
     }
 
     public SortedMap<String, String> getClaims(String endUserName) throws AppManagementException {
-        SortedMap<String, String> claimValues;
+
+        SortedMap<String, String> claimValues = null;
+
         try {
             int tenantId = AppManagerUtil.getTenantId(endUserName);
             //check in local cache
@@ -88,10 +90,15 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
                 if(MultitenantConstants.SUPER_TENANT_ID != tenantId){
                     tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(endUserName);
                 }
-                claimValues = new TreeMap(userStoreManager.getUserClaimValues(tenantAwareUserName, claimURIs, null));
-                UserClaims userClaims = new UserClaims(claimValues);
-                //add to cache
-                getClaimsLocalCache().put(cacheKey, userClaims);
+
+                if(userStoreManager.isExistingUser(tenantAwareUserName)){
+                    claimValues = new TreeMap(userStoreManager.getUserClaimValues(tenantAwareUserName, claimURIs, null));
+                    UserClaims userClaims = new UserClaims(claimValues);
+                    //add to cache
+                    getClaimsLocalCache().put(cacheKey, userClaims);
+                }
+
+
             }
         } catch (UserStoreException e) {
             throw new AppManagementException("Error while retrieving user claim values from "
