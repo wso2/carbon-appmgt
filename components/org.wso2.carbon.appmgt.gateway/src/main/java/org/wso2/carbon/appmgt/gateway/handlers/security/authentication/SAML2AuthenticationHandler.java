@@ -105,7 +105,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // Fetch the web app for the requested context and version.
         try {
             if(webApp == null){
-                webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion, -1234);
+                webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion);
             }
         } catch (AppManagementException e) {
             String errorMessage = String.format("Can't fetch the web for '%s' from the repository.", fullResourceURL);

@@ -102,7 +102,7 @@ public class DefaultAppRepository implements AppRepository {
     }
 
     @Override
-    public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
+    public WebApp getWebAppByContextAndVersion(String context, String version) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement preparedStatementToGetBasicInfo = null;
@@ -115,11 +115,10 @@ public class DefaultAppRepository implements AppRepository {
         try {
             connection = getRDBMSConnectionWithoutAutoCommit();
 
-            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ? AND TENANT_ID = ?";
+            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ?";
             preparedStatementToGetBasicInfo = connection.prepareStatement(basicQuery);
             preparedStatementToGetBasicInfo.setString(1, context);
             preparedStatementToGetBasicInfo.setString(2, version);
-            preparedStatementToGetBasicInfo.setInt(3, tenantId);
 
             resultSetOfBasicInfo = preparedStatementToGetBasicInfo.executeQuery();
 
@@ -159,6 +158,7 @@ public class DefaultAppRepository implements AppRepository {
                 policyGroup.setPolicyGroupId(resultSetOfURLMappings.getInt("POLICY_GRP_ID"));
                 policyGroup.setUserRoles(resultSetOfURLMappings.getString("USER_ROLES"));
                 policyGroup.setAllowAnonymous(resultSetOfURLMappings.getBoolean("URL_ALLOW_ANONYMOUS"));
+                policyGroup.setThrottlingTier(resultSetOfURLMappings.getString("THROTTLING_TIER"));
 
                 URITemplate uriTemplate = new URITemplate();
                 uriTemplate.setPolicyGroup(policyGroup);

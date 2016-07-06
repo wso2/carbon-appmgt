@@ -1927,7 +1927,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Resource appArtifactResource = registry.get(appArtifactPath);
             String applicationStatus = appArtifactResource.getProperty(AppMConstants.WEB_APP_LIFECYCLE_STATUS);
             if (subsCount > 0 && !applicationStatus.equals("Retired")) {
-               return isAppDeleted;
+                //remove subscriptions per app
+                appMDAO.removeAPISubscription(identifier);
             }
 
             //If SSOProvider exists, remove it
