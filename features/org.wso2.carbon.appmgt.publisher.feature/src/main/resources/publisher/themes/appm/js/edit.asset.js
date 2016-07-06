@@ -318,6 +318,20 @@ $(function() {
 			}
 		}
 
+		//Check illegal characters in tags
+		var tags = $('#tag-test').tokenInput('get');
+		if(tags.length > 0) {
+			for (var index in tags) {
+				if(checkIllegalCharacters(tags[index].name)){
+					showAlert("Tags contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)", 'error');
+					this.disabled = false;
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					return;
+				}
+
+			}
+		}
+
 
 		if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
@@ -534,6 +548,15 @@ $(function() {
 		return formData;
 	}
 
+	var checkIllegalCharacters = function (value) {
+		// registry doesn't allow following illegal charecters
+		var match = value.match(/[~!@#;%^*()+={}|\\<>"',]/);
+		if (match) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 
     function createServiceProvider() {
         var sso_config = {};
