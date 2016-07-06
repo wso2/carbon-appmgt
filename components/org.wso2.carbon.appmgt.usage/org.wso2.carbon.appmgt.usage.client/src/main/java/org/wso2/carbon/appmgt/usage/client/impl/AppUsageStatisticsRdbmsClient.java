@@ -610,7 +610,6 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
     }
 
     public List<AppVersionUserUsageDTO> getUsageBySubscriber(String subscriberName, String period) throws Exception {
-        Map<String, Object> result = new HashMap<String, Object>();
         OMElement omElement;
         List<AppVersionUserUsageDTO> apiUserUsages = new ArrayList<AppVersionUserUsageDTO>();
 
@@ -688,30 +687,22 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
+
+            query = "SELECT * FROM " + columnFamily + " WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ?";
+
+            if (selectRowsByColumnName != null) {
+                query = query + " AND " + selectRowsByColumnName + " = ? ";
+            }
+
             //TODO: API_FAULT_COUNT need to populate according to match with given time range
-            if (!columnFamily.equals(APIUsageStatisticsClientConstants.API_FAULT_SUMMARY)) {
-                if (selectRowsByColumnName != null) {
-                    query = "SELECT * FROM  " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\' AND "
-                            + selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\'";
-                    if (toDate != null && fromDate != null) {
-                        query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
-                    }
-                } else {
-                    query = "SELECT * FROM " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\'";
-                }
-            } else {
-                if (selectRowsByColumnName != null) {
-                    query = "SELECT * FROM  " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\' AND "
-                            + selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\'";
-                } else {
-                    query = "SELECT * FROM " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\'";
-                }
+            if (!columnFamily.equals(APIUsageStatisticsClientConstants.API_FAULT_SUMMARY) &&
+                    selectRowsByColumnName != null && (toDate != null && fromDate != null)) {
+                query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
             }
             if (limit != Integer.MIN_VALUE) {
                 if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
@@ -720,7 +711,13 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     query += " LIMIT " + limit;
                 }
             }
-            rs = statement.executeQuery(query);
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, tenantDomain);
+            if (selectRowsByColumnName != null) {
+                preparedStatement.setString(2, selectRowsByColumnValue);
+            }
+
+            rs = preparedStatement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -730,7 +727,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -748,9 +745,9 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
 
                 }
             }
-            if (statement != null) {
+            if (preparedStatement != null) {
                 try {
-                    statement.close();
+                    preparedStatement.close();
                 } catch (SQLException e) {
 
                 }
@@ -781,30 +778,58 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             if (selectRowsByColumnName != null) {
                 query =
-                        "SELECT api,version,apiPublisher,context,method,SUM(total_request_count) as " +
-                                "total_request_count FROM  " +
-                                columnFamily + " WHERE " + selectRowsByColumnName +
-                                "=\'" + selectRowsByColumnValue + "\' AND " + APIUsageStatisticsClientConstants.TIME +
+                        String.format("SELECT " +
+                                APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.METHOD + "," +
+                                "SUM("+ APIUsageStatisticsClientConstants.REQUEST +") as " +
+                                APIUsageStatisticsClientConstants.REQUEST +" FROM  %s WHERE %s " +
+                                " = ? AND " + APIUsageStatisticsClientConstants.TIME +
                                 " BETWEEN " +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" +
-                                " GROUP BY api,version,apiPublisher,context,method";
+                                "? AND ?" +
+                                " GROUP BY "+
+                                APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.METHOD, columnFamily, selectRowsByColumnName);
+                statement = connection.prepareStatement(query);
+                statement.setString(1, selectRowsByColumnValue);
+                statement.setString(2, fromDate);
+                statement.setString(3, toDate);
+
             } else {
                 query =
-                        "SELECT api,version,apiPublisher,context,method,SUM(total_request_count) as " +
-                                "total_request_count FROM  "
-                                + columnFamily + " WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" +
-                                " GROUP BY api,version,apiPublisher,context,method";
+                        String.format("SELECT " +
+                                APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.METHOD + "," +
+                                "SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " +
+                                APIUsageStatisticsClientConstants.REQUEST + " FROM  " +
+                                " %s WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ? " +
+                                " GROUP BY " +
+                                APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.METHOD, columnFamily);
+                statement = connection.prepareStatement(query);
+                statement.setString(1, fromDate);
+                statement.setString(2, toDate);
+
             }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -814,7 +839,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -865,42 +890,93 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             if (fromDate != null && toDate != null) {
                 if (selectRowsByColumnName != null) {
-                    query = "SELECT api,version,apiPublisher,context,SUM(total_request_count) as total_request_count" +
-                            " FROM  " + columnFamily +
-                            " WHERE " + selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\' " +
+
+                    query = String.format("SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " + APIUsageStatisticsClientConstants.REQUEST +
+                            " FROM  %s " +
+                            " WHERE %s = ? " +
                             " AND " + APIUsageStatisticsClientConstants.TIME +
-                            " BETWEEN " + "\'" + fromDate + "\' " +
-                            " AND \'" + toDate + "\'" +
-                            " GROUP BY api,version,apiPublisher,context";
+                            " BETWEEN ? AND ? " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT, columnFamily, selectRowsByColumnName);
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, selectRowsByColumnValue);
+                    statement.setString(2, fromDate);
+                    statement.setString(3, toDate);
                 } else {
-                    query =
-                            "SELECT api,version,apiPublisher,context,SUM(total_request_count) as total_request_count " +
-                                    "FROM  "
-                                    + columnFamily + " WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                                    "\'" + fromDate + "\' AND \'" + toDate + "\'" +
-                                    " GROUP BY api,version,apiPublisher,context";
+
+                    query = String.format("SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " + APIUsageStatisticsClientConstants.REQUEST +
+                            " FROM  %s " +
+                            " WHERE " +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " BETWEEN ? AND ? " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT, columnFamily);
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, fromDate);
+                    statement.setString(2, toDate);
                 }
             } else {
                 if (selectRowsByColumnName != null) {
-                    query = "SELECT api,version,apiPublisher,context,SUM(total_request_count) as total_request_count" +
-                            " FROM  " + columnFamily +
-                            " WHERE " + selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\' " +
-                            " GROUP BY api,version,apiPublisher,context";
+
+                    query = String.format("SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " + APIUsageStatisticsClientConstants.REQUEST +
+                            " FROM  %s " +
+                            " WHERE %s = ? " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT, columnFamily, selectRowsByColumnName);
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, selectRowsByColumnValue);
+
                 } else {
                     query = "SELECT api,version,apiPublisher,context,SUM(total_request_count) as total_request_count " +
                             " FROM" + columnFamily +
                             " GROUP BY api,version,apiPublisher,context";
+                    query = String.format("SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " + APIUsageStatisticsClientConstants.REQUEST +
+                            " FROM  %s " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT, columnFamily);
+                    statement = connection.prepareStatement(query);
                 }
             }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -958,56 +1034,123 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             String oracleQuery;
             if (fromDate != null && toDate != null) {
-                query = "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, " +
-                        "CONTEXT, TIME " +
-                        "FROM API_REQUEST_SUMMARY " +
-                        "WHERE APIPUBLISHER = \'" + tenantDomain + "\' AND " +
-                                APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" +
-                                " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT, TIME" +
-                        " ORDER BY TOTAL_REQUEST_COUNT DESC ";
 
+                if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
+                    query = "SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ") AS " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ", " +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " FROM " + APIUsageStatisticsClientConstants.API_PAGE_USAGE_SUMMARY +
+                            " WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? AND " +
+                            APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ? AND ROWNUM <= ? " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " ORDER BY " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + " DESC ";
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomain);
+                    statement.setString(2, fromDate);
+                    statement.setString(3, toDate);
+                    statement.setInt(4, resultsLimit);
 
-                oracleQuery =
-                        "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, " +
-                                "CONTEXT, TIME " +
-                                "FROM API_REQUEST_SUMMARY " +
-                                "WHERE APIPUBLISHER = \'" + tenantDomain + "\' AND " +
-                                APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" + " AND ROWNUM <= " + resultsLimit +
-                                " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT, TIME" +
-                                " ORDER BY TOTAL_REQUEST_COUNT DESC ";
+                } else {
+                    query = "SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ") AS " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ", " +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " FROM " + APIUsageStatisticsClientConstants.API_PAGE_USAGE_SUMMARY +
+                            " WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? AND " +
+                            APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ? " +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " ORDER BY " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + " DESC ";
+
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomain);
+                    statement.setString(2, fromDate);
+                    statement.setString(3, toDate);
+                }
             } else {
-                query =
-                        "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, " +
-                                "CONTEXT, TIME " +
-                                "FROM API_REQUEST_SUMMARY " +
-                                "WHERE APIPUBLISHER = \'" + tenantDomain + "\' " +
-                                " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT, TIME" +
-                                " ORDER BY TOTAL_REQUEST_COUNT DESC ";
 
-                oracleQuery =
-                        "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, " +
-                                "CONTEXT, TIME " +
-                                "FROM API_REQUEST_SUMMARY " +
-                                "WHERE APIPUBLISHER = \'" + tenantDomain + "\' " +
-                                "\' AND ROWNUM <= " + resultsLimit +
-                                " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT, TIME " +
-                                "ORDER BY TOTAL_REQUEST_COUNT DESC ";
+                if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
+                    query = "SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ") AS " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ", " +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " FROM " + APIUsageStatisticsClientConstants.API_PAGE_USAGE_SUMMARY +
+                            " WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? AND ROWNUM <= ?" +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " ORDER BY " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + " DESC ";
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomain);
+                    statement.setInt(2, resultsLimit);
+                }else{
+                    query = "SELECT " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            " SUM(" + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ") AS " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ", " +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " FROM " + APIUsageStatisticsClientConstants.API_PAGE_USAGE_SUMMARY +
+                            " WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ?" +
+                            " GROUP BY " +
+                            APIUsageStatisticsClientConstants.API + "," +
+                            APIUsageStatisticsClientConstants.API_VERSION + "," +
+                            APIUsageStatisticsClientConstants.VERSION + "," +
+                            APIUsageStatisticsClientConstants.USERID + "," +
+                            APIUsageStatisticsClientConstants.CONTEXT + "," +
+                            APIUsageStatisticsClientConstants.TIME +
+                            " ORDER BY " +
+                            APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + " DESC ";
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomain);
+                }
+            }
 
-            }
-            if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
-                query = oracleQuery;
-            }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -1017,7 +1160,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -1084,91 +1227,12 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
             return appHitsStatsList;
         } catch (SQLException e) {
             throw new AppUsageQueryServiceClientException("SQL Exception is occurred when " +
-                                                                  "reading user hits from SQL table" +
-                                                                  e.getMessage(), e);
+                    "reading user hits from SQL table" +
+                    e.getMessage(), e);
         } finally {
             APIMgtDBUtil.closeAllConnections(getAppHitsStatement, null, appInfoResult);
         }
     }
-
-    private OMElement queryForCacheHitCount(String fromDate, String toDate, Integer limit)
-            throws AppUsageQueryServiceClientException, SQLException, XMLStreamException {
-        if (dataSource == null) {
-            throw new AppUsageQueryServiceClientException(errorMsg);
-        }
-
-        int resultsLimit = APIUsageStatisticsClientConstants.DEFAULT_RESULTS_LIMIT;
-        if (limit != null) {
-            resultsLimit = limit.intValue();
-        }
-
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet rs = null;
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
-            String query;
-            String oracleQuery;
-            if (fromDate != null && toDate != null) {
-                query =
-                        "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS " +
-                                "TOTAL_REQUEST_COUNT,TIME " +
-                                "FROM CACHE_REQUEST_SUMMARY WHERE TIME BETWEEN " +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" +
-                                " GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
-
-
-                oracleQuery =
-                        "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS " +
-                                "TOTAL_REQUEST_COUNT,TIME  " +
-                                "FROM CACHE_REQUEST_SUMMARY WHERE TIME BETWEEN" +
-                                "\'" + fromDate + "\' AND \'" + toDate + "\'" + " AND ROWNUM <= " + resultsLimit +
-                                "  GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
-            } else {
-                query =
-                        "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS " +
-                                "TOTAL_REQUEST_COUNT," +
-                                "TIME FROM CACHE_REQUEST_SUMMARY GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH " +
-                                "ORDER BY time ,CACHEHIT DESC";
-
-                oracleQuery =
-                        "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS " +
-                                "TOTAL_REQUEST_COUNT,TIME " +
-                                "\"FROM CACHE_REQUEST_SUMMARY WHERE ROWNUM <= " + resultsLimit +
-                                " GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
-
-            }
-            if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
-                query = oracleQuery;
-            }
-            rs = statement.executeQuery(query);
-            StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
-            int columnCount = rs.getMetaData().getColumnCount();
-            while (rs.next()) {
-                returnStringBuilder.append("<row>");
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = rs.getMetaData().getColumnName(i);
-                    String columnValue = rs.getString(columnName);
-                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
-                }
-                returnStringBuilder.append("</row>");
-            }
-            returnStringBuilder.append("</rows></omElement>");
-            String returnString = returnStringBuilder.toString();
-            return AXIOMUtil.stringToOM(returnString);
-
-        } catch (SQLException e) {
-            throw new SQLException("Error when executing the SQL", e);
-        } catch (XMLStreamException e) {
-            throw new XMLStreamException("Error while reading the xml stream", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(null, connection, rs);
-        }
-    }
-
 
     private OMElement queryBetweenTwoDaysForFaulty(String columnFamily, String fromDate, String toDate,
                                                    QueryServiceStub.CompositeIndex[] compositeIndex)
@@ -1186,24 +1250,51 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             if (selectRowsByColumnName != null) {
-                query = "SELECT api,version,apiPublisher,context,SUM(total_fault_count) as total_fault_count FROM  " +
-                        columnFamily + " WHERE " + selectRowsByColumnName +
-                        "=\'" + selectRowsByColumnValue + "\' AND " + APIUsageStatisticsClientConstants.TIME +
-                        " BETWEEN " +
-                        "\'" + fromDate + "\' AND \'" + toDate + "\'" + " GROUP BY api,version,apiPublisher,context";
+
+                query = String.format("SELECT " +
+                        APIUsageStatisticsClientConstants.API + "," +
+                        APIUsageStatisticsClientConstants.VERSION + "," +
+                        APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                        APIUsageStatisticsClientConstants.CONTEXT + "," +
+                        "SUM(" + APIUsageStatisticsClientConstants.FAULT + ") as " +
+                        APIUsageStatisticsClientConstants.FAULT + " FROM %s "  +
+                        " WHERE %s = ? AND " + APIUsageStatisticsClientConstants.TIME +
+                        " BETWEEN ? AND ? " +
+                        " GROUP BY " +
+                        APIUsageStatisticsClientConstants.API + "," +
+                        APIUsageStatisticsClientConstants.VERSION + "," +
+                        APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                        APIUsageStatisticsClientConstants.CONTEXT, columnFamily, selectRowsByColumnName);
+                statement = connection.prepareStatement(query);
+                statement.setString(1, selectRowsByColumnValue);
+                statement.setString(2, fromDate);
+                statement.setString(3, toDate);
             } else {
-                query = "SELECT api,version,apiPublisher,context,SUM(total_fault_count) as total_fault_count FROM  "
-                        + columnFamily + " WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                        "\'" + fromDate + "\' AND \'" + toDate + "\'" + " GROUP BY api,version,apiPublisher,context";
+                query = String.format("SELECT "+
+                        APIUsageStatisticsClientConstants.API + "," +
+                        APIUsageStatisticsClientConstants.VERSION + "," +
+                        APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                        APIUsageStatisticsClientConstants.CONTEXT + "," +
+                        "SUM(" + APIUsageStatisticsClientConstants.FAULT + ") as " +
+                        APIUsageStatisticsClientConstants.FAULT + " FROM %s " +
+                        " WHERE " + APIUsageStatisticsClientConstants.TIME +
+                        " BETWEEN ? AND ? " +
+                        " GROUP BY " +
+                        APIUsageStatisticsClientConstants.API + "," +
+                        APIUsageStatisticsClientConstants.VERSION + "," +
+                        APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                        APIUsageStatisticsClientConstants.CONTEXT, columnFamily);
+                statement = connection.prepareStatement(query);
+                statement.setString(1, fromDate);
+                statement.setString(2, toDate);
             }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -1213,7 +1304,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -1265,34 +1356,112 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             if (selectRowsByColumnName != null) {
-                query =
-                        "SELECT api,version,apiPublisher,context,referer,userid,SUM(total_request_count) as " +
-                                "total_request_count FROM  " +
-                                columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomainName + "\' AND " +
-                                selectRowsByColumnName +
-                                "=\'" + selectRowsByColumnValue + "\' ";
                 if (fromDate != null && toDate != null) {
-                    query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
+                    query =
+                            String.format("SELECT " +
+                                    APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.REFERER + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    "SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " +
+                                    APIUsageStatisticsClientConstants.REQUEST + " FROM %s " +
+                                    "WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? AND %s = ? " +
+                                    "AND " + APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ? " +
+                                    " GROUP BY " + APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    APIUsageStatisticsClientConstants.REFERER, columnFamily, selectRowsByColumnName);
+
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomainName);
+                    statement.setString(2, selectRowsByColumnValue);
+                    statement.setString(3, fromDate);
+                    statement.setString(4, toDate);
+                } else {
+                    query =
+                            String.format("SELECT " +
+                                    APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.REFERER + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    "SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " +
+                                    APIUsageStatisticsClientConstants.REQUEST + " FROM %s " +
+                                    "WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? AND %s = ? " +
+                                    " GROUP BY " + APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    APIUsageStatisticsClientConstants.REFERER, columnFamily, selectRowsByColumnName);
+
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomainName);
+                    statement.setString(2, selectRowsByColumnValue);
+
                 }
-                query += " GROUP BY api,version,apiPublisher,context,userid,referer";
+
             } else {
-                query =
-                        "SELECT api,version,apiPublisher,context,referer,userid,SUM(total_request_count) as " +
-                                "total_request_count FROM  "
-                                + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomainName + "\' ";
+
                 if (fromDate != null && toDate != null) {
-                    query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
+                    query =
+                            String.format("SELECT " +
+                                    APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.REFERER + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    "SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " +
+                                    APIUsageStatisticsClientConstants.REQUEST + " FROM %s " +
+                                    "WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? " +
+                                    "AND " + APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ? " +
+                                    " GROUP BY " + APIUsageStatisticsClientConstants.API + "," +
+                                    APIUsageStatisticsClientConstants.VERSION + "," +
+                                    APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                    APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                    APIUsageStatisticsClientConstants.USER_ID + "," +
+                                    APIUsageStatisticsClientConstants.REFERER, columnFamily);
+
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, tenantDomainName);
+                    statement.setString(2, fromDate);
+                    statement.setString(3, toDate);
+                }else{
+
                 }
-                query += " GROUP BY api,version,apiPublisher,context,userid,referer";
+                query =
+                        String.format("SELECT " +
+                                APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.REFERER + "," +
+                                APIUsageStatisticsClientConstants.USER_ID + "," +
+                                "SUM(" + APIUsageStatisticsClientConstants.REQUEST + ") as " +
+                                APIUsageStatisticsClientConstants.REQUEST + " FROM %s " +
+                                "WHERE " + APIUsageStatisticsClientConstants.API_PUBLISHER + " = ? " +
+                                " GROUP BY " + APIUsageStatisticsClientConstants.API + "," +
+                                APIUsageStatisticsClientConstants.VERSION + "," +
+                                APIUsageStatisticsClientConstants.API_PUBLISHER + "," +
+                                APIUsageStatisticsClientConstants.CONTEXT + "," +
+                                APIUsageStatisticsClientConstants.USER_ID + "," +
+                                APIUsageStatisticsClientConstants.REFERER, columnFamily);
+                statement = connection.prepareStatement(query);
+                statement.setString(1, tenantDomainName);
             }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -1302,7 +1471,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -1378,31 +1547,37 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             if (connection != null && connection.getMetaData().getDatabaseProductName().equalsIgnoreCase("oracle")) {
                 if (selectRowsByColumnName != null) {
                     //select time,year,month,day from API_REQUEST_SUMMARY order by time ASC limit 1
-                    query = "SELECT time,year,month,day FROM  " + columnFamily + " WHERE " + selectRowsByColumnName +
-                            "=\'" + selectRowsByColumnValue + "\' AND ROWNUM <= 1 order by time ASC";
+                    query = String.format("SELECT time,year,month,day FROM  %s WHERE %s = ? " +
+                            " AND ROWNUM <= 1 order by time ASC",columnFamily, selectRowsByColumnName);
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, selectRowsByColumnValue);
                 } else {
-                    query = "SELECT time,year,month,day FROM  " + columnFamily + " WHERE ROWNUM <= 1 order by time ASC";
+                    query = String.format("SELECT time,year,month,day FROM  %s WHERE ROWNUM <= 1 order by time ASC", columnFamily);
+                    statement = connection.prepareStatement(query);
                 }
 
             } else {
                 if (selectRowsByColumnName != null) {
                     //select time,year,month,day from API_REQUEST_SUMMARY order by time ASC limit 1
-                    query = "SELECT time,year,month,day FROM  " + columnFamily + " WHERE " + selectRowsByColumnName +
-                            "=\'" + selectRowsByColumnValue + "\' order by time ASC limit 1";
+                    query = String.format("SELECT time,year,month,day FROM  %s WHERE %s " +
+                            "= ? order by time ASC limit 1", columnFamily, selectRowsByColumnName);
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, selectRowsByColumnValue);
                 } else {
-                    query = "SELECT time,year,month,day FROM  " + columnFamily + " order by time ASC limit 1";
+                    query = String.format("SELECT time,year,month,day FROM  %s order by time ASC limit 1", columnFamily);
+                    statement = connection.prepareStatement(query);
+
                 }
             }
-            rs = statement.executeQuery(query);
+            rs = statement.executeQuery();
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             int columnCount = rs.getMetaData().getColumnCount();
             while (rs.next()) {
@@ -1412,7 +1587,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                     String columnValue = rs.getString(columnName);
                     String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                       "</" + columnName.toLowerCase() + ">");
+                            "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
             }
@@ -1644,7 +1819,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                 for (int i = 0; i < usageData.size(); i++) {
                     if (usageData.get(i).getApiName().equals(rowElement.getFirstChildWithName(new QName(
                             APIUsageStatisticsClientConstants.API))
-                                                                     .getText()) && usageData.get(i).getApiVersion()
+                            .getText()) && usageData.get(i).getApiVersion()
                             .equals(
                                     rowElement.getFirstChildWithName(new QName(
                                             APIUsageStatisticsClientConstants.VERSION)).getText())) {
@@ -1751,20 +1926,22 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
         }
 
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
         try {
             connection = dataSource.getConnection();
-            statement = connection.createStatement();
             String query;
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
             //check whether table exist first
             if (isTableExist(columnFamily, connection)) {//Table Exist
                 if (selectRowsByColumnName != null) {
                     query = "SELECT * FROM  " + columnFamily + " WHERE " + selectRowsByColumnName +
-                            "=\'" + selectRowsByColumnValue + "\'";
+                            " = ?";
+                    statement = connection.prepareStatement(query);
+                    statement.setString(1, selectRowsByColumnValue);
                 } else {
                     query = "SELECT * FROM  " + columnFamily;
+                    statement = connection.prepareStatement(query);
                 }
                 rs = statement.executeQuery(query);
                 int columnCount = rs.getMetaData().getColumnCount();
@@ -1776,7 +1953,7 @@ public class AppUsageStatisticsRdbmsClient implements AppUsageStatisticsClient {
                         String columnValue = rs.getString(columnName);
                         String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
                         returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
-                                                           "</" + columnName.toLowerCase() + ">");
+                                "</" + columnName.toLowerCase() + ">");
                     }
                     returnStringBuilder.append("</row>");
                 }

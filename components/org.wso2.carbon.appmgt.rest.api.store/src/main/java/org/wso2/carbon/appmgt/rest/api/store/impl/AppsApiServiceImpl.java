@@ -359,6 +359,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         File binaryFile = null;
         String contentType = null;
         try {
+
+            if(!RestApiUtil.isValidFileName(fileName)){
+                RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' is provided", log);
+            }
+
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {

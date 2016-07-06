@@ -698,78 +698,6 @@ public class AppMDAO {
 	}
 
 	/**
-	 * This method is to update the access token
-	 *
-	 * @param userId
-	 *            id of the user
-	 * @param apiInfoDTO
-	 *            Api info
-	 * @param statusEnum
-	 *            Status of the access key
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 *             if failed to update the access token
-	 * @throws org.wso2.carbon.identity.base.IdentityException
-	 *             if failed to get tenant id
-	 */
-	public void changeAccessTokenStatus(String userId, APIInfoDTO apiInfoDTO, String statusEnum)
-	                                                                                            throws
-                                                                                                AppManagementException,
-	                                                                                            IdentityException {
-		String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(userId);
-		int tenantId = 0;
-		IdentityTenantUtil.getTenantIdOfUser(userId);
-
-		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
-		if (AppManagerUtil.checkAccessTokenPartitioningEnabled() &&
-				AppManagerUtil.checkUserNameAssertionEnabled()) {
-			accessTokenStoreTable = AppManagerUtil.getAccessTokenStoreTableFromUserId(userId);
-		}
-
-		Connection conn = null;
-		PreparedStatement ps = null;
-        String sqlQuery = "UPDATE " + accessTokenStoreTable + " IAT, APM_SUBSCRIBER SB, " +
-                "APM_SUBSCRIPTION SP, APM_APPLICATION APP, APM_APP API " +
-                "SET IAT.TOKEN_STATE = ? " +
-                "WHERE SB.USER_ID = ? " +
-                "AND SB.TENANT_ID = ? " +
-                "AND API.APP_PROVIDER = ? " +
-                "AND API.APP_NAME = ? " +
-                "AND API.APP_VERSION = ? " +
-                "AND SP.ACCESS_TOKEN = IAT.ACCESS_TOKEN " +
-                "AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
-                "AND APP.APPLICATION_ID = SP.APPLICATION_ID " +
-                "AND API.APP_ID = SP.APP_ID";
-        try {
-
-			conn = APIMgtDBUtil.getConnection();
-			ps = conn.prepareStatement(sqlQuery);
-			ps.setString(1, statusEnum);
-			ps.setString(2, tenantAwareUsername);
-			ps.setInt(3, tenantId);
-			ps.setString(4, AppManagerUtil.replaceEmailDomainBack(apiInfoDTO.getProviderId()));
-			ps.setString(5, apiInfoDTO.getApiName());
-			ps.setString(6, apiInfoDTO.getVersion());
-
-			int count = ps.executeUpdate();
-			if (log.isDebugEnabled()) {
-				log.debug("Number of rows being updated : " + count);
-			}
-			conn.commit();
-		} catch (SQLException e) {
-			try {
-				if (conn != null) {
-					conn.rollback();
-				}
-			} catch (SQLException e1) {
-				log.error("Failed to rollback the changeAccessTokenStatus operation", e);
-			}
-			handleException("Error while executing SQL", e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, null);
-		}
-	}
-
-	/**
 	 * Validate the provided key against the given WebApp. First it will
 	 * validate the key is valid
 	 * , ACTIVE and not expired.
@@ -827,14 +755,14 @@ public class AppMDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-        String applicationSqlQuery = "SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED, IAT.TOKEN_STATE, IAT.USER_TYPE, " +
+        String applicationSqlQuery = String.format("SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED, IAT.TOKEN_STATE, IAT.USER_TYPE, " +
                 "IAT.AUTHZ_USER, IAT.TIME_CREATED, SUB.TIER_ID, SUBS.USER_ID, SUB.SUB_STATUS, APP.APPLICATION_ID, " +
                 "APP.NAME, APP.APPLICATION_TIER, API.APP_NAME, API.APP_PROVIDER " +
-                "FROM " + accessTokenStoreTable + " IAT, APM_SUBSCRIPTION SUB, APM_SUBSCRIBER SUBS, " +
+                "FROM %s IAT, APM_SUBSCRIPTION SUB, APM_SUBSCRIBER SUBS, " +
                 "APM_APPLICATION APP, APM_APP API " +
                 "WHERE IAT.ACCESS_TOKEN = ? AND API.CONTEXT = ? AND API.APP_VERSION = ? " +
                 "AND SUB.APPLICATION_ID = APP.APPLICATION_ID AND APP.SUBSCRIBER_ID = SUBS.SUBSCRIBER_ID " +
-                "AND API.APP_ID = SUB.APP_ID";
+                "AND API.APP_ID = SUB.APP_ID", accessTokenStoreTable);
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -3359,53 +3287,6 @@ public class AppMDAO {
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, connection, result);
 		}
-	}
-
-	public String[] getOAuthCredentials(String accessToken, String tokenType)
-	                                                                         throws
-                                                                             AppManagementException {
-
-		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
-		if (AppManagerUtil.checkAccessTokenPartitioningEnabled() &&
-		    AppManagerUtil.checkUserNameAssertionEnabled()) {
-			accessTokenStoreTable = AppManagerUtil.getAccessTokenStoreTableFromAccessToken(accessToken);
-		}
-		Connection connection = null;
-		PreparedStatement prepStmt = null;
-		ResultSet rs = null;
-		String consumerKey = null;
-		String consumerSecret = null;
-		String sqlStmt =
-		                 "SELECT " + " ICA.CONSUMER_KEY AS CONSUMER_KEY," +
-		                         " ICA.CONSUMER_SECRET AS CONSUMER_SECRET " + "FROM " +
-		                         " IDN_OAUTH_CONSUMER_APPS ICA," + accessTokenStoreTable + " IAT" +
-		                         " WHERE " + " IAT.ACCESS_TOKEN = ? AND" +
-		                         " IAT.TOKEN_SCOPE = ? AND" +
-		                         " IAT.CONSUMER_KEY = ICA.CONSUMER_KEY";
-
-		try {
-			connection = APIMgtDBUtil.getConnection();
-			prepStmt = connection.prepareStatement(sqlStmt);
-			prepStmt.setString(1, AppManagerUtil.encryptToken(accessToken));
-			prepStmt.setString(2, tokenType);
-			rs = prepStmt.executeQuery();
-
-			if (rs.next()) {
-				consumerKey = rs.getString("CONSUMER_KEY");
-				consumerSecret = rs.getString("CONSUMER_SECRET");
-
-				consumerKey = AppManagerUtil.decryptToken(consumerKey);
-				consumerSecret = AppManagerUtil.decryptToken(consumerSecret);
-			}
-
-		} catch (SQLException e) {
-			handleException("Error when adding a new OAuth consumer.", e);
-		} catch (CryptoException e) {
-			handleException("Error while encrypting/decrypting tokens/app credentials.", e);
-		} finally {
-			IdentityDatabaseUtil.closeAllConnections(connection, rs, prepStmt);
-		}
-		return new String[] { consumerKey, consumerSecret };
 	}
 
 	public String[] addOAuthConsumer(String username, int tenantId, String appName,
@@ -8553,24 +8434,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
+            String query = null;
 
             if (sortOption == WebAppSortOption.SORT_BY_CREATED_TIME_DESC) {
-                query = query + " ORDER BY FAV_APP.CREATED_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_CREATED_TIME_DESC);
             } else {
-                query = query + " ORDER BY APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_APP_NAME_ASC);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8620,25 +8491,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
 
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APP.APP_PROVIDER LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_PROVIDER);
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
-                query = query + " AND  APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8691,18 +8551,12 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (sortOption == WebAppSortOption.SORT_BY_SUBSCRIBED_TIME_DESC) {
-                query = query + " ORDER BY APM_SUBSCRIPTION.SUBSCRIPTION_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_SUBSCRIPTION_TIME);
             } else {
-                query = query + " ORDER BY APM_APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setBoolean(1,treatAsSite);
             ps.setInt(2,tenantIdOfStore);
             ps.setInt(3,applicationId);
@@ -8759,19 +8613,14 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
-                query = query + " AND  APM_APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setBoolean(1,treatAsSite);
             ps.setInt(2,tenantIdOfStore);
             ps.setInt(3,applicationId);

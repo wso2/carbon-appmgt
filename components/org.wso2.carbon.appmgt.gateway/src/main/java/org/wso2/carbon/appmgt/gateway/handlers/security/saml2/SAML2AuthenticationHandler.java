@@ -27,6 +27,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -116,6 +117,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1463,7 +1465,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         requestedAuthnContext.getAuthnContextClassRefs().add(authnContextClassRef);
 
         DateTime issueInstant = new DateTime();
-        String authReqRandomId = Integer.toHexString(new Double(Math.random()).intValue());
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[32];
+        secRandom.nextBytes(result);
+        String authReqRandomId = String.valueOf(Hex.encodeHex(result));
 
         /* Creation of AuthRequestObject */
         AuthnRequestBuilder authRequestBuilder = new AuthnRequestBuilder();
