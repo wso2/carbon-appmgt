@@ -72,8 +72,7 @@
                                 <i class="fw fw-heart"></i>{{t "Add to Favorites"}}
                             </a>
                         {{/if}}
-                        {{#if asset.attributes.overview_allowAnonymous}}
-                        {{else}}
+                        {{#ifCond asset.attributes.overview_allowAnonymous "==" "FALSE"}}
                             {{#if isSelfSubscriptionEnabled}}
                                 {{#if isSubscribed}}
                                     <a href="#" id="btnUnsubscribe" class="btn btn-default">
@@ -85,7 +84,7 @@
                                     </a>
                                 {{/if}}
                             {{/if}}
-                        {{/if}}
+                        {{/ifCond}}
                     {{else}}
                     {{!-- user cannot access this app --}}
                         {{#if isSubscriptionAvailable}}
