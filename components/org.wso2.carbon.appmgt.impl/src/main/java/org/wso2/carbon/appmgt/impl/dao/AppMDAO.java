@@ -7300,8 +7300,8 @@ public class AppMDAO {
         Boolean isMandatory = false; //no need to show the mandatory fields as options
         JSONArray arrJavaPolicies = new JSONArray();
 
-        String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
-                ",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
+        String query = " SELECT distinct POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
+                ",DISPLAY_ORDER_SEQ_NO ,? AS APP_ID " +
                 "FROM APM_APP_JAVA_POLICY POL " +
                 "LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
                 "LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
@@ -7312,8 +7312,9 @@ public class AppMDAO {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(query);
             ps.setString(1, applicationUUId);
-            ps.setBoolean(2, isMandatory);
-            ps.setBoolean(3, isGlobalPolicy);
+            ps.setString(2, applicationUUId);
+            ps.setBoolean(3, isMandatory);
+            ps.setBoolean(4, isGlobalPolicy);
             rs = ps.executeQuery();
             while (rs.next()) {
                 JSONObject objPolicy = new JSONObject();
