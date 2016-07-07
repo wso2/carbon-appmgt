@@ -140,7 +140,7 @@ public class WebApp extends App{
     }
 
     public String getLogoutURL() {
-        if(logoutURL.startsWith("/")){
+        if(logoutURL != null && logoutURL.startsWith("/")){
             return logoutURL.substring(1);
         }else {
             return logoutURL;
