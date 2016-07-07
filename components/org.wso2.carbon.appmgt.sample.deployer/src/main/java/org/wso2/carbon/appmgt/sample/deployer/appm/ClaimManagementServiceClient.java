@@ -77,16 +77,6 @@ public class ClaimManagementServiceClient {
         ClaimMappingDTO claimMappingDTO = new ClaimMappingDTO();
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
-        // check whether claim already exits or not.
-        ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
-                .getClaimMappings();
-        for (ClaimMappingDTO claimMapping : claimMappingDTOList) {
-            ClaimDTO claim = claimMapping.getClaim();
-            String claimUri = claim.getClaimUri();
-            if (claimUri.equals(claimURI)) {
-                claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
-                break;
-            }
-        }
+        claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
     }
 }
