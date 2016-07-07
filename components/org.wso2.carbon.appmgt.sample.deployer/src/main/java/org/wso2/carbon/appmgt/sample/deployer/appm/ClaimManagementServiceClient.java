@@ -23,7 +23,6 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceStub;
-import org.wso2.carbon.claim.mgt.stub.dto.ClaimAttributeDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimMappingDTO;
 
@@ -77,6 +76,21 @@ public class ClaimManagementServiceClient {
         ClaimMappingDTO claimMappingDTO = new ClaimMappingDTO();
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
-        claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+
+        // check whether claim already exits or not.
+        ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
+                .getClaimMappings();
+
+        boolean isClaimExists = false;
+        for (ClaimMappingDTO claimMapping : claimMappingDTOList) {
+            ClaimDTO claim = claimMapping.getClaim();
+            if (claim.getClaimUri().equals(claimURI)) {
+                isClaimExists = true;
+                break;
+            }
+        }
+        if (!isClaimExists) {
+            claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+        }
     }
 }

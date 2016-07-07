@@ -77,7 +77,11 @@ public class UserAdminServiceClient {
      * @throws UserAdminUserAdminException Throws this when user failed to register
      */
     public void addUser(String userName) throws RemoteException, UserAdminUserAdminException {
-        userAdminStub.addUser(userName, "subscriber",
-                new String[]{"Internal/subscriber"}, new ClaimValue[]{}, "default");
+        // check whether user already exists.
+        String[] usersList = userAdminStub.listUsers(userName, 1);
+        if (usersList == null) {
+            userAdminStub.addUser(userName, "subscriber", new String[]{"Internal/subscriber"}, new ClaimValue[]{},
+                                  "default");
+        }
     }
 }
