@@ -462,12 +462,13 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
-                    "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? ";
+            String queryToGetBusinessOwner = null;
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                queryToGetBusinessOwner += "AND ROWNUM >= ? AND ROWNUM <= ?";
+                queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
+                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM >= ? AND ROWNUM <= ?";
             } else {
-                queryToGetBusinessOwner += "LIMIT ? , ? ";
+                queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
+                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? LIMIT ? , ? ";
             }
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
             searchValue = "%" + searchValue + "%";
