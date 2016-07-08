@@ -288,13 +288,7 @@ public class SAMLUtils {
 
     private static String getAssertionConsumerUrl(MessageContext messageContext){
 
-        String appRootURL = null;
-        try {
-            appRootURL = GatewayUtils.getAppRootURL(messageContext);
-        } catch (MalformedURLException e) {
-            log.error("Error while getting app root URL");
-            return null;
-        }
+        String appRootURL = GatewayUtils.getAppRootURL(messageContext);
 
         //Construct the assertion consumer url by appending gateway endpoint as the host
         String assertionConsumerUrl = appRootURL + AppMConstants.GATEWAY_ACS_RELATIVE_URL;
@@ -303,6 +297,14 @@ public class SAMLUtils {
     }
 
     public static LogoutRequest buildLogoutRequest(String issuerName, Session session) {
+
+        String subject = session.getAuthenticationContext().getSubject();
+        String sessionIndexString = (String) session.getAttribute(SESSION_ATTRIBUTE_SAML_SESSION_INDEX);
+
+        if(log.isDebugEnabled()){
+            log.debug(String.format("{%s} - Building logout request for subject : '%s' & sessionIndex : '%s'",
+                                        session.getUuid(), subject, sessionIndexString));
+        }
 
         LogoutRequest logoutRequest = new LogoutRequestBuilder().buildObject();
 
@@ -320,11 +322,11 @@ public class SAMLUtils {
 
         NameID nameId = new NameIDBuilder().buildObject();
         nameId.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:entity");
-        nameId.setValue(session.getAuthenticationContext().getSubject());
+        nameId.setValue(subject);
         logoutRequest.setNameID(nameId);
 
         SessionIndex sessionIndex = new SessionIndexBuilder().buildObject();
-        sessionIndex.setSessionIndex((String) session.getAttribute(SESSION_ATTRIBUTE_SAML_SESSION_INDEX));
+        sessionIndex.setSessionIndex(sessionIndexString);
         logoutRequest.getSessionIndexes().add(sessionIndex);
 
         logoutRequest.setReason("Single Logout");

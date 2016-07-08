@@ -584,7 +584,8 @@ public final class AppMConstants {
 
     // Gateway caching constants
     public static final String GATEWAY_CACHE_MANAGER = "APPMGT.GATEWAY";
-    public static final String GATEWAY_SESSION_CACHE = "sessionCache";
+    public static final String GATEWAY_SESSION_CACHE = "appm.sessionCache";
+    public static final String GATEWAY_SESSION_INDEX_MAPPING_CACHE = "appm.sessionIndexMappingCache";
 
 
     public static final String SAML2_COOKIE = "appmanager_sso";

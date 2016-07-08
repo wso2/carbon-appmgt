@@ -35,11 +35,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.ResponseImpl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
@@ -53,16 +49,13 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.token.JWTGenerator;
 import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
+import org.wso2.carbon.appmgt.gateway.utils.CacheManager;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.net.HttpCookie;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,9 +111,17 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         // If the request comes to the ACS URL, then it should be a SAML response or a request from the IDP.
         if(isACSURL(relativeResourceURL)){
-            if(handleRequestToACSEndpoint(messageContext, session)){
-                return false;
-            }
+            handleRequestToACSEndpoint(messageContext, session);
+
+            // All requests to the ACS URL should be redirected to somewhere. e.g. IDP, app root URL
+            return false;
+        }
+
+        // Handle logout requests. These requests don't need to  be authenticated.
+        if(GatewayUtils.isLogoutURL(webApp, relativeResourceURL)){
+            doLogout(session);
+            redirectToIDPWithLogoutRequest(messageContext, session);
+            return false;
         }
 
         if(GatewayUtils.isAnonymousAccessAllowed(webApp, matchedTemplate)){
@@ -137,51 +138,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         if(!authenticationContext.isAuthenticated()){
 
-            // WORKAROUND : SLO requested is sent by the IDP has no session. So we need to skip authentication for SLO requests.
-            if(GatewayUtils.isLogoutURL(webApp, relativeResourceURL)){
-
-                // Build the message.
-                try {
-                    RelayUtils.buildMessage(axis2MessageContext);
-                } catch (IOException e) {
-                    String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                    GatewayUtils.logAndThrowException(log, errorMessage, e);
-                } catch (XMLStreamException e) {
-                    String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-                    GatewayUtils.logAndThrowException(log, errorMessage, e);
-                }
-
-                try {
-                    IDPMessage idpMessage = SAMLUtils.processIDPMessage(messageContext);
-
-                    if(idpMessage.isSLORequest()){
-
-
-                        OMFactory fac = OMAbstractFactory.getOMFactory();
-                        OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
-                        OMElement payload = fac.createOMElement("SLOResponse", ns);
-
-                        OMElement errorMessage = fac.createOMElement("message", ns);
-                        errorMessage.setText("SLORequest has been successfully processed by WSO2 App Manager");
-
-                        payload.addChild(errorMessage);
-
-                        GatewayUtils.send200(messageContext, payload);
-                        return false;
-                    }
-
-                } catch (SAMLException e) {
-                    GatewayUtils.logAndThrowException(log, "Can't build SLO response to be sent to the IDP.", e);
-                }
-
-            }
-
-
             if(log.isDebugEnabled()){
                 GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is not authenticated", fullResourceURL));
             }
 
             session.setRequestedURL(fullResourceURL);
+            SessionStore.getInstance().updateSession(session);
             setSessionCookie(messageContext, session.getUuid());
             requestAuthentication(messageContext);
             return false;
@@ -196,6 +158,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             if(!session.hasBeenAccessed(webApp.getUUID())){
                 GatewayUtils.logWithRequestInfo(log, messageContext, "This web app has not been accessed before in the current session. Doing SSO through IDP since it is needed to make SLO work.");
+                session.setRequestedURL(fullResourceURL);
+                SessionStore.getInstance().updateSession(session);
                 requestAuthentication(messageContext);
             }
 
@@ -226,21 +190,44 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
+    private void doLogout(Session session) {
+        SessionStore.getInstance().removeSession(session.getUuid());
+    }
+
+    private OMElement handleSLORequest(MessageContext messageContext, LogoutRequest logoutRequest) {
+
+        // Get the session index from the SLORequest and remove the relevant session.
+        String sessionIndex = logoutRequest.getSessionIndexes().get(0).getSessionIndex();
+
+        String sessionId = CacheManager.getSessionIndexMappingCache().get(sessionIndex);
+
+        if(sessionId != null){
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Found a session id (md5 : '%s')for the given session index in the SLO request: '%s'. Clear the session", GatewayUtils.getMD5Hash(sessionId), sessionIndex));
+            SessionStore.getInstance().removeSession(sessionId);
+            CacheManager.getSessionIndexMappingCache().remove(sessionIndex);
+        }else{
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Couldn't find a session id for the given session index : '%s'", sessionIndex));
+        }
+
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
+        OMElement payload = fac.createOMElement("SLOResponse", ns);
+
+        OMElement errorMessage = fac.createOMElement("message", ns);
+        errorMessage.setText("SLORequest has been successfully processed by WSO2 App Manager");
+
+        payload.addChild(errorMessage);
+
+        return payload;
+
+    }
+
     private boolean handleRequestToACSEndpoint(MessageContext messageContext, Session session) {
 
         String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
-        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
-        // Build the message.
-        try {
-            RelayUtils.buildMessage(axis2MessageContext);
-        } catch (IOException e) {
-            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
-        } catch (XMLStreamException e) {
-            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
-        }
+        // Build the incoming message.
+        GatewayUtils.buildIncomingMessage(messageContext);
 
         IDPMessage idpMessage = null;
         try {
@@ -258,19 +245,17 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));
 
         // If not configured, the SLO request URL and the SLO response URL is the ACS URL by default.
-        // So handle this properly.
+        // SLOResponse is handled in this method. But the SLORequest is handled generically in the rest of the handler code.
         if(idpMessage.isSLOResponse()){
-            try {
-                GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLResponse in an SLO response.");
-                GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
-                return true;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLResponse in an SLO response.");
+            GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
+            return false;
         }else if(idpMessage.isSLORequest()){
             GatewayUtils.logWithRequestInfo(log, messageContext, "SAMLRequest in an SLO request.");
-            // Logout handler will handle the rest.
-        }else{
+            OMElement response = handleSLORequest(messageContext, (LogoutRequest) idpMessage.getSAMLRequest());
+            GatewayUtils.send200(messageContext, response);
+            return false;
+        } else{
 
             if(idpMessage.isResponseValidityPeriodExpired()){
 
@@ -296,6 +281,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 String sessionIndex = (String) SAMLUtils.getSessionIndex((ResponseImpl) idpMessage.getSAMLResponse());
                 session.addAttribute(SAMLUtils.SESSION_ATTRIBUTE_SAML_SESSION_INDEX, sessionIndex);
                 GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Session index : %s", sessionIndex));
+
+                // Add Session Index -> Session ID to a cache.
+                CacheManager.getSessionIndexMappingCache().put(sessionIndex, session.getUuid());
 
                 // Mark this web app as an access web app in this session.
                 session.addAccessedWebAppUUID(webApp.getUUID());
@@ -327,15 +315,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if(session.getRequestedURL() != null){
                     GatewayUtils.redirectToURL(messageContext, session.getRequestedURL());
                 }else{
-                    try {
-                        log.warn(String.format("Original requested URL in the session is null. Redirecting to the app root URL."));
-                        GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
+                    log.warn(String.format("Original requested URL in the session is null. Redirecting to the app root URL."));
+                    GatewayUtils.redirectToURL(messageContext, GatewayUtils.getAppRootURL(messageContext));
+
                 }
 
-                return true;
+                return false;
             }else{
 
                 if(log.isDebugEnabled()){
@@ -343,10 +328,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 requestAuthentication(messageContext);
-                return true;
+                return false;
             }
         }
-        return false;
+
     }
 
     @Override
@@ -404,6 +389,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
         return cookies;
+    }
+
+    private void redirectToIDPWithLogoutRequest(MessageContext messageContext, Session session) {
+        LogoutRequest logoutRequest = SAMLUtils.buildLogoutRequest(webApp.getSaml2SsoIssuer(), session);
+        GatewayUtils.logWithRequestInfo(log, messageContext, "Redirecting to the IDP for logging out.");
+        GatewayUtils.redirectToIDPWithSAMLRequest(messageContext, logoutRequest);
     }
 
     private void setSessionCookie(MessageContext messageContext, String cookieValue) {

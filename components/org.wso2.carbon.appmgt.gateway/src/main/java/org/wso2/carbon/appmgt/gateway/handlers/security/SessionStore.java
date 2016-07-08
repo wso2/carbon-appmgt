@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.gateway.handlers.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.gateway.utils.CacheManager;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 
@@ -78,7 +79,6 @@ public class SessionStore {
     }
 
     private Cache<String, Session> getSessionCache() {
-        return Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).
-                getCache(AppMConstants.GATEWAY_SESSION_CACHE);
+        return CacheManager.getSessionCache();
     }
 }

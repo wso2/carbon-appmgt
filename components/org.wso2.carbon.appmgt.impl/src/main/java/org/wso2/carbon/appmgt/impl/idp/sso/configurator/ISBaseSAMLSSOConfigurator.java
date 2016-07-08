@@ -53,12 +53,8 @@ public abstract class ISBaseSAMLSSOConfigurator {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
-        if(provider.getLogoutUrl() != null && !provider.getLogoutUrl().trim().isEmpty()){
-            dto.setDoSingleLogout(true);
-            dto.setSloRequestURL(provider.getLogoutUrl());
-        }else{
-            dto.setDoSingleLogout(false);
-        }
+        dto.setDoSingleLogout(true);
+        // Let the ACS URL be the SLO Request accepting URL.
 
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);
