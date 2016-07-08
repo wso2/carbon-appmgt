@@ -47,6 +47,35 @@ var render = function(theme, data, meta, require) {
                 data.newViewData.images.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(appName);
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
+            if(data.artifact.attributes.overview_subscriptionAvailability == "current_tenant") {
+                data.newViewData.showExternalStoreTab = false;
+            } else if (data.artifact.attributes.overview_subscriptionAvailability == "specific_tenants") {
+                var appStores = data.appStores.externalStores;
+                var noOfStoreToList = 0;
+                for(var i = 0; i < appStores.length; i++) {
+                    var appStore = appStores[i];
+                    if( (data.artifact.attributes.overview_tenants.indexOf(appStore.name) > -1)) {
+                        appStore.showInStoreList = true;
+                        appStores[i] = appStore;
+                        noOfStoreToList++;
+                    } else {
+                        appStore.showInStoreList = false;
+                    }
+                }
+                data.appStores.externalStores = appStores;
+                if(noOfStoreToList > 0) {
+                    data.newViewData.showExternalStoreTab = true;
+                }
+            } else {
+                var appStores = data.appStores.externalStores;
+                for(var i = 0; i < appStores.length; i++) {
+                    var appStore = appStores[i];
+                    appStore.showInStoreList = true;
+                }
+                data.appStores.externalStores = appStores;
+                data.newViewData.showExternalStoreTab = true;
+            }
+
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
             if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {

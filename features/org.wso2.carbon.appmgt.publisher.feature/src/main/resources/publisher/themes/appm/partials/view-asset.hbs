@@ -60,11 +60,13 @@
                                 <li><a href="#nav-pills-tab-3" data-toggle="tab">Single Sign On Configuration</a></li>
                                 <li><a href="#nav-pills-tab-4" data-toggle="tab">OAUTH Parameters</a></li>
                                 {{#if newViewData.publishActionAuthorized}}
-                                    {{#compare artifact.lifecycleState "Published" operator="=="}}
-                                        {{#compare artifact.attributes.overview_visibleRoles " " operator="=="}}
-                                            <li><a href="#nav-pills-tab-5" data-toggle="tab">External Stores</a></li>
+                                    {{#if newViewData.showExternalStoreTab}}
+                                        {{#compare artifact.lifecycleState "Published" operator="=="}}
+                                            {{#compare artifact.attributes.overview_visibleRoles " " operator="=="}}
+                                                <li><a href="#nav-pills-tab-5" data-toggle="tab">External Stores</a></li>
+                                            {{/compare}}
                                         {{/compare}}
-                                    {{/compare}}
+                                    {{/if}}
                                 {{/if}}
                                 <li><a href="#nav-pills-tab-6" data-toggle="tab">Business Owner Details</a></li>
                             </ul>
@@ -184,13 +186,15 @@
                                         {{#each appStores.externalStores}}
                                             <div class="row">
                                                 <div class="col-md-4 col-sm-4 col-xs-3 col-md-offset-0">
-                                                    {{#if published}}
-                                                        <input type="checkbox" name="externalStore" value="{{name}}"
-                                                               checked />
-                                                        {{displayName}}<br>
-                                                    {{else}}
-                                                        <input type="checkbox" name="externalStore" value="{{name}}" />
-                                                        {{displayName}}<br>
+                                                    {{#if showInStoreList}}
+                                                        {{#if published}}
+                                                            <input type="checkbox" name="externalStore" value="{{name}}"
+                                                                   checked />
+                                                            {{displayName}}<br>
+                                                        {{else}}
+                                                            <input type="checkbox" name="externalStore" value="{{name}}" />
+                                                            {{displayName}}<br>
+                                                        {{/if}}
                                                     {{/if}}
                                                 </div>
                                             </div>
