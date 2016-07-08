@@ -766,7 +766,7 @@
     <carbon.identity.pkg.version>[5.1.0, 6.0.0)</carbon.identity.pkg.version>
     <carbon.user.mgt.pkg.version>[5.1.0, 6.0.0)</carbon.user.mgt.pkg.version>
     <carbon.multitenancy.version>4.5.2</carbon.multitenancy.version>
-    <carbon.deployment.version>4.6.2-SNAPSHOT</carbon.deployment.version>
+    <carbon.deployment.version>4.7.0</carbon.deployment.version>
     <carbon.commons.version>4.5.3</carbon.commons.version>
     <carbon.registry.version>4.5.3</carbon.registry.version>
     <carbon.governance.version>4.6.2</carbon.governance.version>
