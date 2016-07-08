@@ -84,7 +84,7 @@ private String uuid;
         accessedWebAppUUIDs.add(webAppUUID);
     }
 
-    public boolean hasBeenAccessed(String webAppUUID) {
+    public boolean hasAppBeenAccessedBefore(String webAppUUID) {
         return accessedWebAppUUIDs.contains(webAppUUID);
     }
 }

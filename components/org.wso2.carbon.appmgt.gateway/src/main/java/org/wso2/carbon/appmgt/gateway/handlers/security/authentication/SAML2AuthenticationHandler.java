@@ -67,7 +67,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private static final Log log = LogFactory.getLog(SAML2AuthenticationHandler.class);
     private static final String SET_COOKIE_PATTERN = "%s=%s; Path=%s;";
-    private static final String SESSION_ATTRIBUTE_JWT = "jwt";
+    private static final String SESSION_ATTRIBUTE_JWTS = "jwts";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
 
     // A Synapse handler is instantiated per Synapse API.
@@ -156,11 +156,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             // If this web app has not been access before in this session, redirect to the IDP.
             // This is done to make sure SLO works.
 
-            if(!session.hasBeenAccessed(webApp.getUUID())){
+            if(!session.hasAppBeenAccessedBefore(webApp.getUUID())){
                 GatewayUtils.logWithRequestInfo(log, messageContext, "This web app has not been accessed before in the current session. Doing SSO through IDP since it is needed to make SLO work.");
                 session.setRequestedURL(fullResourceURL);
                 SessionStore.getInstance().updateSession(session);
                 requestAuthentication(messageContext);
+                return false;
             }
 
             // Set the session as a message context property.
@@ -168,21 +169,41 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             if(shouldSendSAMLResponseToBackend()){
 
-                addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, (String) session.getAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSE));
+                Map<String , String> samlResponses = (Map<String, String>) session.getAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSES);
 
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response has been set in the request to the backend.");
+                String samlResponseForApp = null;
+
+                if(samlResponses != null && (samlResponseForApp = samlResponses.get(webApp.getUUID())) != null){
+
+                    addTransportHeader(messageContext, HTTP_HEADER_SAML_RESPONSE, samlResponseForApp);
+
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "SAML response has been set in the request to the backend.");
+                    }
+
+                }else{
+
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "Couldn't find the SAML response for the app in the session.");
+                    }
                 }
             }
 
             if(isJWTEnabled()){
 
                 String jwtHeaderName = configuration.getFirstProperty(APISecurityConstants.API_SECURITY_CONTEXT_HEADER);
+                Map<String, String> generatedJWTs = (Map<String, String>) session.getAttribute(SESSION_ATTRIBUTE_JWTS);
 
-                addTransportHeader(messageContext, jwtHeaderName, (String) session.getAttribute(SESSION_ATTRIBUTE_JWT));
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, "JWT has been set in the request to the backend.");
+                String jwtForApp = null;
+                if(generatedJWTs != null && (jwtForApp = generatedJWTs.get(webApp.getUUID())) != null){
+                    addTransportHeader(messageContext, jwtHeaderName, jwtForApp);
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "JWT has been set in the request to the backend.");
+                    }
+                }else{
+                    if(log.isDebugEnabled()){
+                        GatewayUtils.logWithRequestInfo(log, messageContext, "Couldn't find the generated JWT for the app in the session.");
+                    }
                 }
             }
 
@@ -275,7 +296,18 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
 
                 session.setAuthenticationContext(authenticationContext);
-                session.addAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSE, idpMessage.getRawSAMLResponse());
+
+                if(shouldSendSAMLResponseToBackend()){
+
+                    Map<String, String> samlResponses = (Map<String, String>) session.getAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSES);
+
+                    if(samlResponses == null){
+                        samlResponses = new HashMap<String, String>();
+                        session.addAttribute(SAMLUtils.SESSION_ATTRIBUTE_RAW_SAML_RESPONSES, samlResponses);
+                    }
+
+                    samlResponses.put(webApp.getUUID(), idpMessage.getRawSAMLResponse());
+                }
 
                 // Get the SAML session index.
                 String sessionIndex = (String) SAMLUtils.getSessionIndex((ResponseImpl) idpMessage.getSAMLResponse());
@@ -303,7 +335,17 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 // Generate the JWT and store in the session.
                 if(isJWTEnabled()){
                     try {
-                        session.addAttribute(SESSION_ATTRIBUTE_JWT, getJWTGenerator().generateToken(userAttributes, webApp, messageContext));
+
+                        //Generate and store the JWT against the app.
+                        Map<String, String> generatedJWTs = (Map<String, String>) session.getAttribute(SESSION_ATTRIBUTE_JWTS);
+
+                        if(generatedJWTs == null){
+                            generatedJWTs = new HashMap<String, String>();
+                            session.addAttribute(SESSION_ATTRIBUTE_JWTS, generatedJWTs);
+                        }
+
+                        generatedJWTs.put(webApp.getUUID(), getJWTGenerator().generateToken(userAttributes, webApp, messageContext));
+
                     } catch (AppManagementException e) {
                         String errorMessage = String.format("Can't generate JWT for the subject : '%s'",
                                 authenticationContext.getSubject());

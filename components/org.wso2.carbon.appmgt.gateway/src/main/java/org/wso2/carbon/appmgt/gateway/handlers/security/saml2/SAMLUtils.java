@@ -70,7 +70,7 @@ public class SAMLUtils {
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
 
     public static final String SESSION_ATTRIBUTE_SAML_SESSION_INDEX = "samlSessionIndex";
-    public static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSE = "rawSAMLResponse";
+    public static final String SESSION_ATTRIBUTE_RAW_SAML_RESPONSES = "rawSAMLResponses";
 
     /**
      * Builds and returns a SAML authentication request to the IDP.
