@@ -38,6 +38,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.RequestAbstractType;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
@@ -50,6 +51,8 @@ import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.UrlPatternMatcher;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -67,7 +70,7 @@ public class GatewayUtils {
                 getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
     }
 
-    public static String getAppRootURL(MessageContext messageContext) throws MalformedURLException {
+    public static String getAppRootURL(MessageContext messageContext){
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
         String servicePrefix = axis2MessageContext.getProperty("SERVICE_PREFIX").toString();
@@ -75,9 +78,15 @@ public class GatewayUtils {
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
 
-        URL serverRootURL = new URL(servicePrefix);
-        URL appRootURL = new URL(serverRootURL, String.format("%s/%s/", webAppContext, webAppVersion));
-        return appRootURL.toString();
+        URL serverRootURL = null;
+        try {
+            serverRootURL = new URL(servicePrefix);
+            URL appRootURL = new URL(serverRootURL, String.format("%s/%s/", webAppContext, webAppVersion));
+            return appRootURL.toString();
+        } catch (MalformedURLException e) {
+            log.error("Error occurred while constructing the app root URL.", e);
+            return null;
+        }
     }
 
     public static boolean isAnonymousAccessAllowed(WebApp webApp, URITemplate uriTemplate) {
@@ -298,5 +307,23 @@ public class GatewayUtils {
     private static void removeIrrelevantHeadersBeforeResponding(Map headerMap) {
         headerMap.remove(HttpHeaders.HOST);
         headerMap.remove(HTTPConstants.HEADER_COOKIE);
+    }
+
+    public static void buildIncomingMessage(MessageContext messageContext) {
+
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+
+
+        try {
+            RelayUtils.buildMessage(axis2MessageContext);
+        } catch (IOException e) {
+            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } catch (XMLStreamException e) {
+            String errorMessage = String.format("Can't build the incoming request message for '%s'.", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        }
+
     }
 }
