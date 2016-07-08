@@ -223,7 +223,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         String sessionId = CacheManager.getSessionIndexMappingCache().get(sessionIndex);
 
         if(sessionId != null){
-            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Found a session id (md5 : '%s')for the given session index in the SLO request: '%s'. Clear the session", GatewayUtils.getMD5Hash(sessionId), sessionIndex));
+            GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Found a session id (md5 : '%s')for the given session index in the SLO request: '%s'. Clearing the session", GatewayUtils.getMD5Hash(sessionId), sessionIndex));
             SessionStore.getInstance().removeSession(sessionId);
             CacheManager.getSessionIndexMappingCache().remove(sessionIndex);
         }else{
