@@ -35,7 +35,9 @@ public class DocumentDTO  {
   
   
   private String sourceUrl = null;
-  
+
+  private String fileName = null;
+
   
   private String otherTypeName = null;
 
@@ -111,6 +113,16 @@ public class DocumentDTO  {
     this.sourceUrl = sourceUrl;
   }
 
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("fileName")
+  public String getFileName() {
+    return fileName;
+  }
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
+  }
   
   /**
    **/
@@ -135,7 +147,7 @@ public class DocumentDTO  {
     sb.append("  type: ").append(type).append("\n");
     sb.append("  summary: ").append(summary).append("\n");
     sb.append("  sourceType: ").append(sourceType).append("\n");
-    sb.append("  sourceUrl: ").append(sourceUrl).append("\n");
+    sb.append("  fileName: ").append(fileName).append("\n");
     sb.append("  otherTypeName: ").append(otherTypeName).append("\n");
     sb.append("}\n");
     return sb.toString();

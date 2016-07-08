@@ -3353,6 +3353,10 @@
                     "type": "string",
                     "example": ""
                 },
+                "fileName": {
+                    "type": "string",
+                    "example": "SampleDoc.pdf"
+                },
                 "otherTypeName": {
                     "type": "string",
                     "example": ""
