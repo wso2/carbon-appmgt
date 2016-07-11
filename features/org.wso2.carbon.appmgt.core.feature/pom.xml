@@ -206,11 +206,11 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.stub:${carbon.sequences.stub.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon.identity.base.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:compatible:${identity.framework.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:compatible:${bam.presentation.stub.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security.stub:compatible:${carbon.mediation.security.stub}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon.identity.base.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${carbon.identity.base.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${identity.entitlement.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${identity.entitlement.proxy.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.webapp.mgt.stub:${carbon.webapp.mgt.stub}</bundleDef>

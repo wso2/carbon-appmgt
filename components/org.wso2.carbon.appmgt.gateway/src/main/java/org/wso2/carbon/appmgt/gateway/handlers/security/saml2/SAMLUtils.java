@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.gateway.handlers.security.saml2;
 
 
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -50,6 +51,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -106,7 +108,10 @@ public class SAMLUtils {
         requestedAuthnContext.getAuthnContextClassRefs().add(authnContextClassRef);
 
         DateTime issueInstant = new DateTime();
-        String authReqRandomId = Integer.toHexString(new Double(Math.random()).intValue());
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[32];
+        secRandom.nextBytes(result);
+        String authReqRandomId = String.valueOf(Hex.encodeHex(result));
 
         /* Creation of AuthRequestObject */
         AuthnRequestBuilder authRequestBuilder = new AuthnRequestBuilder();

@@ -29,6 +29,8 @@ public class App {
     private String type;
     private String uuid;
     private String displayName;
+    private String name;
+    private String version;
     private float rating;
     private String[] appVisibility;
     private String banner;
@@ -36,6 +38,21 @@ public class App {
     private APIStatus lifeCycleStatus;
     private List<CustomProperty> customProperties;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public String[] getAppVisibility() {
         return appVisibility;
