@@ -61,10 +61,10 @@ var getAPISubscription = function (app, applicationName, subscriptionType, usern
             subscription: subscription
         };
     } catch (e) {
-        log.error(e.message);
+        log.warn("There is no any subscription for the user - " + String(username));
         return {
-            log.warn("There is no any subscription for the user - " + String(username));
-            subscription: null
+            error:e,
+            subscription:null
         };
     }
 };
