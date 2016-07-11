@@ -6,6 +6,9 @@ $(function() {
     var TAG_CONTAINER = '#tag-test';
     var CHARS_REM = 'chars-rem';
     var SP_ERROR_MEESAGE = 'Error adding service providers.';
+    var MSG_CONTAINER = '#msg-container-recent-activity';
+    var ERROR_CSS = 'alert alert-error';
+    var SUCCESS_CSS = 'alert alert-info';
 
 
     $('#overview_description').after('<span class="span8 ' + CHARS_REM + '"></span>');
@@ -188,7 +191,8 @@ $(function() {
                                         window.location = caramel.context + '/assets/' + type + '/';
                                     },
                                     error: function (response) {
-                                        showAlert('Error adding permissions.', 'error');
+                                        createMessage(MSG_CONTAINER, ERROR_CSS, 'Error while adding role permissions');
+
                                     }
                                 });
                             } else {
@@ -216,7 +220,8 @@ $(function() {
                                 contentType: 'application/json; charset=utf-8',
                                 dataType: 'json',
                                 error: function () {
-                                    showAlert('Unable to add the selected tag.', 'error');
+                                    createMessage(MSG_CONTAINER, ERROR_CSS, 'Unable to add the selected tag');
+
                                 }
                             });
                         }
@@ -227,13 +232,13 @@ $(function() {
 
                     } else {
                         var msg = result.message;
-                        showAlert(msg, 'error');
+                        createMessage(MSG_CONTAINER, ERROR_CSS, msg);
                     }
 
                 }, // post-submit callback
 
                 error: function (response) {
-                    showAlert('Failed to add asset.', 'error');
+                    createMessage(MSG_CONTAINER, ERROR_CSS, 'Failed to create the new version');
                 },
 
                 url: caramel.context + '/asset/' + type,
@@ -241,7 +246,7 @@ $(function() {
                 data: {oldVersion: $("#overview_oldVersion").val()}
             };
         }else{
-            showAlert('Mandatory field \'New Version\' has not been filled in.', 'error');
+            createMessage(MSG_CONTAINER, ERROR_CSS, 'Mandatory field \'New Version\' has not been filled in.');
         }
 
         $('#form-asset-copy').ajaxSubmit(options);
@@ -396,7 +401,20 @@ $(function() {
         });
     }
 
+    /*
+     The function creates a message and displays it in the provided container element.
+     @containerElement: The html element within which the message will be displayed
+     @cssClass: The type of message to be displayed
+     @msg: The message to be displayed
+     */
+    function createMessage(containerElement, cssClass, msg) {
+        var date = new Date();
+        var time = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        var infoMessage = '<div class="' + cssClass + '">' + '<a data-dismiss="alert" class="close">x</a>' + time + ' ' + msg + '</div';
 
+        //Place the message
+        $(containerElement).html(infoMessage);
+    }
 
     /*
      The function is used to build a report message indicating the errors in the form
