@@ -333,12 +333,12 @@
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
-        <version>${carbon.identity.version}</version>
+        <version>${identity.core.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.identity.user.registration.stub</artifactId>
-        <version>${carbon.identity.version}</version>
+        <version>${identity.framework.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon</groupId>
@@ -393,7 +393,7 @@
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.um.ws.api</artifactId>
-        <version>${carbon.identity.version}</version>
+        <version>${identity.um.ws.api.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon.mediation</groupId>
@@ -448,7 +448,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
-            <version>${carbon.identity.version}</version>
+            <version>${identity.application.mgt.version}</version>
         </dependency>
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
@@ -458,7 +458,7 @@
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
-        <version>${identity.entitlement.version}</version>
+        <version>${identity.entitlement.proxy.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon</groupId>
@@ -756,10 +756,10 @@
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.6.1-SNAPSHOT</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
-    <carbon.identity.version>5.1.1-SNAPSHOT</carbon.identity.version>
-    <carbon.identity.version_5.1.1>5.1.1-SNAPSHOT</carbon.identity.version_5.1.1>
-    <carbon.identity.base.version>5.1.1-SNAPSHOT</carbon.identity.base.version>
-    <carbon.identity.auth.version>5.1.1-SNAPSHOT</carbon.identity.auth.version>
+    <carbon.identity.version>5.1.1</carbon.identity.version>
+    <carbon.identity.version_5.1.1>5.1.1</carbon.identity.version_5.1.1>
+    <carbon.identity.base.version>5.1.1</carbon.identity.base.version>
+    <carbon.identity.auth.version>5.1.1</carbon.identity.auth.version>
     <carbon.identity.thrift.auth.version>${carbon.identity.version}</carbon.identity.thrift.auth.version>
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
     <carbon.identity.oauth.version>${carbon.identity.version}</carbon.identity.oauth.version>
@@ -774,8 +774,6 @@
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
     <carbon.store.version>1.4.2</carbon.store.version>
-
-     <!--carbon.commons.version_4.4.8>4.4.8</carbon.commons.version_4.4.8-->
 
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
@@ -831,15 +829,18 @@
     <jaggeryjs.uuid.feature.version>1.5.2</jaggeryjs.uuid.feature.version>
     <jaggeryjs.ws.feature.version>1.5.2</jaggeryjs.ws.feature.version>
 
-	<!-- Identity Version -->
-	<identity.sso.saml.version>${carbon.identity.version}</identity.sso.saml.version>
-	<identity.sso.saml.stub.version>${carbon.identity.version}</identity.sso.saml.stub.version>
-	<identity.core.version>${carbon.identity.version}</identity.core.version>
-	<identity.oauth.common.version>${carbon.identity.version}</identity.oauth.common.version>
-	<identity.provider.version>${carbon.identity.version}</identity.provider.version>
-	<identity.application.mgt.version>5.0.7</identity.application.mgt.version>
-	<identity.entitlement.version>${carbon.identity.version}</identity.entitlement.version>
-	<idp.mgt.stub.version>5.0.7</idp.mgt.stub.version>
+    <!-- Identity Versions -->
+    <identity.sso.saml.version>${carbon.identity.version}</identity.sso.saml.version>
+    <identity.sso.saml.stub.version>${carbon.identity.version}</identity.sso.saml.stub.version>
+    <identity.core.version>5.2.0</identity.core.version>
+    <identity.oauth.common.version>${carbon.identity.version}</identity.oauth.common.version>
+    <identity.provider.version>${carbon.identity.version}</identity.provider.version>
+    <identity.application.mgt.version>5.2.0</identity.application.mgt.version>
+    <identity.entitlement.version>5.2.0</identity.entitlement.version>
+    <identity.entitlement.proxy.version>5.1.0</identity.entitlement.proxy.version>
+    <idp.mgt.stub.version>5.2.0</idp.mgt.stub.version>
+    <identity.um.ws.api.version>5.1.0</identity.um.ws.api.version>
+    <identity.framework.version>5.2.0</identity.framework.version>
 
     <!-- Registry -->
     <governance.registry.extensions.imp.pkg.version>[4.5.8,4.6.0)</governance.registry.extensions.imp.pkg.version>
