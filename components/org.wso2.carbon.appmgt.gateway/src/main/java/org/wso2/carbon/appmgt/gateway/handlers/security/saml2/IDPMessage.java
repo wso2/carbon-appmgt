@@ -20,8 +20,14 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.saml2;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.opensaml.saml2.core.*;
+import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureValidator;
+import org.opensaml.xml.validation.ValidationException;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
 import java.util.List;
@@ -30,6 +36,8 @@ import java.util.List;
  * Represents the call back request from the IDP.
  */
 public class IDPMessage {
+
+    private static final Log log = LogFactory.getLog(IDPMessage.class);
 
     private RequestAbstractType samlRequest;
     private StatusResponseType samlResponse;
@@ -111,5 +119,43 @@ public class IDPMessage {
         }else{
             return false;
         }
+    }
+
+    public boolean validateSignature(Credential credential) {
+
+        SignatureValidator signatureValidator = new SignatureValidator(credential);
+
+        // Get the signature
+
+        Signature signature = null;
+        if(isResponse()){
+            signature = getSAMLResponse().getSignature();
+        }else if(isRequest()){
+            signature = getSAMLRequest().getSignature();
+        }
+
+        if(signature != null){
+            try {
+                signatureValidator.validate(signature);
+            } catch (ValidationException e) {
+                log.warn("Signature of the SAML message can't be validated.", e);
+                return false;
+            }
+        }else{
+            if(log.isDebugEnabled()){
+                log.debug("SAML message has not been singed.");
+            }
+        }
+
+        return true;
+
+    }
+
+    private boolean isRequest() {
+        return samlRequest != null;
+    }
+
+    private boolean isResponse() {
+        return samlResponse != null;
     }
 }

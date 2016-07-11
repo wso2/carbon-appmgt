@@ -32,15 +32,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
-import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.RequestAbstractType;
+import org.opensaml.xml.security.credential.Credential;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
@@ -50,15 +49,13 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.UrlPatternMatcher;
+import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
+import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public class GatewayUtils {
@@ -325,5 +322,9 @@ public class GatewayUtils {
             GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
+    }
+
+    public static Credential getIDPCertificate(String tenantDomain, String responseSigningKeyAlias) throws IdentitySAML2SSOException {
+        return SAMLSSOUtil.getX509CredentialImplForTenant(tenantDomain, responseSigningKeyAlias);
     }
 }
