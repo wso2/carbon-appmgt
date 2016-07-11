@@ -565,7 +565,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
 
-        final String appName = webApp.getApiName();
+        final String appName = webApp.getId().getApiName();
         try {
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
                     AppMConstants.WEBAPP_ASSET_TYPE);
