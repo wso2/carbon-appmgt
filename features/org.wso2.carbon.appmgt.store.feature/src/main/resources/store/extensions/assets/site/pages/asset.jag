@@ -5,6 +5,9 @@ var AppService;
 var appInfoApi;
 var authenticator;
 var log = new Log();
+var businessOwnerData;
+var ownerName;
+var ownerEmail;
 include('../modules/jagg/jagg.jag');
 
 var DocumentService = require('../services/documentation.js').serviceModule;
@@ -210,6 +213,22 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['overview_provider'] = provider;
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+            var overviewBusinessOwner = asset.attributes.overview_businessOwner;
+
+            var appDomainName = asset.attributes.overview_appTenant;
+            var tenantId = carbon.server.tenantId({
+                                                      domain: appDomainName
+                                                  });
+
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
+                var businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
+                if (businessOwner != null && businessOwner.businessOwnerName != null) {
+                    businessOwnerData =
+                            require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+                    ownerName = businessOwnerData[0].value;
+                    ownerEmail = businessOwnerData[1].value;
+                }
+            }
 
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
@@ -563,7 +582,10 @@ require('/modules/store.js').exec(function (ctx) {
                                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
                                enabledTypeList: enabledTypeList
                            },
-                           assetType : 'site'
+                           assetType : 'site',
+                           businessOwnerData: businessOwnerData,
+                           businessOwnerName: ownerName,
+                           businessOwnerEmail: ownerEmail
                        });
     }
 
