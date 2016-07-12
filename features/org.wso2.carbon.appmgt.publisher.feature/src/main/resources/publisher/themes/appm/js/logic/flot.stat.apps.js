@@ -57,7 +57,8 @@ function drawGraphs() {
 
 }
 
-var drawAPIUsageByUser = function (parsedResponse, usageByContext) {
+var parsedResponse;
+var drawAPIUsageByUser = function (response, usageByContext) {
     var dataStructure = [];
     for (var i = 0; i < usageByContext.length; i++) {
         var Num =0;
@@ -71,7 +72,7 @@ var drawAPIUsageByUser = function (parsedResponse, usageByContext) {
             "checked" : false
         });
     }
-
+    parsedResponse = response;
     length = parsedResponse.length;
     $("#tooltipTable").find("tr:gt(0)").remove();
     var data = [];
@@ -425,8 +426,9 @@ function format ( d ) {
                 }
             }
 
-            for(var k = 0; k < versions.length;k++){
-                subTable.append($('<tr><td >'+versions[k].version +'</td><td style="text-align:right">'+versions[k].SubCount+'</td><td style="text-align:right">'+versions[k].hitCount+'</td></tr>'));
+            for(var k = 0; k < versions.length; k++){
+                subTable.append($('<tr><td >' + versions[k].version + '</td><td style="text-align:center">' + versions[k].SubCount
+                                  + '</td><td style="text-align:center">' + versions[k].hitCount + '</td></tr>'));
             }
         }
     }
