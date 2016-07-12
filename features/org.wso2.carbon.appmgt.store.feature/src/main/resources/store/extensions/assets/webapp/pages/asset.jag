@@ -528,7 +528,7 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
-        var searchQuery = {search: "", searchTerm: ""};
+        var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
                            title: 'WebApp | Store',
