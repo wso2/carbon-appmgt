@@ -61,9 +61,9 @@
 
 
                                 <importFeatureDef>org.wso2.carbon.soaptracer:${carbon.commons.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.security.mgt:${identity.framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.security.mgt:${carbon-identity-framework.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.directory.service.mgr.server:${carbon.identity.version_5.1.1}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.security.mgt.server:${identity.framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.security.mgt.server:${carbon-identity-framework.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.service.mgt.server:${carbon.deployment.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.service.mgt:${carbon.deployment.version}</importFeatureDef>
 
@@ -116,7 +116,7 @@
                                 <importFeatureDef>org.wso2.carbon.identity.user.profile.server:${carbon.identity.version_5.1.1}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.oauth.server:${carbon.identity.version_5.1.1}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.idp.mgt.server:${carbon.identity.version_5.1.1}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.oauth.common:${identity.oauth.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth.common:${identity-inbound-auth-oauth.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.application.authenticator.basicauth.server:${carbon.identity.version_5.1.1}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.application.authenticator.samlsso.server:${carbon.identity.version_5.1.1}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.claim.mgt:${carbon.identity.version_5.1.1}</importFeatureDef>
