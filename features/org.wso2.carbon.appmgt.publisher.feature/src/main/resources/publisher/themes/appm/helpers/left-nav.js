@@ -50,7 +50,6 @@ var generateLeftNavJson = function(data, listPartial) {
             editEnabled = false;
         }
 
-        log.info("Editable : "+editEnabled)
         if (createActionAuthorized) {
             if (editEnabled) {
                 leftNavItems = {
