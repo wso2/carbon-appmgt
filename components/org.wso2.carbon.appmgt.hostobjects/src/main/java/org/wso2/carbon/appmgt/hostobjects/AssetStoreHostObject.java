@@ -1545,7 +1545,7 @@ public class AssetStoreHostObject extends ScriptableObject {
                             (k > 0 ? k : ""));
                     if (type != null && url != null && comment != null) {
                         NativeObject row = new NativeObject();
-                        row.put("name", row, DigestUtils.md5Hex(comment + url + type));
+                        row.put("name", row, DigestUtils.shaHex(comment + url + type));
                         row.put("sourceType", row, "URL");
                         row.put("summary", row, comment);
                         row.put("sourceUrl", row, url);

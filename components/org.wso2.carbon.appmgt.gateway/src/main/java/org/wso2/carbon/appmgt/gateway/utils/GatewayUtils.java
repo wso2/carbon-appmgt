@@ -248,7 +248,7 @@ public class GatewayUtils {
     }
 
     public static String getMD5Hash(String input){
-        return DigestUtils.md5Hex(input);
+        return DigestUtils.shaHex(input);
     }
 
     public static void redirectToIDPWithSAMLRequest(MessageContext messageContext, RequestAbstractType samlRequest) {

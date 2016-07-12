@@ -200,7 +200,7 @@ public class APPMgtGoogleAnalayticsHandler extends AbstractHandler {
         String message;
         message = userAgent + getRandomNumber() + UUID.randomUUID().toString();
 
-        MessageDigest m = MessageDigest.getInstance("MD5");
+        MessageDigest m = MessageDigest.getInstance("SHA-512");
         m.update(message.getBytes("UTF-8"), 0, message.length());
         byte[] sum = m.digest();
         BigInteger messageAsNumber = new BigInteger(1, sum);
