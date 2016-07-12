@@ -36,6 +36,9 @@ var render = function (theme, data, meta, require) {
         isEnterpriseSubscriptionEnabled: data.config.isEnterpriseSubscriptionEnabled,
         isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
         metadata:data.metadata,
+        businessOwnerData: data.businessOwnerData,
+        businessOwnerName: data.businessOwnerName,
+        businessOwnerEmail: data.businessOwnerEmail,
         tabs:{
             documentation:{
                 data:data.documentation,
