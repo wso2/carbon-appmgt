@@ -46,7 +46,7 @@ public abstract class ISBaseSAMLSSOConfigurator {
         dto.setIssuer(provider.getIssuerName());
         dto.setAssertionConsumerUrls(new String[]{provider.getAssertionConsumerURL()});
         dto.setDefaultAssertionConsumerUrl(provider.getAssertionConsumerURL());
-        dto.setCertAlias(null);
+        dto.setDoSignResponse(true);
 
         dto.setNameIDFormat(provider.getNameIdFormat());
         if (dto.getNameIDFormat() != null) {

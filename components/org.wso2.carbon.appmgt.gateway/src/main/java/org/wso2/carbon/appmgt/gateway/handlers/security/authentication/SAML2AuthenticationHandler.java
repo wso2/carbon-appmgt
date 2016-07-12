@@ -37,6 +37,7 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.ResponseImpl;
+import org.opensaml.xml.security.credential.Credential;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
@@ -55,6 +56,8 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -258,9 +261,24 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 String errorMessage = String.format("A SAML request or response was not there in the request to the ACS URL ('%s')", fullResourceURL);
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
+
+            // Validate the signature if there is any.
+            String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
+            Credential certificate = GatewayUtils.getIDPCertificate(CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), responseSigningKeyAlias);
+            boolean isValidSignature = idpMessage.validateSignature(certificate);
+
+            if(!isValidSignature){
+                String errorMessage = String.format("The signature of the SAML message received by the ASC URL ('%s'), can't be validated.", fullResourceURL);
+                GatewayUtils.logAndThrowException(log, errorMessage, null);
+            }
+
+
         } catch (SAMLException e) {
             String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, null);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } catch (IdentitySAML2SSOException e) {
+            String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));

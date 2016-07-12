@@ -306,6 +306,9 @@
         <!-- URL of the IDP use for SSO -->
         <IdentityProviderUrl>https://${carbon.local.ip}:${mgt.transport.https.port}/samlsso</IdentityProviderUrl>
 
+        <!-- This alias is used to validate the signature of the responses form the IDP -->
+        <ResponseSigningKeyAlias>wso2carbon</ResponseSigningKeyAlias>
+
         <Configurators>
             <Configurator>
                 <name>wso2is</name>
