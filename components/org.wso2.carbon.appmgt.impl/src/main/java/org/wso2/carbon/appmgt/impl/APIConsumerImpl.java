@@ -136,12 +136,14 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     /**
      * Returns business owner Ids by a prefix of business owner name.
      * @param searchPrefix
+     * @param appTenantId
      * @return
      * @throws AppManagementException
      */
     @Override
-    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix) throws AppManagementException {
-        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int appTenantId) throws
+                                                                                          AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, appTenantId);
     }
 
     /**

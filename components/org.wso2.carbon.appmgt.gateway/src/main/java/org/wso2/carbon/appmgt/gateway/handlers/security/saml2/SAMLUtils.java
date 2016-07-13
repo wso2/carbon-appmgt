@@ -296,7 +296,7 @@ public class SAMLUtils {
         String appRootURL = GatewayUtils.getAppRootURL(messageContext);
 
         //Construct the assertion consumer url by appending gateway endpoint as the host
-        String assertionConsumerUrl = appRootURL + AppMConstants.GATEWAY_ACS_RELATIVE_URL;
+        String assertionConsumerUrl = appRootURL + GatewayUtils.getACSURLPostfix();
 
         return assertionConsumerUrl;
     }

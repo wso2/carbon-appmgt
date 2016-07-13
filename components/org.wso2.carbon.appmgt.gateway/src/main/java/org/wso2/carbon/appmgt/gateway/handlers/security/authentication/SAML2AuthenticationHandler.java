@@ -223,12 +223,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // Get the session index from the SLORequest and remove the relevant session.
         String sessionIndex = logoutRequest.getSessionIndexes().get(0).getSessionIndex();
 
-        String sessionId = CacheManager.getSessionIndexMappingCache().get(sessionIndex);
+        String sessionId = CacheManager.getInstance().getSessionIndexMappingCache().get(sessionIndex);
 
         if(sessionId != null){
             GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Found a session id (md5 : '%s')for the given session index in the SLO request: '%s'. Clearing the session", GatewayUtils.getMD5Hash(sessionId), sessionIndex));
             SessionStore.getInstance().removeSession(sessionId);
-            CacheManager.getSessionIndexMappingCache().remove(sessionIndex);
+            CacheManager.getInstance().getSessionIndexMappingCache().remove(sessionIndex);
         }else{
             GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Couldn't find a session id for the given session index : '%s'", sessionIndex));
         }
@@ -333,7 +333,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Session index : %s", sessionIndex));
 
                 // Add Session Index -> Session ID to a cache.
-                CacheManager.getSessionIndexMappingCache().put(sessionIndex, session.getUuid());
+                CacheManager.getInstance().getSessionIndexMappingCache().put(sessionIndex, session.getUuid());
 
                 // Mark this web app as an access web app in this session.
                 session.addAccessedWebAppUUID(webApp.getUUID());
@@ -487,7 +487,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     private boolean isACSURL(String relativeResourceURL) {
-        return relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL) ||
+
+        String acsUrlPostfix = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+
+        return relativeResourceURL.equals(acsUrlPostfix) ||
                 relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL + "/");
     }
 
