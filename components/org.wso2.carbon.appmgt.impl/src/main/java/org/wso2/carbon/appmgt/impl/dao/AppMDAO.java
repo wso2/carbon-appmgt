@@ -58,6 +58,7 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserRealmService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -8622,6 +8623,8 @@ public class AppMDAO {
 
                 ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
+            } else if (searchOption == WebAppSearchOption.SEARCH_BY_BUSINESS_OWNER) {
+                List<Integer> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
             } else {
                 ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_NAME);
             }
@@ -8650,6 +8653,34 @@ public class AppMDAO {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
         return apiIdentifiers;
+    }
+
+    private void getUserAccessibleAppsByBusinessOwner(List<APIIdentifier> apiIdentifiers, List<Integer>
+            businessOwnerIdList, Registry registry, int tenantId, String searchValue) throws AppManagementException {
+            boolean isTenantFlowStarted = false;
+            try {
+                GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                UserRealmService realmService =
+                        (UserRealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                                .getOSGiService(UserRealmService.class);
+                String tenantDomain = realmService.getTenantManager().getDomain(tenantId);
+
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
+                                                                                    AppMConstants.API_KEY);
+            } catch (RegistryException e) {
+                handleException("Failed to search accessible apps details from tenant store :" + tenantId, e);
+            } catch (UserStoreException e) {
+                e.printStackTrace();
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+            }
     }
 
     /**
