@@ -79,6 +79,6 @@ public class SessionStore {
     }
 
     private Cache<String, Session> getSessionCache() {
-        return CacheManager.getSessionCache();
+        return CacheManager.getInstance().getSessionCache();
     }
 }

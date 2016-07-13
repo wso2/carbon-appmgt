@@ -67,6 +67,11 @@ public class GatewayUtils {
                 getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
     }
 
+    public static String getACSURLPostfix(){
+        return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+    }
+
     public static String getAppRootURL(MessageContext messageContext){
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();

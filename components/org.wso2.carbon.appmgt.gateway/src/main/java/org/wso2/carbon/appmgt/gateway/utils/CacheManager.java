@@ -21,20 +21,71 @@
 package org.wso2.carbon.appmgt.gateway.utils;
 
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
+import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import javax.cache.Cache;
+import javax.cache.CacheConfiguration;
 import javax.cache.Caching;
+import java.util.concurrent.TimeUnit;
 
 // A wrapper to class to get App Manager caches.
 public class CacheManager {
 
-    public static Cache<String, String> getSessionIndexMappingCache(){
+    private static CacheManager instance;
+
+    private static final long DEFAULT_GATEWAY_SESSION_TIMEOUT = 1800L;
+
+    private CacheManager(){
+        initCaches();
+    }
+
+    private void initCaches() {
+
+        String sessionCacheTimeoutPropertyValue = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+                                                    getFirstProperty(AppMConstants.GATEWAY_SESSION_TIMEOUT);
+
+        long sessionCacheTimeout = DEFAULT_GATEWAY_SESSION_TIMEOUT;
+
+        if(sessionCacheTimeoutPropertyValue != null){
+            sessionCacheTimeout = Long.parseLong(sessionCacheTimeoutPropertyValue);
+        }
+
+
+        Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).
+                createCacheBuilder(AppMConstants.GATEWAY_SESSION_CACHE).
+                setExpiry(CacheConfiguration.ExpiryType.MODIFIED, new CacheConfiguration.Duration(TimeUnit.SECONDS, sessionCacheTimeout)).
+                setExpiry(CacheConfiguration.ExpiryType.ACCESSED, new CacheConfiguration.Duration(TimeUnit.SECONDS, sessionCacheTimeout)).
+                setStoreByValue(false).build();
+
+        Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).
+                createCacheBuilder(AppMConstants.GATEWAY_SESSION_INDEX_MAPPING_CACHE).
+                setExpiry(CacheConfiguration.ExpiryType.MODIFIED, new CacheConfiguration.Duration(TimeUnit.SECONDS, sessionCacheTimeout)).
+                setExpiry(CacheConfiguration.ExpiryType.ACCESSED, new CacheConfiguration.Duration(TimeUnit.SECONDS, sessionCacheTimeout)).
+                setStoreByValue(false).build();
+
+
+    }
+
+
+    public static CacheManager getInstance() {
+        if (instance == null) {
+            synchronized (CacheManager.class) {
+                if (instance == null) {
+                    instance = new CacheManager();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public Cache<String, String> getSessionIndexMappingCache(){
         return Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).getCache(AppMConstants.GATEWAY_SESSION_INDEX_MAPPING_CACHE);
     }
 
-    public static Cache<String, Session> getSessionCache(){
+    public Cache<String, Session> getSessionCache(){
         return Caching.getCacheManager(AppMConstants.GATEWAY_CACHE_MANAGER).getCache(AppMConstants.GATEWAY_SESSION_CACHE);
     }
+
 
 }

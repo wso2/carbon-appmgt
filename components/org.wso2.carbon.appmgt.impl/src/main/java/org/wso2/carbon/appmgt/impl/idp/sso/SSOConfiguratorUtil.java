@@ -300,7 +300,9 @@ public class SSOConfiguratorUtil {
     }
 
     public static String getACSURL(WebApp webApp){
-        return getGatewayUrl(webApp) + AppMConstants.GATEWAY_ACS_RELATIVE_URL;
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String acsURLPostfix = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+        return getGatewayUrl(webApp) + acsURLPostfix;
     }
 
     private static void handleException(String msg, Throwable t) throws AppManagementException {

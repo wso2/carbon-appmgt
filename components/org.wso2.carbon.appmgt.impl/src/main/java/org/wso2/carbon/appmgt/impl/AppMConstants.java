@@ -50,6 +50,7 @@ public final class AppMConstants {
     public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
     public static final String MOBILE_LIFE_CYCLE = "MobileAppLifeCycle";
     public static final String WEBAPP_LIFE_CYCLE = "WebAppLifeCycle";
+    public static final String REGISTRY_LC_NAME = "registry.LC.name";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
@@ -436,6 +437,7 @@ public final class AppMConstants {
 
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
     public static final String SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS = SSO_CONFIGURATION + "ResponseSigningKeyAlias";
+    public static final String SSO_CONFIGURATION_ACS_URL_POSTFIX = SSO_CONFIGURATION + "ACSURLPostfix";
     public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
     public static final String SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS = SSO_CONFIGURATION + "CreateServiceProviderForSkipGatewayApps";
     public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";
@@ -450,6 +452,7 @@ public final class AppMConstants {
     public static final String SSO_CONFIGURATION_IDP_SERVICE_PWD = SSO_CONFIGURATION + "Password";
 
     public static final String APP_CONSUMER_AUTH_CONFIG = "AppConsumerAuthConfiguration.";
+    public static final String GATEWAY_SESSION_TIMEOUT = APP_CONSUMER_AUTH_CONFIG + "SessionTimeout";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = APP_CONSUMER_AUTH_CONFIG + "AddSAMLResponseHeaderToOutMessage";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = APP_CONSUMER_AUTH_CONFIG + "AddClaimsSelectively";
     public static final String TOKEN_GENERATOR_IMPL = APP_CONSUMER_AUTH_CONFIG + "TokenGeneratorImpl";

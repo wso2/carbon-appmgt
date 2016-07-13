@@ -64,6 +64,9 @@
     -->
     <AppConsumerAuthConfiguration>
 
+        <!-- Timeout (in seconds) for the gateway session cache. -->
+        <SessionTimeout>1800</SessionTimeout>
+
         <!--
         Enable/Disable JWT generation. Default is false.
         -->
@@ -305,6 +308,9 @@
 
         <!-- URL of the IDP use for SSO -->
         <IdentityProviderUrl>https://${carbon.local.ip}:${mgt.transport.https.port}/samlsso</IdentityProviderUrl>
+
+        <!-- Postfix of the ACS URL -->
+        <ACSURLPostfix>appm/acs</ACSURLPostfix>
 
         <!-- This alias is used to validate the signature of the responses form the IDP -->
         <ResponseSigningKeyAlias>wso2carbon</ResponseSigningKeyAlias>
