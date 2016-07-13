@@ -53,7 +53,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
+public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor {
 
     private static final Log log = LogFactory.getLog(PublishAPPWSWorkflowExecutor.class);
 
@@ -76,14 +76,14 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
     }
 
     @Override
-    public void execute(WorkflowDTO workflowDTO) throws WorkflowException{
+    public void execute(WorkflowDTO workflowDTO) throws WorkflowException {
 
         WorkflowExecutor appPublishWFExecutor = WorkflowExecutorFactory.getInstance().
                 getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APP_PUBLISH);
 
         //Update Webapp state to IN-Review till the workflow is approved
-        PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
-        try  {
+        PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO) workflowDTO;
+        try {
             String adminUserUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName();
             APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
@@ -94,7 +94,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 api.setStatus(oldState);
                 provider.changeAPIStatus(api, newStatus, adminUserUsername, true);
             }
-        }catch (AppManagementException e){
+        } catch (AppManagementException e) {
             log.error("Could not update APP lifecycle state to IN-REVIEW", e);
             throw new WorkflowException("Could not update APP lifecycle state to IN-REVIEW", e);
         } catch (UserStoreException e) {
@@ -103,10 +103,10 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
         }
 
         try {
-            if(publishAPPDTO.getLcState().equalsIgnoreCase(AppMConstants.ApplicationStatus.APPLICATION_CREATED)) {
+            if (publishAPPDTO.getLcState().equalsIgnoreCase(AppMConstants.ApplicationStatus.APPLICATION_CREATED)) {
 
                 ServiceClient client = new ServiceClient(ServiceReferenceHolder.getInstance()
-                                                                 .getContextService().getClientConfigContext(), null);
+                        .getContextService().getClientConfigContext(), null);
                 Options options = new Options();
                 options.setAction("http://workflow.publishapplication.apimgt.carbon.wso2.org/initiate");
                 options.setTo(new EndpointReference(serviceEndpoint));
@@ -135,13 +135,13 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 client.setOptions(options);
 
                 String payload = "<wor:PublishAppApprovalWorkFlowProcessRequest xmlns:wor=\"http://workflow.publishapplication.apimgt.carbon.wso2.org\">\n" +
-                                 "         <wor:appName>$1</wor:appName>\n" +
-                                 "         <wor:appVersion>$2</wor:appVersion>\n" +
-                                 "         <wor:appProvider>$3</wor:appProvider>\n" +
-                                 "         <wor:lcState>$4</wor:lcState>\n" +
-                                 "         <wor:workflowExternalRef>$5</wor:workflowExternalRef>\n" +
-                                 "         <wor:callBackURL>$6</wor:callBackURL>\n" +
-                                 "      </wor:PublishAppApprovalWorkFlowProcessRequest>";
+                        "         <wor:appName>$1</wor:appName>\n" +
+                        "         <wor:appVersion>$2</wor:appVersion>\n" +
+                        "         <wor:appProvider>$3</wor:appProvider>\n" +
+                        "         <wor:lcState>$4</wor:lcState>\n" +
+                        "         <wor:workflowExternalRef>$5</wor:workflowExternalRef>\n" +
+                        "         <wor:callBackURL>$6</wor:callBackURL>\n" +
+                        "      </wor:PublishAppApprovalWorkFlowProcessRequest>";
 
                 PublishApplicationWorkflowDTO publishApplicationWorkflowDTO = (PublishApplicationWorkflowDTO) workflowDTO;
                 String callBackURL = publishApplicationWorkflowDTO.getCallbackUrl();
@@ -170,10 +170,10 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
     public void complete(WorkflowDTO workflowDTO) throws WorkflowException {
         workflowDTO.setUpdatedTime(System.currentTimeMillis());
         super.complete(workflowDTO);
-        log.info("Publish API [Complete] Workflow Invoked. Workflow ID : " + workflowDTO.getExternalWorkflowReference() + "Workflow State : "+ workflowDTO.getStatus());
+        log.info("Publish API [Complete] Workflow Invoked. Workflow ID : " + workflowDTO.getExternalWorkflowReference() + "Workflow State : " + workflowDTO.getStatus());
 
         AppMDAO dao = new AppMDAO();
-        if(WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())){
+        if (WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())) {
             try {
                 WorkflowDTO wfdto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
                 String reference = wfdto.getWorkflowReference();
@@ -197,15 +197,15 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                     Resource apiResource = registry.get(apiPath);
                     String artifactId = apiResource.getUUID();
                     GenericArtifact webapp = artifactManager.getGenericArtifact(artifactId);
-                    webapp.invokeAction("Approve", AppMConstants.APP_LIFE_CYCLE);
-                }catch (RegistryException e){
+                    webapp.invokeAction(AppMConstants.STATE_APPROVE, apiResource.getProperty(AppMConstants.REGISTRY_LC_NAME));
+                } catch (RegistryException e) {
                     log.error("Error occured while retrieving registry artifact", e);
                 }
 
             } catch (AppManagementException e) {
                 log.error("Error while retrieving relevant workflow reference", e);
             }
-        } else if (WorkflowStatus.REJECTED.equals(workflowDTO.getStatus())){              //Web App rejection workflow
+        } else if (WorkflowStatus.REJECTED.equals(workflowDTO.getStatus())) {              //Web App rejection workflow
             try {
                 WorkflowDTO wfdto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
                 String reference = wfdto.getWorkflowReference();
@@ -237,7 +237,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                     String artifactId = apiResource.getUUID();
                     GenericArtifact webapp = artifactManager.getGenericArtifact(artifactId);
                     webapp.invokeAction("Reject", AppMConstants.APP_LIFE_CYCLE);
-                }catch (RegistryException e){
+                } catch (RegistryException e) {
                     log.error("Error occured while retrieving registry artifact", e);
                 }
 
@@ -247,12 +247,34 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 log.error("Error while trying to reject workflow. Retrieving admin user, username failed.", e);
             }
 
+        } else if (WorkflowStatus.PUBLISHED.equals(workflowDTO.getStatus())) {
+            try {
+                WorkflowDTO dto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
+                String reference = dto.getWorkflowReference();
+                String adminUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().
+                        getRealmConfiguration().getAdminUserName();
+
+                String[] appDecodedValue = decodeValues(reference);
+                APIIdentifier appIdentifier = new APIIdentifier(appDecodedValue[2], appDecodedValue[0],
+                        appDecodedValue[1]);
+                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUsername);
+                WebApp app = provider.getAPI(appIdentifier);
+
+                if (app != null) {
+                    APIStatus newStatus = getApiStatus(workflowDTO.getStatus().name());
+                    provider.changeAPIStatus(app, newStatus, adminUsername, true);
+                }
+            } catch (AppManagementException e) {
+                log.error("Error while retrieving relevant workflow reference", e);
+            } catch (UserStoreException e) {
+                log.error("Error while trying to publish workflow. Retrieving admin user, username failed.", e);
+            }
         }
     }
 
-    private String[] decodeValues(String concatString){
-         String[] values = concatString.split(":");
-         return values;
+    private String[] decodeValues(String concatString) {
+        String[] values = concatString.split(":");
+        return values;
     }
 
     private static APIStatus getApiStatus(String status) {

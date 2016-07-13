@@ -52,10 +52,11 @@ var generateLeftNavJson = function(data, listPartial) {
 
     var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, userManager);
     var lifecycleState = data.artifact.lifecycleState;
-    if (lifecycleState == "Approved" || lifecycleState == "Published") {
-        editEnabled = false;
-    } else if (user.hasRoles(["admin"]) || mobileAppUpdateAuthorized) {
+
+    if(user.hasRoles(["admin"]) || (mobileAppUpdateAuthorized &&  !(lifecycleState == "Published"))){
         editEnabled = true;
+    } else {
+        editEnabled = false;
     }
 
     if (editEnabled) {

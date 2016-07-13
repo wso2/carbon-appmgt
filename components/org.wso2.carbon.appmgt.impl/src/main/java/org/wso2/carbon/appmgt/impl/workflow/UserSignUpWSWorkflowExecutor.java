@@ -28,16 +28,20 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.SelfSignUpUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
+public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor {
 
     private static final Log log = LogFactory.getLog(UserSignUpWSWorkflowExecutor.class);
 
@@ -64,14 +68,14 @@ public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
             Options options = new Options();
             options.setAction("http://workflow.registeruser.apimgt.carbon.wso2.org/initiate");
             options.setTo(new EndpointReference(serviceEndpoint));
-            if(contentType != null){
+            if (contentType != null) {
                 options.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
             }
 
             HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
 
             //Consider this as a secured service if username and password are not null. Unsecured if not.
-            if(username != null && password != null){
+            if (username != null && password != null) {
                 auth.setUsername(username);
                 auth.setPassword(password);
                 auth.setPreemptiveAuthentication(true);
@@ -79,7 +83,7 @@ public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
                 authSchemes.add(HttpTransportProperties.Authenticator.BASIC);
                 auth.setAuthSchemes(authSchemes);
 
-                if(contentType == null){
+                if (contentType == null) {
                     options.setProperty(Constants.Configuration.MESSAGE_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
                 }
                 options.setProperty(org.apache.axis2.transport.http.HTTPConstants.AUTHENTICATE, auth);
@@ -98,7 +102,7 @@ public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
 
             String callBackURL = workflowDTO.getCallbackUrl();
 
-            payload = payload.replace("$1", workflowDTO.getWorkflowReference()) ;
+            payload = payload.replace("$1", workflowDTO.getWorkflowReference());
             payload = payload.replace("$2", workflowDTO.getTenantDomain());
             payload = payload.replace("$3", workflowDTO.getExternalWorkflowReference());
             payload = payload.replace("$4", callBackURL != null ? callBackURL : "?");
@@ -118,10 +122,10 @@ public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
     public void complete(WorkflowDTO workflowDTO) throws WorkflowException {
         workflowDTO.setStatus(workflowDTO.getStatus());
         workflowDTO.setUpdatedTime(System.currentTimeMillis());
-        log.info("User Sign Up [Complete] Workflow Invoked. Workflow ID : " + workflowDTO.getExternalWorkflowReference() + "Workflow State : "+ workflowDTO.getStatus());
+        log.info("User Sign Up [Complete] Workflow Invoked. Workflow ID : " + workflowDTO.getExternalWorkflowReference() + "Workflow State : " + workflowDTO.getStatus());
 
         super.complete(workflowDTO);
-        if(WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())){
+        if (WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())) {
             AppManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
             String serverURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
             String adminUsername = config.getFirstProperty(AppMConstants.AUTH_MANAGER_USERNAME);
@@ -131,25 +135,28 @@ public class UserSignUpWSWorkflowExecutor extends UserSignUpWorkflowExecutor{
                         " authentication manager");
             }
 
-            String role = config.getFirstProperty(AppMConstants.SELF_SIGN_UP_ROLE);
-            if (role == null) {
-                throw new WorkflowException("Subscriber role undefined for self registration");
-            }
-
-            try{
-                /* update users role list with SELF_SIGN_UP_ROLE role */
-                updateRolesOfUser(serverURL, adminUsername, adminPassword, workflowDTO.getWorkflowReference(), role);
-            }catch(Exception e){
+            String tenantDomain = workflowDTO.getTenantDomain();
+            try {
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                        .getTenantId(tenantDomain);
+                String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(workflowDTO.getWorkflowReference());
+                UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantId);
+                List role = SelfSignUpUtil.getRoleNames(signupConfig);
+                if (role == null) {
+                    throw new WorkflowException("Subscriber role undefined for self registration");
+                }
+                updateRolesOfUser(serverURL, adminUsername, adminPassword, tenantAwareUserName,
+                        SelfSignUpUtil.getRoleNames(signupConfig), tenantDomain);
+            } catch (AppManagementException e) {
+                throw new WorkflowException("Error while accessing signup configuration", e);
+            } catch (Exception e) {
                 throw new WorkflowException("Error while assigning role to user", e);
-
             }
         }
-
     }
 
-
     @Override
-    public List<WorkflowDTO> getWorkflowDetails(String workflowStatus) throws WorkflowException{
+    public List<WorkflowDTO> getWorkflowDetails(String workflowStatus) throws WorkflowException {
         return null;
     }
 
