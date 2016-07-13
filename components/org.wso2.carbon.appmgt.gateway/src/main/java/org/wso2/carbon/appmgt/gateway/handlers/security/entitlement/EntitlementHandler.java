@@ -33,9 +33,11 @@ import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -60,7 +62,10 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     	if (isHandlerApplicable(messageContext)) {
     		try {
 				if(!isResourcePermitted(messageContext)){
-					notifyUser(messageContext);
+					GatewayUtils.logWithRequestInfo(log, messageContext,
+									String.format("'%s' doesn't have rights to access the resource.",
+													GatewayUtils.getSession(messageContext).getAuthenticationContext().getSubject()));
+					GatewayUtils.send401(messageContext, null);
 					return false;
 				}else{
 					return true;
@@ -84,18 +89,17 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     }
 
     private boolean isHandlerApplicable(MessageContext messageContext) {
-		return doesInUrlHasMatchingResourcePattern(messageContext) && !isAnnoymousAccessAllowed(messageContext);  
+
+		if(GatewayUtils.shouldSkipSecurity(messageContext)){
+			return false;
+		}
+
+		URITemplate matchedURITemplate = (URITemplate) messageContext.getProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE);
+		boolean isEntitlementPolicyAvailable = matchedURITemplate.getPolicyGroup().getFirstEntitlementPolicyId() > 0;
+
+		return isEntitlementPolicyAvailable;
 	}
 
-	private boolean isAnnoymousAccessAllowed(MessageContext messageContext) {
-		return (Boolean) messageContext.getProperty(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS) ||
-                (Boolean) messageContext.getProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS);
-	}
-    
-	private boolean doesInUrlHasMatchingResourcePattern(MessageContext messageContext) {
-		return messageContext.getProperty(AppMConstants.MATCHED_URL_PATTERN_PROERTY_NAME) != null;
-	}
-    
     /**
      * Extracts info related to the resource requests and checkes whether the request is permitted.
      * @param messageContext Synapse message context.
@@ -115,6 +119,8 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     		
     		// We only support only one XACML policy as of now.
     		String applicablePolicyId = applicablePolicyIds.get(0);
+
+			GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Applying XACML policy '%s'", applicablePolicyId));
     		
     		EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
     		return isResourcePermitted(entitlementDecisionRequest);
@@ -123,12 +129,11 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 
     private List<String> getApplicableEntitlementPolicyIds(MessageContext messageContext) throws AppManagementException {
 		
-    	Integer appId = (Integer) messageContext.getProperty(AppMConstants.MATCHED_APP_ID_PROERTY_NAME);
-    	String matchedUrlPattern = (String) messageContext.getProperty(AppMConstants.MATCHED_URL_PATTERN_PROERTY_NAME);
-    	String httpVerb = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(Constants.Configuration.HTTP_METHOD);
-    	
+    	Integer appId = (Integer) messageContext.getProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_APP_ID);
+		URITemplate matchedURITemplate = (URITemplate) messageContext.getProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE);
+
     	AppMDAO appMDAO = new AppMDAO();
-    	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedUrlPattern, httpVerb);
+    	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedURITemplate.getUriTemplate(), matchedURITemplate.getHTTPVerb());
 	}
 
 	private boolean isResourcePermitted(EntitlementDecisionRequest request) throws AppManagementException {
@@ -143,7 +148,7 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      */
     private EntitlementDecisionRequest getEntitlementDecisionRequest(MessageContext messageContext, String applicablePolicyId) {
 
-        String subject = (String) messageContext.getProperty(APISecurityConstants.SUBJECT);
+        String subject = GatewayUtils.getSession(messageContext).getAuthenticationContext().getSubject();
 
         EntitlementDecisionRequest entitlementDecisionRequest = new EntitlementDecisionRequest();
         entitlementDecisionRequest.setPolicyId(applicablePolicyId);
@@ -151,31 +156,7 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 
         return entitlementDecisionRequest;
     }
-    
-	/**
-	 * Sends "401 Unauthorized" response to the user.
-	 * 
-	 * @param messageContext
-	 */
-	private void notifyUser(MessageContext messageContext) {
 
-		org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-		Object headers = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-		
-		if (headers != null && headers instanceof Map) {
-            
-			@SuppressWarnings("unchecked")
-			Map<String, Object> headersMap = (Map<String, Object>) headers;
-            
-			headersMap.clear();
-            axis2MessageContext.setProperty("HTTP_SC", "401");
-            axis2MessageContext.setProperty("NO_ENTITY_BODY", new Boolean("true"));
-            messageContext.setProperty("RESPONSE", "true");
-            messageContext.setTo(null);
-            Axis2Sender.sendBack(messageContext);
-        }
-	}
-	
     /**
      * Returns the Axis2 message context from the Synapse message context.
      * @param messageContext

@@ -114,8 +114,8 @@ public class GatewayUtils {
 
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace ns = fac.createOMNamespace("http://wso2.org/appm", "appm");
-        OMElement payload = fac.createOMElement("fault", ns);
-        payload.setText("Unauthorized");
+        OMElement payload = fac.createOMElement("error", ns);
+        payload.setText("Unauthorized access");
 
         OMElement firstChild = messageContext.getEnvelope().getBody().getFirstElement();
         if (firstChild != null) {

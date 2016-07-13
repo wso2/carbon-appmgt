@@ -108,6 +108,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
+        messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_APP_ID, webApp.getDatabaseId());
+
         // Find a matched URI template.
         URITemplate matchedTemplate = GatewayUtils.findMatchedURITemplate(webApp, httpVerb, relativeResourceURL);
         messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE, matchedTemplate);
@@ -166,7 +168,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 requestAuthentication(messageContext);
                 return false;
             }
-
+            
             // Set the session as a message context property.
             messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, session.getUuid());
 
