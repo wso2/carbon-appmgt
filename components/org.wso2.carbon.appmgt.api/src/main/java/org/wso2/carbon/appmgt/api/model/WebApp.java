@@ -773,4 +773,19 @@ public class WebApp extends App{
 
         uriTemplates.add(uriTemplate);
     }
+
+    public URITemplate getURITemplate(int urlTemplateId) {
+
+        if(uriTemplates != null){
+
+            for(URITemplate template : uriTemplates){
+                if(template.getId() == urlTemplateId){
+                    return template;
+                }
+            }
+
+        }
+
+        return null;
+    }
 }
