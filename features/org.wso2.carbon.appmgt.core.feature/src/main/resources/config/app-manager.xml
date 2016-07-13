@@ -64,6 +64,9 @@
     -->
     <AppConsumerAuthConfiguration>
 
+        <!-- Timeout (in seconds) for the gateway session cache. -->
+        <SessionTimeout>1800</SessionTimeout>
+
         <!--
         Enable/Disable JWT generation. Default is false.
         -->

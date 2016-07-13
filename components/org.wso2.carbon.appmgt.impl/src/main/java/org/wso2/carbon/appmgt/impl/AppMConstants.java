@@ -452,6 +452,7 @@ public final class AppMConstants {
     public static final String SSO_CONFIGURATION_IDP_SERVICE_PWD = SSO_CONFIGURATION + "Password";
 
     public static final String APP_CONSUMER_AUTH_CONFIG = "AppConsumerAuthConfiguration.";
+    public static final String GATEWAY_SESSION_TIMEOUT = APP_CONSUMER_AUTH_CONFIG + "SessionTimeout";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = APP_CONSUMER_AUTH_CONFIG + "AddSAMLResponseHeaderToOutMessage";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = APP_CONSUMER_AUTH_CONFIG + "AddClaimsSelectively";
     public static final String TOKEN_GENERATOR_IMPL = APP_CONSUMER_AUTH_CONFIG + "TokenGeneratorImpl";
