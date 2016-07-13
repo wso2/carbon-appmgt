@@ -487,7 +487,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     private boolean isACSURL(String relativeResourceURL) {
-        return relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL) ||
+
+        String acsUrlPostfix = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+
+        return relativeResourceURL.equals(acsUrlPostfix) ||
                 relativeResourceURL.equals(AppMConstants.GATEWAY_ACS_RELATIVE_URL + "/");
     }
 
