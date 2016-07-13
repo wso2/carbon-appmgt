@@ -2518,13 +2518,14 @@ public class APIStoreHostObject extends ScriptableObject {
      */
     public static List<Integer> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
             Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
-        if (args == null || args.length != 1) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of parameters.");
         }
 
         String searchPrefix = args[0].toString();
+        int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        List<Integer> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix);
+        List<Integer> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
         return businessOwnersList;
     }
 
