@@ -94,7 +94,7 @@ public class ApproveEventExecutor implements Execution
             return false;
         }
 
-        if(appPublishWFExecutor.isAsynchronus()){
+        if(appPublishWFExecutor.isAsynchronus() || WorkflowStatus.PUBLISHED.name().equalsIgnoreCase(s2)){
             String resourceID = requestContext.getResource().getUUID();
             String appName = null;
             String appVersion = null;
@@ -125,8 +125,11 @@ public class ApproveEventExecutor implements Execution
                     try {
                         if(workflowDTO!=null){
                             PublishApplicationWorkflowDTO publishhAppDTO = new PublishApplicationWorkflowDTO();
-
-                            publishhAppDTO.setStatus(WorkflowStatus.APPROVED);
+                            if (WorkflowStatus.PUBLISHED.name().equalsIgnoreCase(s2)) {
+                                publishhAppDTO.setStatus(WorkflowStatus.PUBLISHED);
+                            } else {
+                                publishhAppDTO.setStatus(WorkflowStatus.APPROVED);
+                            }
                             publishhAppDTO.setExternalWorkflowReference(workflowDTO.getExternalWorkflowReference());
                             publishhAppDTO.setWorkflowReference(workflowDTO.getWorkflowReference());
                             publishhAppDTO.setWorkflowType(workflowDTO.getWorkflowType());

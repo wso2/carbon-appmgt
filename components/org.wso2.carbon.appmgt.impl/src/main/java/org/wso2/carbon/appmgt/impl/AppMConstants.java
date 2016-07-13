@@ -50,6 +50,7 @@ public final class AppMConstants {
     public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
     public static final String MOBILE_LIFE_CYCLE = "MobileAppLifeCycle";
     public static final String WEBAPP_LIFE_CYCLE = "WebAppLifeCycle";
+    public static final String REGISTRY_LC_NAME = "registry.LC.name";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";

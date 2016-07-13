@@ -128,6 +128,9 @@ public class SubscriptionCreationWSWorkflowExecutor extends WorkflowExecutor{
 
                 client.fireAndForget(AXIOMUtil.stringToOM(payload));
 
+                appMDAO.updateSubscriptionStatus(Integer.parseInt(workflowDTO.getWorkflowReference()),
+                        AppMConstants.SubscriptionStatus.BLOCKED);
+
                 super.execute(workflowDTO);
             }
         } catch (AxisFault axisFault) {
