@@ -53,6 +53,12 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
         }
 
         try {
+            AppManagerUtil.loadTenantConf(tenantId);
+        } catch (AppManagementException e) {
+            log.error(String.format("Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry", tenantDomain));
+            e.printStackTrace();
+        }
+        try {
             //Add the creator & publisher roles if not exists
             //Apply permissons to appmgt collection for creator role
             UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
