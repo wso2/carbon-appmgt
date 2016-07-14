@@ -65,6 +65,7 @@ var module = function () {
 
         webAppObj.setPolicyGroups(policyGroups); //set policy group id list
         webAppObj.setJavaPolicies(javaPolicies); //set java policies id list
+        webAppObj.setVisibleRoles(attributes["overview_visibleRoles"]);
 
         while(urlPattern != null && trim(urlPattern).length > 0){
 

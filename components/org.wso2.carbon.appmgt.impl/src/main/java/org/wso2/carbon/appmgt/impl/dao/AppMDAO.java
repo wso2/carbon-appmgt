@@ -3988,8 +3988,8 @@ public class AppMDAO {
         ResultSet rs = null;
         String businessOwnerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                        "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "VISIBLE_ROLES, UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4019,12 +4019,13 @@ public class AppMDAO {
             prepStmt.setString(4, app.getId().getVersion());
             prepStmt.setString(5, app.getContext());
             prepStmt.setString(6, app.getTrackingCode());
-            prepStmt.setString(7, app.getUUID());
-            prepStmt.setString(8, app.getSaml2SsoIssuer());
-            prepStmt.setString(9, logoutURL);
-            prepStmt.setBoolean(10, app.getAllowAnonymous());
-            prepStmt.setString(11, app.getUrl());
-            prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
+            prepStmt.setString(7, app.getVisibleRoles());
+            prepStmt.setString(8, app.getUUID());
+            prepStmt.setString(9, app.getSaml2SsoIssuer());
+            prepStmt.setString(10, logoutURL);
+            prepStmt.setBoolean(11, app.getAllowAnonymous());
+            prepStmt.setString(12, app.getUrl());
+            prepStmt.setBoolean(13, Boolean.parseBoolean(app.getTreatAsASite()));
 
             prepStmt.execute();
 
@@ -4616,8 +4617,8 @@ public class AppMDAO {
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
-                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
-                    " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
+                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? ," +
+                    " VISIBLE_ROLES = ? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
 				getAPIManagerConfiguration().getFirstProperty(GATEWAY_URL);
@@ -4642,9 +4643,10 @@ public class AppMDAO {
             prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
             prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
-            prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setString(7, api.getId().getApiName());
-            prepStmt.setString(8, api.getId().getVersion());
+            prepStmt.setString(6, api.getVisibleRoles());
+            prepStmt.setString(7, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setString(8, api.getId().getApiName());
+            prepStmt.setString(9, api.getId().getVersion());
             prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);

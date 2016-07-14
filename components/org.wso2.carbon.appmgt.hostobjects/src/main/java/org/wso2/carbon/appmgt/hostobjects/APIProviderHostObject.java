@@ -1299,9 +1299,10 @@ public class APIProviderHostObject extends ScriptableObject {
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
                                                                                  apiData));
         String treatAsSite = (String) apiData.get("overview_treatAsASite", apiData);
+        String visibleRoles = (String) apiData.get(AppMConstants.API_OVERVIEW_VISIBLE_ROLES);
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
-        String visibleRoles = "";
+
 
         if (endpoint != null && endpoint.trim().length() == 0) {
             endpoint = null;
@@ -1391,6 +1392,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setAllowAnonymous(allowAnonymous);
         api.setDefaultVersion(makeAsDefaultVersion);
         api.setTreatAsASite(treatAsSite);
+        api.setVisibleRoles(visibleRoles);
 
         try {
             apiProvider.updateAPI(api);

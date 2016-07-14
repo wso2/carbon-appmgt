@@ -453,6 +453,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         serviceProvider.setInboundAuthenticationConfig(iac);
 
         setLocalAndOutBoundAuthentication(serviceProvider);
+        serviceProvider.getLocalAndOutBoundAuthenticationConfig().setUseTenantDomainInLocalSubjectIdentifier(true);
         return serviceProvider;
     }
 

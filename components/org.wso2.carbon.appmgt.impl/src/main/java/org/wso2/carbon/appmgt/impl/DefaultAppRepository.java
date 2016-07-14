@@ -141,6 +141,7 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.setLogoutURL(resultSetOfBasicInfo.getString("LOG_OUT_URL"));
                 webApp.setAllowAnonymous(resultSetOfBasicInfo.getBoolean("APP_ALLOW_ANONYMOUS"));
                 webApp.setUrl(resultSetOfBasicInfo.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicInfo.getString("VISIBLE_ROLES"));
 
                 // There should be only one app for the given combination
                 break;
