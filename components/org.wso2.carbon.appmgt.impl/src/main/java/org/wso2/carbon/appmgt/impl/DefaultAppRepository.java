@@ -735,6 +735,32 @@ public class DefaultAppRepository implements AppRepository {
         // Get the attributes of the source.
         WebApp sourceApp = (WebApp) getApp(targetApp.getType(), targetApp.getUUID());
 
+        //check if the new app identity already exists
+        final String appName = sourceApp.getName();
+        final String appVersion = targetApp.getId().getVersion();
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                                                                                       AppMConstants.WEBAPP_ASSET_TYPE);
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            attributeListMap.put(AppMConstants.API_OVERVIEW_VERSION, new ArrayList<String>() {{
+                add(appVersion);
+            }});
+
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleException("A duplicate webapp already exists with name '" +
+                                        appName + "' and version '" + appVersion + "'", null);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error occurred while checking existence for webapp with name '" + appName +
+                                    "' and version '" + appVersion + "'", null);
+        }
+
+
         // Clear the ID.
         sourceApp.setUUID(null);
 
