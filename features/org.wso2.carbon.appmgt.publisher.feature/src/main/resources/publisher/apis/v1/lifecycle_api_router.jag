@@ -400,10 +400,8 @@ require('/modules/publisher.js').exec(function (ctx) {
         // add comments for life cycle promotion
         try {
             // content type of the PUT request should be 'application/json'
-            var receivedContent = context.content;
-            if (receivedContent) {
-                var message = JSON.parse(receivedContent);
-                var comment = message.comment;
+            var comment = (context.content) ? context.content.comment : null;
+            if (comment) {
                 var lcHistory = artifactManager.getLifecycleHistory(currentArtifact);
                 var lcHistoryXML = new XML(lcHistory.content);
                 lcHistoryJSON = utility.xml.convertE4XtoJSON(lcHistoryXML);
