@@ -1438,6 +1438,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 subscriptionToReturn.put("applicationId", subscriptionToReturn, subscription.getApplicationId());
                 subscriptionToReturn.put("subscriptionType", subscriptionToReturn, subscription.getSubscriptionType());
                 subscriptionToReturn.put("subscriptionStatus",subscriptionToReturn,subscription.getSubscriptionStatus());
+                subscriptionToReturn.put("subscriptionTime",subscriptionToReturn,subscription.getSubscriptionTime());
+                subscriptionToReturn.put("subscribedUser",subscriptionToReturn,subscription.getUserId());
 
                 Set<String> trustedIdps = subscription.getTrustedIdps();
 
