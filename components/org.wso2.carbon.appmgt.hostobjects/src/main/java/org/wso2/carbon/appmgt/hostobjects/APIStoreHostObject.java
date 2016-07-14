@@ -2516,7 +2516,7 @@ public class APIStoreHostObject extends ScriptableObject {
      * @return business owner Ids List.
      * @throws AppManagementException
      */
-    public static List<Integer> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
+    public static List<String> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
             Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
         if (args == null || args.length != 2) {
             handleException("Invalid number of parameters.");
@@ -2525,7 +2525,7 @@ public class APIStoreHostObject extends ScriptableObject {
         String searchPrefix = args[0].toString();
         int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        List<Integer> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+        List<String> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
         return businessOwnersList;
     }
 
