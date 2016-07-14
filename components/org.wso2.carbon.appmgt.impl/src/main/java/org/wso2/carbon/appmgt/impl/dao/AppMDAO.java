@@ -1299,12 +1299,14 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUB.APP_ID, " +
-                    "APPLICATION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, TRUSTED_IDP " +
-                    "FROM APM_SUBSCRIPTION SUB, APM_APP APP " +
-                    "WHERE SUB.APP_ID = APP.APP_ID AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? " +
-                    "AND APP.APP_VERSION = ? AND SUB.APPLICATION_ID = ? AND SUB.SUBSCRIPTION_TYPE" +
-                    " = ?";
+            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, SUBSCRIPTION_TIME, " +
+                     "USER_ID , APM_APP.APP_ID, APM_APPLICATION.APPLICATION_ID, TRUSTED_IDP " +
+                    "FROM APM_SUBSCRIPTION, APM_APPLICATION, APM_SUBSCRIBER, APM_APP " +
+                    "WHERE APM_APPLICATION.APPLICATION_ID = APM_SUBSCRIPTION.APPLICATION_ID " +
+                    "AND APM_SUBSCRIBER.SUBSCRIBER_ID = APM_APPLICATION.SUBSCRIBER_ID " +
+                    "AND APM_SUBSCRIPTION.APP_ID = APM_APP.APP_ID " +
+                    "AND APM_APP.APP_PROVIDER = ? AND APM_APP.APP_NAME = ? AND APM_APP.APP_VERSION = ? " +
+                    "AND APM_APPLICATION.APPLICATION_ID = ? AND SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
@@ -1323,6 +1325,8 @@ public class AppMDAO {
                 subscription.setApplicationId(resultSet.getInt("APPLICATION_ID"));
                 subscription.setSubscriptionType(resultSet.getString("SUBSCRIPTION_TYPE"));
                 subscription.setSubscriptionStatus(resultSet.getString("SUB_STATUS"));
+                subscription.setUserId(resultSet.getString("USER_ID"));
+                subscription.setSubscriptionTime(resultSet.getString("SUBSCRIPTION_TIME"));
 
                 String trustedIdpsJson = resultSet.getString("TRUSTED_IDP");
                 Object decodedJson = null;

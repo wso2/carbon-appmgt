@@ -36,6 +36,8 @@ public class Subscription {
     private Set<String> trustedIdps;
     private String subscriptionStatus;
     private String tierId;
+    private String userId;
+    private String subscriptionTime;
 
     public Subscription() {
         trustedIdps = new HashSet<String>();
@@ -99,6 +101,22 @@ public class Subscription {
 
     public void setTierId(String tierId) {
         this.tierId = tierId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getSubscriptionTime() {
+        return subscriptionTime;
+    }
+
+    public void setSubscriptionTime(String subscriptionTime) {
+        this.subscriptionTime = subscriptionTime;
     }
 
     /**
