@@ -1211,10 +1211,13 @@ var exec = function (fn, request, response, session) {
         response.sendError(404, 'Tenant:' + tenant.domain + ' not registered');
         return;
     }
+    var username = tenant ? tenant.username : carbon.user.anonUser;
+    var tenantAwareUserName = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(username);
+
 
     es.server.sandbox({
         tenantId: tenantId,
-        username: tenant ? tenant.username : carbon.user.anonUser,
+        username: tenantAwareUserName,
         request: request
     }, function () {
         var configs = require('/config/store.js').config();
