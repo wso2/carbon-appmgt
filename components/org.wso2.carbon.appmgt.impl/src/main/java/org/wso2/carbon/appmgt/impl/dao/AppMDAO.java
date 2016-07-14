@@ -311,10 +311,9 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("NAME"));
-                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
-                businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
-                        ("SHOW_IN_STORE")));
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getString("NAME"));
+                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getString("VALUE"));
+                businessOwnerProperty.setShowingInStore(resultSetOfbusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
                 businessOwnerPropertiesList.add(businessOwnerProperty);
             }
         } catch (SQLException e) {
@@ -1300,12 +1299,14 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUB.APP_ID, " +
-                    "APPLICATION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, TRUSTED_IDP " +
-                    "FROM APM_SUBSCRIPTION SUB, APM_APP APP " +
-                    "WHERE SUB.APP_ID = APP.APP_ID AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? " +
-                    "AND APP.APP_VERSION = ? AND SUB.APPLICATION_ID = ? AND SUB.SUBSCRIPTION_TYPE" +
-                    " = ?";
+            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, SUBSCRIPTION_TIME, " +
+                     "USER_ID , APM_APP.APP_ID, APM_APPLICATION.APPLICATION_ID, TRUSTED_IDP " +
+                    "FROM APM_SUBSCRIPTION, APM_APPLICATION, APM_SUBSCRIBER, APM_APP " +
+                    "WHERE APM_APPLICATION.APPLICATION_ID = APM_SUBSCRIPTION.APPLICATION_ID " +
+                    "AND APM_SUBSCRIBER.SUBSCRIBER_ID = APM_APPLICATION.SUBSCRIBER_ID " +
+                    "AND APM_SUBSCRIPTION.APP_ID = APM_APP.APP_ID " +
+                    "AND APM_APP.APP_PROVIDER = ? AND APM_APP.APP_NAME = ? AND APM_APP.APP_VERSION = ? " +
+                    "AND APM_APPLICATION.APPLICATION_ID = ? AND SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
@@ -1324,6 +1325,8 @@ public class AppMDAO {
                 subscription.setApplicationId(resultSet.getInt("APPLICATION_ID"));
                 subscription.setSubscriptionType(resultSet.getString("SUBSCRIPTION_TYPE"));
                 subscription.setSubscriptionStatus(resultSet.getString("SUB_STATUS"));
+                subscription.setUserId(resultSet.getString("USER_ID"));
+                subscription.setSubscriptionTime(resultSet.getString("SUBSCRIPTION_TIME"));
 
                 String trustedIdpsJson = resultSet.getString("TRUSTED_IDP");
                 Object decodedJson = null;
@@ -3989,8 +3992,8 @@ public class AppMDAO {
         ResultSet rs = null;
         String businessOwnerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                        "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "VISIBLE_ROLES, UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4020,12 +4023,13 @@ public class AppMDAO {
             prepStmt.setString(4, app.getId().getVersion());
             prepStmt.setString(5, app.getContext());
             prepStmt.setString(6, app.getTrackingCode());
-            prepStmt.setString(7, app.getUUID());
-            prepStmt.setString(8, app.getSaml2SsoIssuer());
-            prepStmt.setString(9, logoutURL);
-            prepStmt.setBoolean(10, app.getAllowAnonymous());
-            prepStmt.setString(11, app.getUrl());
-            prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
+            prepStmt.setString(7, app.getVisibleRoles());
+            prepStmt.setString(8, app.getUUID());
+            prepStmt.setString(9, app.getSaml2SsoIssuer());
+            prepStmt.setString(10, logoutURL);
+            prepStmt.setBoolean(11, app.getAllowAnonymous());
+            prepStmt.setString(12, app.getUrl());
+            prepStmt.setBoolean(13, Boolean.parseBoolean(app.getTreatAsASite()));
 
             prepStmt.execute();
 
@@ -4617,8 +4621,8 @@ public class AppMDAO {
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
-                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
-                    " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
+                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? ," +
+                    " VISIBLE_ROLES = ? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
 				getAPIManagerConfiguration().getFirstProperty(GATEWAY_URL);
@@ -4643,9 +4647,10 @@ public class AppMDAO {
             prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
             prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
-            prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setString(7, api.getId().getApiName());
-            prepStmt.setString(8, api.getId().getVersion());
+            prepStmt.setString(6, api.getVisibleRoles());
+            prepStmt.setString(7, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setString(8, api.getId().getApiName());
+            prepStmt.setString(9, api.getId().getVersion());
             prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);

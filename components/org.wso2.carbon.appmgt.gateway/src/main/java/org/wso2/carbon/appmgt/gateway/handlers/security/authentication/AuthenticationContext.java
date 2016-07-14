@@ -31,6 +31,7 @@ import java.util.Map;
  */
 public class AuthenticationContext {
 
+    private String tenantDomain;
     private boolean authenticated;
     private List<AuthenticatedIDP> authenticatedIDPs;
     private String subject;
@@ -40,6 +41,14 @@ public class AuthenticationContext {
     public AuthenticationContext() {
         setAuthenticated(false);
         roles = new ArrayList<String>();
+    }
+
+    public String getTenantDomain() {
+        return tenantDomain;
+    }
+
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
     }
 
     public boolean isAuthenticated() {

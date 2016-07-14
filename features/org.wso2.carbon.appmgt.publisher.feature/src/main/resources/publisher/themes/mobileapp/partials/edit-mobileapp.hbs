@@ -112,7 +112,7 @@
 						<div class="fileupload-preview fileupload-preview-banner thumbnail" style="line-height: 160px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_banner}}"></div>
 						<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
-								<input type="file" id="txtBanner" name="bannerFile" value="{{artifact.attributes.images_banner}}">
+								<input type="file" id="txtBanner" name="bannerFile" accept="image/*" value="{{artifact.attributes.images_banner}}">
 							</span>
 						</div>
 					</div>
@@ -136,7 +136,7 @@
 						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[0]}}"></div>
 						<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
-								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot1" name="screenshot1File" class="uploadAction">
+								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot1" name="screenshot1File" accept="image/*" class="uploadAction">
 							</span>
 						</div>
 					</div>
@@ -147,7 +147,7 @@
 						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[1]}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
-								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot2" name="screenshot2File" class="uploadAction">
+								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot2" name="screenshot2File" accept="image/*" class="uploadAction">
 							</span>
 						</div>
 					</div>
@@ -163,7 +163,7 @@
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
                                         type="file" class="uploadAction" name="screenshot2File"
-                                        id="txtScreenShot2" data-url="{{url "/api/apps/upload"}}" />
+                                        id="txtScreenShot2" accept="image/*" data-url="{{url "/api/apps/upload"}}" />
 							</span><a href="#" class="btn fileupload-exists"
                                       data-dismiss="fileupload"><i class="icon-remove"></i></a>
                             </div>
@@ -176,7 +176,7 @@
 						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[2]}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
-								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot3" name="screenshot3File" class="uploadAction">
+								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot3" name="screenshot3File" accept="image/*" class="uploadAction">
 							</span>
 						</div>
 					</div>
@@ -192,7 +192,7 @@
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
                                         type="file" class="uploadAction" name="screenshot3File"
-                                        id="txtScreenShot3" data-url="{{url "/api/apps/upload"}}" />
+                                        id="txtScreenShot3" accept="image/*" data-url="{{url "/api/apps/upload"}}" />
 							</span><a href="#" class="btn fileupload-exists"
                                       data-dismiss="fileupload"><i class="icon-remove"></i></a>
                             </div>
@@ -213,7 +213,7 @@
 						<div class="fileupload-preview fileupload-preview-icon thumbnail" style="line-height: 160px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_thumbnail}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
-								<input type="file" name="iconFile">
+								<input type="file" name="iconFile" accept="image/*">
 							</span>
 						</div>
 					</div>

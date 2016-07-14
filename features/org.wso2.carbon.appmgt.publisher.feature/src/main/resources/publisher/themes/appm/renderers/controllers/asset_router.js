@@ -26,6 +26,7 @@ var render = function(theme, data, meta, require) {
     var notificationCount = session.get('notificationCount');
     var typeList = apiProvider.getEnabledAssetTypeList();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+    var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
     var appMDAOObj = new appMDAO();
 
     //Determine what view to show
@@ -90,7 +91,7 @@ var render = function(theme, data, meta, require) {
             if (data.artifact.lifecycleState == "Published") {
                 editEnabled = false;
             }
-            if (user.hasRoles(["admin"]) || updateWebAppAuthorized) {
+            if (user.hasRoles([ADMIN_ROLE]) || updateWebAppAuthorized) {
                 editEnabled = true;
             }
             if (!editEnabled) {

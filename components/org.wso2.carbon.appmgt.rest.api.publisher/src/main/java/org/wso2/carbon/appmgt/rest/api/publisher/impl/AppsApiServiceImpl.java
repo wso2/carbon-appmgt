@@ -598,8 +598,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             App app = null;
-            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 app = APPMappingUtil.fromDTOToWebapp(body);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                MobileApp mobileAppModel = new MobileApp();
+                mobileAppModel.setVersion(body.getVersion());
+                mobileAppModel.setDisplayName(body.getDisplayName());
+                mobileAppModel.setType(AppMConstants.MOBILE_ASSET_TYPE);
+                app = mobileAppModel;
+            } else {
+                RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
             }
 
             app.setUUID(appId);

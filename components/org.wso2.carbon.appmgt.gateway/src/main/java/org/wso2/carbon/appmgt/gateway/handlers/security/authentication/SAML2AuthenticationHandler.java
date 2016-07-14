@@ -266,9 +266,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             // Validate the signature if there is any.
             String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
-            Credential certificate = GatewayUtils.getIDPCertificate(CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), responseSigningKeyAlias);
-            boolean isValidSignature = idpMessage.validateSignature(certificate);
 
+            // User the certificate of the super tenant since the responses are signed by the super tenant.
+            Credential certificate = GatewayUtils.getIDPCertificate("carbon.super", responseSigningKeyAlias);
+            
+            boolean isValidSignature = idpMessage.validateSignature(certificate);
             if(!isValidSignature){
                 String errorMessage = String.format("The signature of the SAML message received by the ASC URL ('%s'), can't be validated.", fullResourceURL);
                 GatewayUtils.logAndThrowException(log, errorMessage, null);

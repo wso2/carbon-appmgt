@@ -43,6 +43,7 @@ import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
@@ -283,7 +284,9 @@ public class SAMLUtils {
             authenticationContext.setAuthenticated(false);
             return authenticationContext;
         }else{
-            authenticationContext.setSubject(assertion.getSubject().getNameID().getValue());
+            String subject = assertion.getSubject().getNameID().getValue();
+            authenticationContext.setSubject(subject);
+            authenticationContext.setTenantDomain(MultitenantUtils.getTenantDomain(subject));
        }
 
        authenticationContext.setAuthenticatedIDPs(idpMessage.getAuthenticatedIDPs());
