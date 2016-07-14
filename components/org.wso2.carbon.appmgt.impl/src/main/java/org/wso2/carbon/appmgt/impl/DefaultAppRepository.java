@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
@@ -108,8 +107,10 @@ public class DefaultAppRepository implements AppRepository {
         Connection connection = null;
         PreparedStatement preparedStatementToGetBasicInfo = null;
         PreparedStatement preparedStatementToGetURLMappings = null;
+        PreparedStatement preparedStatementToGetEntitlementPolicies = null;
         ResultSet resultSetOfBasicInfo = null;
         ResultSet resultSetOfURLMappings  = null;
+        ResultSet resultSetOfEntitlementPolicies = null;
 
         WebApp webApp = null;
 
@@ -162,6 +163,7 @@ public class DefaultAppRepository implements AppRepository {
                 policyGroup.setThrottlingTier(resultSetOfURLMappings.getString("THROTTLING_TIER"));
 
                 URITemplate uriTemplate = new URITemplate();
+                uriTemplate.setId(resultSetOfURLMappings.getInt("URL_MAPPING_ID"));
                 uriTemplate.setPolicyGroup(policyGroup);
                 uriTemplate.setHTTPVerb(resultSetOfURLMappings.getString("HTTP_METHOD"));
                 uriTemplate.setUriTemplate(resultSetOfURLMappings.getString("URL_PATTERN"));
@@ -169,6 +171,30 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.addURITemplate(uriTemplate);
             }
 
+            String entitlementPolicyQuery = "SELECT * FROM " +
+                                                "APM_POLICY_GRP_PARTIAL_MAPPING ENTITLEMENT, " +
+                                                "APM_APP_URL_MAPPING TEMPLATE " +
+                                                "WHERE " +
+                                                "TEMPLATE.POLICY_GRP_ID = ENTITLEMENT.POLICY_GRP_ID AND APP_ID = ?";
+
+            preparedStatementToGetEntitlementPolicies = connection.prepareStatement(entitlementPolicyQuery);
+            preparedStatementToGetEntitlementPolicies.setInt(1, webApp.getDatabaseId());
+            resultSetOfEntitlementPolicies = preparedStatementToGetEntitlementPolicies.executeQuery();
+
+            Map<Integer, List<String>> entitlementPoliciesForPolicyGroups = new HashMap<Integer, List<String>>();
+
+            while (resultSetOfEntitlementPolicies.next()){
+
+                int urlMappingId = resultSetOfEntitlementPolicies.getInt("URL_MAPPING_ID");
+
+                URITemplate uriTemplate = webApp.getURITemplate(urlMappingId);
+
+                String entitlementPolicyId = resultSetOfEntitlementPolicies.getString("POLICY_PARTIAL_ID");
+
+                if(uriTemplate != null && entitlementPolicyId != null){
+                    uriTemplate.getPolicyGroup().setEntitlementPolicyId(Integer.parseInt(entitlementPolicyId));
+                }
+            }
 
             return webApp;
 

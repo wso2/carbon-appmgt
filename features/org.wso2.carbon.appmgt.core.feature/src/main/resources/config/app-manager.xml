@@ -112,7 +112,7 @@
         <!--
         Add SAML response as transport header in outgoing message.
         -->
-        <AddSAMLResponseHeaderToOutMessage>true</AddSAMLResponseHeaderToOutMessage>
+        <AddSAMLResponseHeaderToOutMessage>false</AddSAMLResponseHeaderToOutMessage>
 
     </AppConsumerAuthConfiguration>
 

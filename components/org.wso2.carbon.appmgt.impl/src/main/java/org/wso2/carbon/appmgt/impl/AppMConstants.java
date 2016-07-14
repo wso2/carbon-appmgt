@@ -664,6 +664,7 @@ public final class AppMConstants {
     public static final String GATEWAY_ACS_RELATIVE_URL = "acs";
     public static final String MESSAGE_CONTEXT_PROPERTY_GATEWAY_SKIP_SECURITY = "appm.gateway.skipSecurity";
     public static final String MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE = "appm.gateway.matchedURITemplate";
+    public static final String MESSAGE_CONTEXT_PROPERTY_APP_ID = "appm.gateway.appID";
 
     public static final String API_RESPONSE_CACHE_ENABLED = "Enabled";
     public static final String API_RESPONSE_CACHE_DISABLED = "Disabled";
