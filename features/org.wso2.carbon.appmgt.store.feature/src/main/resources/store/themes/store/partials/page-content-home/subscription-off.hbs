@@ -2,11 +2,7 @@
     {{#each assets}}
         <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
             <div class="app-tile">
-                <a {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                   href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../assetType}}/{{attributes.overview_advertisedAppUuid}}"
-                    {{else}}
-                        href="{{accessUrl}}"
-                    {{/ifCond}}
+                <a href="{{accessUrl}}"
                    target="_blank" data-id="{{id}}"
                    data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
                    data-context="{{attributes.overview_context}}" data-stats="usage" class="hover-overlay-container">
@@ -51,7 +47,16 @@
                             <i class="fw fw-ellipsis fw-rotate-90"></i>
                         </a>
                         <ul class="more-menu-items dropdown-menu">
-                            <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                <li>
+                                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../type}}/{{attributes.overview_advertisedAppUuid}}">
+                                        More Details
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{/ifCond}}
+
                             {{#if ../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
                                         style="display: none" {{/unless}}>

@@ -596,31 +596,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
     public String createNewVersion(App app) throws AppManagementException {
-
-        final String appName = app.getName();
-        final String appVersion = app.getVersion();
-        try {
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                    AppMConstants.WEBAPP_ASSET_TYPE);
-            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
-            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
-                add(appName);
-            }});
-            attributeListMap.put(AppMConstants.API_OVERVIEW_VERSION, new ArrayList<String>() {{
-                add(appVersion);
-            }});
-
-            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
-
-            if (existingArtifacts != null && existingArtifacts.length > 0) {
-                handleResourceAlreadyExistsException("A duplicate webapp already exists with name '" +
-                        appName + "' and version '" + appVersion + "'");
-            }
-        } catch (GovernanceException e) {
-            handleException("Error occurred while checking existence for webapp with name '" + appName +
-                    "' and version '" + appVersion + "'");
-        }
-
         AppRepository appRepository = new DefaultAppRepository(registry);
         String uuid = appRepository.createNewVersion(app);
         return uuid;
