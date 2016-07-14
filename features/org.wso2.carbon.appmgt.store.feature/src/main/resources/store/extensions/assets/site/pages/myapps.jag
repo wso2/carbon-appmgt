@@ -422,6 +422,7 @@ require('/modules/store.js').exec(function (ctx) {
             if (searchOption.toLowerCase() == "provider") {
                 searchOption = "SEARCH_BY_APP_PROVIDER";
             } else if (searchOption.toLowerCase() == "business owner") {
+                query = "businessOwner:" + searchValue;
                 searchOption = "SEARCH_BY_BUSINESS_OWNER";
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
