@@ -37,6 +37,7 @@ import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
@@ -320,7 +321,14 @@ public abstract class AbstractAPIManager implements APIManager {
             }
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
                                                                                 AppMConstants.API_KEY);
-            Resource apiResource = registry.get(apiPath);
+            Resource apiResource = null;
+            try {
+                apiResource = registry.get(apiPath);
+            } catch (AuthorizationFailedException ex) {
+                log.warn("Retrieving app details for the app : " + identifier.getApiName() + " of user : " + username + ". But user do not have " +
+                        "permission to the app.");
+                return null;
+            }
             String artifactId = apiResource.getUUID();
             if (artifactId == null) {
                 throw new AppManagementException("artifact id is null for : " + apiPath);
