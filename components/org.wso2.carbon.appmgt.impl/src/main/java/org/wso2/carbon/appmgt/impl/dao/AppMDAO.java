@@ -308,10 +308,9 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("NAME"));
-                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
-                businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
-                        ("SHOW_IN_STORE")));
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getString("NAME"));
+                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getString("VALUE"));
+                businessOwnerProperty.setShowingInStore(resultSetOfbusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
                 businessOwnerPropertiesList.add(businessOwnerProperty);
             }
         } catch (SQLException e) {
