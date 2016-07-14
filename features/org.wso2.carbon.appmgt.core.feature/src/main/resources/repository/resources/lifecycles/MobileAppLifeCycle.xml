@@ -7,7 +7,7 @@
                 <state id='Initial'>
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Create" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Create" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -28,7 +28,7 @@
                 <state id="Created">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Submit for Review" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Submit for Review" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -50,7 +50,7 @@
                 <state id="In-Review">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Approve" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Approve" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -65,7 +65,7 @@
                                 <parameter name="STATE_RULE3:Approved" value="Internal/everyone:-get,-add,-delete,-authorize"/>
                                 <parameter name="STATE_RULE4:Approved" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Reject" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Reject" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -88,7 +88,7 @@
                 <state id="Approved">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Publish" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Publish" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -113,7 +113,7 @@
                 <state id="Rejected">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Submit for Review" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Submit for Review" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -135,7 +135,7 @@
                 <state id="Published">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Unpublish" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Unpublish" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -153,7 +153,7 @@
                                 <parameter name="STATE_RULE4:Unpublished" value="system/wso2.anonymous.role:-get" />
                                 <parameter name="STATE_RULE4:Unpublished" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Deprecate" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Deprecate" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -179,7 +179,7 @@
                 <state id="Unpublished">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Re-Publish" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Re-Publish" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -197,7 +197,7 @@
                                 <parameter name="STATE_RULE4:Published" value="system/wso2.anonymous.role:+get" />
                                 <parameter name="STATE_RULE5:Published" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Retire" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Retire" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -221,7 +221,7 @@
                 <state id="Deprecated">
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Retire" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Retire" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"

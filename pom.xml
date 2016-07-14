@@ -862,7 +862,7 @@
     <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>
     <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
     <axiom.wso2.version>1.2.11.wso2v10</axiom.wso2.version>
-    <synapse.version>2.1.7-wso2v3-BETA</synapse.version>
+    <synapse.version>2.1.7-wso2v3</synapse.version>
     <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
     <rhino.js.pkg.version>[1.7.0, 1.8.0)</rhino.js.pkg.version>
     <google.code.gson.version>2.1</google.code.gson.version>
