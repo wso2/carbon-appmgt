@@ -78,7 +78,8 @@ $(".btn-reject-proceed").click(function () {
 	jQuery.ajax({
 		url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
 		type: "PUT",
-		data: JSON.stringify({comment: comment}),
+		contentType: 'application/json',
+		data: (comment) ? JSON.stringify({comment: comment}) : "",
 		success: function (msg) {
 			location.reload();
 		}
