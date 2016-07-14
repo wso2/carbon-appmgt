@@ -66,22 +66,21 @@ public class Deployer {
             log.error("Error while parsing JSON object", e);
             throw new AppManagementException("Error while parsing JSON object", e);
         }
-        Boolean hasSubscriptionEnabled = isSubscriptionEnabled();
-        if (hasSubscriptionEnabled) {
-            UserAdminServiceClient userAdminServiceClient;
-            try {
-                userAdminServiceClient = new UserAdminServiceClient();
-                userAdminServiceClient.addUser("subscriber_" + username);
-            } catch (UserAdminUserAdminException e) {
 
-            } catch (RemoteException e) {
-                log.error("Error while registering a User subscriber_" + username, e);
-                throw new AppManagementException("Error while registering a User subscriber_" + username, e);
-            } catch (LoginAuthenticationExceptionException e) {
-                log.error("Error while login to UserAdminStub", e);
-                throw new AppManagementException("Error while login to UserAdminStub", e);
-            }
+        UserAdminServiceClient userAdminServiceClient;
+        try {
+            userAdminServiceClient = new UserAdminServiceClient();
+            userAdminServiceClient.addUser("subscriber_" + username);
+        } catch (UserAdminUserAdminException e) {
+
+        } catch (RemoteException e) {
+            log.error("Error while registering a User subscriber_" + username, e);
+            throw new AppManagementException("Error while registering a User subscriber_" + username, e);
+        } catch (LoginAuthenticationExceptionException e) {
+            log.error("Error while login to UserAdminStub", e);
+            throw new AppManagementException("Error while login to UserAdminStub", e);
         }
+
 
         try {
             storeSession = httpHandler.doPostHttp(httpBackEndUrl + "/store/apis/user/login",
@@ -124,10 +123,8 @@ public class Deployer {
                 webAppDetail.setClaims(claimsMap);
                 backEndApplicationCreator.copyFileUsingFileStreams(webAppDetail.getWarFileName());
                 claimManager.addClaimMapping(claimsMap);
-                if (hasSubscriptionEnabled) {
-                    claimManager.setClaimValues(claimsMap, "subscriber_" + username);
-                }
-                proxyApplicationCreator.createAndPublishWebApplication(webAppDetail, hasSubscriptionEnabled);
+                claimManager.setClaimValues(claimsMap, "subscriber_" + username);
+                proxyApplicationCreator.createAndPublishWebApplication(webAppDetail, isSubscriptionEnabled());
                 if (Configuration.isStactsEnabled().equals("true")) {
                     WebpageAccessor.accsesWebPages(webAppDetail, ipAddress);
                 }

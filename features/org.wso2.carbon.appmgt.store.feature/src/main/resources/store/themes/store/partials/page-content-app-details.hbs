@@ -92,7 +92,7 @@
                             <input type="hidden" id="subsAppTier" name="subsAppTier" value="Unlimited" />
                             {{#if isSelfSubscriptionEnabled}}
                             {{!-- self subscription is enabled --}}
-                                {{#if subscriptionInfo.individualSubscription.OnHold}}
+                                {{#ifCond subscriptionInfo.individualSubscription.subscriptionStatus "==" "BLOCKED"}}
                                     <a href="#" id="btnSubscribe" class="btn btn-subscribe disabled">
                                         <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
                                     </a>
@@ -103,7 +103,7 @@
                                     <a href="#" id="btnSubscribe" class="btn btn-subscribe">
                                         <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
                                     </a>
-                                {{/if}}
+                                {{/ifCond}}
                             {{/if}}
 
                             {{#if isEnterpriseSubscriptionEnabled}}
