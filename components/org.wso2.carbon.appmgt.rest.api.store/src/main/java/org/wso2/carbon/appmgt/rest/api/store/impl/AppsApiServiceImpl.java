@@ -996,8 +996,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
                                                                     Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
             if (subscription != null) {
+                subscriptionData.put("SubscriptionId", String.valueOf(subscription.getSubscriptionId()));
+                subscriptionData.put("SubscriptionType", subscription.getSubscriptionType());
                 subscriptionData.put("Status", subscription.getSubscriptionStatus());
-                subscriptionData.put("SubscrptionType", subscription.getSubscriptionType());
+                subscriptionData.put("SubscriptionTime", subscription.getSubscriptionTime());
+                subscriptionData.put("SubscribedUser", subscription.getUserId());
             }
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError(

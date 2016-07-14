@@ -44,6 +44,7 @@ public class MobileApp extends App{
     private String recentChanges;
     private List<String> screenShots;
     private String createdTime;
+    private String originVersion;
 
     public String getCreatedTime() {
         return createdTime;
@@ -196,4 +197,11 @@ public class MobileApp extends App{
         this.screenShots = screenShots;
     }
 
+    public String getOriginVersion() {
+        return originVersion;
+    }
+
+    public void setOriginVersion(String originVersion) {
+        this.originVersion = originVersion;
+    }
 }
