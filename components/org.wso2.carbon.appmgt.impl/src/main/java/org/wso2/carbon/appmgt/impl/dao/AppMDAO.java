@@ -8679,12 +8679,13 @@ public class AppMDAO {
             UserRealmService realmService =
                     (UserRealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getOSGiService(UserRealmService.class);
-            String tenantDomain = realmService.getTenantManager().getDomain(tenantId);
+            String requestedTenantDomain = realmService.getTenantManager().getDomain(tenantId);
 
-            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (requestedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    requestedTenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(requestedTenantDomain, true);
             }
 
             APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
