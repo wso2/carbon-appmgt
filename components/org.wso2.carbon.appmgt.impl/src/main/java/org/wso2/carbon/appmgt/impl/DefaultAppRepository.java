@@ -54,6 +54,10 @@ public class DefaultAppRepository implements AppRepository {
 
     private Registry registry;
 
+    public DefaultAppRepository(){
+
+    }
+
     public DefaultAppRepository(Registry registry){
         this.registry = registry;
     }
@@ -112,53 +116,129 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    @Override
-    public WebApp getWebAppByContextAndVersion(String context, String version) throws AppManagementException {
+    public WebApp getWebAppByNameAndVersion(String name, String version, int tenantId) throws AppManagementException {
 
         Connection connection = null;
-        PreparedStatement preparedStatementToGetBasicInfo = null;
-        PreparedStatement preparedStatementToGetURLMappings = null;
-        PreparedStatement preparedStatementToGetEntitlementPolicies = null;
-        ResultSet resultSetOfBasicInfo = null;
-        ResultSet resultSetOfURLMappings  = null;
-        ResultSet resultSetOfEntitlementPolicies = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
 
         WebApp webApp = null;
-
         try {
             connection = getRDBMSConnectionWithoutAutoCommit();
+            String basicQuery = "SELECT * FROM APM_APP WHERE APP_NAME = ? AND APP_VERSION = ? AND TENANT_ID = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
 
-            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ?";
-            preparedStatementToGetBasicInfo = connection.prepareStatement(basicQuery);
-            preparedStatementToGetBasicInfo.setString(1, context);
-            preparedStatementToGetBasicInfo.setString(2, version);
+            preparedStatementToGetBasicApp.setString(1, name);
+            preparedStatementToGetBasicApp.setString(2, version);
+            preparedStatementToGetBasicApp.setInt(3, tenantId);
 
-            resultSetOfBasicInfo = preparedStatementToGetBasicInfo.executeQuery();
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
 
-            while(resultSetOfBasicInfo.next()){
+            while(resultSetOfBasicApp.next()){
 
-                String appName = resultSetOfBasicInfo.getString("APP_NAME");
-                String appProvider = resultSetOfBasicInfo.getString("APP_PROVIDER");
+                String appName = resultSetOfBasicApp.getString("APP_NAME");
+                String appProvider = resultSetOfBasicApp.getString("APP_PROVIDER");
                 APIIdentifier id = new APIIdentifier(appProvider, appName, version);
                 webApp = new WebApp(id);
 
-                webApp.setDatabaseId(resultSetOfBasicInfo.getInt("APP_ID"));
-                webApp.setUUID(resultSetOfBasicInfo.getString("UUID"));
+                webApp.setAppTenant(Integer.toString(tenantId));
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicApp.getString("UUID"));
 
                 webApp.setVersion(version);
-                webApp.setContext(context);
-                webApp.setTrackingCode(resultSetOfBasicInfo.getString("TRACKING_CODE"));
-                webApp.setSaml2SsoIssuer(resultSetOfBasicInfo.getString("SAML2_SSO_ISSUER"));
-                webApp.setLogoutURL(resultSetOfBasicInfo.getString("LOG_OUT_URL"));
-                webApp.setAllowAnonymous(resultSetOfBasicInfo.getBoolean("APP_ALLOW_ANONYMOUS"));
-                webApp.setUrl(resultSetOfBasicInfo.getString("APP_ENDPOINT"));
+                webApp.setContext(resultSetOfBasicApp.getString("CONTEXT"));
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
 
                 // There should be only one app for the given combination
                 break;
             }
 
+            fillWebApp(webApp, connection);
+
+            return webApp;
+
+        } catch (SQLException e) {
+            handleException(String.format("Error while fetching the web app for name : '%s', version : '%s', tenantId : '%d'", name, version, tenantId), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicApp, connection, resultSetOfBasicApp);
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
+
+        WebApp webApp = null;
+
+        try {
+
+            connection = getRDBMSConnectionWithoutAutoCommit();
+
+            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
+            preparedStatementToGetBasicApp.setString(1, context);
+            preparedStatementToGetBasicApp.setString(2, version);
+
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
+
+            while(resultSetOfBasicApp.next()){
+
+                String appName = resultSetOfBasicApp.getString("APP_NAME");
+                String appProvider = resultSetOfBasicApp.getString("APP_PROVIDER");
+                APIIdentifier id = new APIIdentifier(appProvider, appName, version);
+                webApp = new WebApp(id);
+
+                webApp.setAppTenant(Integer.toString(tenantId));
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicApp.getString("UUID"));
+
+                webApp.setVersion(version);
+                webApp.setContext(context);
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+
+                // There should be only one app for the given combination
+                break;
+            }
+
+            fillWebApp(webApp, connection);
+
+            return webApp;
+        } catch (SQLException e) {
+            handleException(String.format("Error while fetching the web app for context : '%s', version : '%s', tenantId : '%d'", context, version, tenantId), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicApp, connection, resultSetOfBasicApp);
+        }
+
+        return null;
+    }
+
+    private WebApp fillWebApp(WebApp webApp, Connection connection) throws SQLException {
+
+        PreparedStatement preparedStatementToGetURLMappings = null;
+        PreparedStatement preparedStatementToGetEntitlementPolicies = null;
+        PreparedStatement preparedStatementToGetDefaultVersion = null;
+        ResultSet resultSetOfURLMappings  = null;
+        ResultSet resultSetOfEntitlementPolicies = null;
+        ResultSet resultSetOfDefaultVersions = null;
+
+        try{
+
             String urlMappingQuery = "SELECT * from APM_APP_URL_MAPPING URL, APM_POLICY_GROUP POLICY " +
-                                        "WHERE URL.POLICY_GRP_ID = POLICY.POLICY_GRP_ID AND URL.APP_ID = ?";
+                    "WHERE URL.POLICY_GRP_ID = POLICY.POLICY_GRP_ID AND URL.APP_ID = ?";
 
             preparedStatementToGetURLMappings = connection.prepareStatement(urlMappingQuery);
             preparedStatementToGetURLMappings.setInt(1, webApp.getDatabaseId());
@@ -183,16 +263,14 @@ public class DefaultAppRepository implements AppRepository {
             }
 
             String entitlementPolicyQuery = "SELECT * FROM " +
-                                                "APM_POLICY_GRP_PARTIAL_MAPPING ENTITLEMENT, " +
-                                                "APM_APP_URL_MAPPING TEMPLATE " +
-                                                "WHERE " +
-                                                "TEMPLATE.POLICY_GRP_ID = ENTITLEMENT.POLICY_GRP_ID AND APP_ID = ?";
+                    "APM_POLICY_GRP_PARTIAL_MAPPING ENTITLEMENT, " +
+                    "APM_APP_URL_MAPPING TEMPLATE " +
+                    "WHERE " +
+                    "TEMPLATE.POLICY_GRP_ID = ENTITLEMENT.POLICY_GRP_ID AND APP_ID = ?";
 
             preparedStatementToGetEntitlementPolicies = connection.prepareStatement(entitlementPolicyQuery);
             preparedStatementToGetEntitlementPolicies.setInt(1, webApp.getDatabaseId());
             resultSetOfEntitlementPolicies = preparedStatementToGetEntitlementPolicies.executeQuery();
-
-            Map<Integer, List<String>> entitlementPoliciesForPolicyGroups = new HashMap<Integer, List<String>>();
 
             while (resultSetOfEntitlementPolicies.next()){
 
@@ -207,18 +285,31 @@ public class DefaultAppRepository implements AppRepository {
                 }
             }
 
+            // Fetch version information. e.g. default version.
+            // Get the default version for the app group (name + provider)
+            String defaultVersionQuery = "SELECT * FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME = ? AND APP_PROVIDER = ? AND TENANT_ID = ?";
+            preparedStatementToGetDefaultVersion = connection.prepareStatement(defaultVersionQuery);
+            preparedStatementToGetDefaultVersion.setString(1, webApp.getId().getApiName());
+            preparedStatementToGetDefaultVersion.setString(2, webApp.getId().getProviderName());
+            preparedStatementToGetDefaultVersion.setInt(3, Integer.parseInt(webApp.getAppTenant()));
+
+            resultSetOfDefaultVersions = preparedStatementToGetDefaultVersion.executeQuery();
+
+            while (resultSetOfDefaultVersions.next()){
+                String defaultVersion = resultSetOfDefaultVersions.getString("DEFAULT_APP_VERSION");
+                webApp.setDefaultVersion(webApp.getId().getVersion().equals(defaultVersion));
+
+                // There should be only one record for the above query.
+                break;
+            }
+
             return webApp;
 
-        } catch (SQLException e) {
-           handleException(String.format("Error occured while fetch the web app from database for context:'%s', version:'%s'", context, version), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicInfo, null, resultSetOfBasicInfo);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetEntitlementPolicies, null, resultSetOfEntitlementPolicies);
             APIMgtDBUtil.closeAllConnections(preparedStatementToGetURLMappings, null, resultSetOfURLMappings);
-            APIMgtDBUtil.closeAllConnections(null, connection, null);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetDefaultVersion, null, resultSetOfDefaultVersions);
         }
-
-
-        return null;
     }
 
     @Override
@@ -588,13 +679,7 @@ public class DefaultAppRepository implements AppRepository {
                 handleException("Can't get the database connection.", e);
             }
 
-            int webAppDatabaseId = getDatabaseId(webApp, connection);
-
-            List<EntitlementPolicyGroup> policyGroups = getPolicyGroups(webAppDatabaseId, connection);
-            webApp.setAccessPolicyGroups(policyGroups);
-
-            Set<URITemplate> uriTemplates = getURITemplates(webAppDatabaseId, connection);
-            webApp.setUriTemplates(uriTemplates);
+            fillWebApp(webApp, connection);
 
             return webApp;
         } catch (SQLException e) {

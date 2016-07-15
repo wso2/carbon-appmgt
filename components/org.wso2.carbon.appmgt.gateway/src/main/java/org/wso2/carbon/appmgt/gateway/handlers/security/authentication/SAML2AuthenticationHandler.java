@@ -86,14 +86,20 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     @Override
     public boolean handleRequest(MessageContext messageContext) {
 
-        // Check per-app anonymous access first.
         Session session = getSession(messageContext);
 
+        // Get and set relevant message context properties.
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
         String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+
+        // If the request has come through the default App (the Synapse API without a version),
+        // remove the version from the request URL when doing a redirection.
+        String redirectionFriendlyFullRequestPath = getRedirectionReadyFullRequestPath(messageContext);
+        messageContext.setProperty(AppMConstants.MESSAGE_CONTEXT_PROPERTY_REDIRECTION_FRIENDLY_FULL_REQUEST_PATH, redirectionFriendlyFullRequestPath);
+
         String baseURL = String.format("%s/%s/", webAppContext, webAppVersion);
         String relativeResourceURL = StringUtils.substringAfter(fullResourceURL, baseURL);
         String httpVerb =   (String) axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD);
@@ -101,7 +107,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // Fetch the web app for the requested context and version.
         try {
             if(webApp == null){
-                webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion);
+                int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+                webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion, tenantId);
             }
         } catch (AppManagementException e) {
             String errorMessage = String.format("Can't fetch the web for '%s' from the repository.", fullResourceURL);
@@ -147,7 +154,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Request to '%s' is not authenticated", fullResourceURL));
             }
 
-            session.setRequestedURL(fullResourceURL);
+            session.setRequestedURL(redirectionFriendlyFullRequestPath);
             SessionStore.getInstance().updateSession(session);
             setSessionCookie(messageContext, session.getUuid());
             requestAuthentication(messageContext);
@@ -163,7 +170,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             if(!session.hasAppBeenAccessedBefore(webApp.getUUID())){
                 GatewayUtils.logWithRequestInfo(log, messageContext, "This web app has not been accessed before in the current session. Doing SSO through IDP since it is needed to make SLO work.");
-                session.setRequestedURL(fullResourceURL);
+                session.setRequestedURL(redirectionFriendlyFullRequestPath);
                 SessionStore.getInstance().updateSession(session);
                 requestAuthentication(messageContext);
                 return false;
@@ -214,6 +221,24 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             return true;
         }
+    }
+
+    private String getRedirectionReadyFullRequestPath(MessageContext messageContext) {
+
+        String fullResourceURL = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+
+        // If the request has come though the default Synapse API (without versioning) remove the version part of the URL.
+        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        Map<String, Object> headers = (Map<String, Object>) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        String hasRequestedThoughDefaultVersion = (String) headers.get(AppMConstants.GATEWAY_DEFAULT_VERSION_INDICATION_HEADER_NAME);
+
+        if(hasRequestedThoughDefaultVersion != null && Boolean.parseBoolean(hasRequestedThoughDefaultVersion)){
+            String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+            return fullResourceURL.replaceFirst("/" + webAppVersion, "");
+        }
+
+        return fullResourceURL;
     }
 
     private void doLogout(Session session) {
