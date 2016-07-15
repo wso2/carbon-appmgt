@@ -6608,10 +6608,10 @@ public class AppMDAO {
 
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
                 query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME) "
-                        + "AS APP_NAME, CONTEXT FROM APM_APP_HITS HIT "
+                        + "AS APP_NAME, HIT.CONTEXT FROM APM_APP_HITS HIT "
                         + "WHERE HIT.USER_ID=? "
-                        + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION UNION ALL "
-                        + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
+                        + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION, HIT.CONTEXT UNION ALL "
+                        + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP "
                         + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? )) A  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
@@ -8630,14 +8630,15 @@ public class AppMDAO {
                 ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else if (searchOption == WebAppSearchOption.SEARCH_BY_BUSINESS_OWNER) {
-                List<String> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
                 Map<String, List<String>> businessOwnerIdsMap = new HashMap<String, List<String>>();
-                businessOwnerIdsMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , businessOwnerIdList);
-                List<String> treatAsASiteList = new ArrayList<>();
-                treatAsASiteList.add(String.valueOf(treatAsSite));
-                businessOwnerIdsMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, treatAsASiteList);
-                getUserAccessibleAppsByBusinessOwner(apiIdentifiers, businessOwnerIdsMap, registry, tenantIdOfStore,
-                                                      username);
+                List<String> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
+                for (String businessOwnerId : businessOwnerIdList) {
+                    businessOwnerIdsMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , Arrays.asList(businessOwnerId));
+                    businessOwnerIdsMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, Arrays.asList(String.valueOf
+                            (treatAsSite)));
+                    getUserAccessibleAppsByBusinessOwner(apiIdentifiers, businessOwnerIdsMap, registry, tenantIdOfStore,
+                                                         tenantIdOfUser, username);
+                }
             } else {
                 ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_NAME);
             }
@@ -8673,13 +8674,14 @@ public class AppMDAO {
     }
 
     private void getUserAccessibleAppsByBusinessOwner(List<APIIdentifier> apiIdentifiers, Map<String, List<String>>
-            businessOwnerIdsMap, Registry registry, int tenantId, String userName) throws AppManagementException {
+            businessOwnerIdsMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName) throws
+                                                                                           AppManagementException {
         boolean isTenantFlowStarted = false;
         try {
             UserRealmService realmService =
                     (UserRealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getOSGiService(UserRealmService.class);
-            String requestedTenantDomain = realmService.getTenantManager().getDomain(tenantId);
+            String requestedTenantDomain = realmService.getTenantManager().getDomain(tenantIdOfStore);
 
             if (requestedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
                     requestedTenantDomain)) {
@@ -8689,9 +8691,11 @@ public class AppMDAO {
             }
 
             APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
-            // User has to set anonnymous to get myapps.
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants
-                                                                                      .REGISTRY_ANONNYMOUS_USERNAME);
+            if (tenantIdOfStore != tenantOfUser) {
+                // User has to set anonnymous to get myapps.
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants
+                        .REGISTRY_ANONNYMOUS_USERNAME);
+            }
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
             GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
                                                                                 AppMConstants.API_KEY);
@@ -8715,9 +8719,9 @@ public class AppMDAO {
                 }
             }
         } catch (RegistryException e) {
-            handleException("Failed to search accessible apps details from tenant store :" + tenantId, e);
+            handleException("Failed to search accessible apps details from tenant store :" + tenantIdOfStore, e);
         } catch (UserStoreException e) {
-            handleException("Failed to get tenant domain for tenant id :" + tenantId, e);
+            handleException("Failed to get tenant domain for tenant id :" + tenantIdOfStore, e);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();

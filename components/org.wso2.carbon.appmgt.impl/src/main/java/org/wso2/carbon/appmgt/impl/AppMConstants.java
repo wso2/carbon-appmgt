@@ -591,6 +591,8 @@ public final class AppMConstants {
     public static final String GATEWAY_SESSION_CACHE = "appm.sessionCache";
     public static final String GATEWAY_SESSION_INDEX_MAPPING_CACHE = "appm.sessionIndexMappingCache";
 
+    public static final String GATEWAY_DEFAULT_VERSION_INDICATION_HEADER_NAME = "WSO2_APPM_INVOKED_WITHOUT_VERSION";
+
 
     public static final String SAML2_COOKIE = "appmanager_sso";
     public static final String SAML_SSO_TOKENID = "samlssoTokenId";
@@ -664,6 +666,7 @@ public final class AppMConstants {
     public static final String GATEWAY_ACS_RELATIVE_URL = "acs";
     public static final String MESSAGE_CONTEXT_PROPERTY_GATEWAY_SKIP_SECURITY = "appm.gateway.skipSecurity";
     public static final String MESSAGE_CONTEXT_PROPERTY_MATCHED_URI_TEMPLATE = "appm.gateway.matchedURITemplate";
+    public static final String MESSAGE_CONTEXT_PROPERTY_REDIRECTION_FRIENDLY_FULL_REQUEST_PATH = "appm.gateway.redirectionFriendlyFullRequestPath";
     public static final String MESSAGE_CONTEXT_PROPERTY_APP_ID = "appm.gateway.appID";
 
     public static final String API_RESPONSE_CACHE_ENABLED = "Enabled";

@@ -260,7 +260,6 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         subPage = '/ Search: "' + query + '"';
-        assets = store.search(options, paging);
     } else {
         if (paging.sort == 'popular') {
             var urlQuery = 'sort=' + paging.sort + '&';
