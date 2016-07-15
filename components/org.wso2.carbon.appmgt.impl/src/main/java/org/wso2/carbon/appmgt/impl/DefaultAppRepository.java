@@ -107,7 +107,9 @@ public class DefaultAppRepository implements AppRepository {
             GenericArtifact artifact = artifactManager.getGenericArtifact(uuid);
 
             if(artifact != null){
-                return getApp(type, artifact);
+                App app = getApp(type, artifact);
+                app.setType(type);
+                return app;
             }else{
                 return null;
             }
@@ -199,7 +201,6 @@ public class DefaultAppRepository implements AppRepository {
                 APIIdentifier id = new APIIdentifier(appProvider, appName, version);
                 webApp = new WebApp(id);
 
-                webApp.setAppTenant(Integer.toString(tenantId));
                 webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
                 webApp.setUUID(resultSetOfBasicApp.getString("UUID"));
 
@@ -211,6 +212,7 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
                 webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
                 webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
+                webApp.setAppTenant(String.valueOf(resultSetOfBasicApp.getInt("TENANT_ID")));
 
                 // There should be only one app for the given combination
                 break;
@@ -246,6 +248,7 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatementToGetURLMappings.setInt(1, webApp.getDatabaseId());
             resultSetOfURLMappings = preparedStatementToGetURLMappings.executeQuery();
 
+            webApp.getUriTemplates().clear();
             while (resultSetOfURLMappings.next()){
 
                 EntitlementPolicyGroup policyGroup = new EntitlementPolicyGroup();
@@ -328,7 +331,9 @@ public class DefaultAppRepository implements AppRepository {
 
         for(GenericArtifact artifact : appArtifacts){
             if(isSearchHit(artifact, searchTerms)){
-                apps.add(getApp(type, artifact));
+                App app = getApp(type, artifact);
+                app.setType(type);
+                apps.add(app);
             }
         }
 
@@ -669,16 +674,38 @@ public class DefaultAppRepository implements AppRepository {
     private WebApp getWebApp(GenericArtifact webAppArtifact) throws AppManagementException {
 
         Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
 
         try {
 
             AppFactory appFactory = getAppFactory(AppMConstants.WEBAPP_ASSET_TYPE);
             WebApp webApp = (WebApp) appFactory.createApp(webAppArtifact, registry);
 
-            try {
-                connection = getRDBMSConnectionWithoutAutoCommit();
-            } catch (SQLException e) {
-                handleException("Can't get the database connection.", e);
+            // Fill fields from the database.
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            String basicQuery = "SELECT * FROM APM_APP WHERE UUID = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
+
+            preparedStatementToGetBasicApp.setString(1, webAppArtifact.getId());
+
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
+
+            while(resultSetOfBasicApp.next()){
+
+                webApp.setAppTenant(String.valueOf(resultSetOfBasicApp.getInt("TENANT_ID")));
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+
+                webApp.setContext(resultSetOfBasicApp.getString("CONTEXT"));
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
+
+                // There should be only one app for the given combination
+                break;
             }
 
             fillWebApp(webApp, connection);
