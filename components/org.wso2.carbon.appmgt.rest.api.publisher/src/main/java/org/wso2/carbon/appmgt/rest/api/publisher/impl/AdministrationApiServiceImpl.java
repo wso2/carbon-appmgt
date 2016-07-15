@@ -204,7 +204,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             ownerName = ownerName.trim();
             ownerEmail = ownerEmail.trim();
             int existingOwnerId = apiProvider.getBusinessOwnerId(ownerName, ownerEmail);
-            if ((existingOwnerId != businessOwnerId) || (existingOwnerId != -1)) {
+            if (!((existingOwnerId == businessOwnerId) || (existingOwnerId == -1))) {
                 String message =  "A duplicate business owner already exists with the owner name :  " + ownerName +
                         " and owner email " + ownerEmail;
                 RestApiUtil.handleConflictException(message, log);

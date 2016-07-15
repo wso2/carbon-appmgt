@@ -1534,8 +1534,8 @@ public class DefaultAppRepository implements AppRepository {
     private int persistWebAppToDatabase(WebApp webApp, Connection connection) throws SQLException, AppManagementException {
 
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                            "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL, APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL, APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, VISIBLE_ROLES) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
@@ -1564,6 +1564,7 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatement.setBoolean(10, webApp.getAllowAnonymous());
             preparedStatement.setString(11, webApp.getUrl());
             preparedStatement.setBoolean(12, Boolean.parseBoolean(webApp.getTreatAsASite()));
+            preparedStatement.setString(13, webApp.getVisibleRoles());
 
             preparedStatement.execute();
 
