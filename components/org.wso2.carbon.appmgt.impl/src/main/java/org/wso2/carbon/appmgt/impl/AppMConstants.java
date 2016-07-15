@@ -590,6 +590,9 @@ public final class AppMConstants {
     public static final String GATEWAY_CACHE_MANAGER = "APPMGT.GATEWAY";
     public static final String GATEWAY_SESSION_CACHE = "appm.sessionCache";
     public static final String GATEWAY_SESSION_INDEX_MAPPING_CACHE = "appm.sessionIndexMappingCache";
+    public static final String USAGE_CACHE_MANAGER = "APPMGT.USAGE";
+    public static final String USAGE_CACHE = "appm.usageCache";
+
 
     public static final String GATEWAY_DEFAULT_VERSION_INDICATION_HEADER_NAME = "WSO2_APPM_INVOKED_WITHOUT_VERSION";
 
