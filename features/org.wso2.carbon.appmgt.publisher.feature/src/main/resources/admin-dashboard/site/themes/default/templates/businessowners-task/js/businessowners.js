@@ -207,7 +207,7 @@ function GetDynamicTextBox(hasHeader, index, key, value, showInStore) {
 function removeFields(index) {
     var id_key = "#" + "key-".concat(index);
     var id_val = "#" + "value-".concat(index);
-    var check_val = "showInStore-".concat(index);
+    var check_val = "#showInStore-".concat(index);
     var id_btn = "#" + index;
     $(id_key).val("");
     $(id_val).val("");
