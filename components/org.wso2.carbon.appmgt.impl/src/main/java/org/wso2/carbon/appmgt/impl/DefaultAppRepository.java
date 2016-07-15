@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -23,9 +24,15 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
+import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.registry.core.utils.RegistryUtils;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -47,6 +54,10 @@ public class DefaultAppRepository implements AppRepository {
 
     private Registry registry;
 
+    public DefaultAppRepository(){
+
+    }
+
     public DefaultAppRepository(Registry registry){
         this.registry = registry;
     }
@@ -58,6 +69,8 @@ public class DefaultAppRepository implements AppRepository {
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
             return persistWebApp((WebApp) app);
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+            return persistMobileApp((MobileApp) app);
         }
 
         return null;
@@ -66,8 +79,11 @@ public class DefaultAppRepository implements AppRepository {
     @Override
     public String createNewVersion(App app) throws AppManagementException {
 
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
-            WebApp newVersion = createNewWebAppVersion((WebApp)app);
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+            WebApp newVersion = createNewWebAppVersion((WebApp) app);
+            return newVersion.getUUID();
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+            MobileApp newVersion = createNewMobileAppVersion((MobileApp) app);
             return newVersion.getUUID();
         }
 
@@ -85,20 +101,220 @@ public class DefaultAppRepository implements AppRepository {
     @Override
     public App getApp(String type, String uuid) throws AppManagementException {
 
-        Map<String, String> searchTerms = new HashMap<String, String>();
-        searchTerms.put("id", uuid);
 
-        List<App> result = searchApps(type, searchTerms);
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, type);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(uuid);
 
-        if(result.size() == 1){
-            return result.get(0);
-        }else if(result.isEmpty()) {
-            return null;
-        }else{
-            //flag an error.
-            throw new AppManagementException("Duplicate entries found for the given uuid.");
+            if(artifact != null){
+                App app = getApp(type, artifact);
+                app.setType(type);
+                return app;
+            }else{
+                return null;
+            }
+        } catch (GovernanceException e) {
+            throw new AppManagementException(String.format("Error while querying registry for '%s':'%s'", type, uuid));
+        }
+    }
+
+    public WebApp getWebAppByNameAndVersion(String name, String version, int tenantId) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
+
+        WebApp webApp = null;
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            String basicQuery = "SELECT * FROM APM_APP WHERE APP_NAME = ? AND APP_VERSION = ? AND TENANT_ID = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
+
+            preparedStatementToGetBasicApp.setString(1, name);
+            preparedStatementToGetBasicApp.setString(2, version);
+            preparedStatementToGetBasicApp.setInt(3, tenantId);
+
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
+
+            while(resultSetOfBasicApp.next()){
+
+                String appName = resultSetOfBasicApp.getString("APP_NAME");
+                String appProvider = resultSetOfBasicApp.getString("APP_PROVIDER");
+                APIIdentifier id = new APIIdentifier(appProvider, appName, version);
+                webApp = new WebApp(id);
+
+                webApp.setAppTenant(Integer.toString(tenantId));
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicApp.getString("UUID"));
+
+                webApp.setVersion(version);
+                webApp.setContext(resultSetOfBasicApp.getString("CONTEXT"));
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
+
+                // There should be only one app for the given combination
+                break;
+            }
+
+            fillWebApp(webApp, connection);
+
+            return webApp;
+
+        } catch (SQLException e) {
+            handleException(String.format("Error while fetching the web app for name : '%s', version : '%s', tenantId : '%d'", name, version, tenantId), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicApp, connection, resultSetOfBasicApp);
         }
 
+        return null;
+
+    }
+
+    @Override
+    public WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
+
+        WebApp webApp = null;
+
+        try {
+
+            connection = getRDBMSConnectionWithoutAutoCommit();
+
+            String basicQuery = "SELECT * FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
+            preparedStatementToGetBasicApp.setString(1, context);
+            preparedStatementToGetBasicApp.setString(2, version);
+
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
+
+            while(resultSetOfBasicApp.next()){
+
+                String appName = resultSetOfBasicApp.getString("APP_NAME");
+                String appProvider = resultSetOfBasicApp.getString("APP_PROVIDER");
+                APIIdentifier id = new APIIdentifier(appProvider, appName, version);
+                webApp = new WebApp(id);
+
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+                webApp.setUUID(resultSetOfBasicApp.getString("UUID"));
+
+                webApp.setVersion(version);
+                webApp.setContext(context);
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
+                webApp.setAppTenant(String.valueOf(resultSetOfBasicApp.getInt("TENANT_ID")));
+
+                // There should be only one app for the given combination
+                break;
+            }
+
+            fillWebApp(webApp, connection);
+
+            return webApp;
+        } catch (SQLException e) {
+            handleException(String.format("Error while fetching the web app for context : '%s', version : '%s', tenantId : '%d'", context, version, tenantId), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetBasicApp, connection, resultSetOfBasicApp);
+        }
+
+        return null;
+    }
+
+    private WebApp fillWebApp(WebApp webApp, Connection connection) throws SQLException {
+
+        PreparedStatement preparedStatementToGetURLMappings = null;
+        PreparedStatement preparedStatementToGetEntitlementPolicies = null;
+        PreparedStatement preparedStatementToGetDefaultVersion = null;
+        ResultSet resultSetOfURLMappings  = null;
+        ResultSet resultSetOfEntitlementPolicies = null;
+        ResultSet resultSetOfDefaultVersions = null;
+
+        try{
+
+            String urlMappingQuery = "SELECT * from APM_APP_URL_MAPPING URL, APM_POLICY_GROUP POLICY " +
+                    "WHERE URL.POLICY_GRP_ID = POLICY.POLICY_GRP_ID AND URL.APP_ID = ?";
+
+            preparedStatementToGetURLMappings = connection.prepareStatement(urlMappingQuery);
+            preparedStatementToGetURLMappings.setInt(1, webApp.getDatabaseId());
+            resultSetOfURLMappings = preparedStatementToGetURLMappings.executeQuery();
+
+            webApp.getUriTemplates().clear();
+            while (resultSetOfURLMappings.next()){
+
+                EntitlementPolicyGroup policyGroup = new EntitlementPolicyGroup();
+                policyGroup.setPolicyGroupName(resultSetOfURLMappings.getString("NAME"));
+                policyGroup.setPolicyGroupId(resultSetOfURLMappings.getInt("POLICY_GRP_ID"));
+                policyGroup.setUserRoles(resultSetOfURLMappings.getString("USER_ROLES"));
+                policyGroup.setAllowAnonymous(resultSetOfURLMappings.getBoolean("URL_ALLOW_ANONYMOUS"));
+                policyGroup.setThrottlingTier(resultSetOfURLMappings.getString("THROTTLING_TIER"));
+
+                URITemplate uriTemplate = new URITemplate();
+                uriTemplate.setId(resultSetOfURLMappings.getInt("URL_MAPPING_ID"));
+                uriTemplate.setPolicyGroup(policyGroup);
+                uriTemplate.setHTTPVerb(resultSetOfURLMappings.getString("HTTP_METHOD"));
+                uriTemplate.setUriTemplate(resultSetOfURLMappings.getString("URL_PATTERN"));
+
+                webApp.addURITemplate(uriTemplate);
+            }
+
+            String entitlementPolicyQuery = "SELECT * FROM " +
+                    "APM_POLICY_GRP_PARTIAL_MAPPING ENTITLEMENT, " +
+                    "APM_APP_URL_MAPPING TEMPLATE " +
+                    "WHERE " +
+                    "TEMPLATE.POLICY_GRP_ID = ENTITLEMENT.POLICY_GRP_ID AND APP_ID = ?";
+
+            preparedStatementToGetEntitlementPolicies = connection.prepareStatement(entitlementPolicyQuery);
+            preparedStatementToGetEntitlementPolicies.setInt(1, webApp.getDatabaseId());
+            resultSetOfEntitlementPolicies = preparedStatementToGetEntitlementPolicies.executeQuery();
+
+            while (resultSetOfEntitlementPolicies.next()){
+
+                int urlMappingId = resultSetOfEntitlementPolicies.getInt("URL_MAPPING_ID");
+
+                URITemplate uriTemplate = webApp.getURITemplate(urlMappingId);
+
+                String entitlementPolicyId = resultSetOfEntitlementPolicies.getString("POLICY_PARTIAL_ID");
+
+                if(uriTemplate != null && entitlementPolicyId != null){
+                    uriTemplate.getPolicyGroup().setEntitlementPolicyId(Integer.parseInt(entitlementPolicyId));
+                }
+            }
+
+            // Fetch version information. e.g. default version.
+            // Get the default version for the app group (name + provider)
+            String defaultVersionQuery = "SELECT * FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME = ? AND APP_PROVIDER = ? AND TENANT_ID = ?";
+            preparedStatementToGetDefaultVersion = connection.prepareStatement(defaultVersionQuery);
+            preparedStatementToGetDefaultVersion.setString(1, webApp.getId().getApiName());
+            preparedStatementToGetDefaultVersion.setString(2, webApp.getId().getProviderName());
+            preparedStatementToGetDefaultVersion.setInt(3, Integer.parseInt(webApp.getAppTenant()));
+
+            resultSetOfDefaultVersions = preparedStatementToGetDefaultVersion.executeQuery();
+
+            while (resultSetOfDefaultVersions.next()){
+                String defaultVersion = resultSetOfDefaultVersions.getString("DEFAULT_APP_VERSION");
+                webApp.setDefaultVersion(webApp.getId().getVersion().equals(defaultVersion));
+
+                // There should be only one record for the above query.
+                break;
+            }
+
+            return webApp;
+
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetEntitlementPolicies, null, resultSetOfEntitlementPolicies);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetURLMappings, null, resultSetOfURLMappings);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetDefaultVersion, null, resultSetOfDefaultVersions);
+        }
     }
 
     @Override
@@ -115,7 +331,9 @@ public class DefaultAppRepository implements AppRepository {
 
         for(GenericArtifact artifact : appArtifacts){
             if(isSearchHit(artifact, searchTerms)){
-                apps.add(getApp(type, artifact));
+                App app = getApp(type, artifact);
+                app.setType(type);
+                apps.add(app);
             }
         }
 
@@ -360,6 +578,23 @@ public class DefaultAppRepository implements AppRepository {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
     }
+
+    @Override
+    public Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException {
+
+        Connection connection = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            return new AppMDAO().getEnterpriseSubscription(webAppContext, webAppVersion, connection);
+        } catch (SQLException e) {
+            handleException(String.format("Can't enterprise subscription for '%s':'%s'", webAppContext, webAppVersion), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+
+        return null;
+    }
     // ------------------- END : Repository API implementation methods. ----------------------------------
 
     private AppFactory getAppFactory(String appType) {
@@ -372,10 +607,12 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private WebApp getApp(String type, GenericArtifact appArtifact) throws AppManagementException {
+    private App getApp(String type, GenericArtifact appArtifact) throws AppManagementException {
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(type)) {
             return getWebApp(appArtifact);
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(type)) {
+            return getMobileApp(appArtifact);
         }
         return null;
     }
@@ -437,25 +674,41 @@ public class DefaultAppRepository implements AppRepository {
     private WebApp getWebApp(GenericArtifact webAppArtifact) throws AppManagementException {
 
         Connection connection = null;
+        PreparedStatement preparedStatementToGetBasicApp = null;
+        ResultSet resultSetOfBasicApp = null;
 
         try {
 
             AppFactory appFactory = getAppFactory(AppMConstants.WEBAPP_ASSET_TYPE);
             WebApp webApp = (WebApp) appFactory.createApp(webAppArtifact, registry);
 
-            try {
-                connection = getRDBMSConnectionWithoutAutoCommit();
-            } catch (SQLException e) {
-                handleException("Can't get the database connection.", e);
+            // Fill fields from the database.
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            String basicQuery = "SELECT * FROM APM_APP WHERE UUID = ?";
+            preparedStatementToGetBasicApp = connection.prepareStatement(basicQuery);
+
+            preparedStatementToGetBasicApp.setString(1, webAppArtifact.getId());
+
+            resultSetOfBasicApp = preparedStatementToGetBasicApp.executeQuery();
+
+            while(resultSetOfBasicApp.next()){
+
+                webApp.setAppTenant(String.valueOf(resultSetOfBasicApp.getInt("TENANT_ID")));
+                webApp.setDatabaseId(resultSetOfBasicApp.getInt("APP_ID"));
+
+                webApp.setContext(resultSetOfBasicApp.getString("CONTEXT"));
+                webApp.setTrackingCode(resultSetOfBasicApp.getString("TRACKING_CODE"));
+                webApp.setSaml2SsoIssuer(resultSetOfBasicApp.getString("SAML2_SSO_ISSUER"));
+                webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
+                webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
+                webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
+
+                // There should be only one app for the given combination
+                break;
             }
 
-            int webAppDatabaseId = getDatabaseId(webApp, connection);
-
-            List<EntitlementPolicyGroup> policyGroups = getPolicyGroups(webAppDatabaseId, connection);
-            webApp.setAccessPolicyGroups(policyGroups);
-
-            Set<URITemplate> uriTemplates = getURITemplates(webAppDatabaseId, connection);
-            webApp.setUriTemplates(uriTemplates);
+            fillWebApp(webApp, connection);
 
             return webApp;
         } catch (SQLException e) {
@@ -466,6 +719,14 @@ public class DefaultAppRepository implements AppRepository {
 
         return null;
     }
+
+
+    private MobileApp getMobileApp(GenericArtifact mobileAppArtifact) throws AppManagementException {
+        AppFactory appFactory = getAppFactory(AppMConstants.MOBILE_ASSET_TYPE);
+        MobileApp mobileApp = (MobileApp) appFactory.createApp(mobileAppArtifact, registry);
+        return mobileApp;
+    }
+
 
     private Set<URITemplate> getURITemplates(int webAppDatabaseId, Connection connection) throws SQLException {
 
@@ -604,17 +865,182 @@ public class DefaultAppRepository implements AppRepository {
         return null;
     }
 
+    private String persistMobileApp(MobileApp mobileApp) throws AppManagementException {
+        String artifactId = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                                                                                       AppMConstants.MOBILE_ASSET_TYPE);
+
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));
+            GenericArtifact artifact = AppManagerUtil.createMobileAppArtifactContent(genericArtifact, mobileApp);
+            artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            mobileApp.setUUID(artifactId);
+            changeLifeCycleStatus(AppMConstants.MOBILE_ASSET_TYPE, artifactId, APPLifecycleActions.CREATE.getStatus());
+            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+            Set<String> tagSet = mobileApp.getTags();
+            if (tagSet != null) {
+                for (String tag : tagSet) {
+                    registry.applyTag(artifactPath, tag);
+                }
+            }
+
+            if (mobileApp.getAppVisibility() != null) {
+                AppManagerUtil.setResourcePermissions(mobileApp.getAppProvider(),
+                                                      AppMConstants.API_RESTRICTED_VISIBILITY,
+                                                      mobileApp.getAppVisibility(), artifactPath);
+            }
+            registry.commitTransaction();
+        } catch (RegistryException e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException(
+                        "Error while rolling back the transaction for mobile application: "
+                                + mobileApp.getAppName(), re);
+            }
+            handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
+        }
+        return artifactId;
+    }
+
+
+    /**
+     * Change the lifecycle state of a given application
+     *
+     * @param appType         application type ie: webapp, mobileapp
+     * @param appId           application uuid
+     * @param lifecycleAction lifecycle action perform on the application
+     * @throws AppManagementException
+     */
+    private void changeLifeCycleStatus(String appType, String appId, String lifecycleAction)
+            throws AppManagementException, RegistryException {
+
+        try {
+            String username = getUsernameOfCurrentUser();
+            String tenantDomain = getTenantDomainOfCurrentUser();
+
+            String requiredPermission = null;
+
+            if (AppMConstants.LifecycleActions.SUBMIT_FOR_REVIEW.equals(lifecycleAction)) {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_CREATE;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_CREATE;
+                }
+            } else {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_PUBLISH;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_PUBLISH;
+                }
+            }
+
+            if (!AppManagerUtil.checkPermissionQuietly(username, requiredPermission)) {
+                handleException("The user " + username +
+                                        " is not authorized to perform lifecycle action " + lifecycleAction + " on " +
+                                        appType + " with uuid " + appId, null);
+            }
+            //Check whether the user has enough permissions to change lifecycle
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                    getTenantId(tenantDomain);
+
+            AuthorizationManager authManager = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantUserRealm(tenantId).getAuthorizationManager();
+
+            //Get system registry for logged in tenant domain
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(systemRegistry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            String resourcePath = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                                                                RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +
+                                                                        appArtifact.getPath());
+
+            if (appArtifact != null) {
+                if (!authManager.isUserAuthorized(username, resourcePath, "authorize")) {
+                    //Throws resource authorization exception
+                    handleException("The user " + username +
+                                            " is not authorized to" + appType + " with uuid " + appId, null);
+                }
+                //Change lifecycle status
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.MOBILE_LIFE_CYCLE);
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.WEBAPP_LIFE_CYCLE);
+                }
+
+                //If application is role restricted, deny read rights for Internal/everyone and system/wso2.anonymous
+                // .role roles
+                if ((AppMConstants.LifecycleActions.PUBLISH.equals(lifecycleAction) ||
+                        AppMConstants.LifecycleActions.RE_PUBLISH.equals(lifecycleAction)) &&
+                        !StringUtils.isBlank(appArtifact.getAttribute("overview_visibleRoles"))) {
+
+                    authManager.denyRole(AppMConstants.EVERYONE_ROLE, resourcePath, ActionConstants.GET);
+                    authManager.denyRole(AppMConstants.ANONYMOUS_ROLE, resourcePath, ActionConstants.GET);
+                }
+
+                if (log.isDebugEnabled()) {
+                    String logMessage =
+                            "Lifecycle action " + lifecycleAction + " has been successfully performed on " + appType
+                                    + " with id" + appId;
+                    log.debug(logMessage);
+                }
+            } else {
+                handleException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                                        appId + ". Artifact does not exist", null);
+            }
+        } catch (UserStoreException e) {
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
+                                    " with id : " + appId + ". Failed to retrieve tenant id for user : ", e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
     private WebApp createNewWebAppVersion(WebApp targetApp) throws AppManagementException {
 
         // Get the attributes of the source.
         WebApp sourceApp = (WebApp) getApp(targetApp.getType(), targetApp.getUUID());
+
+        //check if the new app identity already exists
+        final String appName = sourceApp.getApiName().toString();
+        final String appVersion = targetApp.getId().getVersion();
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                                                                                       AppMConstants.WEBAPP_ASSET_TYPE);
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            attributeListMap.put(AppMConstants.API_OVERVIEW_VERSION, new ArrayList<String>() {{
+                add(appVersion);
+            }});
+
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleException("A duplicate webapp already exists with name '" +
+                                        appName + "' and version '" + appVersion + "'", null);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error occurred while checking existence for webapp with name '" + appName +
+                                    "' and version '" + appVersion + "'", null);
+        }
+
 
         // Clear the ID.
         sourceApp.setUUID(null);
 
         // Set New Version.
 
-        sourceApp.setOriginVersion(targetApp.getId().getVersion());
+        sourceApp.setOriginVersion(sourceApp.getId().getVersion());
         sourceApp.setVersion(targetApp.getId().getVersion());
         sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
 
@@ -639,6 +1065,51 @@ public class DefaultAppRepository implements AppRepository {
 
         saveApp(sourceApp);
 
+        return sourceApp;
+    }
+
+    private MobileApp createNewMobileAppVersion(MobileApp targetApp) throws AppManagementException {
+
+        // Get the attributes of the source.
+        MobileApp sourceApp = (MobileApp) getApp(targetApp.getType(), targetApp.getUUID());
+
+        //check if the new app identity already exists
+        final String appName = sourceApp.getAppName().toString();
+        final String appVersion = targetApp.getVersion();
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                                                                                       AppMConstants.MOBILE_ASSET_TYPE);
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            attributeListMap.put(AppMConstants.API_OVERVIEW_VERSION, new ArrayList<String>() {{
+                add(appVersion);
+            }});
+
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleException("A duplicate webapp already exists with name '" +
+                                        appName + "' and version '" + appVersion + "'", null);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error occurred while checking existence for webapp with name '" + appName +
+                                    "' and version '" + appVersion + "'", null);
+        }
+
+
+        // Clear the ID.
+        sourceApp.setUUID(null);
+
+        // Set New Version.
+        sourceApp.setOriginVersion(sourceApp.getVersion());
+        sourceApp.setVersion(targetApp.getVersion());
+
+        // Set the other properties accordingly.
+        sourceApp.setDisplayName(targetApp.getDisplayName());
+        sourceApp.setCreatedTime(String.valueOf(new Date().getTime()));
+        saveApp(sourceApp);
         return sourceApp;
     }
 
@@ -1063,8 +1534,8 @@ public class DefaultAppRepository implements AppRepository {
     private int persistWebAppToDatabase(WebApp webApp, Connection connection) throws SQLException, AppManagementException {
 
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                            "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL, APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL, APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, VISIBLE_ROLES) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
@@ -1093,6 +1564,7 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatement.setBoolean(10, webApp.getAllowAnonymous());
             preparedStatement.setString(11, webApp.getUrl());
             preparedStatement.setBoolean(12, Boolean.parseBoolean(webApp.getTreatAsASite()));
+            preparedStatement.setString(13, webApp.getVisibleRoles());
 
             preparedStatement.execute();
 

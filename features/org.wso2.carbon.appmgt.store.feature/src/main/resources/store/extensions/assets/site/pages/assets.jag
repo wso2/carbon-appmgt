@@ -48,7 +48,7 @@ require('/modules/store.js').exec(function (ctx) {
             store = ctx.store,
             user = ctx.user,
             server = ctx.server,
-            tenantId = ctx.tenantId,
+            tenantId = ctx.tenant.tenantId,
             tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
@@ -207,23 +207,59 @@ require('/modules/store.js').exec(function (ctx) {
         options.lifecycleState = ["published"];
         assets = store.taggeds(type, options, paging);
     } else if (query) {
-        var urlQuery = 'query=' + query + '&';
-        query = require('/modules/search.js').build(query);
-        query.overview_treatAsASite = 'TRUE';
-        if (!isMultipleVersionDisplayEnabled) {
-            query.overview_makeAsDefaultVersion = 'true';
+        var searchParameter;
+        var searchValue;
+        var splitQuery = query.split(":");
+        searchParameter = splitQuery[0];
+        // This is a registry based search. In search box, user wants to search by business owner name. But
+        // in registry, there is only business owner Id. Therefore, it is necessary to get business owner Ids
+        // related to search prefix from DB.
+
+        if (!searchParameter.equals("Business Owner")) {
+            var urlQuery = 'query=' + query + '&';
+            query = require('/modules/search.js').build(query);
+            query.overview_treatAsASite = 'TRUE';
+            if (!isMultipleVersionDisplayEnabled) {
+                query.overview_makeAsDefaultVersion = 'true';
+            }
+            options = {
+                type: type,
+                attributes: query
+            };
+        } else {
+            searchValue = splitQuery[1];
+            var initialQuery = "businessOwner:" + searchValue;
+            var searchPrefix = searchValue.split("\"")[1];
+            var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
+            if (resultIdsList){
+                var resultAssets = [];
+                resultIdsList = resultIdsList.toArray();
+                for(var key in resultIdsList) {
+                    var businessOwnerId = resultIdsList[key];
+                    query = "businessOwner:\"" + businessOwnerId + "\"";
+                    query = require('/modules/search.js').build(query);
+                    query.overview_treatAsASite = 'TRUE';
+                    if (!isMultipleVersionDisplayEnabled) {
+                        query.overview_makeAsDefaultVersion = 'true';
+                    }
+                    options = {
+                        type: type,
+                        attributes: query
+                    };
+                    resultAssets = resultAssets.concat(store.search(options, paging));
+                }
+                assets = resultAssets;
+            }
+            query = initialQuery;
+            urlQuery = 'query=' + initialQuery + '&';
+            query = require('/modules/search.js').build(query);
         }
-        options = {
-            type: type,
-            attributes: query
-        };
         for (key in query) {
             if (query.hasOwnProperty(key) && key === 'overview_category') {
                 selectedCategory = query[key];
             }
         }
         subPage = '/ Search: "' + query + '"';
-        assets = store.search(options, paging);
     } else {
         if (paging.sort == 'popular') {
             var urlQuery = 'sort=' + paging.sort + '&';

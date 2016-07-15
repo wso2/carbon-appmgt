@@ -403,6 +403,29 @@ public class AppsApi  {
     {
     return delegate.appsAppTypeIdAppIdDocsDocumentIdDelete(appType,appId,documentId,ifMatch,ifUnmodifiedSince);
     }
+
+    @PUT
+    @Path("/{appType}/id/{appId}/docs/{documentId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Update an Webapp Document", notes = "Update document details. ", response = DocumentDTO.class, tags={ "API Document",  })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.  Document updated ", response = DocumentDTO.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.  Invalid request or validation error. ", response = DocumentDTO.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.  The resource to be updated does not exist. ", response = DocumentDTO.class),
+            @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed.  The request has not been performed because one of the preconditions is not met. ", response = DocumentDTO.class) })
+    public Response appsAppTypeIdAppIdDocsDocumentIdPut(
+            @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. ",required=true) @PathParam("appId") String appId,
+            @ApiParam(value = "Document UUID. ",required=true) @PathParam("documentId") String documentId,
+            @ApiParam(value = "The App type (either Webapp/Mobile app). ",required=true) @PathParam("appType") String appType,
+            @ApiParam(value = "Document object that needs to be added " ,required=true) DocumentDTO body,
+            @ApiParam(value = "Media type of the entity in the body. Default is JSON. " ,required=true, defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
+            @ApiParam(value = "Validator for conditional requests; based on the ETag. " )@HeaderParam("If-Match") String ifMatch,
+            @ApiParam(value = "Validator for conditional requests; based on the Last Modified header. " )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+             {
+        return delegate.appsAppTypeIdAppIdDocsDocumentIdPut(appId,documentId,appType,body,contentType,ifMatch,ifUnmodifiedSince);
+    }
+
     @POST
     @Path("/{appType}/id/{appId}/docs/{documentId}/content")
     @Consumes({ "multipart/form-data" })
@@ -426,6 +449,29 @@ public class AppsApi  {
     {
     return delegate.appsAppTypeIdAppIdDocsDocumentIdContentPost(appType,appId,documentId,fileInputStream,fileDetail,inlineContent,ifMatch,ifUnmodifiedSince);
     }
+
+    @GET
+    @Path("/{appType}/id/{appId}/docs/{documentId}/content")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get document content", notes = "Downloads a FILE type document/get the inline content or source url of a certain document. ", response = void.class, tags={ "App Document",  })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.  File or inline content returned. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 303, message = "See Other. Source can be retrived from the URL specified at the Location header. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 304, message = "Not Modified.  Empty body because the client has already the latest version of the requested resource. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.  Requested Document does not exist. ", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.  The requested media type is not supported ", response = void.class) })
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentGet(
+            @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. ",required=true) @PathParam("appId") String appId,
+            @ApiParam(value = "Document UUID. ",required=true) @PathParam("documentId") String documentId,
+            @ApiParam(value = "The App type (either Webapp/Mobile app). ",required=true) @PathParam("appType") String appType,
+            @ApiParam(value = "Media types acceptable for the response. Default is JSON. " , defaultValue="JSON")@HeaderParam("Accept") String accept,
+            @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. " )@HeaderParam("If-None-Match") String ifNoneMatch,
+            @ApiParam(value = "Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. " )@HeaderParam("If-Modified-Since") String ifModifiedSince)
+    {
+        return delegate.appsAppTypeIdAppIdDocsDocumentIdContentGet(appId,documentId,appType,accept,ifNoneMatch,ifModifiedSince);
+    }
+
     @GET
     @Path("/{appType}/id/{appId}/lifecycle")
     @Consumes({ "application/json" })

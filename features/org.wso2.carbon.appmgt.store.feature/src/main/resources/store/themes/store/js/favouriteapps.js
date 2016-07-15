@@ -213,19 +213,19 @@ $(function () {
                 content: "You can mark or unmark your favourite apps in My Apps page"
             },
             {
-                element: "#set-home",
+                element: "#dropdown-toggle-conf",
                 title: "Set the default page",
                 placement: "left",
                 content: "My Favourites page can be set/reset as your default page with the configuration option here."
             },
             {
-                element: "#all-apps-link",
+                element: "#store-link",
                 title: "Checkout new applications",
                 placement: "right",
                 content: "You can go to App Store from this link, search and subscribe to new applications"
             },
             {
-                element: "#my-favorites-link",
+                element: "#store-link",
                 title: "Add to your favourites",
                 placement: "right",
                 content: "The subscribed application can be marked as your Favourites and make it your default home page."

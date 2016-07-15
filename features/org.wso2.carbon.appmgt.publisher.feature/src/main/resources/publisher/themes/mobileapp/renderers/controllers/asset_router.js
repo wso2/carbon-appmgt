@@ -31,6 +31,7 @@ var render = function(theme, data, meta, require) {
     var um = server.userManager(user.tenantId);
     var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
     var updateMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_update, um);
+    var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var typeList = apiProvider.getEnabledAssetTypeList();
     data.typeList = typeList;
@@ -61,7 +62,7 @@ var render = function(theme, data, meta, require) {
             if (data.artifact.lifecycleState == "Published") {
                 editEnabled = false;
             }
-            if (user.hasRoles(["admin"]) || updateMobileAppAuthorized) {
+            if (user.hasRoles([ADMIN_ROLE]) || updateMobileAppAuthorized) {
                 editEnabled = true;
             }
             if (!editEnabled) {

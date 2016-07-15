@@ -426,7 +426,8 @@ var exec = function (fn, request, response, session) {
         tenant = es.server.tenant(request, session),
         user = es.server.current(session);
     if(!user) {
-        response.sendError(401, 'Unauthorized');
+        var context = caramel.configs().context;
+        response.sendRedirect(context);
         return;
     }
     es.server.sandbox({

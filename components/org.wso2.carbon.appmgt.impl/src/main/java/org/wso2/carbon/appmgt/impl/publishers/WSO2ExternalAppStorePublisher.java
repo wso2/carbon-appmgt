@@ -19,6 +19,7 @@ package org.wso2.carbon.appmgt.impl.publishers;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +34,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -45,8 +44,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
 import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -83,9 +82,9 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
 
         CookieStore cookieStore = new BasicCookieStore();
         HttpContext httpContext = new BasicHttpContext();
-        HttpClient httpClient = new DefaultHttpClient();
         httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
         String storeEndpoint = store.getEndpoint();
+        HttpClient httpClient = AppManagerUtil.getHttpClient(storeEndpoint);
         String provider = AppManagerUtil.replaceEmailDomain(store.getUsername());
         //login
         loginToExternalStore(store, httpContext, httpClient);
@@ -130,11 +129,11 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
 
         validateStore(store);
 
-        HttpClient httpClient = new DefaultHttpClient();
+        String storeEndpoint = store.getEndpoint();
+        HttpClient httpClient = AppManagerUtil.getHttpClient(storeEndpoint);
         CookieStore cookieStore = new BasicCookieStore();
         HttpContext httpContext = new BasicHttpContext();
         httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-        String storeEndpoint = store.getEndpoint();
 
         loginToExternalStore(store, httpContext, httpClient);
         deleteFromExternalStore(webApp, store.getUsername(), storeEndpoint, httpContext);
@@ -158,14 +157,14 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
         String appVersion = webApp.getId().getVersion();
 
         try {
-            HttpClient httpclient = new DefaultHttpClient();
             String urlSuffix = provider + "/" + appName + "/" + appVersion;
             urlSuffix = URIUtil.encodePath(urlSuffix, "UTF-8");
             storeEndpoint = storeEndpoint + AppMConstants.APP_STORE_GET_UUID_URL + urlSuffix;
             HttpGet httpGet = new HttpGet(storeEndpoint);
+            HttpClient httpClient = AppManagerUtil.getHttpClient(storeEndpoint);
 
             //Execute and get the response.
-            HttpResponse response = httpclient.execute(httpGet, httpContext);
+            HttpResponse response = httpClient.execute(httpGet, httpContext);
             HttpEntity entity = response.getEntity();
             //{"error" : false, "uuid" : "bbfa1766-e36a-4676-bb61-fdf2ba1f5327"}
             // or {"error" : false, "uuid" : null, "message" : "Could not find UUID for given webapp"}
@@ -219,8 +218,9 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
             }
             storeEndpoint = storeEndpoint + AppMConstants.APP_STORE_DELETE_URL + uuid;
 
-            HttpClient httpclient = new DefaultHttpClient();
+            HttpClient httpclient = AppManagerUtil.getHttpClient(storeEndpoint);
             HttpDelete httpDelete = new HttpDelete(storeEndpoint);
+
             //Execute and get the response.
             HttpResponse response = httpclient.execute(httpDelete, httpContext);
             HttpEntity entity = response.getEntity();

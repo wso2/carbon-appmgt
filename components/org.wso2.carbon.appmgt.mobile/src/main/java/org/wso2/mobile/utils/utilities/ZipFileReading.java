@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -47,7 +48,9 @@ public class ZipFileReading {
 	public static final String APK_PACKAGE_KEY = "package";
 	
     public static Document loadXMLFromString(String xml) throws Exception {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource is = new InputSource(new StringReader(xml));
         return builder.parse(is);
@@ -62,7 +65,6 @@ public class ZipFileReading {
                 ZipEntry entry;
                 while ((entry = stream.getNextEntry()) != null) {
                     if (entry.getName().equals("AndroidManifest.xml")) {
-                        StringBuilder builder = new StringBuilder();
                         xml = AndroidXMLParsing.decompressXML(IOUtils
                                 .toByteArray(stream));
                     }

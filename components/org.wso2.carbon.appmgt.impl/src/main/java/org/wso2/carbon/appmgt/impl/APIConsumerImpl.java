@@ -121,14 +121,29 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Returns business owner Ids by a prefix of business owner name.
-     * @param searchPrefix
+     * Get business owner for a given business owner id in public store.
+     * @param businessOwnerId
+     * @param appTenantId
      * @return
      * @throws AppManagementException
      */
     @Override
-    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix) throws AppManagementException {
-        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int appTenantId) throws
+                                                                                          AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId, appTenantId);
+    }
+
+    /**
+     * Returns business owner Ids by a prefix of business owner name.
+     * @param searchPrefix
+     * @param appTenantId
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int appTenantId) throws
+                                                                                          AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, appTenantId);
     }
 
     /**
@@ -1770,8 +1785,21 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
                                                         String searchValue) throws AppManagementException {
+        Registry anonnymousUserRegistry = null;
+        try {
+            if (tenantIdOfStore != tenantIdOfUser) {
+                // Get registry for anonnymous users when searching is going in tenant.
+                anonnymousUserRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                        .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIdOfStore);
+            } else {
+                anonnymousUserRegistry = registry;
+            }
+        } catch (RegistryException e) {
+            handleException("Error while obtaining registry.", e);
+        }
+
         return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,
-                                                searchValue);
+                                                searchValue, anonnymousUserRegistry);
     }
 
     @Override

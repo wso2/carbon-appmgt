@@ -103,8 +103,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         try {
             if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
-                appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
-                                                                          tenantDomain);
+               appProvider = appProvider.replace("-AT-", "@");
+               appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
+                                                                         tenantDomain);
             } else {
                 appData = appGatewayAdminStub.getVersionedWebApp(appProvider, appName, appVersion);
             }

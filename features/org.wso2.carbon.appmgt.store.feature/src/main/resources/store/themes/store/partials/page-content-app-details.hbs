@@ -72,17 +72,19 @@
                                 <i class="fw fw-heart"></i>{{t "Add to Favorites"}}
                             </a>
                         {{/if}}
-                        {{#if isSelfSubscriptionEnabled}}
-                            {{#if isSubscribed}}
-                                <a href="#" id="btnUnsubscribe" class="btn btn-default">
-                                    {{t "Un-Subscribe"}}
-                                </a>
-                            {{else}}
-                                <a href="#" id="btnSubscribe" class="btn btn-subscribe">
-                                    <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
-                                </a>
+                        {{#ifCond asset.attributes.overview_allowAnonymous "==" "false"}}
+                            {{#if isSelfSubscriptionEnabled}}
+                                {{#if isSubscribed}}
+                                    <a href="#" id="btnUnsubscribe" class="btn btn-default">
+                                        {{t "Un-Subscribe"}}
+                                    </a>
+                                {{else}}
+                                    <a href="#" id="btnSubscribe" class="btn btn-subscribe">
+                                        <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
+                                    </a>
+                                {{/if}}
                             {{/if}}
-                        {{/if}}
+                        {{/ifCond}}
                     {{else}}
                     {{!-- user cannot access this app --}}
                         {{#if isSubscriptionAvailable}}
@@ -90,7 +92,7 @@
                             <input type="hidden" id="subsAppTier" name="subsAppTier" value="Unlimited" />
                             {{#if isSelfSubscriptionEnabled}}
                             {{!-- self subscription is enabled --}}
-                                {{#if subscriptionInfo.individualSubscription.OnHold}}
+                                {{#ifCond subscriptionInfo.individualSubscription.subscriptionStatus "==" "BLOCKED"}}
                                     <a href="#" id="btnSubscribe" class="btn btn-subscribe disabled">
                                         <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
                                     </a>
@@ -101,7 +103,7 @@
                                     <a href="#" id="btnSubscribe" class="btn btn-subscribe">
                                         <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
                                     </a>
-                                {{/if}}
+                                {{/ifCond}}
                             {{/if}}
 
                             {{#if isEnterpriseSubscriptionEnabled}}
@@ -158,10 +160,12 @@
         <div id="menu4" class="tab-pane fade">
             <div class="row">
                 {{#each businessOwnerData}}
-                    <div class="row">
-                        <div class="col-sm-3"><b>{{name}}</b></div>
-                        <div class="col-sm-9">{{value}}</div>
-                    </div>
+                    {{#if value}}
+                        <div class="row">
+                            <div class="col-sm-3"><b>{{name}}</b></div>
+                            <div class="col-sm-9">{{value}}</div>
+                        </div>
+                    {{/if}}
                 {{/each}}
             </div>
         </div>

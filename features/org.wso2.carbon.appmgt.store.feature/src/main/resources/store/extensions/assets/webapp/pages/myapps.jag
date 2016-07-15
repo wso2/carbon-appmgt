@@ -171,7 +171,8 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 searchValue = splitQuery[1];
                 var initialQuery = "businessOwner:" + searchValue;
-                var resultIdsList =storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchValue.split("\"")[1]);
+                var searchPrefix = searchValue.split("\"")[1];
+                var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
                 if (resultIdsList){
                     var resultAssets = [];
                     resultIdsList = resultIdsList.toArray();
@@ -413,6 +414,9 @@ require('/modules/store.js').exec(function (ctx) {
 
             if (searchOption.toLowerCase() == "provider") {
                 searchOption = "SEARCH_BY_APP_PROVIDER";
+            } else if (searchOption.toLowerCase() == "business owner") {
+                query = "businessOwner:" + searchValue;
+                searchOption = "SEARCH_BY_BUSINESS_OWNER";
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
             }

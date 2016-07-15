@@ -21,17 +21,17 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
-import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
-import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is responsible for mapping APPM core documentation related objects into REST API documentation
@@ -51,6 +51,13 @@ public class DocumentationMappingUtil {
         documentDTO.setSummary(documentation.getSummary());
         documentDTO.setType(DocumentDTO.TypeEnum.valueOf(documentation.getType().toString()));
         documentDTO.setOtherTypeName(documentation.getOtherTypeName());
+        String filePath = documentation.getFilePath();
+        String fileName = null;
+        if(StringUtils.isNotEmpty(filePath)){
+            Path path = Paths.get(filePath);
+            fileName = String.valueOf(path.getFileName());
+        }
+        documentDTO.setFileName(fileName);
         if (documentation.getSourceType() != null)
             documentDTO.setSourceType(DocumentDTO.SourceTypeEnum.valueOf(documentation.getSourceType().toString()));
         documentDTO.setSourceUrl(documentation.getSourceUrl());

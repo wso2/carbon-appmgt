@@ -304,7 +304,35 @@ $(function() {
 
 		//Extract the fields
 		var fields = $('#form-asset-edit :input');
-		
+
+		var subscribeAvailability = $('#sub-availability').val();
+		if (subscribeAvailability == 'specific_tenants') {
+			var tenantList = $('#tenant-list');
+			var tenantListValue = tenantList.val();
+			if(tenantListValue == null || tenantListValue.trim() == '') {
+				showAlert('Please enter the specific tenant list.', 'error');
+				tenantList.focus();
+				this.disabled = false;
+				$("html, body").animate({ scrollTop: 0 }, "slow");
+				return;
+			}
+		}
+
+		//Check illegal characters in tags
+		var tags = $('#tag-test').tokenInput('get');
+		if(tags.length > 0) {
+			for (var index in tags) {
+				if(checkIllegalCharacters(tags[index].name)){
+					showAlert("Tags contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)", 'error');
+					this.disabled = false;
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					return;
+				}
+
+			}
+		}
+
+
 		if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
 			$('#sso_ssoProvider').val(selectedProvider);
@@ -355,21 +383,19 @@ $(function() {
                 			});
             			}
 
-                        	if (rolePermissions.length > 0) {
-                            		$.ajax({
-                                		url: caramel.context + '/asset/' + type + '/id/' + id + '/permissions',
-                                		type: 'POST',
-                                		processData: false,
-                                		contentType: 'application/json',
-                                		data: JSON.stringify(rolePermissions),
-                                		success: function (response) {
-                                   			 showModel(type, id);
-                               			 },
-                               			error: function (response) {
-                                   			 showAlert('Error adding permissions.', 'error');
-                                		}
-                            		});
-                        	}
+                        $.ajax({
+                                   url: caramel.context + '/asset/' + type + '/id/' + id + '/permissions',
+                                   type: 'POST',
+                                   processData: false,
+                                   contentType: 'application/json',
+                                   data: JSON.stringify(rolePermissions),
+                                   success: function (response) {
+                                       showModel(type, id);
+                                   },
+                                   error: function (response) {
+                                       showAlert('Error adding permissions.', 'error');
+                                   }
+                               });
 	            			
         			})();
 
@@ -520,6 +546,15 @@ $(function() {
 		return formData;
 	}
 
+	var checkIllegalCharacters = function (value) {
+		// registry doesn't allow following illegal charecters
+		var match = value.match(/[~!@#;%^*()+={}|\\<>"',]/);
+		if (match) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 
     function createServiceProvider() {
         var sso_config = {};

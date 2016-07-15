@@ -223,7 +223,7 @@ public class HostObjectUtils {
      */
     public static String getBinaryStorageConfiguration() {
         AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        String binaryStorageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        String binaryStorageLocation = config.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION);
         return binaryStorageLocation;
     }
 

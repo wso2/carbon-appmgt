@@ -188,7 +188,9 @@ $(function () {
 
                                  $('#messageModal a.btn-primary').click(function () {
                                      $('#messageModal').modal('hide');
-                                     location.href =  caramel.tenantedUrl('/login');
+                                     var loginUrl = caramel.tenantedUrl('/login?header=true');
+                                     var fixedUrl = loginUrl.replace('#', '');
+                                     window.location = fixedUrl;
                                  });
 
 

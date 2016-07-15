@@ -27,11 +27,22 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.URL;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -113,13 +124,29 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -354,6 +381,7 @@ public final class AppManagerUtil {
             mobileApp.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
             mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            mobileApp.setType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
             mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
           //  mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
@@ -867,6 +895,7 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(mobileApp.getAppVisibility()));
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, AppMConstants.MOBILE_ASSET_TYPE);
 
 
 		} catch (GovernanceException e) {
@@ -1484,6 +1513,44 @@ public final class AppManagerUtil {
 
 		return gatewayURLs;
 	}
+
+    /**
+     *
+     * Returns the HTTP URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                                                    .getAPIManagerConfiguration()
+                                                    .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpGatewayURL = gatewayURLs.split(",")[0];
+
+        return httpGatewayURL;
+    }
+
+    /**
+     *
+     * Returns the HTTPS URL of the App Gateway
+     *
+     * @return
+     */
+    public static String getGatewayHTTPSURL(){
+
+        List<Environment> gatewayEnvironments = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration()
+                .getApiGatewayEnvironments();
+
+        // More than one gateway is not supported. So only deal with the first gateway.
+        String gatewayURLs = gatewayEnvironments.get(0).getApiGatewayEndpoint();
+        String httpsGatewayURL = gatewayURLs.split(",")[1];
+
+        return httpsGatewayURL;
+    }
 
 	/**
 	 * Gateway endpoint has HTTP and HTTPS endpoints.
@@ -3704,6 +3771,58 @@ public final class AppManagerUtil {
 
     public static void loadTenantConf(int tenantID) throws AppManagementException {
         loadOAuthScopeRoleMapping(tenantID);
+        loadCustomAppPropertyDefinitions(tenantID);
+    }
+
+    private static void loadCustomAppPropertyDefinitions(int tenantID) throws AppManagementException {
+
+        RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
+        try {
+            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            loadCustomAppPropertyDefinitionsForAppType(AppMConstants.WEBAPP_ASSET_TYPE, registry);
+            loadCustomAppPropertyDefinitionsForAppType(AppMConstants.MOBILE_ASSET_TYPE, registry);
+        } catch (RegistryException e) {
+            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+        } catch (IOException e) {
+            throw new AppManagementException("Error while reading tenant conf file content", e);
+        }
+    }
+
+    private static void loadCustomAppPropertyDefinitionsForAppType(String appType, UserRegistry registry) throws RegistryException, IOException {
+
+        if(!registry.resourceExists(getCustomPropertyDefinitionsResourcePath(appType))){
+
+            String customPropertyDefinitions = CarbonUtils.getCarbonHome() + File.separator +
+                                                AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                                                AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH + File.separator +
+                                                appType + ".json";
+
+            File customPropertyDefinitionsFile = new File(customPropertyDefinitions);
+
+            byte[] data;
+
+            if (customPropertyDefinitionsFile.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(customPropertyDefinitionsFile);
+                data = IOUtils.toByteArray(fileInputStream);
+
+                Resource resource = registry.newResource();
+                resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+                resource.setContent(data);
+
+                String customPropertyDefinitionsRegistryPath = getCustomPropertyDefinitionsResourcePath(appType);
+                registry.put(customPropertyDefinitionsRegistryPath, resource);
+
+                log.debug(String.format("Added custom property mapping ('%s') for '%s'", customPropertyDefinitionsRegistryPath, appType));
+
+            }else{
+                log.warn(String.format("Can't find custom property definitions file ('%s') for '%s'", customPropertyDefinitionsFile, AppMConstants.WEBAPP_ASSET_TYPE));
+            }
+        }
+    }
+
+    private static String getCustomPropertyDefinitionsResourcePath(String appType) {
+        return String.format("%s/%s/%s.json", AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, AppMConstants.CUSTOM_PROPERTY_DEFINITIONS_PATH, appType);
     }
 
     private static void loadOAuthScopeRoleMapping(int tenantID) throws AppManagementException {
@@ -3719,16 +3838,16 @@ public final class AppManagerUtil {
                 return;
             }
 
-            String tenantConfLocation = CarbonUtils.getCarbonHome() + File.separator +
+            String oauthScopeRoleMappingFilePath = CarbonUtils.getCarbonHome() + File.separator +
                                             AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
                                             AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
-            File tenantConfFile = new File(tenantConfLocation);
+            File oauthScopeRoleMappingFile = new File(oauthScopeRoleMappingFilePath);
 
             byte[] data;
 
-            if (tenantConfFile.exists()) { // Load conf from resources directory in pack if it exists
-                FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
+            if (oauthScopeRoleMappingFile.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(oauthScopeRoleMappingFile);
                 data = IOUtils.toByteArray(fileInputStream);
 
                 Resource resource = registry.newResource();
@@ -3745,9 +3864,9 @@ public final class AppManagerUtil {
                 log.warn(String.format("Can't find OAuth scope role mapping file in '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
             }
         } catch (RegistryException e) {
-            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+            throw new AppManagementException("Error while saving OAuth scope role mapping to the registry", e);
         } catch (IOException e) {
-            throw new AppManagementException("Error while reading tenant conf file content", e);
+            throw new AppManagementException("Error while reading OAuth scope role mapping file content", e);
         }
     }
 
@@ -3780,5 +3899,77 @@ public final class AppManagerUtil {
         throw new AppManagementException(msg);
     }
 
+    /**
+     * Return a http client instance
+     *
+     * @param port      - server port
+     * @param protocol  - service endpoint protocol http/https
+     * @return
+     */
+    public static HttpClient getHttpClient(int port, String protocol) {
+        SchemeRegistry registry = new SchemeRegistry();
+        SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+        String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
+        if (ignoreHostnameVerification != null && "true".equalsIgnoreCase(ignoreHostnameVerification)) {
+            X509HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            socketFactory.setHostnameVerifier(hostnameVerifier);
+        }
+        if (AppMConstants.HTTPS_PROTOCOL.equalsIgnoreCase(protocol)) {
+            if (port >= 0) {
+                registry.register(new Scheme(AppMConstants.HTTPS_PROTOCOL, port, socketFactory));
+            } else {
+                registry.register(new Scheme(AppMConstants.HTTPS_PROTOCOL, 443, socketFactory));
+            }
+        } else if (AppMConstants.HTTP_PROTOCOL.equalsIgnoreCase(protocol)) {
+            if (port >= 0) {
+                registry.register(new Scheme(AppMConstants.HTTP_PROTOCOL, port, PlainSocketFactory.getSocketFactory()));
+            } else {
+                registry.register(new Scheme(AppMConstants.HTTP_PROTOCOL, 80, PlainSocketFactory.getSocketFactory()));
+            }
+        }
+        HttpParams params = new BasicHttpParams();
+        ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
+        return new DefaultHttpClient(tcm, params);
+    }
 
+    /**
+     * Return a http client instance. This http client is configured according to the
+     * org.wso2.ignoreHostnameVerification system property.
+     *
+     * @param url      - server endpoint
+     * @return HttpClient
+     */
+    public static HttpClient getHttpClient(String url) {
+        URL ulrEndpoint = new URL(url);
+        int port = ulrEndpoint.getPort();
+        String protocol = ulrEndpoint.getProtocol();
+        return getHttpClient(port, protocol);
+    }
+
+    /**
+     * Resolve file path avoiding Potential Path Traversals
+     *
+     * @param baseDirPath base directory file path
+     * @param fileName    filename
+     * @return
+     */
+    public static String resolvePath(String baseDirPath, String fileName) {
+        final Path basePath = Paths.get(baseDirPath);
+        final Path filePath = Paths.get(fileName);
+        if (!basePath.isAbsolute()) {
+            throw new IllegalArgumentException("Base directory path '" + baseDirPath + "' must be absolute");
+        }
+        if (filePath.isAbsolute()) {
+            throw new IllegalArgumentException("Invalid file name '" + fileName + "' with an absolute file path is provided");
+        }
+        // Join the two paths together, then normalize so that any ".." elements
+        final Path resolvedPath = basePath.resolve(filePath).normalize();
+
+        // Make sure the resulting path is still within the required directory.
+        if (!resolvedPath.startsWith(baseDirPath)) {
+            throw new IllegalArgumentException("File '" + fileName + "' is not within the required directory.");
+        }
+
+        return String.valueOf(resolvedPath);
+    }
 }

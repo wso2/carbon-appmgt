@@ -359,7 +359,11 @@ Store.prototype.commentsPaging = function (request) {
 };
 
 Store.prototype.subscriptionSpace = function (type) {
-    return this.userSpace + SUBSCRIPTIONS_PATH + (type ? '/' + type : '');
+    // return the subscription space if user space defines only.
+    var userSpaceValue = this.userSpace;
+    if (typeof userSpaceValue !== 'undefined') {
+        return userSpaceValue + SUBSCRIPTIONS_PATH + (type ? '/' + type : '');
+    }
 };
 
 Store.prototype.subscribe = function (type, id) {
@@ -442,8 +446,10 @@ Store.prototype.searchSubscriptions = function (type, searchAttribute, searchVal
     var appIdPaths = registry.content(path);
     appIdPaths.forEach(function (path) {
         var app = that.asset(type, path.substr(path.lastIndexOf('/') + 1));
-        if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
-            apps.push(app);
+        if (app != null) {
+            if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
+                apps.push(app);
+            }
         }
     });
     result[type] = apps;
@@ -451,9 +457,12 @@ Store.prototype.searchSubscriptions = function (type, searchAttribute, searchVal
 };
 
 Store.prototype.isSubscribed = function (type, id) {
-    var path = this.subscriptionSpace(type) + '/' + id;
-    if (this.registry.exists(path)) {
-        return true;
+    var subscriptionSpace = this.subscriptionSpace(type);
+    if (subscriptionSpace) {
+        var path = subscriptionSpace + '/' + id;
+        if (this.registry.exists(path)) {
+            return true;
+        }
     }
     return false;
 };
@@ -1202,10 +1211,13 @@ var exec = function (fn, request, response, session) {
         response.sendError(404, 'Tenant:' + tenant.domain + ' not registered');
         return;
     }
+    var username = tenant ? tenant.username : carbon.user.anonUser;
+    var tenantAwareUserName = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(username);
+
 
     es.server.sandbox({
         tenantId: tenantId,
-        username: tenant ? tenant.username : carbon.user.anonUser,
+        username: tenantAwareUserName,
         request: request
     }, function () {
         var configs = require('/config/store.js').config();

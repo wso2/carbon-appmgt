@@ -442,6 +442,24 @@ var jagg = jagg || (function () {
         renderBlock(name, inputs, null, true);
     };
 
+            var setCSRFToken = function(){
+                var cookie = request.getCookie("csrftoken");
+                var user = jagg.getUser();
+                var csrfuser =  session.get('csrfuser');
+                //set CSRF if it is not set + you need to refresh the token if the user has changed.
+                if( !cookie || user != csrfuser){
+                    //Use a secure random as the CSRF token.
+                    var SecureRandom = Packages.java.security.SecureRandom;
+                    var random = new SecureRandom();
+                    var BigInteger = Packages.java.math.BigInteger;
+                    var token = new BigInteger(130, random).toString(32);
+
+                    var cookie= {'name':'csrftoken','value': token , 'maxAge': 86400, 'path':"/"};
+                    session.put('csrfuser',user);
+                    response.addCookie(cookie);
+                }
+            }
+
     var includeBlocks = function (bloks) {
         if (!bloks) {
             return;

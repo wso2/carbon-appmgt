@@ -435,8 +435,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             //If exists, return an error message
             if (isexists == true) {
                 response.contentType = CONTENT_TYPE_JSON;
-                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
-                                                       name + "' and version - '" + version +"'"});
+                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name '" +
+                                                       name + "' and version '" + version +"'"});
                 return;
             }
 
@@ -478,9 +478,9 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             username = username + "@" + tenantDomain;
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
             appMgtProviderObj.generateEntitlementPolicies(webappId);
-
+            var tenantAwareUserName =  jagg.getUser().username;
             if (oldVersion == null || oldVersion == '') {
-                auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
                                                                                    ", apiName='" + webappId.name + '\''
@@ -490,7 +490,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                                                                                    '}', "", "");
             }
             else {
-                auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
                                                                                     ", apiName='" + webappId.name + '\''

@@ -28,49 +28,20 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIKey;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.Application;
-import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
-import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.JavaPolicy;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Subscription;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
-import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
-import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
-import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
+import org.wso2.carbon.appmgt.impl.dto.*;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
-import org.wso2.carbon.appmgt.impl.utils.APIVersionComparator;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.LRUCache;
-import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
+import org.wso2.carbon.appmgt.impl.utils.*;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
@@ -88,7 +59,9 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserRealmService;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.carbon.utils.xml.StringUtils;
@@ -96,31 +69,11 @@ import org.wso2.carbon.utils.xml.StringUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,7 +168,8 @@ public class AppMDAO {
 
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
             statementToDeleteRecord.setString(1, businessOwnerId);
-            int i = statementToDeleteRecord.executeUpdate();
+            statementToDeleteRecord.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             if (connection != null) {
                 try {
@@ -253,8 +207,10 @@ public class AppMDAO {
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
                 String artifactContext = artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER);
-                if (artifactContext.equalsIgnoreCase(businessOwnerId)) {
-                    return true;
+                if (artifactContext != null) {
+                    if (artifactContext.equalsIgnoreCase(businessOwnerId)) {
+                        return true;
+                    }
                 }
             }
         } catch (RegistryException e) {
@@ -355,10 +311,9 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("NAME"));
-                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
-                businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
-                        ("SHOW_IN_STORE")));
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getString("NAME"));
+                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getString("VALUE"));
+                businessOwnerProperty.setShowingInStore(resultSetOfbusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
                 businessOwnerPropertiesList.add(businessOwnerProperty);
             }
         } catch (SQLException e) {
@@ -459,7 +414,7 @@ public class AppMDAO {
 
             String queryToInsertRecordTwo =
                     "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
-                            "(LAST_INSERT_ID(),?,?,?)";
+                            "(?,?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
@@ -468,9 +423,10 @@ public class AppMDAO {
                     BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
                     if(!StringUtils.isEmpty(propertyId)) {
-                        statementToInsertBusinessOwnerDetails.setString(1, propertyId);
-                        statementToInsertBusinessOwnerDetails.setString(2, businessOwnerProperties.getPropertyValue());
-                        statementToInsertBusinessOwnerDetails.setBoolean(3, businessOwnerProperties.isShowingInStore());
+                        statementToInsertBusinessOwnerDetails.setInt(1, businessOwnerId);
+                        statementToInsertBusinessOwnerDetails.setString(2, propertyId);
+                        statementToInsertBusinessOwnerDetails.setString(3, businessOwnerProperties.getPropertyValue());
+                        statementToInsertBusinessOwnerDetails.setBoolean(4, businessOwnerProperties.isShowingInStore());
                         statementToInsertBusinessOwnerDetails.executeUpdate();
                     }
                 }
@@ -508,12 +464,13 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
-                    "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? ";
+            String queryToGetBusinessOwner = null;
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                queryToGetBusinessOwner += "WHERE ROWNUM >= ? AND ROWNUM <= ?";
+                queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
+                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM >= ? AND ROWNUM <= ?";
             } else {
-                queryToGetBusinessOwner += "LIMIT ? , ? ";
+                queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
+                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? LIMIT ? , ? ";
             }
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
             searchValue = "%" + searchValue + "%";
@@ -582,13 +539,13 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws AppManagementException {
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
         ResultSet businessOwnerResultSet = null;
 
-        List<Integer> businessOwnerIdsList = new ArrayList<>();
+        List<String> businessOwnerIdsList = new ArrayList<>();
         try {
             connection = APIMgtDBUtil.getConnection();
             String queryToGetBusinessOwner = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME LIKE ? AND TENANT_ID = ? ";
@@ -602,7 +559,7 @@ public class AppMDAO {
             while (businessOwnerResultSet.next()) {
                 BusinessOwner businessOwner = new BusinessOwner();
                 int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
-                businessOwnerIdsList.add(businessOwnerId);
+                businessOwnerIdsList.add(String.valueOf(businessOwnerId));
             }
         } catch (SQLException e) {
             handleException("Failed to retrieve business Ids for the search value " + searchPrefix, e);
@@ -610,6 +567,44 @@ public class AppMDAO {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
         }
         return businessOwnerIdsList;
+    }
+
+    /**
+     * Get Businesss owner Id by owner name, email and tenant Id
+     * @param businessOwnerName
+     * @param businessOwnerEmail
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId) throws
+                                                                                                AppManagementException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet businessOwnerResultSet = null;
+
+        String query = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME = ? AND OWNER_EMAIL = ? AND " +
+                "TENANT_ID = ?";
+
+        int businessOwnerId = -1; // if any business owner doesn't exit for the input parameters, return owner id as -1
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, businessOwnerName);
+            preparedStatement.setString(2, businessOwnerEmail);
+            preparedStatement.setInt(3, tenantId);
+            businessOwnerResultSet = preparedStatement.executeQuery();
+
+            if (businessOwnerResultSet.next()) {
+                businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve business owners.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, businessOwnerResultSet);
+
+        }
+        return businessOwnerId;
     }
 
     /**
@@ -623,13 +618,11 @@ public class AppMDAO {
 	 * @throws org.wso2.carbon.identity.base.IdentityException
 	 *             if failed to get tenant id
 	 */
-	public APIInfoDTO[] getSubscribedAPIsOfUser(String userId) throws AppManagementException,
-	                                                          IdentityException {
+	public APIInfoDTO[] getSubscribedAPIsOfUser(String userId) throws AppManagementException {
 
 		// identify loggedinuser
 		String loginUserName = getLoginUserName(userId);
 
-		String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(loginUserName);
 		int tenantId = IdentityTenantUtil.getTenantIdOfUser(loginUserName);
 		List<APIInfoDTO> apiInfoDTOList = new ArrayList<APIInfoDTO>();
 		Connection conn = null;
@@ -643,7 +636,7 @@ public class AppMDAO {
         try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(sqlQuery);
-			ps.setString(1, tenantAwareUsername);
+			ps.setString(1, loginUserName);
 			ps.setInt(2, tenantId);
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -709,78 +702,6 @@ public class AppMDAO {
 	}
 
 	/**
-	 * This method is to update the access token
-	 *
-	 * @param userId
-	 *            id of the user
-	 * @param apiInfoDTO
-	 *            Api info
-	 * @param statusEnum
-	 *            Status of the access key
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 *             if failed to update the access token
-	 * @throws org.wso2.carbon.identity.base.IdentityException
-	 *             if failed to get tenant id
-	 */
-	public void changeAccessTokenStatus(String userId, APIInfoDTO apiInfoDTO, String statusEnum)
-	                                                                                            throws
-                                                                                                AppManagementException,
-	                                                                                            IdentityException {
-		String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(userId);
-		int tenantId = 0;
-		IdentityTenantUtil.getTenantIdOfUser(userId);
-
-		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
-		if (AppManagerUtil.checkAccessTokenPartitioningEnabled() &&
-				AppManagerUtil.checkUserNameAssertionEnabled()) {
-			accessTokenStoreTable = AppManagerUtil.getAccessTokenStoreTableFromUserId(userId);
-		}
-
-		Connection conn = null;
-		PreparedStatement ps = null;
-        String sqlQuery = "UPDATE " + accessTokenStoreTable + " IAT, APM_SUBSCRIBER SB, " +
-                "APM_SUBSCRIPTION SP, APM_APPLICATION APP, APM_APP API " +
-                "SET IAT.TOKEN_STATE = ? " +
-                "WHERE SB.USER_ID = ? " +
-                "AND SB.TENANT_ID = ? " +
-                "AND API.APP_PROVIDER = ? " +
-                "AND API.APP_NAME = ? " +
-                "AND API.APP_VERSION = ? " +
-                "AND SP.ACCESS_TOKEN = IAT.ACCESS_TOKEN " +
-                "AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
-                "AND APP.APPLICATION_ID = SP.APPLICATION_ID " +
-                "AND API.APP_ID = SP.APP_ID";
-        try {
-
-			conn = APIMgtDBUtil.getConnection();
-			ps = conn.prepareStatement(sqlQuery);
-			ps.setString(1, statusEnum);
-			ps.setString(2, tenantAwareUsername);
-			ps.setInt(3, tenantId);
-			ps.setString(4, AppManagerUtil.replaceEmailDomainBack(apiInfoDTO.getProviderId()));
-			ps.setString(5, apiInfoDTO.getApiName());
-			ps.setString(6, apiInfoDTO.getVersion());
-
-			int count = ps.executeUpdate();
-			if (log.isDebugEnabled()) {
-				log.debug("Number of rows being updated : " + count);
-			}
-			conn.commit();
-		} catch (SQLException e) {
-			try {
-				if (conn != null) {
-					conn.rollback();
-				}
-			} catch (SQLException e1) {
-				log.error("Failed to rollback the changeAccessTokenStatus operation", e);
-			}
-			handleException("Error while executing SQL", e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, null);
-		}
-	}
-
-	/**
 	 * Validate the provided key against the given WebApp. First it will
 	 * validate the key is valid
 	 * , ACTIVE and not expired.
@@ -838,14 +759,14 @@ public class AppMDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-        String applicationSqlQuery = "SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED, IAT.TOKEN_STATE, IAT.USER_TYPE, " +
+        String applicationSqlQuery = String.format("SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED, IAT.TOKEN_STATE, IAT.USER_TYPE, " +
                 "IAT.AUTHZ_USER, IAT.TIME_CREATED, SUB.TIER_ID, SUBS.USER_ID, SUB.SUB_STATUS, APP.APPLICATION_ID, " +
                 "APP.NAME, APP.APPLICATION_TIER, API.APP_NAME, API.APP_PROVIDER " +
-                "FROM " + accessTokenStoreTable + " IAT, APM_SUBSCRIPTION SUB, APM_SUBSCRIBER SUBS, " +
+                "FROM %s IAT, APM_SUBSCRIPTION SUB, APM_SUBSCRIBER SUBS, " +
                 "APM_APPLICATION APP, APM_APP API " +
                 "WHERE IAT.ACCESS_TOKEN = ? AND API.CONTEXT = ? AND API.APP_VERSION = ? " +
                 "AND SUB.APPLICATION_ID = APP.APPLICATION_ID AND APP.SUBSCRIBER_ID = SUBS.SUBSCRIBER_ID " +
-                "AND API.APP_ID = SUB.APP_ID";
+                "AND API.APP_ID = SUB.APP_ID", accessTokenStoreTable);
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -1378,12 +1299,14 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUB.APP_ID, " +
-                    "APPLICATION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, TRUSTED_IDP " +
-                    "FROM APM_SUBSCRIPTION SUB, APM_APP APP " +
-                    "WHERE SUB.APP_ID = APP.APP_ID AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? " +
-                    "AND APP.APP_VERSION = ? AND SUB.APPLICATION_ID = ? AND SUB.SUBSCRIPTION_TYPE" +
-                    " = ?";
+            String queryToGetSubscriptionId = "SELECT SUBSCRIPTION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, SUBSCRIPTION_TIME, " +
+                     "USER_ID , APM_APP.APP_ID, APM_APPLICATION.APPLICATION_ID, TRUSTED_IDP " +
+                    "FROM APM_SUBSCRIPTION, APM_APPLICATION, APM_SUBSCRIBER, APM_APP " +
+                    "WHERE APM_APPLICATION.APPLICATION_ID = APM_SUBSCRIPTION.APPLICATION_ID " +
+                    "AND APM_SUBSCRIBER.SUBSCRIBER_ID = APM_APPLICATION.SUBSCRIBER_ID " +
+                    "AND APM_SUBSCRIPTION.APP_ID = APM_APP.APP_ID " +
+                    "AND APM_APP.APP_PROVIDER = ? AND APM_APP.APP_NAME = ? AND APM_APP.APP_VERSION = ? " +
+                    "AND APM_APPLICATION.APPLICATION_ID = ? AND SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
@@ -1402,6 +1325,8 @@ public class AppMDAO {
                 subscription.setApplicationId(resultSet.getInt("APPLICATION_ID"));
                 subscription.setSubscriptionType(resultSet.getString("SUBSCRIPTION_TYPE"));
                 subscription.setSubscriptionStatus(resultSet.getString("SUB_STATUS"));
+                subscription.setUserId(resultSet.getString("USER_ID"));
+                subscription.setSubscriptionTime(resultSet.getString("SUBSCRIPTION_TIME"));
 
                 String trustedIdpsJson = resultSet.getString("TRUSTED_IDP");
                 Object decodedJson = null;
@@ -2977,32 +2902,26 @@ public class AppMDAO {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate, int tenantId) throws
-                                                                                      AppManagementException {
+                                                                                                AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
-        // List<WebAppInfoDTO> webAppInfoDTOList;
         List<Subscriber> subscribers;
-
-        String sqlQuery =
-                "SELECT SUBR.USER_ID AS USER_ID, API.APP_NAME AS API,API.APP_VERSION, " +
-                        "API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME " +
-                        "FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, " +
-                        "APM_APP API " +
-                        "WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = " +
-                        "APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? ";
-        if (fromDate != null && toDate != null) {
-            sqlQuery += addRangeCondition("SUB.SUBSCRIPTION_TIME", true);
-        }
-
-        sqlQuery += "GROUP BY SUBR.USER_ID, API.APP_NAME, API.APP_VERSION";
-
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
 
         try {
             connection = APIMgtDBUtil.getConnection();
+            String sqlQuery = "SELECT SUBR.USER_ID AS USER_ID,API.APP_NAME AS API, API.APP_VERSION, API.APP_PROVIDER " +
+                    "AS PROVIDER, SUB.SUBSCRIPTION_TIME as TIME  FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, " +
+                    "APM_SUBSCRIPTION SUB, APM_APP API WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND " +
+                    "SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? ";
+
+            if (fromDate != null && toDate != null) {
+                sqlQuery += addRangeCondition("SUB.SUBSCRIPTION_TIME", true, connection.getMetaData().getDriverName());
+            }
+
+            sqlQuery += "GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,SUB.SUBSCRIPTION_TIME";
 
             ps = connection.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
@@ -3014,7 +2933,6 @@ public class AppMDAO {
             if (result == null) {
                 return users;
             }
-
 
             while (result.next()) {
                 String app = result.getString("API")+"/"+result.getString("APP_VERSION");
@@ -3034,8 +2952,7 @@ public class AppMDAO {
                 }
             }
         } catch (SQLException e) {
-            handleException("Failed to get subscribed apps by users for the period " + fromDate + "to " +
-                    toDate, e);
+            handleException("Failed to get subscribed apps by users for the period " + fromDate + "to " + toDate, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
@@ -3378,53 +3295,6 @@ public class AppMDAO {
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, connection, result);
 		}
-	}
-
-	public String[] getOAuthCredentials(String accessToken, String tokenType)
-	                                                                         throws
-                                                                             AppManagementException {
-
-		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
-		if (AppManagerUtil.checkAccessTokenPartitioningEnabled() &&
-		    AppManagerUtil.checkUserNameAssertionEnabled()) {
-			accessTokenStoreTable = AppManagerUtil.getAccessTokenStoreTableFromAccessToken(accessToken);
-		}
-		Connection connection = null;
-		PreparedStatement prepStmt = null;
-		ResultSet rs = null;
-		String consumerKey = null;
-		String consumerSecret = null;
-		String sqlStmt =
-		                 "SELECT " + " ICA.CONSUMER_KEY AS CONSUMER_KEY," +
-		                         " ICA.CONSUMER_SECRET AS CONSUMER_SECRET " + "FROM " +
-		                         " IDN_OAUTH_CONSUMER_APPS ICA," + accessTokenStoreTable + " IAT" +
-		                         " WHERE " + " IAT.ACCESS_TOKEN = ? AND" +
-		                         " IAT.TOKEN_SCOPE = ? AND" +
-		                         " IAT.CONSUMER_KEY = ICA.CONSUMER_KEY";
-
-		try {
-			connection = APIMgtDBUtil.getConnection();
-			prepStmt = connection.prepareStatement(sqlStmt);
-			prepStmt.setString(1, AppManagerUtil.encryptToken(accessToken));
-			prepStmt.setString(2, tokenType);
-			rs = prepStmt.executeQuery();
-
-			if (rs.next()) {
-				consumerKey = rs.getString("CONSUMER_KEY");
-				consumerSecret = rs.getString("CONSUMER_SECRET");
-
-				consumerKey = AppManagerUtil.decryptToken(consumerKey);
-				consumerSecret = AppManagerUtil.decryptToken(consumerSecret);
-			}
-
-		} catch (SQLException e) {
-			handleException("Error when adding a new OAuth consumer.", e);
-		} catch (CryptoException e) {
-			handleException("Error while encrypting/decrypting tokens/app credentials.", e);
-		} finally {
-			IdentityDatabaseUtil.closeAllConnections(connection, rs, prepStmt);
-		}
-		return new String[] { consumerKey, consumerSecret };
 	}
 
 	public String[] addOAuthConsumer(String username, int tenantId, String appName,
@@ -4122,8 +3992,8 @@ public class AppMDAO {
         ResultSet rs = null;
         String businessOwnerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                        "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "VISIBLE_ROLES, UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4153,12 +4023,13 @@ public class AppMDAO {
             prepStmt.setString(4, app.getId().getVersion());
             prepStmt.setString(5, app.getContext());
             prepStmt.setString(6, app.getTrackingCode());
-            prepStmt.setString(7, app.getUUID());
-            prepStmt.setString(8, app.getSaml2SsoIssuer());
-            prepStmt.setString(9, logoutURL);
-            prepStmt.setBoolean(10, app.getAllowAnonymous());
-            prepStmt.setString(11, app.getUrl());
-            prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
+            prepStmt.setString(7, app.getVisibleRoles());
+            prepStmt.setString(8, app.getUUID());
+            prepStmt.setString(9, app.getSaml2SsoIssuer());
+            prepStmt.setString(10, logoutURL);
+            prepStmt.setBoolean(11, app.getAllowAnonymous());
+            prepStmt.setString(12, app.getUrl());
+            prepStmt.setBoolean(13, Boolean.parseBoolean(app.getTreatAsASite()));
 
             prepStmt.execute();
 
@@ -4750,8 +4621,8 @@ public class AppMDAO {
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
-                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
-                    " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
+                    " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? ," +
+                    " VISIBLE_ROLES = ? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
 				getAPIManagerConfiguration().getFirstProperty(GATEWAY_URL);
@@ -4776,9 +4647,10 @@ public class AppMDAO {
             prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
             prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
-            prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setString(7, api.getId().getApiName());
-            prepStmt.setString(8, api.getId().getVersion());
+            prepStmt.setString(6, api.getVisibleRoles());
+            prepStmt.setString(7, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setString(8, api.getId().getApiName());
+            prepStmt.setString(9, api.getId().getVersion());
             prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);
@@ -6131,7 +6003,7 @@ public class AppMDAO {
      * @param connection SQL Connection to the data store
      * @return The enterprise subscription if there is one. Null otherwise.
      */
-    private Subscription getEnterpriseSubscription(String appContext, String appVersion, Connection connection){
+    public Subscription getEnterpriseSubscription(String appContext, String appVersion, Connection connection){
 
         Subscription subscription = null;
 
@@ -6736,10 +6608,10 @@ public class AppMDAO {
 
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
                 query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME) "
-                        + "AS APP_NAME, CONTEXT FROM APM_APP_HITS HIT "
+                        + "AS APP_NAME, HIT.CONTEXT FROM APM_APP_HITS HIT "
                         + "WHERE HIT.USER_ID=? "
-                        + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION UNION ALL "
-                        + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
+                        + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION, HIT.CONTEXT UNION ALL "
+                        + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP "
                         + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? )) A  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
@@ -7435,8 +7307,8 @@ public class AppMDAO {
         Boolean isMandatory = false; //no need to show the mandatory fields as options
         JSONArray arrJavaPolicies = new JSONArray();
 
-        String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
-                ",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
+        String query = " SELECT distinct POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
+                ",DISPLAY_ORDER_SEQ_NO ,? AS APP_ID " +
                 "FROM APM_APP_JAVA_POLICY POL " +
                 "LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
                 "LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
@@ -7447,8 +7319,9 @@ public class AppMDAO {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(query);
             ps.setString(1, applicationUUId);
-            ps.setBoolean(2, isMandatory);
-            ps.setBoolean(3, isGlobalPolicy);
+            ps.setString(2, applicationUUId);
+            ps.setBoolean(3, isMandatory);
+            ps.setBoolean(4, isGlobalPolicy);
             rs = ps.executeQuery();
             while (rs.next()) {
                 JSONObject objPolicy = new JSONObject();
@@ -8572,24 +8445,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
+            String query = null;
 
             if (sortOption == WebAppSortOption.SORT_BY_CREATED_TIME_DESC) {
-                query = query + " ORDER BY FAV_APP.CREATED_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_CREATED_TIME_DESC);
             } else {
-                query = query + " ORDER BY APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_FAVOURITE_APPS_SORT_BY_APP_NAME_ASC);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8639,25 +8502,14 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query = "SELECT " +
-                    " APP.APP_PROVIDER AS APP_PROVIDER," +
-                    " APP.APP_NAME AS APP_NAME," +
-                    " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP" +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
-                    " AND FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ? )" +
-                    " WHERE APP.TENANT_ID = ?";
 
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APP.APP_PROVIDER LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_PROVIDER);
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
-                query = query + " AND  APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_FAVOURITE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8710,18 +8562,12 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (sortOption == WebAppSortOption.SORT_BY_SUBSCRIBED_TIME_DESC) {
-                query = query + " ORDER BY APM_SUBSCRIPTION.SUBSCRIPTION_TIME DESC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_SUBSCRIPTION_TIME);
             } else {
-                query = query + " ORDER BY APM_APP.APP_NAME ASC";
+                ps = connection.prepareStatement(SQLConstants.GET_USER_ACCESSIBlE_APPS_ORDER_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
             ps.setBoolean(1,treatAsSite);
             ps.setInt(2,tenantIdOfStore);
             ps.setInt(3,applicationId);
@@ -8756,12 +8602,14 @@ public class AppMDAO {
      * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
      * @param searchOption    Search Option
      * @param searchValue     Search Value
+     * @param registry Registry of the current store.
      * @return List of App Identifiers
      * @throws AppManagementException
      */
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
-                                                        String searchValue) throws AppManagementException {
+                                                        String searchValue, Registry registry) throws
+                                                                                               AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Searching accessible apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
                               " for tenant store: " + tenantIdOfStore + ",Search Option: " + searchOption +
@@ -8778,33 +8626,41 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
-                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
-                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
-                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
-
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
-                query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
+            } else if (searchOption == WebAppSearchOption.SEARCH_BY_BUSINESS_OWNER) {
+                Map<String, List<String>> businessOwnerIdsMap = new HashMap<String, List<String>>();
+                List<String> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
+                for (String businessOwnerId : businessOwnerIdList) {
+                    businessOwnerIdsMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , Arrays.asList(businessOwnerId));
+                    businessOwnerIdsMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, Arrays.asList(String.valueOf
+                            (treatAsSite)));
+                    getUserAccessibleAppsByBusinessOwner(apiIdentifiers, businessOwnerIdsMap, registry, tenantIdOfStore,
+                                                         tenantIdOfUser, username);
+                }
             } else {
-                query = query + " AND  APM_APP.APP_NAME LIKE ?";
+                ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_NAME);
             }
 
-            ps = connection.prepareStatement(query);
-            ps.setBoolean(1,treatAsSite);
-            ps.setInt(2,tenantIdOfStore);
-            ps.setInt(3,applicationId);
-            ps.setBoolean(4,allowAnonymous);
-            ps.setString(5, "%" + searchValue + "%");
-            result = ps.executeQuery();
+            // ps is null when search by business owner.
+            if (ps != null) {
+                ps.setBoolean(1,treatAsSite);
+                ps.setInt(2,tenantIdOfStore);
+                ps.setInt(3,applicationId);
+                ps.setBoolean(4,allowAnonymous);
+                ps.setString(5, "%" + searchValue + "%");
+                result = ps.executeQuery();
 
-            while (result.next()) {
-                APIIdentifier apiIdentifier = new APIIdentifier(
-                        AppManagerUtil.replaceEmailDomain(result.getString("APP_PROVIDER")),
-                        result.getString("APP_NAME"),
-                        result.getString("APP_VERSION")
-                );
-                apiIdentifiers.add(apiIdentifier);
+                while (result.next()) {
+                    APIIdentifier apiIdentifier = new APIIdentifier(
+                            AppManagerUtil.replaceEmailDomain(result.getString("APP_PROVIDER")),
+                            result.getString("APP_NAME"),
+                            result.getString("APP_VERSION")
+                    );
+                    apiIdentifiers.add(apiIdentifier);
+                }
+
             }
 
         } catch (SQLException e) {
@@ -8815,6 +8671,62 @@ public class AppMDAO {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
         return apiIdentifiers;
+    }
+
+    private void getUserAccessibleAppsByBusinessOwner(List<APIIdentifier> apiIdentifiers, Map<String, List<String>>
+            businessOwnerIdsMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName) throws
+                                                                                           AppManagementException {
+        boolean isTenantFlowStarted = false;
+        try {
+            UserRealmService realmService =
+                    (UserRealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                            .getOSGiService(UserRealmService.class);
+            String requestedTenantDomain = realmService.getTenantManager().getDomain(tenantIdOfStore);
+
+            if (requestedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    requestedTenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(requestedTenantDomain, true);
+            }
+
+            APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
+            if (tenantIdOfStore != tenantOfUser) {
+                // User has to set anonnymous to get myapps.
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants
+                        .REGISTRY_ANONNYMOUS_USERNAME);
+            }
+            GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
+                                                                                AppMConstants.API_KEY);
+            GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(businessOwnerIdsMap);
+            for (GenericArtifact artifact : artifacts) {
+                String provider = artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);
+                String appName = artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME);
+                String appVersion = artifact.getAttribute(AppMConstants.API_OVERVIEW_VERSION);
+                for (APIInfoDTO apiInfoDTO : subscribedApps) {
+                    if (appName.equals(apiInfoDTO.getApiName()) && appVersion.equals(apiInfoDTO.getVersion()) &&
+                            provider.equals(apiInfoDTO.getProviderId())) {
+                        APIIdentifier apiIdentifier = new APIIdentifier(
+                                AppManagerUtil
+                                        .replaceEmailDomain(artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER)),
+                                artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME),
+                                artifact.getAttribute(AppMConstants.API_OVERVIEW_VERSION)
+                        );
+                        apiIdentifiers.add(apiIdentifier);
+                        break;
+                    }
+                }
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to search accessible apps details from tenant store :" + tenantIdOfStore, e);
+        } catch (UserStoreException e) {
+            handleException("Failed to get tenant domain for tenant id :" + tenantIdOfStore, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
     }
 
     /**
@@ -8974,12 +8886,17 @@ public class AppMDAO {
         return status;
     }
 
-    private String addRangeCondition(String rangeField, boolean andNeeded){
+    private String addRangeCondition(String rangeField, boolean andNeeded, String connectionType) {
         String query = "";
         if (andNeeded) {
             query += " AND ";
         }
-        query += rangeField + " BETWEEN ? AND ?";
+        if (!connectionType.contains("Oracle")) {
+            query += rangeField + " BETWEEN ? AND ? ";
+        } else {
+            query += rangeField + " BETWEEN TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
+                    "HH24:MI:SS') ";
+        }
         return query;
     }
 }

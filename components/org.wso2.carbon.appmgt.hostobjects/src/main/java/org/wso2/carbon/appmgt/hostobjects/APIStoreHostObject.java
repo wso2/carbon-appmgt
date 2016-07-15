@@ -236,13 +236,14 @@ public class APIStoreHostObject extends ScriptableObject {
             throws
             AppManagementException {
 
-        if (args == null || args.length != 1) {
+        if (args == null || args.length != 2) {
             throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
         }
 
         int businessOwnerId = Integer.valueOf(args[0].toString());
+        int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(businessOwnerId);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwnerForAppStore(businessOwnerId, tenantId);
         NativeObject row = new NativeObject();
         row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
         row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
@@ -1437,6 +1438,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 subscriptionToReturn.put("applicationId", subscriptionToReturn, subscription.getApplicationId());
                 subscriptionToReturn.put("subscriptionType", subscriptionToReturn, subscription.getSubscriptionType());
                 subscriptionToReturn.put("subscriptionStatus",subscriptionToReturn,subscription.getSubscriptionStatus());
+                subscriptionToReturn.put("subscriptionTime",subscriptionToReturn,subscription.getSubscriptionTime());
+                subscriptionToReturn.put("subscribedUser",subscriptionToReturn,subscription.getUserId());
 
                 Set<String> trustedIdps = subscription.getTrustedIdps();
 
@@ -2515,15 +2518,16 @@ public class APIStoreHostObject extends ScriptableObject {
      * @return business owner Ids List.
      * @throws AppManagementException
      */
-    public static List<Integer> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
+    public static List<String> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
             Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
-        if (args == null || args.length != 1) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of parameters.");
         }
 
         String searchPrefix = args[0].toString();
+        int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        List<Integer> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix);
+        List<String> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
         return businessOwnersList;
     }
 
@@ -3315,21 +3319,22 @@ public class APIStoreHostObject extends ScriptableObject {
             int i = 0;
             for (APIIdentifier identifier : identifiers) {
                 WebApp app = apiConsumer.getAPI(identifier);
-                String lifeCycleStatus = app.getStatus().getStatus();
-                String accessUrl = getAccessUrl(app);
-
-                NativeObject row = new NativeObject();
-                row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
-                row.put("version", row, identifier.getVersion());
-                row.put("context", row, app.getContext());
-                row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                row.put("gatewayUrl", row, accessUrl);
-                row.put("uuid", row, app.getUUID());
-                row.put("treatAsSite", row, app.getTreatAsASite());
-                row.put("appDisplayName", row, app.getDisplayName());
-                row.put("lifeCycleStatus", row, lifeCycleStatus);
-                nativeArray.put(i++, nativeArray, row);
+                if (app != null) {
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    String accessUrl = getAccessUrl(app);
+                    NativeObject row = new NativeObject();
+                    row.put("appName", row, identifier.getApiName());
+                    row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
+                    row.put("version", row, identifier.getVersion());
+                    row.put("context", row, app.getContext());
+                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                    row.put("gatewayUrl", row, accessUrl);
+                    row.put("uuid", row, app.getUUID());
+                    row.put("treatAsSite", row, app.getTreatAsASite());
+                    row.put("appDisplayName", row, app.getDisplayName());
+                    row.put("lifeCycleStatus", row, lifeCycleStatus);
+                    nativeArray.put(i++, nativeArray, row);
+                }
             }
         }
         return nativeArray;
@@ -3465,37 +3470,39 @@ public class APIStoreHostObject extends ScriptableObject {
             int i = 0;
             for (APIIdentifier identifier : identifiers) {
                 WebApp app = apiConsumer.getAPI(identifier);
-                String lifeCycleStatus = app.getStatus().getStatus();
-                //Anonymous apps which are in published status, and subscribed apps which are in published,
-                //unpublished, deprecated and retired states will be displayed in myapps page when
-                //subscription option is enabled
-                if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
-                    continue;
+                if (app != null) {
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Anonymous apps which are in published status, and subscribed apps which are in published,
+                    //unpublished, deprecated and retired states will be displayed in myapps page when
+                    //subscription option is enabled
+                    if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        continue;
+                    }
+
+                    String accessUrl = getAccessUrl(app);
+
+                    NativeObject attributes = new NativeObject();
+                    attributes.put("overview_name", attributes, identifier.getApiName());
+                    attributes.put("overview_displayName", attributes, app.getDisplayName());
+                    attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                            identifier.getProviderName()));
+                    attributes.put("overview_context", attributes, app.getContext());
+                    attributes.put("overview_version", attributes, identifier.getVersion());
+                    attributes.put("overview_appTenant", attributes, app.getAppTenant());
+                    attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
+                            app.getThumbnailUrl()));
+                    attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
+                    attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
+                    attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
+
+                    NativeObject asset = new NativeObject();
+                    asset.put("id", asset, app.getUUID());
+                    asset.put("lifecycleState", asset, lifeCycleStatus);
+                    asset.put("accessUrl", asset, accessUrl);
+                    asset.put("attributes", asset, attributes);
+
+                    nativeArray.put(i++, nativeArray, asset);
                 }
-
-                String accessUrl = getAccessUrl(app);
-
-                NativeObject attributes = new NativeObject();
-                attributes.put("overview_name", attributes, identifier.getApiName());
-                attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
-                        identifier.getProviderName()));
-                attributes.put("overview_context", attributes, app.getContext());
-                attributes.put("overview_version", attributes, identifier.getVersion());
-                attributes.put("overview_appTenant", attributes, app.getAppTenant());
-                attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
-                        app.getThumbnailUrl()));
-                attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
-                attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
-                attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
-
-                NativeObject asset = new NativeObject();
-                asset.put("id", asset, app.getUUID());
-                asset.put("lifecycleState", asset, lifeCycleStatus);
-                asset.put("accessUrl", asset, accessUrl);
-                asset.put("attributes", asset, attributes);
-
-                nativeArray.put(i++, nativeArray, asset);
             }
         }
         return nativeArray;

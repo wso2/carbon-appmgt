@@ -5,7 +5,7 @@ var render = function (theme, data, meta, require) {
 
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
-        searchQuery = {overview_name: searchQuery, searchTerm: 'overview_name', search: searchQuery};
+        searchQuery = {overview_displayName: searchQuery, searchTerm: 'overview_displayName', search: searchQuery};
     } else {
         for (var key in searchQuery) {
             if (searchQuery.hasOwnProperty(key)) {

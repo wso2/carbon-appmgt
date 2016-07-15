@@ -28,6 +28,8 @@ var auditLog = require('/modules/auditLog/logger.js');
 
     var AuthService = require('../extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
+    var assetOverviewPageMatcher = '/{context}/assets/{type}/{id}'
+    var tenantedAssetOverviewPageMatcher = '/{context}/t/{domain}/assets/{type}/{id}'
     authenticator.init(jagg, session);
 
 
@@ -128,7 +130,9 @@ var auditLog = require('/modules/auditLog/logger.js');
                                 //when only mobile app is enabled do not check for favourite home page
                                 if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
                                     var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
-                                    if (isFavouritePageSelected) {
+                                    var pathMatcher = new URIMatcher(relayState);
+                                    if (isFavouritePageSelected && !(pathMatcher.match(assetOverviewPageMatcher) ||
+                                            pathMatcher.match(tenantedAssetOverviewPageMatcher))) {
                                         var favPage = configs.pages.favouritePage;
                                         relayState = contextPath + favPage;
                                     } else {

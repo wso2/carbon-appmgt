@@ -24,6 +24,7 @@ var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var caramel = require('caramel');
+var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
 var log = new Log();
 
 breadcrumbItems = deploymentManager.getAssetData();
@@ -52,10 +53,11 @@ var generateLeftNavJson = function(data, listPartial) {
 
     var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, userManager);
     var lifecycleState = data.artifact.lifecycleState;
-    if (lifecycleState == "Approved" || lifecycleState == "Published") {
-        editEnabled = false;
-    } else if (user.hasRoles(["admin"]) || mobileAppUpdateAuthorized) {
+
+    if(user.hasRoles([ADMIN_ROLE]) || (mobileAppUpdateAuthorized &&  !(lifecycleState == "Published"))){
         editEnabled = true;
+    } else {
+        editEnabled = false;
     }
 
     if (editEnabled) {

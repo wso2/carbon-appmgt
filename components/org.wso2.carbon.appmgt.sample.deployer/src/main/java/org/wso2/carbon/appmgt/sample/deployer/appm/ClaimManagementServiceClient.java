@@ -64,7 +64,8 @@ public class ClaimManagementServiceClient {
     public void addClaim(String description, String claimURI, boolean isRequired) throws RemoteException,
             ClaimManagementServiceException {
         ClaimDTO claimDTO = new ClaimDTO();
-        claimDTO.setDialectURI("http://wso2.org/claims");
+        String dialectURI = "http://wso2.org/claims";
+        claimDTO.setDialectURI(dialectURI);
         claimDTO.setClaimUri(claimURI);
         claimDTO.setDisplayTag(description);
         claimDTO.setDescription(description);
@@ -75,6 +76,21 @@ public class ClaimManagementServiceClient {
         ClaimMappingDTO claimMappingDTO = new ClaimMappingDTO();
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
-        claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+
+        // check whether claim already exits or not.
+        ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
+                .getClaimMappings();
+
+        boolean isClaimExists = false;
+        for (ClaimMappingDTO claimMapping : claimMappingDTOList) {
+            ClaimDTO claim = claimMapping.getClaim();
+            if (claim.getClaimUri().equals(claimURI)) {
+                isClaimExists = true;
+                break;
+            }
+        }
+        if (!isClaimExists) {
+            claimManagementServiceStub.addNewClaimMapping(claimMappingDTO);
+        }
     }
 }

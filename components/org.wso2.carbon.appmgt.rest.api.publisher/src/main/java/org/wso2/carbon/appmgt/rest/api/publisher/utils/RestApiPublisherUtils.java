@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,7 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -42,6 +44,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.Date;
 
 /**
@@ -50,14 +53,13 @@ import java.util.Date;
 public class RestApiPublisherUtils {
 
     private static final Log log = LogFactory.getLog(RestApiPublisherUtils.class);
-    final static String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 
     public static String generateBinaryUUID() {
-
-        String uuid = "";
-        for (int i = 0; i < 15; i++) {
-            uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));
-        }
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[8];
+        secRandom.nextBytes(result);
+        String uuid = String.valueOf(Hex.encodeHex(result));
         return uuid;
     }
 
@@ -65,7 +67,7 @@ public class RestApiPublisherUtils {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String directoryLocation =
-                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION);
         File binaryFile = new File(directoryLocation);
         //Generate UUID for the uploading file
         RestApiUtil.transferFile(fileContent.getContent(), fileContent.getFileName(), binaryFile.getAbsolutePath());
@@ -123,7 +125,7 @@ public class RestApiPublisherUtils {
             }
 
             RestApiUtil.transferFile(inputStream, filename, docFile.getAbsolutePath());
-            docInputStream = new FileInputStream(docFile.getAbsolutePath() + File.separator + filename);
+            docInputStream = new FileInputStream(AppManagerUtil.resolvePath(docFile.getAbsolutePath(), filename));
             String mediaType = fileDetails.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
             mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
             apiProvider.addFileToDocumentation(webApp, documentation, filename, docInputStream, mediaType);

@@ -1,10 +1,7 @@
 package org.wso2.carbon.appmgt.impl;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +48,28 @@ public interface AppRepository {
      * @throws AppManagementException
      */
     App getApp(String type, String uuid) throws AppManagementException;
+
+    /**
+     * Returns the web app for the given name and version.
+     *
+     * @param name
+     * @param version
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    WebApp getWebAppByNameAndVersion(String name, String version, int tenantId) throws AppManagementException;
+
+    /**
+     *
+     * Returns the web app for the give context and the version.
+     *
+     * @param context
+     * @param version
+     * @return
+     * @throws AppManagementException
+     */
+    WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException;
 
     /**
      * Searches and returns the apps for the given search terms.
@@ -109,4 +128,5 @@ public interface AppRepository {
      */
     public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
 
+    Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException;
 }

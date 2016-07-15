@@ -54,6 +54,10 @@
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.commons</groupId>
+            <artifactId>org.wso2.carbon.ganalytics.publisher</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -138,12 +142,11 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.custom.mediators:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
                             </bundles>
+                            <importBundles>
+                                <importBundleDef>org.wso2.carbon.commons:org.wso2.carbon.ganalytics.publisher:${carbon.commons.version}</importBundleDef>
+                            </importBundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
-                                <!--importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
-                                .stub:${carbon.mediation.version}</importBundleDef>
-                                <importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
-                                .stub:${carbon.mediation.version}</importBundleDef-->
                             </importFeatures>
                         </configuration>
                     </execution>

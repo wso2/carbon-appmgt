@@ -214,10 +214,10 @@
 
                         {{#compare artifact.attributes.overview_subscriptionAvailability "specific_tenants" operator="=="}}
                             <input type="text" id="tenant-list" name="overview_tenants" class='col-md-6 col-lg-6 col-sm-8 col-xs-6'
-                                   placeholder="e.g teant1.com,tenat2.com" value="{{artifact.attributes.overview_tenants}}"/>
+                                   placeholder="e.g tenant1.com,tenant2.com" value="{{artifact.attributes.overview_tenants}}"/>
                         {{else}}
                             <input type="text" id="tenant-list" name="overview_tenants" class='col-md-6 col-lg-6 col-sm-8 col-xs-6'
-                                   placeholder="e.g teant1.com,tenat2.com" style="display: none"/>
+                                   placeholder="e.g tenant1.com,tenant2.com" style="display: none"/>
                         {{/compare}}
 
                     </div>

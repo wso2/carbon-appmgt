@@ -22,7 +22,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.sample.deployer.appm.WSRegistryServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.bean.AppCreateRequest;
 import org.wso2.carbon.appmgt.sample.deployer.bean.WebAppDetail;
@@ -33,6 +36,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
@@ -53,7 +57,7 @@ public class ProxyApplicationCreator {
     private ConcurrentHashMap<String, String> trackingCodes;
     private InvokeStatistcsJavascriptBuilder invokeStatistcsJavascriptBuilder;
     private String ipAddress = "localhost";
-    private Random random;
+    private SecureRandom random;
     private String adminPublisherSession;
     private ApplicationPublisher applicationPublisher;
     private ApplicationSubscriber applicationSubscriber;
@@ -72,7 +76,7 @@ public class ProxyApplicationCreator {
         trackingCodes = new ConcurrentHashMap<String, String>();
         applicationPublisher = new ApplicationPublisher();
         applicationSubscriber = new ApplicationSubscriber();
-        random = new Random();
+        random = new SecureRandom();
         String errorMessage = "Error while creating a WSRegistryServiceClient";
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);
@@ -94,7 +98,8 @@ public class ProxyApplicationCreator {
      *                                Throws this when policy id is failed while requesting
      *                                Throws this when failed to create,publish or subscribe web application
      */
-    public void createAndPublishWebApplication(WebAppDetail webAppDetail) throws AppManagementException {
+    public void createAndPublishWebApplication(WebAppDetail webAppDetail, Boolean hasSubscriptionEnabled) throws
+                                                                                                AppManagementException {
         String currentUserName = webAppDetail.getUserName();
         String creatorSession = webAppDetail.getCreatorSession();
         String storeSession = webAppDetail.getStoreSession();
@@ -168,15 +173,17 @@ public class ProxyApplicationCreator {
             throw new AppManagementException(publishingErrorMessage, e);
         }
         log.info(appCreateRequest.getOverview_name() + " published and UUID is " + UUID);
-        try {
-            applicationSubscriber.subscribeApplication(appCreateRequest, storeSession,
-                    currentUserName);
-        } catch (IOException e) {
-            String subscribingErrorMessage = "Error while subscribing a web application " + webAppDetail.getDisplayName();
-            log.error(subscribingErrorMessage, e);
-            throw new AppManagementException(subscribingErrorMessage, e);
+        if (hasSubscriptionEnabled) {
+            try {
+                applicationSubscriber.subscribeApplication(appCreateRequest, storeSession, currentUserName);
+            } catch (IOException e) {
+                String subscribingErrorMessage = "Error while subscribing a web application " + webAppDetail.getDisplayName();
+                log.error(subscribingErrorMessage, e);
+                throw new AppManagementException(subscribingErrorMessage, e);
+            }
+            log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_" + currentUserName);
+
         }
-        log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_" + currentUserName);
     }
 
     /**

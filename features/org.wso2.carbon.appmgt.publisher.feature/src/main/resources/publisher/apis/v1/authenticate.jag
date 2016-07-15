@@ -32,6 +32,7 @@
 include("/extensions/webapp/modules/jagg/jagg.jag");
 var log = new Log('login-api');
 var user = require('store').user;
+var auditLog = require('/modules/auditLog/logger.js');
 //var constants = require("rxt").constants;
 var credentials = {};
 var result = {};
@@ -48,6 +49,7 @@ constants.STATUS_CODES = {
         BAD_REQUEST:400,
         UNAUTHORIZED:401,
         NOT_FOUND:404,
+        METHOD_NOT_ALLOWED:405,
         INTERNAL_SERVER_ERROR:500,
         NOT_IMPLEMENTED:501
     };
@@ -102,6 +104,12 @@ switch (METHOD) {
                     var provider = manager.getAPIProviderObj();
                     result = provider.login(credentials.username, credentials.password);
                     response = buildSuccessResponse(response, constants.STATUS_CODES.OK, {'sessionId': session.getId()});
+                    var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+                    var tenantDomain = MultitenantUtils.getTenantDomain(credentials.username);
+                    var tenantId = carbon.server.tenantId({
+                        domain: tenantDomain
+                    });
+                    auditLog.writeLog(tenantId, credentials.username, "UserLoggedIn", "", "", "", "");
                 } else {
                     response = buildErrorResponse(response, constants.STATUS_CODES.UNAUTHORIZED, 'username/password is incorrect');
                 }
@@ -109,9 +117,18 @@ switch (METHOD) {
         }else if (action == "logout"){
             try {
                 var user = require('store').user;//get current user
-                user.logout();
-                session.invalidate();
-                response =  buildSuccessResponse(response, constants.STATUS_CODES.OK, {'message': 'User Logged out successfully'});
+                var currentSession = require('store').server.current(session);
+                if(currentSession){
+                    var currentUsername = currentSession.username;//session.get("LOGGED_IN_USER");
+                    var tenantId = currentSession.tenantId;
+                    user.logout();
+                    session.invalidate();
+                    auditLog.writeLog(tenantId, currentUsername, "UserLoggedOut","Logout","", "", "");
+                    response =  buildSuccessResponse(response, constants.STATUS_CODES.OK, {'message': 'User Logged out successfully'});
+                }else{
+                    //Return HTTP 405, when the session is not available to invalidate
+                    response =  buildErrorResponse(response, constants.STATUS_CODES.METHOD_NOT_ALLOWED, 'Logout is not allowed');
+                }
             }
             catch (e) {
                 response =  buildErrorResponse(response, constants.STATUS_CODES.INTERNAL_SERVER_ERROR, 'Unable to logout user!');

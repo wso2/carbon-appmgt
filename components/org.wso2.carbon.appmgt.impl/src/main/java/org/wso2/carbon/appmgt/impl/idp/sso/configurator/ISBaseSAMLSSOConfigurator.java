@@ -46,19 +46,15 @@ public abstract class ISBaseSAMLSSOConfigurator {
         dto.setIssuer(provider.getIssuerName());
         dto.setAssertionConsumerUrls(new String[]{provider.getAssertionConsumerURL()});
         dto.setDefaultAssertionConsumerUrl(provider.getAssertionConsumerURL());
-        dto.setCertAlias(null);
+        dto.setDoSignResponse(true);
 
         dto.setNameIDFormat(provider.getNameIdFormat());
         if (dto.getNameIDFormat() != null) {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
-        if(provider.getLogoutUrl() != null && !provider.getLogoutUrl().trim().isEmpty()){
-            dto.setDoSingleLogout(true);
-            dto.setSloRequestURL(provider.getLogoutUrl());
-        }else{
-            dto.setDoSingleLogout(false);
-        }
+        dto.setDoSingleLogout(true);
+        // Let the ACS URL be the SLO Request accepting URL.
 
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);

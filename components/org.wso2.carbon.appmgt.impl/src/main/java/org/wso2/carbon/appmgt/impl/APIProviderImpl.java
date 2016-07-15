@@ -180,6 +180,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Get Business owner Id by owner name and email.
+     * @param businessOwnerName
+     * @param businessOwnerEmail
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException {
+        return appMDAO.getBusinessOwnerId(businessOwnerName, businessOwnerEmail, tenantId);
+    }
+
+    /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *
      * @return Set<Provider>
@@ -553,15 +565,37 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
 
+        final String appName = webApp.getId().getApiName();
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.WEBAPP_ASSET_TYPE);
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A duplicate webapp already exists with name : " +
+                        appName);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error occurred while checking existence for webapp with name '" + appName);
+        }
         AppRepository appRepository = new DefaultAppRepository(registry);
         String appId = appRepository.saveApp(webApp);
         return appId;
 
     }
 
+    /**
+     * Create new version of the application
+     * @param app applictaion
+     * @return app UUID
+     * @throws AppManagementException
+     */
     @Override
     public String createNewVersion(App app) throws AppManagementException {
-
         AppRepository appRepository = new DefaultAppRepository(registry);
         String uuid = appRepository.createNewVersion(app);
         return uuid;
@@ -1915,7 +1949,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Resource appArtifactResource = registry.get(appArtifactPath);
             String applicationStatus = appArtifactResource.getProperty(AppMConstants.WEB_APP_LIFECYCLE_STATUS);
             if (subsCount > 0 && !applicationStatus.equals("Retired")) {
-               return isAppDeleted;
+                //remove subscriptions per app
+                appMDAO.removeAPISubscription(identifier);
             }
 
             //If SSOProvider exists, remove it

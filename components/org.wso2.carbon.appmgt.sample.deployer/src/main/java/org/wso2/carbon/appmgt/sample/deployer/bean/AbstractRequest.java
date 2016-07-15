@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.sample.deployer.bean;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -59,7 +60,7 @@ public abstract class AbstractRequest {
      * @return generated tracking id for web application
      */
     public String generateTrackingID() {
-        Random rand = new Random();
+        SecureRandom rand = new SecureRandom();
         StringBuilder randomNumber = new StringBuilder();
         randomNumber.append("AM_");
         for (int i = 0; i < 18; i++) {

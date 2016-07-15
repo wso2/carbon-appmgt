@@ -32,7 +32,15 @@ $(function () {
         e.preventDefault();
         e.stopPropagation();
 
-        var confirmDel = confirm("Are you sure you want to delete this app?");
+        var confirmationMsg;
+        var hasSubscription = hasSubscriptions(type, id);
+        if (hasSubscription) {
+            confirmationMsg = "This Application already has subscriptions. Are you sure you want to delete this app?";
+        } else {
+            confirmationMsg = "Are you sure you want to delete this app?";
+        }
+
+        var confirmDel = confirm(confirmationMsg);
         if (confirmDel == true) {
             $.ajax({
                 url: caramel.context + '/api/asset/delete/' + type + '/' + id,
@@ -64,6 +72,19 @@ $(function () {
         }
 
     });
+
+    function hasSubscriptions(asset, id) {
+        var hasSubscription = false;
+        $.ajax({
+                   url: caramel.context + '/api/lifecycle/subscribe/' + asset + '/' + id,
+                   type: 'GET',
+                   async: false,
+                   success: function (response) {
+                       hasSubscription = response.subscribed;
+                   }
+               });
+        return hasSubscription;
+    }
 
     var showDeleteModel = function (msg, head, type) {
 

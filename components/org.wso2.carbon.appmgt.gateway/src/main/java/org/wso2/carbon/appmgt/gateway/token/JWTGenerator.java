@@ -27,11 +27,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * This class represents the JSON Web Token generator default implementation.
@@ -62,8 +58,14 @@ public class JWTGenerator extends AbstractJWTGenerator {
                 if (MultitenantConstants.SUPER_TENANT_ID == tenantId) {
                     tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
                 }
+
                 claims.put("sub", userName);
-                claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+                SortedMap<String, String> userClaims = claimsRetriever.getClaims(tenantAwareUserName);
+
+                if(userClaims != null){
+                    claims.putAll(userClaims);
+                }
+
                 return claims;
             } catch (UserStoreException e) {
                 log.error("Error while getting tenant id to populate claims ", e);

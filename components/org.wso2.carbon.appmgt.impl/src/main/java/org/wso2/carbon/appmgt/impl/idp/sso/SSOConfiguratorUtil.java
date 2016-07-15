@@ -25,6 +25,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.idp.sso.configurator.SSOConfigurator;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -296,6 +297,12 @@ public class SSOConfiguratorUtil {
             url = url + app.getContext() + "/" + identifier.getVersion() + "/";
         }
          return url;
+    }
+
+    public static String getACSURL(WebApp webApp){
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String acsURLPostfix = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+        return getGatewayUrl(webApp) + acsURLPostfix;
     }
 
     private static void handleException(String msg, Throwable t) throws AppManagementException {

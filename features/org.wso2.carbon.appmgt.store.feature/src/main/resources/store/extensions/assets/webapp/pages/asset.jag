@@ -215,8 +215,14 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
             var overviewBusinessOwner = asset.attributes.overview_businessOwner;
-            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
-                businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner);
+            
+            var appDomainName = asset.attributes.overview_appTenant;
+            var tenantId = carbon.server.tenantId({
+                                                      domain: appDomainName
+                                                  });
+
+           if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
+                businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
 
                 if (businessOwner != null && businessOwner.businessOwnerName != null) {
                     businessOwnerCustomData =
@@ -522,7 +528,7 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
-        var searchQuery = {search: "", searchTerm: ""};
+        var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
                            title: 'WebApp | Store',

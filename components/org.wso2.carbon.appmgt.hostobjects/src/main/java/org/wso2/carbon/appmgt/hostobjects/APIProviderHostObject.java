@@ -553,6 +553,36 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Get Business owner by owner name and email.
+     * @param ctx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     * @throws ScriptException
+     */
+    public static int jsFunction_getBusinessOwnerId(Context ctx, Scriptable thisObj,Object[] args, Function funObj)
+            throws AppManagementException, ScriptException {
+
+        if (args == null || args.length != 2) {
+            handleException("Invalid number of input parameters.");
+        }
+
+        if (args[0] == null || args[1] == null) {
+            handleException("Error while checking for existence of business owner: NULL value in expected parameters ->"
+                                    + "[business owner name:" + args[0] + ",email:" + args[1] + "]");
+
+        }
+        String businessOwnerName = (String) args[0];
+        String businessOwnerEmail = (String) args[1];
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        int businessOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
+        return businessOwnerId;
+    }
+
+    /**
      * Check whether the application with a given name, provider and version already exists
      *
      * @param ctx Rhino context
@@ -1269,9 +1299,10 @@ public class APIProviderHostObject extends ScriptableObject {
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
                                                                                  apiData));
         String treatAsSite = (String) apiData.get("overview_treatAsASite", apiData);
+        String visibleRoles = (String) apiData.get(AppMConstants.API_OVERVIEW_VISIBLE_ROLES);
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
-        String visibleRoles = "";
+
 
         if (endpoint != null && endpoint.trim().length() == 0) {
             endpoint = null;
@@ -1361,6 +1392,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setAllowAnonymous(allowAnonymous);
         api.setDefaultVersion(makeAsDefaultVersion);
         api.setTreatAsASite(treatAsSite);
+        api.setVisibleRoles(visibleRoles);
 
         try {
             apiProvider.updateAPI(api);
@@ -4219,9 +4251,9 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         APIProvider apiProvider = getAPIProvider(thisObj);
         NativeArray fileNames = (NativeArray) args[0];
-        for(int i = 0;i<fileNames.getLength(); i++){
-            apiProvider.removeBinaryFromStorage(HostObjectUtils.getBinaryStorageConfiguration() +
-                    fileNames.get(i).toString());
+        for (int i = 0; i < fileNames.getLength(); i++) {
+            apiProvider.removeBinaryFromStorage(AppManagerUtil.resolvePath(HostObjectUtils.getBinaryStorageConfiguration(),
+                    fileNames.get(i).toString()));
         }
     }
 }
