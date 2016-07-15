@@ -696,6 +696,9 @@ public class APPMappingUtil {
             String[] visibleRoles = new String[visibleRoleList.size()];
             visibleRoles = visibleRoleList.toArray(visibleRoles);
             webApp.setAppVisibility(visibleRoles);
+            webApp.setVisibleRoles(StringUtils.join(visibleRoleList, ","));
+        }else{
+            webApp.setVisibleRoles("");
         }
         List<String> claimsList = appDTO.getClaims();
         if(claimsList != null){
