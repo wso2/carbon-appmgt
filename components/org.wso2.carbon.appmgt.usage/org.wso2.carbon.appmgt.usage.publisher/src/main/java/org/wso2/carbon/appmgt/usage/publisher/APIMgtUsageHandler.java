@@ -373,7 +373,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        WebApp webApp =null;
+        WebApp webApp = null;
 
         String sqlQuery = "SELECT APM_APP.APP_NAME, APM_APP.APP_PROVIDER, APM_APP.TRACKING_CODE, " +
                 "APM_APP_DEFAULT_VERSION.PUBLISHED_DEFAULT_APP_VERSION FROM APM_APP LEFT JOIN " +
