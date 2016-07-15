@@ -71,9 +71,10 @@ public class AuthorizationHandler extends AbstractHandler implements ManagedLife
             String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
 
             // Fetch the web app for the requested context and version.
+            int appTenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
             try {
                 if(webApp == null){
-                    webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion);
+                    webApp = new DefaultAppRepository(null).getWebAppByContextAndVersion(webAppContext, webAppVersion, appTenantId);
                 }
             } catch (AppManagementException e) {
                 String errorMessage = String.format("Can't fetch the web for '%s' from the repository.", fullResourceURL);
@@ -84,8 +85,8 @@ public class AuthorizationHandler extends AbstractHandler implements ManagedLife
             List<String> roles = session.getAuthenticationContext().getRoles();
             List<String> visibleRoles = webApp.getVisibleRoleList();
 
-            String userTenantDomain = session.getAuthenticationContext().getTenantDomain();
             String appTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String userTenantDomain = session.getAuthenticationContext().getTenantDomain();
 
             //Check for app visibility
             if(!visibleRoles.isEmpty()){
