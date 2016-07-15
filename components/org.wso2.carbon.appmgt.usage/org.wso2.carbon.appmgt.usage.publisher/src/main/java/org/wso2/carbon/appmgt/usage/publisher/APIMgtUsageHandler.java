@@ -40,6 +40,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
+import org.apache.synapse.transport.certificatevalidation.cache.CacheManager;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
@@ -113,14 +114,25 @@ public class APIMgtUsageHandler extends AbstractHandler {
             	tenantDomain = contextAndVersion[1];
             }
 
-            WebApp webApp = null;
+            String usageCacheKey = tenantDomain + ":" + context;
             if (version != null) {
-                webApp = getWebApp(context, version);
-            } else {
-                webApp = getNonVersionedWebApp(context, tenantDomain);
-                version = webApp.getId().getVersion();
+                usageCacheKey = usageCacheKey + ":" + version;
             }
+
+            WebApp webApp = null;
+            if (getUsageCache().get(usageCacheKey) != null) {
+                webApp = (WebApp) getUsageCache().get(usageCacheKey);
+            } else {
+                if (version != null) {
+                    webApp = getWebApp(context, version);
+                } else {
+                    webApp = getNonVersionedWebApp(context, tenantDomain);
+                }
+                getUsageCache().put(usageCacheKey, webApp);
+            }
+
             String appName = webApp.getId().getApiName();
+            version = webApp.getId().getVersion();
             String api_version = appName + ":" + version;
 
             String hashcode = webApp.getTrackingCode();
@@ -413,6 +425,11 @@ public class APIMgtUsageHandler extends AbstractHandler {
     private Cache getUsageConfigCache() {
             return Caching.getCacheManager(AppMConstants.USAGE_CONFIG_CACHE_MANAGER)
                     .getCache(AppMConstants.USAGE_CONFIG_CACHE);
+    }
+
+    private Cache getUsageCache() {
+        return Caching.getCacheManager(AppMConstants.USAGE_CACHE_MANAGER)
+                .getCache(AppMConstants.USAGE_CACHE);
     }
 
    }
