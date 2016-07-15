@@ -788,4 +788,15 @@ public class WebApp extends App{
 
         return null;
     }
+    public List<String> getVisibleRoleList(){
+        List<String> visibleRoleList = new ArrayList<String>();
+
+        if(visibleRoles != null && visibleRoles != ""){
+            String allowedRolesString = visibleRoles;
+            if(allowedRolesString != null && !allowedRolesString.trim().isEmpty()){
+                visibleRoleList = Arrays.asList(allowedRolesString.split(","));
+            }
+        }
+        return visibleRoleList;
+    }
 }

@@ -344,6 +344,7 @@ public class IS510IdentityApplicationManagementAdapter implements IdentityApplic
         serviceProvider.setInboundAuthenticationConfig(iac);
 
         setLocalAndOutBoundAuthentication(serviceProvider, idpName, authenticationStep);
+        serviceProvider.getLocalAndOutBoundAuthenticationConfig().setUseTenantDomainInLocalSubjectIdentifier(true);
         return serviceProvider;
     }
 

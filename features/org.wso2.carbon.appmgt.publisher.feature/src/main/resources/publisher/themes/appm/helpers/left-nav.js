@@ -35,6 +35,7 @@ var generateLeftNavJson = function(data, listPartial) {
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var webAppUpdateAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_update, um);
     var editEnabled = true;
+    var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
     var currentTypeObj = getTypeObj(data.shortName);
     var leftNavItems = {
         leftNavLinks: []
@@ -44,7 +45,7 @@ var generateLeftNavJson = function(data, listPartial) {
 
         editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
 
-        if(user.hasRoles(["admin"]) || (webAppUpdateAuthorized &&  !(data.artifact.lifecycleState == "Published"))){
+        if(user.hasRoles([ADMIN_ROLE]) || (webAppUpdateAuthorized &&  !(data.artifact.lifecycleState == "Published"))){
             editEnabled = true;
         } else {
             editEnabled = false;

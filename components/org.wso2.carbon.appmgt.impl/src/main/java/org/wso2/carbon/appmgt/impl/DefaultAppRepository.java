@@ -152,6 +152,7 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
                 webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
                 webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
 
                 // There should be only one app for the given combination
                 break;
@@ -209,6 +210,7 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.setLogoutURL(resultSetOfBasicApp.getString("LOG_OUT_URL"));
                 webApp.setAllowAnonymous(resultSetOfBasicApp.getBoolean("APP_ALLOW_ANONYMOUS"));
                 webApp.setUrl(resultSetOfBasicApp.getString("APP_ENDPOINT"));
+                webApp.setVisibleRoles(resultSetOfBasicApp.getString("VISIBLE_ROLES"));
 
                 // There should be only one app for the given combination
                 break;

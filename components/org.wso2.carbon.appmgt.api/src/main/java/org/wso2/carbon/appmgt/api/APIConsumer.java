@@ -56,7 +56,7 @@ public interface APIConsumer extends APIManager {
      * @return
      * @throws AppManagementException
      */
-    public List<Integer> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
                                                                                            AppManagementException;
 
 

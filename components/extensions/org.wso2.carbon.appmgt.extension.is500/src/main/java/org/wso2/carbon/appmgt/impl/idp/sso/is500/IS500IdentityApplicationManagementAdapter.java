@@ -345,6 +345,8 @@ public class IS500IdentityApplicationManagementAdapter implements IdentityApplic
         serviceProvider.setInboundAuthenticationConfig(iac);
 
         setLocalAndOutBoundAuthentication(serviceProvider, idpName, authenticationStep);
+        serviceProvider.getLocalAndOutBoundAuthenticationConfig().setUseTenantDomainInLocalSubjectIdentifier(true);
+
         return serviceProvider;
     }
 
