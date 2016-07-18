@@ -21,7 +21,6 @@
 package org.wso2.carbon.appmgt.gateway.handlers.security.entitlement;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
@@ -39,11 +38,8 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -88,6 +84,14 @@ public class AuthorizationHandler extends AbstractHandler implements ManagedLife
             String appTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String userTenantDomain = session.getAuthenticationContext().getTenantDomain();
 
+            String appTenantAdminRole = null;
+            try {
+                appTenantAdminRole = getAdminRole();
+            } catch (UserStoreException e) {
+                GatewayUtils.logAndThrowException(log,
+                                                  String.format("Error occurred while retrieving realm admin for tenant domain '%s' ",appTenantDomain), e);
+            }
+
             //Check for app visibility
             if(!visibleRoles.isEmpty()){
                 if (!isUserInCurrentTenantDomain(userTenantDomain)) {
@@ -98,13 +102,7 @@ public class AuthorizationHandler extends AbstractHandler implements ManagedLife
                         return false;
                     }
                 }
-                String appTenantAdminRole = null;
-                try {
-                    appTenantAdminRole = getAdminRole();
-                } catch (UserStoreException e) {
-                    GatewayUtils.logAndThrowException(log,
-                            String.format("Error occurred while retrieving realm admin for tenant domain '%s' ",appTenantDomain), e);
-                }
+
                 if(ListUtils.intersection(roles, visibleRoles).isEmpty() && !roles.contains(appTenantAdminRole)){
                     if(log.isDebugEnabled()){
                         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("'%s' doesn't have required roles to access '%s'",
@@ -135,7 +133,7 @@ public class AuthorizationHandler extends AbstractHandler implements ManagedLife
                 }
 
                 List<String> allowedRoles  = matchedTemplate.getAllowedRoles();
-                if(!ListUtils.intersection(roles, allowedRoles).isEmpty()){
+                if (!ListUtils.intersection(roles, allowedRoles).isEmpty() || roles.contains(appTenantAdminRole)) {
 
                     if(log.isDebugEnabled()){
                         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("'%s' has required roles to access '%s'",
