@@ -889,25 +889,22 @@ function overridePermissions(assetId, artifactManager, permissions) {
     if(denyEveryone){
         um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
         um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
+
+        //create role restriction resource when restricted roles are available
+        var permPath = artifact.path + "role_restrictions";
+        var resource = {
+            content: JSON.stringify(permissions),
+            mediaType: 'text/plain'
+        };
+        var registry = new carbon.registry.Registry(server, {
+            username: server.current(session).username,
+            tenantId: server.current(session).tenantId
+        });
+        registry.put(permPath, resource);
+        artifact.attributes.overview_permissions = permPath;
     }
 
-
-    var registry = new carbon.registry.Registry(server, {
-        username: server.current(session).username,
-        tenantId: server.current(session).tenantId
-    });
-
     artifact.name = artifact.attributes.overview_name;
-    var permPath = artifact.path + "role_restrictions";
-
-    var resource ={
-        content: JSON.stringify(permissions),
-        mediaType: 'text/plain'
-    };
-
-    registry.put(permPath,resource);
-
-    artifact.attributes.overview_permissions = permPath;
     delete artifact.content;
     artifactManager.update(artifact);
 }
