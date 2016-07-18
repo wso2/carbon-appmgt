@@ -885,23 +885,27 @@ function overridePermissions(assetId, artifactManager, permissions) {
 
     });
 
+    var registry = new carbon.registry.Registry(server, {
+        username: server.current(session).username,
+        tenantId: server.current(session).tenantId
+    });
+    var permPath = artifact.path + "role_restrictions";
+
     //Remove public visibility for role restricted apps
     if(denyEveryone){
         um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
         um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
 
         //create role restriction resource when restricted roles are available
-        var permPath = artifact.path + "role_restrictions";
         var resource = {
             content: JSON.stringify(permissions),
             mediaType: 'text/plain'
         };
-        var registry = new carbon.registry.Registry(server, {
-            username: server.current(session).username,
-            tenantId: server.current(session).tenantId
-        });
         registry.put(permPath, resource);
         artifact.attributes.overview_permissions = permPath;
+    } else {
+        //remove role restrict resource if the role restriction is no longer applicable
+        registry.remove(permPath);
     }
 
     artifact.name = artifact.attributes.overview_name;
