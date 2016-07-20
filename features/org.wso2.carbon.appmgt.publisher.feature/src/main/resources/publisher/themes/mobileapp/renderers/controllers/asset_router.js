@@ -73,7 +73,7 @@ var render = function(theme, data, meta, require) {
             data = require('/helpers/edit-asset.js').screenshots(data);
 
             data = require('/helpers/splitter.js').splitData(data);
-            if (data.artifact.lifecycleState == "Published") {
+            if (data.artifact.lifecycleState == "Published" && !user.hasRoles([ADMIN_ROLE]) ) {
                 response.sendError(400);
                 return;
             }
