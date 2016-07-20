@@ -905,7 +905,9 @@ function overridePermissions(assetId, artifactManager, permissions) {
         artifact.attributes.overview_permissions = permPath;
     } else {
         //remove role restrict resource if the role restriction is no longer applicable
-        registry.remove(permPath);
+        if (registry.get(permPath) != null) {
+            registry.remove(permPath);
+        }
     }
 
     artifact.name = artifact.attributes.overview_name;
