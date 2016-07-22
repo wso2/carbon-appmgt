@@ -152,6 +152,7 @@ $(function(){
                "oauthapis_apiConsumerKey2": "",
                "oauthapis_apiConsumerKey1": "",
                "overview_version": "FIXME",
+               "overview_treatAsASite": "false",
                "context": ""
                      };
         return result;
