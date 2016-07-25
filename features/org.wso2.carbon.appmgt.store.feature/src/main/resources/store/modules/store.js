@@ -288,10 +288,14 @@ Store.prototype.assetsPaging = function (request) {
     var page = request.getParameter('page'),
         size = this.getRecentAppCount().topAssetPage;
     page = page ? page - 1 : 0;
+    var sortOption = 'recent';
+    if(request.getParameter('sort')) {
+        sortOption = encodeURIComponent(request.getParameter('sort'));
+    }
     return {
         start: page * size,
         count: size,
-        sort: encodeURIComponent(request.getParameter('sort')) || 'recent'
+        sort: sortOption
     };
 };
 

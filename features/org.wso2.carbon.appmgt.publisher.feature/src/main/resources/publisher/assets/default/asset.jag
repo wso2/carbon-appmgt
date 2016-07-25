@@ -178,11 +178,14 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         apiData.version = model.get('overview.version').value;
         var result = mod.getAllDocumentation(apiData);
 
-        //get external store details
-        var externalAppStores = getExternalAppStores(apiData);
         var appStoresDetail = {};
-        appStoresDetail.app = apiData;
-        appStoresDetail.externalStores = externalAppStores;
+        //For webapps, get external store details
+        if(shortName == "webapp"){
+            var externalAppStores = getExternalAppStores(apiData);
+            appStoresDetail.app = apiData;
+            appStoresDetail.externalStores = externalAppStores;
+        }
+
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);

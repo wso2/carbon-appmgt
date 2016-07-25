@@ -234,6 +234,7 @@ require('/modules/store.js').exec(function (ctx) {
                 type: type,
                 attributes: query
             };
+            assets = store.search(options, paging);
         } else {
             searchValue = splitQuery[1];
             var initialQuery = "businessOwner:" + searchValue;
