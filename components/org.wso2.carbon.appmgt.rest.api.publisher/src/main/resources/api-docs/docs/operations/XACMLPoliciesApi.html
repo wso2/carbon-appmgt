@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="XACMLPoliciesApi"></a>XACMLPoliciesApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationXacmlpoliciesPolicyPartialIdGet"></a>Get policy partial details</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get policy partial.\n</p>
+            <p class="marked">Get policy partial. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
@@ -17,38 +15,26 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationXacmlpoliciesPolicyPartialIdGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-administrationXacmlpoliciesPolicyPartialIdGet" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="response-administrationXacmlpoliciesPolicyPartialIdGet" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
 &lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,&quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null,&quot;policyPartialIc&quot;: 2}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -67,7 +53,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -84,20 +69,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy partial ID\n</p>
-                            
+                            <p class="param-description marked">Policy partial ID </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -114,20 +96,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -144,20 +123,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -174,20 +150,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -206,68 +179,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying App is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Qualifying App is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#PolicyPartial">PolicyPartial</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationXacmlpoliciesPolicyPartialIdPut"></a>Update an existing policy partial</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Update an existing policy partial\n</p>
+            <p class="marked">Update an existing policy partial </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
@@ -276,47 +231,34 @@
             <code>PUT</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 28bc70efa75175336e177d88e148c46d&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot; -H &quot;Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948&quot; -d &#39;{&quot;isSharedPartial&quot;:true,&quot;policyPartialDesc&quot;:&quot;asdasdasdadsad&quot;,&quot;policyPartial&quot;:&quot;&lt;Rule Effect=\&quot;Permit\&quot; RuleId=\&quot;Rule001\&quot;&gt;&lt;Condition&gt;\n      &lt;Apply FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId=\&quot;http://wso2.org/claims/role\&quot; Category=\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent=\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;\n&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;:&quot;asdasd&quot;,&quot;policyPartialId&quot;:1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/1&quot;
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 28bc70efa75175336e177d88e148c46d&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot; -H &quot;Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948&quot; -d &#39;{&quot;isSharedPartial&quot;:true,&quot;policyPartialDesc&quot;:&quot;asdasdasdadsad&quot;,&quot;policyPartial&quot;:&quot;&lt;Rule Effect&#x3D;\&quot;Permit\&quot; RuleId&#x3D;\&quot;Rule001\&quot;&gt;&lt;Condition&gt;\n      &lt;Apply FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId&#x3D;\&quot;http://wso2.org/claims/role\&quot; Category&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent&#x3D;\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;\n&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;:&quot;asdasd&quot;,&quot;policyPartialId&quot;:1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/1&quot;
 </code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-administrationXacmlpoliciesPolicyPartialIdPut">
                     <h4 class="section-heading">
                         Sample Request
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationXacmlpoliciesPolicyPartialIdPut"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="request-administrationXacmlpoliciesPolicyPartialIdPut"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
 &lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,&quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationXacmlpoliciesPolicyPartialIdPut">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationXacmlpoliciesPolicyPartialIdPut" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -335,7 +277,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -352,20 +293,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy partial ID\n</p>
-                            
+                            <p class="param-description marked">Policy partial ID </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -382,22 +320,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">App object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 PolicyPartial
-                                
                                     (<a href="#!/models#PolicyPartial">PolicyPartial</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -414,20 +348,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -444,20 +375,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -474,20 +402,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -506,81 +431,59 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationXacmlpoliciesPost"></a>Create a new Policy Partial</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Create a new Policy Partial.\n</p>
+            <p class="marked">Create a new Policy Partial. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/</code>
@@ -589,54 +492,41 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 28bc70efa75175336e177d88e148c46d&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot; -H &quot;Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948&quot; -d &#39;{&quot;isSharedPartial&quot;:true,&quot;policyPartialDesc&quot;:&quot;asdasdasdadsad&quot;,&quot;policyPartial&quot;:&quot;&lt;Rule Effect=\&quot;Permit\&quot; RuleId=\&quot;Rule001\&quot;&gt;&lt;Condition&gt;\n      &lt;Apply FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId=\&quot;http://wso2.org/claims/role\&quot; Category=\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent=\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;\n&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;:&quot;asdasd&quot;,&quot;policyPartialId&quot;:1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/&quot;
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 28bc70efa75175336e177d88e148c46d&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot; -H &quot;Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948&quot; -d &#39;{&quot;isSharedPartial&quot;:true,&quot;policyPartialDesc&quot;:&quot;asdasdasdadsad&quot;,&quot;policyPartial&quot;:&quot;&lt;Rule Effect&#x3D;\&quot;Permit\&quot; RuleId&#x3D;\&quot;Rule001\&quot;&gt;&lt;Condition&gt;\n      &lt;Apply FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId&#x3D;\&quot;http://wso2.org/claims/role\&quot; Category&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent&#x3D;\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;\n&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;:&quot;asdasd&quot;,&quot;policyPartialId&quot;:1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/&quot;
 </code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-administrationXacmlpoliciesPost">
                     <h4 class="section-heading">
                         Sample Request
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationXacmlpoliciesPost"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="request-administrationXacmlpoliciesPost"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
 &lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,&quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationXacmlpoliciesPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-administrationXacmlpoliciesPost" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="response-administrationXacmlpoliciesPost" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
 &lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,&quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null,&quot;policyPartialIc&quot;: 2}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -655,7 +545,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -672,22 +561,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy Partial object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">Policy Partial object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 PolicyPartial
-                                
                                     (<a href="#!/models#PolicyPartial">PolicyPartial</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -704,20 +589,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -734,20 +616,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -766,55 +645,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created object as the entity in the body. Location header contains the URL of the newly created entity. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#PolicyPartial">PolicyPartial</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in an unsupported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationXacmlpoliciesValidatePost"></a>Validate policy content</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Validates the content of the policy.\n</p>
+            <p class="marked">Validates the content of the policy. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/validate</code>
@@ -823,45 +688,32 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 04b1607a56c2d51adb35912943335322&quot; -H &quot;Content-Type: application/json&quot;  -d &#39;{ &quot;policyPartial&quot;: &quot;&lt;Condition&gt;\n      &lt;Apply FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId=\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId=\&quot;http://wso2.org/claims/role\&quot; Category=\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType=\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent=\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;&quot;}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 04b1607a56c2d51adb35912943335322&quot; -H &quot;Content-Type: application/json&quot;  -d &#39;{ &quot;policyPartial&quot;: &quot;&lt;Condition&gt;\n      &lt;Apply FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:any-of\&quot;&gt;\n         &lt;Function FunctionId&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal\&quot;/&gt;\n         &lt;AttributeValue DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot;&gt;admin&lt;/AttributeValue&gt;\n         &lt;AttributeDesignator AttributeId&#x3D;\&quot;http://wso2.org/claims/role\&quot; Category&#x3D;\&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\&quot; DataType&#x3D;\&quot;http://www.w3.org/2001/XMLSchema#string\&quot; MustBePresent&#x3D;\&quot;true\&quot;/&gt;\n      &lt;/Apply&gt;\n&lt;/Condition&gt;&quot;}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate&quot;</code></div>
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-administrationXacmlpoliciesValidatePost">
                     <h4 class="section-heading">
                         Sample Request
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationXacmlpoliciesValidatePost"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="request-administrationXacmlpoliciesValidatePost"class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;&lt;/Rule&gt;&quot;}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationXacmlpoliciesValidatePost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationXacmlpoliciesValidatePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -880,7 +732,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -897,22 +748,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy Partial object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">Policy Partial object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 PolicyPartial
-                                
                                     (<a href="#!/models#PolicyPartial">PolicyPartial</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -929,20 +776,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -959,20 +803,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -991,55 +832,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in an unsupported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="xacmlpoliciesGet"></a>Get all XACML policies</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of XACML policies.\n</p>
+            <p class="marked">Get a list of XACML policies. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/xacmlpolicies/</code>
@@ -1048,38 +875,26 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e819870696cc39494d12841b5094a411&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-xacmlpoliciesGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-xacmlpoliciesGet" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
-      &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
-         &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
-         &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
-         &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
+                <div id="response-xacmlpoliciesGet" class="pre collapse"><code class="json">{&quot;policyPartial&quot;: &quot;&lt;Rule Effect&#x3D;&quot;Permit&quot; RuleId&#x3D;&quot;Rule001&quot;&gt;&lt;Condition&gt;
+      &lt;Apply FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
+         &lt;Function FunctionId&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
+         &lt;AttributeValue DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
+         &lt;AttributeDesignator AttributeId&#x3D;&quot;http://wso2.org/claims/role&quot; Category&#x3D;&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType&#x3D;&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent&#x3D;&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
 &lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: policy1,&quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null,,&quot;policyPartialId&quot;: 1}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -1098,7 +913,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1115,20 +929,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
-                            
+                            <p class="param-description marked">Maximum size of resource array to return. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">25</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1145,20 +956,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
-                            
+                            <p class="param-description marked">Starting point within the complete list of items qualified. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">0</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1175,20 +983,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1205,20 +1010,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1237,61 +1039,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of XACML policies is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of XACML policies is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#PolicyPartialList">PolicyPartialList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

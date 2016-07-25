@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="MobileAppsApi"></a>MobileAppsApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsMobileBinariesFileNameGet"></a>Retrieving mobile application binaries</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Retrieving .apk and .ipa binaries for mobile apps.\n</p>
+            <p class="marked">Retrieving .apk and .ipa binaries for mobile apps. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/mobile/binaries/{fileName}</code>
@@ -17,31 +15,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 0763d28a85f20d6fd8954f955859055c&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/O0lsxdlhR998Hhc.apk&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileBinariesFileNameGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsMobileBinariesFileNameGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The file name.\n</p>
-                            
+                            <p class="param-description marked">The file name. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -169,68 +145,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nMobile app binary content retrieved successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Mobile app binary content retrieved successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#file">file</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested entity does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsMobileBinariesPost"></a>Uploading binary files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Uploading .apk/.IPA binary files.\n</p>
+            <p class="marked">Uploading .apk/.IPA binary files. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/mobile/binaries</code>
@@ -239,31 +197,19 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file=@/home/user/sample.apk&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file&#x3D;@/home/user/sample.apk&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileBinariesPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsMobileBinariesPost" class="pre collapse"><code class="json">{&quot;version&quot;: &quot;1.0&quot;,&quot;package&quot;: &quot;home.jmstudios.calc&quot;,&quot;path&quot;: &quot;O0lsxdlhR998Hhc.apk&quot;}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -282,7 +228,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -300,19 +245,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">Document to be uploaded.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 file
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -329,20 +271,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -359,20 +298,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -391,61 +327,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nBinary file uploaded successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Binary file uploaded successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Binary">Binary</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested App does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested App does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>
