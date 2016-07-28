@@ -455,16 +455,19 @@ public class AppsApiServiceImpl extends AppsApiService {
             List<String> roles = group.getUserRolesAsList();
             for (String role : roles) {
                 try {
-                    PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                    RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
-                    int tenantId =
-                            ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
-                                    tenantDomainName);
-                    UserRealm realm = realmService.getTenantUserRealm(tenantId);
-                    UserStoreManager manager = realm.getUserStoreManager();
-                    //check if the role is exists
-                    if (!manager.isExistingRole(role)) {
-                        throw new AppManagementException("Invalid role - " + role);
+                    if (!"".equals(role)) {
+                        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
+                                                                                                null);
+                        int tenantId =
+                                ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                                        tenantDomainName);
+                        UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                        UserStoreManager manager = realm.getUserStoreManager();
+                        //check if the role is exists
+                        if (!manager.isExistingRole(role)) {
+                            throw new AppManagementException("Invalid role - " + role);
+                        }
                     }
 
                 } catch (UserStoreException e) {
