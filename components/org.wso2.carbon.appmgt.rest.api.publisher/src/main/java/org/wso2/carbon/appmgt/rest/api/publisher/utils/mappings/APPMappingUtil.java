@@ -23,15 +23,37 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.CustomProperty;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppSummaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.CustomPropertyDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyGroupsDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UriTemplateDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class APPMappingUtil {
 
@@ -633,10 +655,12 @@ public class APPMappingUtil {
         webApp.setTrackingCode(appDTO.getTrackingCode());
         webApp.setLogoutURL(appDTO.getLogoutURL());
         webApp.setBusinessOwner(appDTO.getBusinessOwnerId());
-        webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(),","));
+        webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(), ","));
         webApp.setSkipGateway(Boolean.parseBoolean(appDTO.getSkipGateway()));
         webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
         webApp.setAcsURL(appDTO.getAcsUrl());
+        webApp.setSsoProviderDetails(AppManagerUtil.getDefaultSSOProvider());
+        webApp.setSaml2SsoIssuer(getSaml2SsoIssuer(appName, appVersion));
 
         List<PolicyGroupsDTO> policyGroupsDTOs = appDTO.getPolicyGroups();
         List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
@@ -715,9 +739,6 @@ public class APPMappingUtil {
         return webApp;
     }
 
-
-
-
     private static boolean validateMandatoryField(String fieldName, Object fieldValue) {
 
         if (fieldValue == null) {
@@ -726,4 +747,14 @@ public class APPMappingUtil {
         return true;
     }
 
+    public static String getSaml2SsoIssuer(String appName, String appVersion) {
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String saml2SsoIssuer;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            saml2SsoIssuer = appName + "-" + appVersion;
+        } else {
+            saml2SsoIssuer = appName + "-" + tenantDomain + "-" + appVersion;
+        }
+        return saml2SsoIssuer;
+    }
 }

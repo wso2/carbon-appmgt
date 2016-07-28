@@ -217,9 +217,12 @@ require('/modules/store.js').exec(function (ctx) {
             var overviewBusinessOwner = asset.attributes.overview_businessOwner;
             
             var appDomainName = asset.attributes.overview_appTenant;
-            var tenantId = carbon.server.tenantId({
-                                                      domain: appDomainName
-                                                  });
+            var tenantId;
+            if (!(!appDomainName || appDomainName == null || appDomainName == 'undefined')) {
+                tenantId = carbon.server.tenantId({ domain: appDomainName });
+            } else {
+                tenantId = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            }
 
            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
                 businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
