@@ -819,8 +819,6 @@
     <jaggeryjs.ws.feature.version>1.5.2</jaggeryjs.ws.feature.version>
 
     <!-- Identity Versions -->
-    <carbon.identity.version>5.1.1</carbon.identity.version>
-    <carbon.identity.version_5.1.1>5.1.1</carbon.identity.version_5.1.1>
     <carbon.identity.base.version>5.1.1</carbon.identity.base.version>
     <carbon.identity.auth.version>5.1.1</carbon.identity.auth.version>
     <carbon-identity-framework.version>5.2.0</carbon-identity-framework.version>
@@ -878,7 +876,7 @@
 
     <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
     <swagger.codegen.version>2.1.5</swagger.codegen.version>
-    <carbon.analytics-common.version>5.0.12-alpha</carbon.analytics-common.version>
+    <carbon.analytics-common.version>5.1.0</carbon.analytics-common.version>
 
       <!-- ReST API Versions -->
       <cxf.version>3.1.4</cxf.version>
