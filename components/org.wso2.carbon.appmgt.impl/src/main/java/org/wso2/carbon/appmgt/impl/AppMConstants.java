@@ -207,6 +207,14 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
     public static final String APP_OVERVIEW_OLD_VERSION = "overview_oldVersion";
 
+    public static final String APP_SSO_SSO_PROVIDER = "sso_ssoProvider";
+    public static final String APP_SSO_SINGLE_SIGN_ON = "sso_singleSignOn";
+    public static final String APP_SSO_SAML2_SSO_ISSUER = "sso_saml2SsoIssuer";
+
+    public static final String APP_URITEMPLATE_POLICYGROUP_IDS = "uriTemplate_policyGroupIds";
+    public static final String APP_URITEMPLATE_URLPATTERN = "uriTemplate_urlPattern";
+    public static final String APP_URITEMPLATE_HTTPVERB = "uriTemplate_httpVerb";
+
     public static final String APP_IMAGES_THUMBNAIL = "images_thumbnail";
     public static final String APP_IMAGES_BANNER = "images_banner";
     public static final String APP_TRACKING_CODE = "overview_trackingCode";
@@ -776,4 +784,7 @@ public final class AppMConstants {
         public static final String PUBLIC = "public";
     }
 
+    public static class claims {
+        public static final String CLAIM_ROLES = "http://wso2.org/claims/role";
+    }
 }

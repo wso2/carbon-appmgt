@@ -61,6 +61,7 @@ import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
@@ -69,6 +70,7 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
+import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.internal.AppManagerComponent;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -3971,5 +3973,21 @@ public final class AppManagerUtil {
         }
 
         return String.valueOf(resolvedPath);
+    }
+
+    //Create the default SSOProvider
+    public static SSOProvider getDefaultSSOProvider() {
+
+        SSOProvider ssoProvider = new SSOProvider();
+        SSOEnvironment defaultSSOEnv = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getSsoEnvironments().get(0);
+
+        ssoProvider.setProviderName(defaultSSOEnv.getName());
+        ssoProvider.setProviderVersion(defaultSSOEnv.getVersion());
+
+        //Adding the default role claim.
+        ssoProvider.setClaims(new String[]{AppMConstants.claims.CLAIM_ROLES});
+
+        return ssoProvider;
     }
 }
