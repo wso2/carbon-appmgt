@@ -16,5 +16,6 @@
     },
     "paths":{
         "RXT_EXTENSION_PATH":"/config/ext/"
-    }
+    },
+    "publicVisibility": false
 }
