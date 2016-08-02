@@ -743,7 +743,7 @@
     <carbon.appmgt.version>1.2.3-SNAPSHOT</carbon.appmgt.version>
     <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
-    <carbon.appmgt.server.version>1.2.0-SNAPSHOT</carbon.appmgt.server.version>
+    <carbon.appmgt.server.version>1.2.1-SNAPSHOT</carbon.appmgt.server.version>
 
     <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
     <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
@@ -877,6 +877,7 @@
     <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
     <swagger.codegen.version>2.1.5</swagger.codegen.version>
     <carbon.analytics-common.version>5.1.0</carbon.analytics-common.version>
+    <apache.velocity.version>1.7</apache.velocity.version>
 
       <!-- ReST API Versions -->
       <cxf.version>3.1.4</cxf.version>
