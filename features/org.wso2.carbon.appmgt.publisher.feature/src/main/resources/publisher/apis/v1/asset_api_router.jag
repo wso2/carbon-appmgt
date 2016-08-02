@@ -343,9 +343,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
-                var isAdvertiseOnly = attributes["overview_advertiseOnly"].trim();
-                if (isAdvertiseOnly.toLowerCase() == "true") {
-                    isDeleted = removeArtifactOnly(shortName, id);
+                var isAdvertiseOnly = attributes["overview_advertiseOnly"];
+                if (isAdvertiseOnly != null) {
+                    isAdvertiseOnly = isAdvertiseOnly.trim();
+                    if (isAdvertiseOnly.toLowerCase() == "true") {
+                        isDeleted = removeArtifactOnly(shortName, id);
+                    } else {
+                        isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                    }
                 } else {
                     isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
                 }
@@ -378,7 +383,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
 
             } catch (e) {
-                log.debug('The asset ' + id + ' could not be deleted.The following exception was thrown: ' + e);
+                log.error('The asset ' + id + ' could not be deleted.The following exception was thrown: ' + e);
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
             }
         }else{
@@ -424,7 +429,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(artifact);
         } catch (e) {
 
-            log.debug('The asset type: ' + shortName + ' with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
+            log.error('The asset type: ' + shortName + ' with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
             response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check the server logs.');
         }
 
@@ -499,7 +504,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         catch (e) {
-            log.debug('An asset of type: ' + shortName + ' could not be created.The following exception was thrown: ' + e);
+            log.error('An asset of type: ' + shortName + ' could not be created.The following exception was thrown: ' + e);
             response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
         }
 
@@ -916,7 +921,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(msg);
 
         } catch (e) {
-            log.debug('The asset ' + id + ' could not be updated.The following exception was thrown: ' + e);
+            log.error('The asset ' + id + ' could not be updated.The following exception was thrown: ' + e);
             response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
         }
     });

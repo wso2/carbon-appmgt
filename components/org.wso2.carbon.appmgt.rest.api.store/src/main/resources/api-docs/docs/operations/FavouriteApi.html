@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="FavouriteApi"></a>FavouriteApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdFavouriteAppDelete"></a>Remove from favourite Apps</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Remove from favourite Apps.\n</p>
+            <p class="marked">Remove from favourite Apps. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/favourite-app</code>
@@ -17,31 +15,19 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdFavouriteAppDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdFavouriteAppDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -169,68 +145,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdFavouriteAppPost"></a>Add to favourite Apps</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Add to favourite Apps.\n</p>
+            <p class="marked">Add to favourite Apps. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/favourite-app</code>
@@ -239,31 +197,19 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -H &quot;Content-Type: application/json&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdFavouriteAppPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdFavouriteAppPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -282,7 +228,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -299,20 +244,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -329,20 +271,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -359,20 +298,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -391,68 +327,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsFavouritePageDelete"></a>Remove from the favourite page</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Remove from the favourite page.\n</p>
+            <p class="marked">Remove from the favourite page. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/favourite-page</code>
@@ -461,18 +379,11 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page&quot;</code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-appsFavouritePageDelete">
                     <h4 class="section-heading">
                         Sample Request
@@ -480,20 +391,14 @@
                     </h4>
                 </div>
                 <div id="request-appsFavouritePageDelete"class="pre collapse"><code class="json"></code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsFavouritePageDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsFavouritePageDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -512,7 +417,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -531,81 +435,59 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsFavouritePagePost"></a>Set as a favourite page</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Set as a favourite page.\n</p>
+            <p class="marked">Set as a favourite page. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/apps/favourite-page</code>
@@ -614,31 +496,19 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -H &quot;Content-Type: application/json&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsFavouritePagePost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsFavouritePagePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -657,7 +527,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -676,74 +545,51 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

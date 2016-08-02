@@ -8389,7 +8389,7 @@ public class AppMDAO {
         PreparedStatement ps = null;
         boolean status = false;
         ResultSet rs = null;
-        String query = "SELECT * FROM APM_FAVOURITE_APPS  " +
+        String query = "SELECT COUNT(*) AS ROWCOUNT FROM APM_FAVOURITE_APPS  " +
                 "WHERE    APP_ID = (SELECT APP_ID  FROM APM_APP " +
                 "WHERE APP_NAME = ? " +
                 "AND APP_VERSION = ? AND APP_PROVIDER = ? AND TENANT_ID = ? ) " +
@@ -8408,7 +8408,9 @@ public class AppMDAO {
 
             rs = ps.executeQuery();
             if (rs.next()) {
-                status = true;
+                if (rs.getInt("ROWCOUNT") > 0) {
+                    status = true;
+                }
             }
         } catch (SQLException e) {
             handleException("Error while checking whether given app: " + identifier.getApiName() + "-" +

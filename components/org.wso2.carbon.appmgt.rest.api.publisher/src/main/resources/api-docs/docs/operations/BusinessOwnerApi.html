@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="BusinessOwnerApi"></a>BusinessOwnerApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationBusinessownerBusinessOwnerIdDelete"></a>Delete Business Owner</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Delete an existing business owner.\n</p>
+            <p class="marked">Delete an existing business owner. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
@@ -17,31 +15,19 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerBusinessOwnerIdDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationBusinessownerBusinessOwnerIdDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Business owner ID.\n</p>
-                            
+                            <p class="param-description marked">Business owner ID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -169,68 +145,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Resource successfully deleted. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationBusinessownerBusinessOwnerIdGet"></a>Get business owners by ID</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get business owners by ID.\n</p>
+            <p class="marked">Get business owners by ID. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
@@ -239,31 +197,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerBusinessOwnerIdGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationBusinessownerBusinessOwnerIdGet" class="pre collapse"><code class="json">{&quot;site&quot;: &quot;test.lk&quot;,&quot;email&quot;: &quot;testOwner@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;testOwner&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: false,&quot;value&quot;: &quot;903334238V&quot;,&quot;key&quot;: &quot;nic&quot;}],&quot;id&quot;: 1}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -282,7 +228,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -299,20 +244,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Business owner ID.\n</p>
-                            
+                            <p class="param-description marked">Business owner ID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -329,20 +271,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -359,20 +298,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -391,68 +327,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#BusinessOwner">BusinessOwner</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationBusinessownerBusinessOwnerIdPut"></a>Update an existing business owner</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Update an existing business owner.\n</p>
+            <p class="marked">Update an existing business owner. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
@@ -461,18 +379,11 @@
             <code>PUT</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1&quot;</code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-administrationBusinessownerBusinessOwnerIdPut">
                     <h4 class="section-heading">
                         Sample Request
@@ -480,20 +391,14 @@
                     </h4>
                 </div>
                 <div id="request-administrationBusinessownerBusinessOwnerIdPut"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;newSysUser.lk&quot;,&quot;email&quot;: &quot;newSysUser@gmail.com&quot;,&quot;description&quot;:&quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerBusinessOwnerIdPut">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationBusinessownerBusinessOwnerIdPut" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -512,7 +417,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -529,20 +433,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Business owner ID.\n</p>
-                            
+                            <p class="param-description marked">Business owner ID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -559,22 +460,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Business Owner object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">Business Owner object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 BusinessOwner
-                                
                                     (<a href="#!/models#BusinessOwner">BusinessOwner</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -591,20 +488,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -621,20 +515,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -651,20 +542,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -683,81 +571,59 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationBusinessownerGet"></a>Get all Business owners</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of available Apps qualifying under a given search condition.\n</p>
+            <p class="marked">Get a list of available Apps qualifying under a given search condition. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner</code>
@@ -766,31 +632,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationBusinessownerGet" class="pre collapse"><code class="json">{&quot;businessOwnerList&quot;: [{&quot;site&quot;: &quot;test.lk&quot;,&quot;email&quot;: &quot;testOwner@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;testOwner&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: false,&quot;value&quot;: &quot;903334238V&quot;,&quot;key&quot;: &quot;nic&quot;}],&quot;id&quot;: 1}]}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -809,7 +663,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -826,20 +679,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -856,20 +706,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -888,68 +735,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying business owners is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of qualifying business owners is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#BusinessOwnerList">BusinessOwnerList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationBusinessownerPost"></a>Create a new Business Owner</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Create a new business owner.\n</p>
+            <p class="marked">Create a new business owner. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner</code>
@@ -958,18 +787,11 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 56bbab397e7baa757e6e5847e789727d&quot; -H &quot;Host: 127.0.0.1:9763&quot; -H &quot;Content-Type:application/json&quot; -d &#39;{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-administrationBusinessownerPost">
                     <h4 class="section-heading">
                         Sample Request
@@ -977,20 +799,14 @@
                     </h4>
                 </div>
                 <div id="request-administrationBusinessownerPost"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationBusinessownerPost" class="pre collapse"><code class="json">{&quot;id&quot;: 4}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -1009,7 +825,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1026,22 +841,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Business Owner object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">Business Owner object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 BusinessOwner
-                                
                                     (<a href="#!/models#BusinessOwner">BusinessOwner</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1058,20 +869,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1088,20 +896,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1120,48 +925,33 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created object as the entity in the body. Location header contains the URL of the newly created entity. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#BusinessOwner">BusinessOwner</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in a not supported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

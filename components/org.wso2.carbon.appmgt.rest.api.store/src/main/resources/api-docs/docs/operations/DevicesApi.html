@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="DevicesApi"></a>DevicesApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="devicesGet"></a>Get all Devices</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of available devices qualifying under a given search condition.\n</p>
+            <p class="marked">Get a list of available devices qualifying under a given search condition. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/store/v1.1/devices</code>
@@ -17,31 +15,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e0fb5670b87e2e83bbe563a7ba2c9610&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/store/v1.1/devices&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-devicesGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-devicesGet" class="pre collapse"><code class="json">{&quot;next&quot;: &quot;&quot;,&quot;previous&quot;: &quot;&quot;,&quot;count&quot;: 2,&quot;deviceList&quot;:[{&quot;name&quot;: &quot;My Nexus&quot;,&quot;id&quot;: &quot;11&quot;,&quot;type&quot;: &quot;phone&quot;,&quot;platform&quot;: &quot;android&quot;,&quot;platformVersion&quot;: &quot;5.0&quot;,&quot;image&quot;: &quot;/store/extensions/assets/mobileapp/resources/models/nexus.png&quot;,&quot;model&quot;: &quot;Nexus&quot;}]}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">A search condition.\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\nEg. \&quot;type:mobile\&quot; will match an App if the provider of the App contains \&quot;mobile\&quot;.\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against the App name.\n</p>
-                            
+                            <p class="param-description marked">A search condition.  You can search attributes by using an **\&quot;attribute:\&quot;** modifier.  Eg. \&quot;type:mobile\&quot; will match an App if the provider of the App contains \&quot;mobile\&quot;.  Supported attribute modifiers are [**provider, app_name, app_version, app_id**]  If no advanced attribute modifier has been specified, search will match the given query string against the App name. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
-                            
+                            <p class="param-description marked">Maximum size of resource array to return. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">25</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
-                            
+                            <p class="param-description marked">Starting point within the complete list of items qualified. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">0</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -167,20 +143,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -197,20 +170,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -229,61 +199,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying devices is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of qualifying devices is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#DeviceList">DeviceList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>
