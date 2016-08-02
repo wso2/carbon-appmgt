@@ -284,6 +284,10 @@ Store.prototype.commentsPageSize = function () {
     return configs()[COMMENTS_PAGE_SIZE];
 };
 
+Store.prototype.getPublicVisibility = function () {
+    return configs()["publicVisibility"];
+};
+
 Store.prototype.assetsPaging = function (request) {
     var page = request.getParameter('page'),
         size = this.getRecentAppCount().topAssetPage;

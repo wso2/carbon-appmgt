@@ -56,6 +56,13 @@ require('/modules/store.js').exec(function (ctx) {
     //set tenant aware username
     var tenantUsername = user ? user.username : null;
 
+    //Get the store public visibility. Read the registry file store.json(tenanted) and get the value of publicVisibility
+    var storePublicVisibility = store.getPublicVisibility();
+    if (storePublicVisibility == null) {
+        log.warn('\'publicVisibility\' property has not been configured in the store.json config file');
+    }
+    var tagInfo = {};
+
     caramel = require('caramel');
     //Check whether to show register link in myapps page
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
@@ -481,60 +488,73 @@ require('/modules/store.js').exec(function (ctx) {
         asset.lifecycleState = lifeCycleState;
         return active
     };
-    /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        //In this case all the apps in the store are accessible by user without any subscriptions
-        //So myapps page should display all the apps.Searching,Sorting,pagination,tag search,recently added apps should
-        //available in myapps page since assets are retrieved from registry.
 
-        //get the apps from registry based on the
-        //requested method(sort,search or normal)
-        getAssetsFromRegistry();
-        //check for pagination
-        setPagination();
+    //Retrieve asset form the registry/DB only for the given condition to increase the store performances.
+    if(storePublicVisibility == true || (storePublicVisibility == false && user)) {
+        /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
+        if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            //In this case all the apps in the store are accessible by user without any subscriptions
+            //So myapps page should display all the apps.Searching,Sorting,pagination,tag search,recently added apps should
+            //available in myapps page since assets are retrieved from registry.
 
-        // hide all apps link in header
-        navigationData.showAllAppsLink = false;
+            //get the apps from registry based on the
+            //requested method(sort,search or normal)
+            getAssetsFromRegistry();
+            //check for pagination
+            setPagination();
+
+            // hide all apps link in header
+            navigationData.showAllAppsLink = false;
+        } else {
+            //show anonymous + subscribed apps for logged in user.
+            //show anonymous apps for anoymous user.
+            getAssetsFromDB();
+        }
+
+        // add rating,access url etc to retrieved webapps
+        addMoreInformationToWebApps();
+        //get recently added apps from registry
+        getRecentAssetsFromRegistry();
+
+        tagInfo.allTags = store.tags(type, isSite);
+        tagInfo.searchedTag = tag;
     } else {
-        //show anonymous + subscribed apps for logged in user.
-        //show anonymous apps for anoymous user.
-        getAssetsFromDB();
+        assets = null;
+        webAppRecentAssets = null;
+        tagInfo.allTags = null;
+        tagInfo.searchedTag = null;
     }
-
-    // add rating,access url etc to retrieved webapps
-    addMoreInformationToWebApps();
-    //get recently added apps from registry
-    getRecentAssetsFromRegistry();
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       navigation: navigationData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-                           enabledTypeList: enabledTypeList
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
+        title: 'Web Apps | Store',
+        user: user,
+        sso: sso,
+        header: headerData,
+        navigation: navigationData,
+        search: {
+            query: query
+        },
+        type: type,
+        tags: {
+            data: tagInfo
+        },
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        },
+        assets: assets,
+        assetType: 'webapp',
+        pagination: {
+            leftNav: leftnav,
+            rightNav: rightnav,
+            urlQuery: urlQuery
+        },
+        recentAssets: webAppRecentAssets
 
-                   });
+    });
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {
