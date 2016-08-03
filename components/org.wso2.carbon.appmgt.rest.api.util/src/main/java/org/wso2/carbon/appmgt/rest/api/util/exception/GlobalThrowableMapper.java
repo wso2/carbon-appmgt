@@ -155,10 +155,10 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
     }
 
 
-    private void logError(String errorMessage, Throwable e){
-        if(log.isDebugEnabled()){
+    private void logError(String errorMessage, Throwable e) {
+        if (log.isDebugEnabled()) {
             log.error(errorMessage, e);
-        }else{
+        } else {
             log.error(errorMessage);
         }
     }
