@@ -93,7 +93,7 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         if (e instanceof MethodNotAllowedException) {
             errorMessage = "Method not allowed";
-            log.error("Method not allowed", e);
+            logError("Method not allowed", e);
             return ((MethodNotAllowedException) e).getResponse();
         }
 
@@ -106,7 +106,7 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         if (e instanceof JsonParseException) {
             errorMessage = "Malformed request body.";
-            log.error(errorMessage, e);
+            logError(errorMessage, e);
             //noinspection ThrowableResultOfMethodCallIgnored
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
         }
