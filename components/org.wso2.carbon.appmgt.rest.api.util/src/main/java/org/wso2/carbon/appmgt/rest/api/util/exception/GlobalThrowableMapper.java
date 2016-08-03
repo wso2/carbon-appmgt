@@ -47,55 +47,65 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable e) {
 
+        String errorMessage = "Error Occurred";
+
         if (e instanceof ClientErrorException) {
-            log.error("Client error", e);
+            errorMessage = "Client error";
+            logError("Resource not found", e);
             return ((ClientErrorException) e).getResponse();
         }
 
         if (e instanceof NotFoundException) {
-            log.error("Resource not found", e);
+            errorMessage = "Resource not found";
+            logError("Resource not found", e);
             return ((NotFoundException) e).getResponse();
         }
 
         if (e instanceof PreconditionFailedException) {
-            log.error("Precondition failed", e);
+            errorMessage = "Precondition failed";
+            logError("Precondition failed", e);
             return ((PreconditionFailedException) e).getResponse();
         }
 
         if (e instanceof BadRequestException) {
-            log.error("Bad request", e);
+            errorMessage = "Bad request";
+            logError("Bad request", e);
             return ((BadRequestException) e).getResponse();
         }
 
         if (e instanceof ConstraintViolationException) {
-            log.error("Constraint violation", e);
+            errorMessage = "Constraint violation";
+            logError("Constraint violation", e);
             return ((ConstraintViolationException) e).getResponse();
         }
 
         if (e instanceof ForbiddenException) {
-            log.error("Resource forbidden", e);
+            errorMessage = "Resource forbiddenn";
+            logError("Resource forbidden", e);
             return ((ForbiddenException) e).getResponse();
         }
 
         if (e instanceof ConflictException) {
-            log.error("Conflict", e);
+            errorMessage = "Conflict";
+            logError("Conflict", e);
             return ((ConflictException) e).getResponse();
         }
 
         if (e instanceof MethodNotAllowedException) {
+            errorMessage = "Method not allowed";
             log.error("Method not allowed", e);
             return ((MethodNotAllowedException) e).getResponse();
         }
 
         if (e instanceof InternalServerErrorException) {
-            String errorMessage = "The server encountered an internal error : " + e.getMessage();
-            log.error(errorMessage, e);
+            errorMessage = "The server encountered an internal error : " + e.getMessage();
+            logError(errorMessage, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Content-Type", "application/json")
                     .entity(e500).build();
         }
 
         if (e instanceof JsonParseException) {
-            String errorMessage = "Malformed request body.";
+            errorMessage = "Malformed request body.";
             log.error(errorMessage, e);
             //noinspection ThrowableResultOfMethodCallIgnored
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
@@ -105,13 +115,13 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
             if (e instanceof UnrecognizedPropertyException) {
                 UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) e;
                 String unrecognizedProperty = unrecognizedPropertyException.getUnrecognizedPropertyName();
-                String errorMessage = "Unrecognized property '" + unrecognizedProperty + "'";
-                log.error(errorMessage, e);
+                errorMessage = "Unrecognized property '" + unrecognizedProperty + "'";
+                logError(errorMessage, e);
                 //noinspection ThrowableResultOfMethodCallIgnored
                 return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
             } else {
-                String errorMessage = "One or more request body parameters contain disallowed values.";
-                log.error(errorMessage, e);
+                errorMessage = "One or more request body parameters contain disallowed values.";
+                logError(errorMessage, e);
                 //noinspection ThrowableResultOfMethodCallIgnored
                 return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
             }
@@ -131,15 +141,25 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         //This occurs when received an empty body in an occasion where the body is mandatory
         if (e instanceof EOFException) {
-            String errorMessage = "Request payload cannot be empty.";
-            log.error(errorMessage, e);
+            errorMessage = "Request payload cannot be empty.";
+            logError(errorMessage, e);
             //noinspection ThrowableResultOfMethodCallIgnored
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
         }
 
         //unknown exception log and return
-        log.error("An Unknown exception has been captured by global exception mapper.", e);
+        errorMessage = "An Unknown exception has been captured by global exception mapper.";
+        logError(errorMessage, e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Content-Type", "application/json")
                 .entity(e500).build();
+    }
+
+
+    private void logError(String errorMessage, Throwable e){
+        if(log.isDebugEnabled()){
+            log.error(errorMessage, e);
+        }else{
+            log.error(errorMessage);
+        }
     }
 }
