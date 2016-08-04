@@ -44,15 +44,14 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
-
+    private static final String DATE_FORMAT = "MM-dd-yyyy HH:mm a";
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
@@ -85,7 +84,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -173,7 +172,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String errorMessage = "Could not find requested application.";
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
-            
+
             Operations mobileOperation = new Operations();
             String action = "uninstall";
             String[] parameters = null;
@@ -185,7 +184,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -250,10 +249,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 
             AppListDTO appListDTO = null;
-            if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
+            if (fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)) {
                 appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
 
-            }else{
+            } else {
                 appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());
@@ -331,19 +330,23 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                                       String[].class);
+                    String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                             log);
+                        log);
             }
             String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
 
             JSONObject user = new JSONObject();
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-           String activityId =   mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -356,6 +359,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
         }
         return Response.serverError().build();
     }
@@ -386,12 +391,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                                       String[].class);
+                    String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                             log);
+                        log);
             }
             String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
 
             JSONObject user = new JSONObject();
             user.put("username", tenantUserName);
@@ -411,6 +420,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
         }
         return Response.serverError().build();
     }
