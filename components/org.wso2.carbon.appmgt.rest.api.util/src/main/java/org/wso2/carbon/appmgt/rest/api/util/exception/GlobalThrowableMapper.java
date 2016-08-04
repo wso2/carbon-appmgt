@@ -30,6 +30,7 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.EOFException;
+import java.text.ParseException;
 
 public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
@@ -108,6 +109,12 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
             errorMessage = "Malformed request body.";
             logError(errorMessage, e);
             //noinspection ThrowableResultOfMethodCallIgnored
+            return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+        }
+
+        if (e instanceof ParseException) {
+            errorMessage = "Invalid schedule date format";
+            logError(errorMessage, e);
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
         }
 
