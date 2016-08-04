@@ -76,6 +76,7 @@ import java.util.*;
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
+    private static final String DATE_FORMAT = "MM-dd-yyyy hh:mm a";
 
     BeanValidator beanValidator;
 
