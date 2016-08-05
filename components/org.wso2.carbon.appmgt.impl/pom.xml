@@ -215,8 +215,7 @@
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.appmgt.impl.internal.*,
-                            org.wso2.carbon.appmgt.impl.*;version="${carbon.appmgt.bundle.version}",
-                            org.wso2.carbon.appmgt.impl.discovery;version="${carbon.appmgt.bundle.version}"
+                            org.wso2.carbon.appmgt.impl.*;version="${carbon.appmgt.bundle.version}"
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.utils,
