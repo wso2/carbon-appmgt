@@ -23,12 +23,13 @@ package org.wso2.carbon.appmgt.gateway.handlers.security;
 
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Represents a gateway user session.
  */
-public class Session {
+public class Session implements Serializable {
 
 private String uuid;
 
