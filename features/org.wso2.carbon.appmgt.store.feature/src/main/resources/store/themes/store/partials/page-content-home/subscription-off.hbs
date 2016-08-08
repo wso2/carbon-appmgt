@@ -7,7 +7,7 @@
                    data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
                    data-context="{{attributes.overview_context}}" data-stats="usage" class="hover-overlay-container">
                     <div class="ratio-responsive-4by3">
-                        { {{#if isFavourite}}
+                        {{#if isFavourite}}
                         {{> ribbons/favorite}}
                     {{else}}
                         {{#if isSubscribed}}
