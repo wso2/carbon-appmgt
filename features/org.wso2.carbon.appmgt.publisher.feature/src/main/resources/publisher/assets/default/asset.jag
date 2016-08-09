@@ -486,7 +486,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                 auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
-                                                                                   ", apiName='" + webappId.name + '\''
+                                                                                   ", appName='" + webappId.name + '\''
                                                                                    +
                                                                                    ", version='" + webappId.version
                                                                                    + '\'' +
@@ -496,7 +496,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                 auditLog.writeLog(tenantId, tenantAwareUserName, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
-                                                                                    ", apiName='" + webappId.name + '\''
+                                                                                    ", appName='" + webappId.name + '\''
                                                                                     +
                                                                                     ", version='" + webappId.version
                                                                                     + '\'' +
