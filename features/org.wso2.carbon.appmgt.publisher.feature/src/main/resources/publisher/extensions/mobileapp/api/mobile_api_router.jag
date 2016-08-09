@@ -12,7 +12,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var server = require('store').server;
     var permissions=require('/modules/permissions.js').permissions;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
-
+    var auditLog = require('/modules/auditLog/logger.js');
 
     routeManager.register('DELETE', 'publisher', '/publisher/api/mobile/delete/{app}', function (ctx) {
         var username=require('store').server.current(session).username;
@@ -41,8 +41,18 @@ require('/modules/publisher.js').exec(function(ctx) {
                    fileNames.push(binaryFileName);
                 }
             }
+            var attributes = artifact.attributes;
+            var appType = "mobileApp";
+            var tenantId = server.current(session).tenantId;
+            var appName = attributes["overview_name"];
+            var appVersion = attributes["overview_version"];
+            var appProvider = attributes["overview_provider"];
             artifactManager.remove(app);
             apiProvider.removeBinaryFilesFromStorage(fileNames);
+            auditLog.writeLog(tenantId, username, "AssetDeleted", appType, "{providerName='" + appProvider +
+                                                                           "', appName='" + appName +
+                                                                           "', version='" + appVersion + "'}",
+                              artifact);
         }
     });
 
