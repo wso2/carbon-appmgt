@@ -368,17 +368,10 @@ require('/modules/publisher.js').exec(function(ctx) {
                     msg['message'] = 'Web Application is successfully deleted';
                     print(msg);
                     var tenantId = server.current(session).tenantId;
-                    auditLog.writeLog(tenantId, username, "AssetDeleted", shortName, "{" +
-                                                                                     "providerName='"
-                                                                                     + attributes["overview_provider"]
-                                                                                     + '\'' +
-                                                                                     ", apiName='"
-                                                                                     + attributes["overview_name"]
-                                                                                     + '\'' +
-                                                                                     ", version='"
-                                                                                     + attributes["overview_version"]
-                                                                                     + '\'' +
-                                                                                     '}', originalArtifact);
+                    auditLog.writeLog(tenantId, username, "AssetDeleted", shortName, "{providerName='" + appProvider +
+                                                                                     "', appName='" + appName +
+                                                                                     "', version='" + appVersion +
+                                                                                     "'}", originalArtifact);
                 } else if (isDeleted == false) {
                     msg['isDeleted'] = false;
                     msg['message'] = 'Web Application delete failed due to active subscriptions';
@@ -696,13 +689,16 @@ require('/modules/publisher.js').exec(function(ctx) {
             var update = apiProvider.updateAPI(artifact);
 
             var attributes = artifact.attributes;
+            var appName = attributes["overview_name"];
+            var appVersion = attributes["overview_version"];
+            var appProvider = attributes["overview_provider"];
 
             //Update entitlement policies of the web application
-            updateEntitlementPolicies(attributes["overview_provider"], attributes["overview_name"], attributes["overview_version"]);
+            updateEntitlementPolicies(appProvider, appName, appVersion);
 
             //update OAuth APIs consumer details per given web-app
             var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
-            var apiIdentifierObj = new apiIdentifier(attributes["overview_provider"], attributes["overview_name"], attributes["overview_version"]);
+            var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
 
             var webApp = Packages.org.wso2.carbon.appmgt.api.model.WebApp;
             var webAppObj = new webApp(apiIdentifierObj);
@@ -721,9 +717,9 @@ require('/modules/publisher.js').exec(function(ctx) {
 	    var tenantDomain = carbon.server.tenantDomain({tenantId:tenantId});
 	    var saml2SsoIssuer = null;
 	    if (tenantId == -1234) {
-		saml2SsoIssuer = attributes["overview_name"] + "-" + attributes["overview_version"];
+		saml2SsoIssuer = appName + "-" + appVersion;
 	    } else {
-		saml2SsoIssuer = attributes["overview_name"] + "-" + tenantDomain + "-" + attributes["overview_version"];
+		saml2SsoIssuer = appName + "-" + tenantDomain + "-" + appVersion;
 	    }
 
             while (tokenEndpoint != null && tokenEndpoint.trim().length > 0) {
@@ -747,16 +743,10 @@ require('/modules/publisher.js').exec(function(ctx) {
                 var updateLCArtifact = artifactManager.get(id);
                 artifactManagerForUpdate.promoteLifecycleState("Revert", updateLCArtifact);
             }
-                auditLog.writeLog(tenantId, username, "AssetUpdated", shortName, "{" +
-                                                                                 "providerName='"
-                                                                                 + attributes["overview_provider"]
-                                                                                 + '\'' +
-                                                                                 ", apiName='"
-                                                                                 + attributes["overview_name"] + '\'' +
-                                                                                 ", version='"
-                                                                                 + attributes["overview_version"] + '\''
-                                                                                 +
-                                                                                 '}', originalArtifact, artifact);
+                auditLog.writeLog(tenantId, username, "AssetUpdated", shortName, "{providerName='" + appProvider +
+                                                                                 "', appName='" + appName +
+                                                                                 "', version='" + appVersion + "'}",
+                                  originalArtifact, artifact);
             msg['ok']=true;
             msg['message']='asset updated';
             msg['asset']=artifact;
@@ -1171,6 +1161,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
                 meta = parse(unescape(meta));
                 var version = ctx.version;
+                var appName = ctx.name;
                 model.set('overview.bundleversion', version);
                 model.set('overview.packagename', meta.package);
                 if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
@@ -1288,6 +1279,11 @@ require('/modules/publisher.js').exec(function(ctx) {
             assetCacheManager.add(asset,shortName);
 
             if (idField) {
+                var tenantId = server.current(session).tenantId;
+                auditLog.writeLog(tenantId, username, "NewAssetAdded", shortName, "{providerName='" + username +
+                                                                                  "', appName='" + appName +
+                                                                                  "', version='" + version + "'}",
+                                  "", "");
                 response.contentType = CONTENT_TYPE_JSON;
                 print({ok: 'true', message: 'Asset created.', id: idField.value});
             }
@@ -1384,6 +1380,9 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}});
                     return;
                 }
+                var appName = originalArtifact.attributes.overview_name;
+                var appVersion = originalArtifact.attributes.overview_version;
+                var appProvider = originalArtifact.attributes.overview_provider;
                 modelA.set('overview.name',originalArtifact.attributes.overview_name);
 				modelA.set('overview.displayName', ctx.displayName);
                 modelA.set('overview.version', originalArtifact.attributes.overview_version);
@@ -1438,6 +1437,11 @@ require('/modules/publisher.js').exec(function(ctx) {
             var tags = context.post['tags'];
             updateTags(tags,artifact.id,rxtManager,shortName);
 
+            var tenantId = server.current(session).tenantId;
+            auditLog.writeLog(tenantId, username, "AssetUpdated", shortName, "{providerName='" + appProvider +
+                                                                             "', appName='" + appName + "', version='" +
+                                                                             appVersion + "'}", originalArtifact,
+                              artifact);
             msg['ok']=true;
             msg['message']='asset updated';
             msg['asset']=artifact;
