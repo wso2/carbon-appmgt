@@ -11,6 +11,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var rxtManager = publisher.rxtManager;
     var server = require('store').server;
     var permissions=require('/modules/permissions.js').permissions;
+    var auditLog = require('/modules/auditLog/logger.js');
 
 
     routeManager.register('DELETE', 'publisher', '/publisher/api/mobile/delete/{app}', function (ctx) {
@@ -21,7 +22,19 @@ require('/modules/publisher.js').exec(function(ctx) {
         if(deleteAuthorized){
             var app = ctx.params.app;
             var artifactManager = rxtManager.getArtifactManager("mobileapp");
+            var artifact = artifactManager.get(app);
+            var attributes = artifact.attributes;
+            var artifact = artifactManager.get(app);
+            var appType = "mobileApp";
+            var tenantId = server.current(session).tenantId;
+            var appName = attributes["overview_name"];
+            var appVersion = attributes["overview_version"];
+            var appProvider = attributes["overview_provider"];
             artifactManager.remove(app);
+            auditLog.writeLog(tenantId, username, "AssetDeleted", appType, "{providerName='" + appProvider +
+                                                                           "', appName='" + appName +
+                                                                           "', version='" + appVersion + "'}",
+                              artifact);
         }
     });
 
