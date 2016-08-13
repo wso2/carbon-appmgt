@@ -25,6 +25,7 @@
             sessionId = session.getId(),
             samlRequest = request.getParameter('SAMLRequest'),
             relayState = request.getParameter('RelayState'),
+            attr = configs.ssoConfiguration,
             sso = require('sso'),
             samlRespObj,
             keyStoreProps = {
@@ -33,7 +34,7 @@
                 IDP_ALIAS: configs.ssoConfiguration.identityAlias
             },
             sso_sessions = application.get('sso_sessions');
-            contextPath = caramel.configs().context,
+    contextPath = caramel.configs().context,
             reversProxyEnabled = caramel.configs().reverseProxyEnabled,
             reverseProxyHost = caramel.configs().reverseProxyHost;
 
@@ -45,34 +46,125 @@
         application.put('sso_sessions', {});
         sso_sessions = application.get('sso_sessions');
     }
+    /**
+     * The method is used to encapsulate all of the validations that
+     * should be performed on a SAML Response
+     */
+    function validateSamlResponse(samlObj, props, keyStoreProps) {
+        props = props || {};
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var propList = createProperties(props);
+        var DEFAULT_TO_TRUE = true;
+        var DEFAULT_TO_FALSE = false;
+        var isValid = true; //Assume all validations will fail
+        var isAssertionValidityPeriodChecked = props.validateAssertionValidityPeriod ? props.validateAssertionValidityPeriod : DEFAULT_TO_FALSE;
+        var isAudienceRestrictionChecked = props.validateAudienceRestriction ? props.validateAudienceRestriction : DEFAULT_TO_FALSE;
+        var isAssertionSigningEnabled = props.assertionSigningEnabled ? props.assertionSigningEnabled : DEFAULT_TO_FALSE;
+        var isResponseSigningEnabled = props.responseSigningEnabled ? props.responseSigningEnabled : DEFAULT_TO_FALSE;
+
+        //Step #1: Validate the token validity period
+        if (isAssertionValidityPeriodChecked) {
+            isValid = Util.validateAssertionValidityPeriod(samlObj, propList);
+        }
+
+        //Break processing if the assertion validity period has expired
+        if (!isValid) {
+            return isValid;
+        }
+        //Step #2: Validate the assertion audience
+        if (isAudienceRestrictionChecked) {
+            isValid = Util.validateAudienceRestriction(samlRespObj, propList);
+        }
+        //Break processing if the audience restriction check fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #3: Validate the response signature
+        if (isResponseSigningEnabled) {
+            if(isResponseSigningEnabled == "true") {
+                isValid = sso.client.validateSignature(samlObj, keyStoreProps);
+            }
+        }
+
+        //Break processing if the signature validation fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #4: Perform assertion signature verification
+        if (isAssertionSigningEnabled) {
+            isValid = callValidateAssertionSignature(samlObj, keyStoreProps);
+        }
+        return isValid;
+    }
+
+    /**
+     * A utility method used to convert a JSON object to
+     * a properties object
+     */
+    function createProperties(props) {
+        var javaPropertyList = new java.util.Properties();
+        Object.keys(props).forEach(function(key) {
+            if (props.hasOwnProperty(key)) {
+                javaPropertyList.setProperty(key, props[key]);
+            }
+        });
+        return javaPropertyList;
+    }
+    /**
+     * Invokes the validateAssertionSignature method by first
+     * resolving tenant details
+     */
+    function callValidateAssertionSignature(samlObj, config) {
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var tDomain, tId;
+        var carbon = require('carbon');
+        if (config.USE_ST_KEY) {
+            tDomain = carbon.server.superTenant.domain;
+            tId = carbon.server.superTenant.tenantId;
+        } else {
+            tDomain = Util.getDomainName(samlObj);
+            tId = carbon.server.tenantId({
+                domain: tDomain
+            });
+        }
+        return Util.validateAssertionSignature(samlObj, config.KEY_STORE_NAME, config.KEY_STORE_PASSWORD, config.IDP_ALIAS, tId, tDomain);
+    }
 
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+        if(!samlRespObj) {
+            log.error('Malformed SAML response recieved from IDP');
+            response.sendError(401);
+            return;
+        }
+
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
             // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
+            if (validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
 
-                if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-                    var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+                var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
 
-                    if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                        session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        session.put("Loged", "true");
+                if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                    session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                    session.put("Loged", "true");
 
-                        sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                    sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
 
-                        var user = require('/modules/user.js');
+                    var user = require('/modules/user.js');
 
-                        if (user.loginWithSAML(sessionObj.loggedInUser)) {
-			    if(log.isDebugEnabled()){
-                            	log.debug('user is set :::' + sessionObj.loggedInUser);
-                            }
-			    response.sendRedirect(relayState);
+                    if (user.loginWithSAML(sessionObj.loggedInUser)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug('user is set :::' + sessionObj.loggedInUser);
                         }
-
+                        response.sendRedirect(relayState);
                     }
                 }
+            }else {
+                response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
             }
 
         } else {
@@ -88,16 +180,16 @@
     // if saml request is a log out request, then invalidate session.
     if (samlRequest != null) {
         var index = sso.client.decodeSAMLLogoutRequest(sso.client.getSamlObject(samlRequest));
-	if(log.isDebugEnabled()){
-        	log.debug('BACKEND LOGOUT RECIEVED FROM STORE THE INDEX IS ######' + index);
-	}
+        if(log.isDebugEnabled()){
+            log.debug('BACKEND LOGOUT RECIEVED FROM STORE THE INDEX IS ######' + index);
+        }
         var jSessionId = application.get('sso_sessions')[index];
 
         delete application.get('sso_sessions')[index];
 
-	if(log.isDebugEnabled()){
-        	log.debug('social Session Id :::' + jSessionId);
-	}
+        if(log.isDebugEnabled()){
+            log.debug('social Session Id :::' + jSessionId);
+        }
         session.invalidate();
     }
 }());

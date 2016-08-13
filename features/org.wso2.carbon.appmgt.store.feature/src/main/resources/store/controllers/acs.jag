@@ -13,6 +13,7 @@ var auditLog = require('/modules/auditLog/logger.js');
             relayState = decodeURIComponent(request.getParameter('RelayState')),
             sso = require('sso'),
             server = require('carbon').server,
+            attr = configs.ssoConfiguration,
             samlRespObj,
             caramel = require('caramel'),
             carbon = require('carbon'),
@@ -25,6 +26,96 @@ var auditLog = require('/modules/auditLog/logger.js');
                 IDP_ALIAS: configs.ssoConfiguration.identityAlias
             },
             sso_sessions = application.get('sso_sessions');
+
+    /**
+     * The method is used to encapsulate all of the validations that
+     * should be performed on a SAML Response
+     */
+    function validateSamlResponse(samlObj, props, keyStoreProps) {
+        props = props || {};
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var propList = createProperties(props);
+        var DEFAULT_TO_TRUE = true;
+        var DEFAULT_TO_FALSE = false;
+
+        var isValid = true; //Assume all validations will fail
+        var isAssertionValidityPeriodChecked = props.validateAssertionValidityPeriod ? props.validateAssertionValidityPeriod : DEFAULT_TO_FALSE;
+        var isAudienceRestrictionChecked = props.validateAudienceRestriction ? props.validateAudienceRestriction : DEFAULT_TO_FALSE;
+        var isAssertionSigningEnabled = props.assertionSigningEnabled ? props.assertionSigningEnabled : DEFAULT_TO_FALSE;
+        var isResponseSigningEnabled = props.responseSigningEnabled ? props.responseSigningEnabled : DEFAULT_TO_FALSE;
+
+        //Step #1: Validate the token validity period
+        if (isAssertionValidityPeriodChecked) {
+            isValid = Util.validateAssertionValidityPeriod(samlObj, propList);
+        }
+
+        //Break processing if the assertion validity period has expired
+        if (!isValid) {
+            return isValid;
+        }
+        //Step #2: Validate the assertion audience
+        if (isAudienceRestrictionChecked) {
+            isValid = Util.validateAudienceRestriction(samlRespObj, propList);
+        }
+
+        //Break processing if the audience restriction check fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #3: Validate the response signature
+        if (isResponseSigningEnabled) {
+            if(isResponseSigningEnabled == "true") {
+                isValid = sso.client.validateSignature(samlObj, keyStoreProps);
+            }
+        }
+
+        //Break processing if the signature validation fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #4: Perform assertion signature verification
+        if (isAssertionSigningEnabled) {
+            isValid = callValidateAssertionSignature(samlObj, keyStoreProps);
+        }
+
+        return isValid;
+    }
+
+    /**
+     * A utility method used to convert a JSON object to
+     * a properties object
+     */
+    function createProperties(props) {
+        var javaPropertyList = new java.util.Properties();
+        Object.keys(props).forEach(function(key) {
+            if (props.hasOwnProperty(key)) {
+                javaPropertyList.setProperty(key, props[key]);
+            }
+        });
+        return javaPropertyList;
+    }
+
+    /**
+     * Invokes the validateAssertionSignature method by first
+     * resolving tenant details
+     */
+    function callValidateAssertionSignature(samlObj, config) {
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var tDomain, tId;
+        var carbon = require('carbon');
+        if (config.USE_ST_KEY) {
+            tDomain = carbon.server.superTenant.domain;
+            tId = carbon.server.superTenant.tenantId;
+        } else {
+            tDomain = Util.getDomainName(samlObj);
+            tId = carbon.server.tenantId({
+                domain: tDomain
+            });
+        }
+        return Util.validateAssertionSignature(samlObj, config.KEY_STORE_NAME, config.KEY_STORE_PASSWORD, config.IDP_ALIAS, tId, tDomain);
+    }
 
     var AuthService = require('../extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
@@ -40,6 +131,13 @@ var auditLog = require('/modules/auditLog/logger.js');
 
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+
+        if(!samlRespObj) {
+            log.error('Malformed SAML response recieved from IDP');
+            response.sendError(401);
+            return;
+        }
+
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
             if (relayState) {
@@ -50,111 +148,111 @@ var auditLog = require('/modules/auditLog/logger.js');
             }
 
             // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
+            if (validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
 
-                if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-                    var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-                    var username = sessionObj.loggedInUser;
-                    if (username.indexOf("@carbon.super") > -1) {
-                        username= username.replace("@carbon.super","");
+                var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+                var username = sessionObj.loggedInUser;
+                if (username.indexOf("@carbon.super") > -1) {
+                    username = username.replace("@carbon.super", "");
+                }
+                if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                    var relayStateUrlMatcher = new URIMatcher(relayState);
+                    var tenantedURIPattern = contextPath + '/t/{domain}/';
+                    var urlTenantDomain;
+
+                    //Check whether the relayState is matched with a tenanted uri pattern
+                    if (relayStateUrlMatcher.match(tenantedURIPattern) ||
+                            relayStateUrlMatcher.match(tenantedURIPattern + '{+any}')) {
+                        var elements = relayStateUrlMatcher.elements();
+
+                        //Extract the tenant domain from the url
+                        urlTenantDomain = elements.domain;
                     }
-                    if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                        var relayStateUrlMatcher = new URIMatcher(relayState);
-                        var tenantedURIPattern = contextPath + '/t/{domain}/';
-                        var urlTenantDomain;
 
-                        //Check whether the relayState is matched with a tenanted uri pattern
-                        if (relayStateUrlMatcher.match(tenantedURIPattern) ||
-                                relayStateUrlMatcher.match(tenantedURIPattern + '{+any}')) {
-                            var elements = relayStateUrlMatcher.elements();
+                    var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+                    var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+                    var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
-                            //Extract the tenant domain from the url
-                            urlTenantDomain = elements.domain;
+                    if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                        var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
+                        var ctx = service.getServerConfigContext();
+                        var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+                        TenantAxisUtils.setTenantAccessed(domainName, ctx);
+
+                    }
+                    var tenantId = carbon.server.tenantId({
+                        domain: domainName
+                    });
+
+                    session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                    session.put("Loged", "true");
+                    session.put("tenantId", tenantId);
+
+                    username = username + "";
+                    var userDetails = {};
+                    userDetails['username'] = username;
+                    userDetails['action'] = "SSOLogin";
+                    authResult = authenticator.login(userDetails);
+                    sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+
+                    var isSubscriberRoleAttached = storeHostObj.checkIfSubscriberRoleAttached(username);
+                    var role = null;
+
+                    if (!isSubscriberRoleAttached.error) {
+                        role = require('/modules/role.js').checkeRole(username, session);
+                    }
+
+                    if (urlTenantDomain && urlTenantDomain != domainName) {
+                        log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
+                        + urlTenantDomain + '. Make sure the user has been registered in the tenant domain');
+                        response.sendError(403, 'You do not have permission to login to this tenant domain.Please register first.');
+                        return;
+                    }
+
+                    if (role) {
+                        var user = require('store').user;
+                        if (log.isDebugEnabled()) {
+                            log.debug('User has been set to : ' + sessionObj.loggedInUser);
                         }
-
-                        var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                        var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                        var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
-
-                        if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                            var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
-                            var ctx = service.getServerConfigContext();
-                            var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-                            TenantAxisUtils.setTenantAccessed(domainName, ctx);
-
-                        }
-                        var tenantId = carbon.server.tenantId({
-                            domain: domainName
-                        });
-
-                        session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        session.put("Loged", "true");
-                        session.put("tenantId",tenantId);
-
-                        username = username + "";
-                        var userDetails = {};
-                        userDetails['username'] = username;
-                        userDetails['action'] = "SSOLogin";
-                        authResult = authenticator.login(userDetails);
-                        sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
-
-                        var isSubscriberRoleAttached = storeHostObj.checkIfSubscriberRoleAttached(username);
-                        var role = null;
-
-                        if (!isSubscriberRoleAttached.error) {
-                            role = require('/modules/role.js').checkeRole(username, session);
-                        }
-
-                        if (urlTenantDomain && urlTenantDomain != domainName) {
-                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
-                            + urlTenantDomain + '. Make sure the user has been registered in the tenant domain');
-                            response.sendError(403, 'You do not have permission to login to this tenant domain.Please register first.');
-                            return;
-                        }
-
-                        if (role) {
-                            var user = require('store').user;
-                            if (log.isDebugEnabled()) {
-                                log.debug('User has been set to : ' + sessionObj.loggedInUser);
+                        auditLog.writeLog(tenantId, username, "UserSignedIn", "Login", "", "", "");
+                        //check whether login request came by clicking the login url and do redirect
+                        // to myfavourites page if user has already selected it as homepage.
+                        //in store login url is in the format of /login?header=true
+                        var queryParam = "?header=true";
+                        if (relayState.indexOf(queryParam)) {
+                            if (!urlTenantDomain) {
+                                urlTenantDomain = "carbon.super";
                             }
-                            auditLog.writeLog(tenantId, username, "UserSignedIn","Login","", "", "");
-                            //check whether login request came by clicking the login url and do redirect
-                            // to myfavourites page if user has already selected it as homepage.
-                            //in store login url is in the format of /login?header=true
-                            var queryParam = "?header=true";
-                            if (relayState.indexOf(queryParam)) {
-                                if(!urlTenantDomain){
-                                    urlTenantDomain = "carbon.super";
-                                }
-                                var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
-                                //when only mobile app is enabled do not check for favourite home page
-                                if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
-                                    var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
-                                    var pathMatcher = new URIMatcher(relayState);
-                                    if (isFavouritePageSelected && !(pathMatcher.match(assetOverviewPageMatcher) ||
-                                            pathMatcher.match(tenantedAssetOverviewPageMatcher))) {
-                                        var favPage = configs.pages.favouritePage;
-                                        relayState = contextPath + favPage;
-                                    } else {
-                                        //remove the query param
-                                        relayState.replace(queryParam, "");
-                                    }
+                            var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+                            //when only mobile app is enabled do not check for favourite home page
+                            if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
+                                var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
+                                var pathMatcher = new URIMatcher(relayState);
+                                if (isFavouritePageSelected && !(pathMatcher.match(assetOverviewPageMatcher) ||
+                                        pathMatcher.match(tenantedAssetOverviewPageMatcher))) {
+                                    var favPage = configs.pages.favouritePage;
+                                    relayState = contextPath + favPage;
+                                } else {
+                                    //remove the query param
+                                    relayState.replace(queryParam, "");
                                 }
                             }
-
-                            if(reversProxyEnabled) {
-                                relayState = reverseProxyHost+relayState;
-                            }
-                            response.sendRedirect(relayState);
-                        } else {
-                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the subscribe permission.');
-                            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
-
                         }
+
+                        if (reversProxyEnabled) {
+                            relayState = reverseProxyHost + relayState;
+                        }
+                        response.sendRedirect(relayState);
+                    } else {
+                        log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the subscribe permission.');
+                        response.sendError(403, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+
                     }
                 }
+            }else {
+                response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
             }
-
         } else {
             session.invalidate();
             var reDirectUrl = contextPath;

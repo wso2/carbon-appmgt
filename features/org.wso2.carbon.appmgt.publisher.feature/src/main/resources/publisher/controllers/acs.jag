@@ -2,7 +2,7 @@
 include("/extensions/webapp/modules/jagg/jagg.jag");
 
 (function () {
-	    var log = new Log(),
+    var log = new Log(),
             configs = require('/config/publisher.js').config(),
             auditLog = require('/modules/auditLog/logger.js'),
             samlResponse = request.getParameter('SAMLResponse'),
@@ -11,14 +11,100 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             relayState = request.getParameter('RelayState'),
             cookie= request.getHeader("Cookie"),
             sso = require('sso'),
-	        server = require('carbon').server,
+            server = require('carbon').server,
             samlRespObj,
+            attr = configs.ssoConfiguration,
             keyStoreProps = {
                 KEY_STORE_NAME: process.getProperty('carbon.home') + configs.ssoConfiguration.keyStoreName,
                 KEY_STORE_PASSWORD: configs.ssoConfiguration.keyStorePassword,
                 IDP_ALIAS: configs.ssoConfiguration.identityAlias
             },
             sso_sessions = application.get('sso_sessions');
+    /**
+     * The method is used to encapsulate all of the validations that
+     * should be performed on a SAML Response
+     */
+    function validateSamlResponse(samlObj, props, keyStoreProps) {
+        props = props || {};
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var propList = createProperties(props);
+        var DEFAULT_TO_TRUE = true;
+        var DEFAULT_TO_FALSE = false;
+        var isValid = true; //Assume all validations will fail
+        var isAssertionValidityPeriodChecked = props.validateAssertionValidityPeriod ? props.validateAssertionValidityPeriod : DEFAULT_TO_FALSE;
+        var isAudienceRestrictionChecked = props.validateAudienceRestriction ? props.validateAudienceRestriction : DEFAULT_TO_FALSE;
+        var isAssertionSigningEnabled = props.assertionSigningEnabled ? props.assertionSigningEnabled : DEFAULT_TO_FALSE;
+        var isResponseSigningEnabled = props.responseSigningEnabled ? props.responseSigningEnabled : DEFAULT_TO_FALSE;
+
+        //Step #1: Validate the token validity period
+        if (isAssertionValidityPeriodChecked) {
+            isValid = Util.validateAssertionValidityPeriod(samlObj, propList);
+        }
+
+        //Break processing if the assertion validity period has expired
+        if (!isValid) {
+            return isValid;
+        }
+        //Step #2: Validate the assertion audience
+        if (isAudienceRestrictionChecked) {
+            isValid = Util.validateAudienceRestriction(samlRespObj, propList);
+        }
+        //Break processing if the audience restriction check fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #3: Validate the response signature
+        if (isResponseSigningEnabled) {
+            if(isResponseSigningEnabled == "true") {
+                isValid = sso.client.validateSignature(samlObj, keyStoreProps);
+            }
+        }
+
+        //Break processing if the signature validation fails
+        if (!isValid) {
+            return isValid;
+        }
+
+        //Step #4: Perform assertion signature verification
+        if (isAssertionSigningEnabled) {
+            isValid = callValidateAssertionSignature(samlObj, keyStoreProps);
+        }
+        return isValid;
+    }
+
+    /**
+     * A utility method used to convert a JSON object to
+     * a properties object
+     */
+    function createProperties(props) {
+        var javaPropertyList = new java.util.Properties();
+        Object.keys(props).forEach(function(key) {
+            if (props.hasOwnProperty(key)) {
+                javaPropertyList.setProperty(key, props[key]);
+            }
+        });
+        return javaPropertyList;
+    }
+    /**
+     * Invokes the validateAssertionSignature method by first
+     * resolving tenant details
+     */
+    function callValidateAssertionSignature(samlObj, config) {
+        var Util = Packages.org.wso2.store.sso.common.util.Util;
+        var tDomain, tId;
+        var carbon = require('carbon');
+        if (config.USE_ST_KEY) {
+            tDomain = carbon.server.superTenant.domain;
+            tId = carbon.server.superTenant.tenantId;
+        } else {
+            tDomain = Util.getDomainName(samlObj);
+            tId = carbon.server.tenantId({
+                domain: tDomain
+            });
+        }
+        return Util.validateAssertionSignature(samlObj, config.KEY_STORE_NAME, config.KEY_STORE_PASSWORD, config.IDP_ALIAS, tId, tDomain);
+    }
 
     var caramel = require('caramel');
     var contextPath = caramel.configs().context;
@@ -33,70 +119,75 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
         application.put('sso_sessions', {});
         sso_sessions = application.get('sso_sessions');
     }
-    
+
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+        if(!samlRespObj) {
+            log.error('Malformed SAML response recieved from IDP');
+            response.sendError(401);
+            return;
+        }
+
         if (!sso.client.isLogoutResponse(samlRespObj)) {
+            if (validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
 
-            // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
+                var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+                if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                    var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+                    var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+                    var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
-            if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-			if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-			                var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
+                    if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                        var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
+                        var ctx = service.getServerConfigContext();
+                        var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+                        TenantAxisUtils.setTenantAccessed(domainName, ctx);
+                    }
 
-                            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                                var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
-                                var ctx = service.getServerConfigContext();
-                                var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-                                TenantAxisUtils.setTenantAccessed(domainName, ctx);
-                            }
+                    jagg.setUser({username: sessionObj.loggedInUser});
+                    var tenantId = carbon.server.tenantId({
+                        domain: domainName
+                    });
 
-                    		jagg.setUser({username:sessionObj.loggedInUser});
-                var tenantId = carbon.server.tenantId({
-                                                          domain: domainName
-                                                      });
+                    session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                    session.put("Loged", "true");
+                    session.put("tenantId", tenantId);
+                    log.info(stringify(sessionObj.loggedInUser));
 
-                session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                session.put("Loged", "true");
-                session.put("tenantId", tenantId);
-                log.info(stringify(sessionObj.loggedInUser));
+                    //sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
 
-                        	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
+                    var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+                    var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
+                    var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
+                    var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
+                    commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
+                            commonUtil.getRootSystemRegistry(tenantId));
 
-                        	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-                            var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
-				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
-				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
-				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
-                                                          commonUtil.getRootSystemRegistry(tenantId));
+                    log.debug("session index :: " + sessionObj.sessionIndex);
+                    log.debug("session :: " + sessionObj.sessionId);
+                    log.debug("real session :: " + session.getId());
 
-                        	log.debug("session index :: " + sessionObj.sessionIndex);
-                        	log.debug("session :: " + sessionObj.sessionId);
-				log.debug("real session :: " + session.getId());
+                    //sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
+                    sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                    username = username + "";
+                    var username = sessionObj.loggedInUser;
+                    var role = require('/modules/role.js').checkeRole(username, session);
 
-				//sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
-				sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
-                        	username = username + "";
-                        	var username = sessionObj.loggedInUser;
-                       		var role = require('/modules/role.js').checkeRole(username, session);
+                    if (role) {
+                        auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
+                        var user = require('store').user;
+                        log.debug('user is set :::' + sessionObj.loggedInUser);
+                        response.sendRedirect(contextPath);
 
-                        	if(role){
-                                auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
-                        		var user = require('store').user;
-					log.debug('user is set :::' + sessionObj.loggedInUser);
-                                response.sendRedirect(contextPath);
+                    } else {
+                        log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the publisher application.Make sure the user has the publisher role.');
+                        response.sendError(403, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                    }
 
-                        	} else {
-					log.warn('User '+sessionObj.loggedInUser+' does not have permission to access the publisher application.Make sure the user has the publisher role.');
-					response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
-                        	}
-
-                   	}
                 }
+            } else {
+                response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
             }
 
         } else {
@@ -110,8 +201,8 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
         var index = sso.client.decodeSAMLLogoutRequest(sso.client.getSamlObject(samlRequest));
         var jSessionId = application.get('sso_sessions')[index];
         delete application.get('sso_sessions')[index];
-	log.debug('portal Session Id :::' + jSessionId);
-	session.invalidate();
+        log.debug('portal Session Id :::' + jSessionId);
+        session.invalidate();
     }
 }());
 %>
