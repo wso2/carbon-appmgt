@@ -494,7 +494,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         auditLog.writeLog(tenantId, username, "LifecycleActionPerformed-"+action, appType, "{" +
                                                                "providerName='" + attributes["overview_provider"] + '\''
                                                                +
-                                                               ", apiName='" + attributes["overview_name"] + '\'' +
+                                                               ", appName='" + attributes["overview_name"] + '\'' +
                                                                ", version='" + attributes["overview_version"] + '\'' +
                                                                '}' + "" + "");
         // everything went great
