@@ -65,6 +65,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 session.put("tenantId", tenantId);
                 log.info(stringify(sessionObj.loggedInUser));
 
+
                         	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
 
                         	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
@@ -88,6 +89,26 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                                 auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
                         		var user = require('store').user;
 					log.debug('user is set :::' + sessionObj.loggedInUser);
+
+
+                                //Retrieve a cookie which authenticate IDP and add to session.
+                                // This will be used in Service provider/XACML policies related IDP admin services for
+                                // authentication
+                                var ws = require("ws");
+                                var requestIDP = new ws.WSRequest();
+                                var options = new Array();
+                                options.useSOAP = 1.2;
+                                options.action = "urn:login";
+                                var manager = jagg.module("manager");
+                                var endPoint = manager.getAuthServerURL() + "/services/SAML2SSOAuthenticationService";
+                                var payload = '<sso:login xmlns:sso="http://sso.saml2.authenticator.identity.carbon.wso2.org"><sso:authDto><xsd:response xmlns:xsd="http://dto.sso.saml2.authenticator.identity.carbon.wso2.org/xsd">'
+                                              + samlResponse + '</xsd:response></sso:authDto></sso:login>';
+                                requestIDP.open(options, endPoint, false);
+                                requestIDP.send(payload);
+                                var responseIDP = requestIDP.responseE4X;
+                                var adminSession = requestIDP.getResponseHeader("Set-Cookie");
+                                session.put("idp-auth-cookie", adminSession);
+
                                 response.sendRedirect(contextPath);
 
                         	} else {
@@ -98,6 +119,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                    	}
                 }
             }
+
 
         } else {
             session.invalidate();
