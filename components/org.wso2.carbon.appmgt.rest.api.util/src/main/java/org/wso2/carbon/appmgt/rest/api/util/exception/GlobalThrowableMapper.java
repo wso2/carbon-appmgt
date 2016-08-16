@@ -156,7 +156,7 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         //unknown exception log and return
         errorMessage = "An Unknown exception has been captured by global exception mapper.";
-        logError(errorMessage, e);
+        log.error(errorMessage, e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Content-Type", "application/json")
                 .entity(e500).build();
     }
