@@ -1923,7 +1923,12 @@ public class DefaultAppRepository implements AppRepository {
 
                 // Set the database ID of the relevant policy group.
                 // The URL templates to be persisted, maintain the relationship to the policy groups using the indexes of the policy groups list.
-                int policyGroupId = uriTemplate.getPolicyGroup().getPolicyGroupId();
+                int policyGroupId;
+                if (uriTemplate.getPolicyGroup() != null ) {
+                    policyGroupId = uriTemplate.getPolicyGroup().getPolicyGroupId();
+                } else {
+                    policyGroupId = uriTemplate.getPolicyGroupId();
+                }
                 if(policyGroupId <= 0){
                     policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
                     uriTemplate.setPolicyGroupId(policyGroupId);
