@@ -74,7 +74,13 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         this.authenticationStep = configuration.get(AUTHENTICATION_STEP);
 
         try {
-            cookie = login();
+
+            cookie = configuration.get(SSOConfiguratorUtil.SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY);
+
+            if(cookie == null){
+                cookie = login();
+            }
+
             String serviceURL = backendServerURL + "/services/IdentitySAMLSSOConfigService";
             ssoStub = new IdentitySAMLSSOConfigServiceStub(serviceURL);
             ServiceClient client = ssoStub._getServiceClient();

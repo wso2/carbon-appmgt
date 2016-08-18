@@ -1931,9 +1931,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Delete applicatoion
      * @param identifier AppIdentifier
      * @param ssoProvider SSO provider
+     * @param cookieForAdminServices The cookie which was generated from the SAML assertion.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
+    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider, String cookieForAdminService) throws
                                                                                 AppManagementException {
 
         SSOConfiguratorUtil ssoConfiguratorUtil;
@@ -1959,7 +1960,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Removing the SSO Provider with name : " + ssoProvider.getProviderName());
                 }
                 ssoConfiguratorUtil = new SSOConfiguratorUtil();
-                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider);
+
+                Map<String, String> serviceConfigs = new HashMap<String, String>();
+                serviceConfigs.put(SSOConfiguratorUtil.SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, cookieForAdminService);
+
+                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider, serviceConfigs);
             }
 
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);

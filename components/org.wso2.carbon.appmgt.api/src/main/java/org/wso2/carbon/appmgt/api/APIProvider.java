@@ -588,9 +588,10 @@ public interface APIProvider extends APIManager {
      *
      * @param identifier APIIdentifier
      * @param ssoProvider SSOProvider
+     * @param cookieForAdminServices The cookie which was generated from the SAML assertion.
      * @throws AppManagementException if failed to remove the WebApp
      */
-    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
+    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider, String cookieForAdminServices) throws
                                                                                 AppManagementException;
 
     /**

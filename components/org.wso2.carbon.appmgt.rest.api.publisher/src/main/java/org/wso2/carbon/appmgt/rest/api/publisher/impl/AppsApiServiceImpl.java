@@ -645,7 +645,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 if (webApp.isAdvertiseOnly()) {
                     removeRegistryArtifact(webApp, username);
                 } else {
-                    apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails());
+                    apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails(), null);
                 }
             } else if (appType.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
                 removeRegistryArtifact(app, username);

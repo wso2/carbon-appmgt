@@ -37,10 +37,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.util.List;
+import java.util.Map;
 
 public class SSOConfiguratorUtil {
 
     private static Log log = LogFactory.getLog(SSOConfiguratorUtil.class);
+
+    public static final String SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY = "adminServiceCookie";
 
     /**
      * Create or update SSO Provider for a given application
@@ -48,7 +51,7 @@ public class SSOConfiguratorUtil {
      * @param app application object
      * @param update isToUpdate
      */
-    public static void createSSOProvider(WebApp app, boolean update) {
+    public static void createSSOProvider(WebApp app, boolean update, Map<String, String> serviceConfigs) {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -61,7 +64,15 @@ public class SSOConfiguratorUtil {
 
         try {
             SSOConfigurator configurator = (SSOConfigurator) Class.forName(ssoEnvironment.getProviderClass()).newInstance();
-            configurator.init(ssoEnvironment.getParameters());
+
+            Map<String, String> configuratorConfig = ssoEnvironment.getParameters();
+
+            // If there is a an http cookie given in the service configs, add it as a configuration to the configurator.
+            if(serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY) != null){
+                configuratorConfig.put(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY));
+            }
+
+            configurator.init(configuratorConfig);
 
             if (update) {
                 if(configurator.updateProvider(app)) {
@@ -212,7 +223,7 @@ public class SSOConfiguratorUtil {
      *
      * @param ssoProvider SSOProvider Object
      */
-    public void deleteSSOProvider(SSOProvider ssoProvider) throws AppManagementException {
+    public void deleteSSOProvider(SSOProvider ssoProvider, Map<String, String> serviceConfigs) throws AppManagementException {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -229,7 +240,15 @@ public class SSOConfiguratorUtil {
         try {
             //Initialize SSOConfigurator
             configurator = (SSOConfigurator) Class.forName(ssoEnvironment.getProviderClass()).newInstance();
-            configurator.init(ssoEnvironment.getParameters());
+
+            Map<String, String> configuratorConfig = ssoEnvironment.getParameters();
+
+            // If there is a an http cookie given in the service configs, add it as a configuration to the configurator.
+            if(serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY) != null){
+                configuratorConfig.put(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY));
+            }
+
+            configurator.init(configuratorConfig);
 
             //Remove SSOProvider if available
             if(configurator.getProvider(ssoProvider.getIssuerName())!=null) {

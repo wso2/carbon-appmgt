@@ -3217,7 +3217,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static boolean jsFunction_deleteApp(Context context, Scriptable thisObj,
                                                Object[] args,
                                                Function funObj) throws AppManagementException {
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[2] == null) {
@@ -3241,7 +3241,10 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
             APIProvider appProvider = getAPIProvider(thisObj);
-            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider);
+
+            String cookieForAdminServices = (String)args[3];
+
+            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider, cookieForAdminServices);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();

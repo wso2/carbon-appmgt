@@ -349,10 +349,10 @@ require('/modules/publisher.js').exec(function(ctx) {
                     if (isAdvertiseOnly.toLowerCase() == "true") {
                         isDeleted = removeArtifactOnly(shortName, id);
                     } else {
-                        isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                        isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj, session.get("idp-auth-cookie"));
                     }
                 } else {
-                    isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                    isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj, session.get("idp-auth-cookie"));
                 }
 
                 response.contentType = CONTENT_TYPE_JSON;

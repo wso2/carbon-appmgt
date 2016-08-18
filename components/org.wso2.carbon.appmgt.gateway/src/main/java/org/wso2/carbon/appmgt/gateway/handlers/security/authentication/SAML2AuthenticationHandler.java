@@ -56,6 +56,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
@@ -292,8 +293,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             // Validate the signature if there is any.
             String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
 
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            if(!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+                responseSigningKeyAlias = tenantDomain;
+            }
+
             // User the certificate of the super tenant since the responses are signed by the super tenant.
-            Credential certificate = GatewayUtils.getIDPCertificate("carbon.super", responseSigningKeyAlias);
+            Credential certificate = GatewayUtils.getIDPCertificate(tenantDomain, responseSigningKeyAlias);
             
             boolean isValidSignature = idpMessage.validateSignature(certificate);
             if(!isValidSignature){
