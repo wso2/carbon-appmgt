@@ -143,8 +143,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             return Response.ok().entity(response.toString()).build();
 
-        } catch (AppManagementException | MobileApplicationException e) {
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
@@ -618,8 +620,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             return Response.ok().entity(response.toString()).build();
 
-        } catch (AppManagementException | MobileApplicationException e) {
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store related Error occurred while uninstalling", e, log);
         } catch (JSONException e) {
@@ -1353,8 +1357,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-        } catch (AppManagementException | MobileApplicationException e) {
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
@@ -1568,8 +1576,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-        } catch (AppManagementException | MobileApplicationException e) {
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
