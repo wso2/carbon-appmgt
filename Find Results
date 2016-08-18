@@ -1,0 +1,44 @@
+Searching 1 file for "SNAPSHOT"
+
+/Users/chatura/Development/WSO2/EMM/GIT/carbon-appmgt/pom.xml:
+    5    <artifactId>carbon-appmgt</artifactId>
+    6    <packaging>pom</packaging>
+    7:   <version>1.1.5-SNAPSHOT</version>
+    8    <name>WSO2 Carbon - App Management Aggregator Pom</name>
+    9    <url>http://wso2.org</url>
+   ..
+  131      </repository>
+  132      <repository>
+  133:       <id>wso2.snapshots</id>
+  134:       <name>WSO2 Snapshot Repository</name>
+  135:       <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+  136:       <snapshots>
+  137          <enabled>true</enabled>
+  138          <updatePolicy>daily</updatePolicy>
+  139:       </snapshots>
+  140        <releases>
+  141          <enabled>false</enabled>
+  ...
+  166      </pluginRepository>
+  167      <pluginRepository>
+  168:       <id>wso2.snapshots</id>
+  169:       <name>WSO2 Snapshot Repository</name>
+  170:       <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+  171:       <snapshots>
+  172          <enabled>true</enabled>
+  173          <updatePolicy>daily</updatePolicy>
+  174:       </snapshots>
+  175        <releases>
+  176          <enabled>false</enabled>
+  ...
+  713  
+  714      <!-- AppM Component Version -->
+  715:     <carbon.appmgt.version>1.1.5-SNAPSHOT</carbon.appmgt.version>
+  716      <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
+  717      <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
+  718  
+  719:     <carbon.device.mgt.version>1.1.2</carbon.device.mgt.version>
+  720      <carbon.device.mgt.version.range>[0.8.0, 2.0.0)</carbon.device.mgt.version.range>
+  721  
+
+13 matches in 1 file
