@@ -1039,7 +1039,6 @@ public class DefaultAppRepository implements AppRepository {
         sourceApp.setUUID(null);
 
         // Set New Version.
-
         sourceApp.setOriginVersion(sourceApp.getId().getVersion());
         sourceApp.setVersion(targetApp.getId().getVersion());
         sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
@@ -1062,6 +1061,11 @@ public class DefaultAppRepository implements AppRepository {
         // Set the other properties accordingly.
         sourceApp.setDisplayName(targetApp.getDisplayName());
         sourceApp.setCreatedTime(String.valueOf(new Date().getTime()));
+
+        //Set the new Saml2SsoIssuer
+        String issuerName = buildIssuerName(new APIIdentifier(sourceApp.getId().getProviderName(),
+                sourceApp.getId().getApiName(), targetApp.getId().getVersion()));
+        sourceApp.setSaml2SsoIssuer(issuerName);
 
         saveApp(sourceApp);
 
@@ -1477,9 +1481,11 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(
                 webApp.isDefaultVersion()));
-        artifact.setAttribute(AppMConstants.APP_SSO_SSO_PROVIDER, String.valueOf(
-                webApp.getSsoProviderDetails().getProviderName() + "-" +
-                        webApp.getSsoProviderDetails().getProviderVersion()));
+        if (webApp.getSsoProviderDetails() != null) {
+            artifact.setAttribute(AppMConstants.APP_SSO_SSO_PROVIDER, String.valueOf(
+                    webApp.getSsoProviderDetails().getProviderName() + "-" +
+                            webApp.getSsoProviderDetails().getProviderVersion()));
+        }
         artifact.setAttribute(AppMConstants.APP_SSO_SAML2_SSO_ISSUER, webApp.getSaml2SsoIssuer());
 
         if(webApp.getOriginVersion() != null){
@@ -1917,7 +1923,7 @@ public class DefaultAppRepository implements AppRepository {
 
                 // Set the database ID of the relevant policy group.
                 // The URL templates to be persisted, maintain the relationship to the policy groups using the indexes of the policy groups list.
-                int policyGroupId = uriTemplate.getPolicyGroupId();
+                int policyGroupId = uriTemplate.getPolicyGroup().getPolicyGroupId();
                 if(policyGroupId <= 0){
                     policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
                     uriTemplate.setPolicyGroupId(policyGroupId);
@@ -1952,15 +1958,7 @@ public class DefaultAppRepository implements AppRepository {
 
         // Build the issuer name.
         APIIdentifier appIdentifier = app.getId();
-        String tenantDomain = getTenantDomainOfCurrentUser();
-
-        String issuerName = null;
-        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
-        } else {
-            issuerName = appIdentifier.getApiName() + "-" + tenantDomain + "-" + appIdentifier.getVersion();
-        }
-
+        String issuerName = buildIssuerName(appIdentifier);
         ssoProvider.setIssuerName(issuerName);
 
         // Set the logout URL
@@ -1970,6 +1968,18 @@ public class DefaultAppRepository implements AppRepository {
 
         SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
         ssoConfiguratorUtil.createSSOProvider(app, false);
+    }
+
+    private String buildIssuerName(APIIdentifier appIdentifier) {
+        String tenantDomain = getTenantDomainOfCurrentUser();
+
+        String issuerName = null;
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
+        } else {
+            issuerName = appIdentifier.getApiName() + "-" + tenantDomain + "-" + appIdentifier.getVersion();
+        }
+        return issuerName;
     }
 
     private int persistSubscription(Connection connection, WebApp webApp, int applicationId, String subscriptionType,
