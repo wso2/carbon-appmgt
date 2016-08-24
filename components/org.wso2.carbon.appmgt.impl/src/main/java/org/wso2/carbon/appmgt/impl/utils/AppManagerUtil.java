@@ -3771,9 +3771,71 @@ public final class AppManagerUtil {
 		return null;
 	}
 
-    public static void loadTenantConf(int tenantID) throws AppManagementException {
+    /**
+     * @param tenantID
+     * @throws AppManagementException
+     * @deprecated Use the method 'createTenantConfInRegistry' instead of this method.
+     *
+     * TODO : Merge the configuration files created in this method, with the unified tenant configuration file. See the method "createTenantConfInRegistry()"
+     *
+     *
+     */
+    @Deprecated
+    public static void createTenantSpecificConfigurationFilesInRegistry(int tenantID) throws AppManagementException {
         loadOAuthScopeRoleMapping(tenantID);
         loadCustomAppPropertyDefinitions(tenantID);
+    }
+
+    /**
+     *
+     * Creates the tenant specific master configuration file in the tenant registry.
+     *
+     * @param tenantID
+     * @throws AppManagementException
+     */
+    public static void createTenantConfInRegistry(int tenantID) throws AppManagementException{
+
+        RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
+        try {
+
+            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            String tenantConfRegistryPath = AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + AppMConstants.TENANT_CONF_FILENAME;
+
+            if(!registry.resourceExists(tenantConfRegistryPath)){
+
+                String tenantConfFilePath = CarbonUtils.getCarbonHome() + File.separator +
+                                                AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                                                AppMConstants.TENANT_CONF_FILENAME;
+
+                File tenantConfFile = new File(tenantConfFilePath);
+
+                byte[] data;
+
+                if (tenantConfFile.exists()) {
+                    FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
+                    data = IOUtils.toByteArray(fileInputStream);
+
+                    Resource resource = registry.newResource();
+                    resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+                    resource.setContent(data);
+
+                    registry.put(tenantConfRegistryPath, resource);
+
+                    log.debug(String.format("Added tenant configuration for the tenant %d to the tenant registry (%s) ", tenantID, tenantConfRegistryPath));
+
+                }else{
+                    String tenantConfFileRelativePath = String.format("CARBON_SERVER/%s/%s", AppMConstants.RESOURCE_FOLDER_LOCATION, AppMConstants.TENANT_CONF_FILENAME);
+                    log.warn(String.format("Can't find tenant configuration file ('%s') to be added to the registry of the tenant (tenant id - %d)", tenantConfFileRelativePath, tenantID));
+                }
+            }
+
+        } catch (RegistryException e) {
+            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+        } catch (IOException e) {
+            throw new AppManagementException("Error while reading tenant conf file content", e);
+        }
+
     }
 
     private static void loadCustomAppPropertyDefinitions(int tenantID) throws AppManagementException {
