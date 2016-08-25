@@ -356,6 +356,14 @@ public final class AppMConstants {
         public static final String APP_WORKFLOWADMIN = "/permission/admin/manage/appm/workflowadmin";
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
+
+        public static final String XACML_POLICY_ADD = "/permission/admin/configure/entitlement/policy/manage/add";
+        public static final String XACML_POLICY_DELETE = "/permission/admin/configure/entitlement/policy/manage/delete";
+        public static final String XACML_POLICY_EDIT = "/permission/admin/configure/entitlement/policy/manage/edit";
+        public static final String XACML_POLICY_ENABLE = "/permission/admin/configure/entitlement/policy/manage/enable";
+        public static final String XACML_POLICY_PUBLISH = "/permission/admin/configure/entitlement/policy/publish";
+        public static final String XACML_POLICY_VIEW = "/permission/admin/configure/entitlement/policy/view";
+
     }
 
     public static final String SEARCH_CONTENT_NAME = "name";
@@ -766,6 +774,8 @@ public final class AppMConstants {
     public static final String STATE_APPROVE ="Approve";
     public static final String STATE_PUBLISH ="Publish";
     public static final String APP_STORE_GET_UUID_URL ="/api/asset/get/uuid/webapp/";
+
+    public static final String IDP_AUTH_ADMIN_COOKIE = "idp-auth-cookie";
 
     public  static class MediaType {
         public static final String WEB_APP = "application/vnd.wso2-webapp+xml";

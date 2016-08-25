@@ -57,8 +57,11 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.authenticator.saml2.sso.stub.SAML2SSOAuthenticationServiceStub;
+import org.wso2.carbon.identity.authenticator.saml2.sso.stub.types.AuthnReqDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,6 +290,22 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if(idpMessage.getSAMLResponse() == null && idpMessage.getSAMLRequest() == null){
                 String errorMessage = String.format("A SAML request or response was not there in the request to the ACS URL ('%s')", fullResourceURL);
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
+            }
+
+            if (idpMessage.getRawSAMLResponse() != null) {
+                //pass saml response and request for an authorized cookie to access admin services
+                String authorizedAdminCookie = authenticateWithSAML2Response(idpMessage.getRawSAMLResponse());
+                if (authorizedAdminCookie == null) {
+                    String errorMessage = String.format(
+                            "Error while requesting the authorized cookie to access IDP admin services via " +
+                                    "SAML2SSOAuthenticationService");
+                    GatewayUtils.logAndThrowException(log, errorMessage, null);
+                }
+                //add to session
+                if (session.getAttribute(AppMConstants.IDP_AUTH_ADMIN_COOKIE) == null) {
+                    session.addAttribute(AppMConstants.IDP_AUTH_ADMIN_COOKIE, authorizedAdminCookie);
+                    SessionStore.getInstance().updateSession(session);
+                }
             }
 
             // Validate the signature if there is any.
@@ -564,5 +583,49 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
         return false;
+    }
+
+    /**
+     * Process the passed SAML response and returns an authorized cookie to access IDP admin services
+     *
+     * @param samlResponse
+     * @return Cookie to access IDP admin services
+     */
+    public String authenticateWithSAML2Response(String samlResponse) {
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfiguration();
+        String backendServerURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
+
+        SAML2SSOAuthenticationServiceStub stub = null;
+        try {
+            stub = new SAML2SSOAuthenticationServiceStub(null,
+                                                         backendServerURL + "/services/SAML2SSOAuthenticationService");
+            AuthnReqDTO authnReqDTO = new AuthnReqDTO();
+            authnReqDTO.setResponse(samlResponse);
+            boolean loggedIn = stub.login(authnReqDTO);
+            String cookie;
+            if (loggedIn) {
+                cookie = (String) stub._getServiceClient().getServiceContext().getProperty(HTTPConstants.COOKIE_STRING);
+                if (log.isDebugEnabled()) {
+                    log.debug("Logged in Cookie : " + cookie);
+                }
+                return cookie;
+            } else {
+                String errorMessage = "Login failure";
+                GatewayUtils.logAndThrowException(log, errorMessage, null);
+            }
+        } catch (RemoteException e) {
+            String errorMessage = "Registry Exception while initializing service";
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } finally {
+            if (stub != null) {
+                try {
+                    stub.cleanup();
+                } catch (RemoteException e) {
+                    log.error("Error while cleaning up SAML2SSOAuthenticationServiceStub", e);
+                }
+            }
+        }
+        return null;
     }
 }

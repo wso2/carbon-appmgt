@@ -125,7 +125,8 @@ function updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
             "anonymousAccessToUrlPattern": anonymousAccessToUrlPattern,
             "policyGroupId": editedPolicyGroup,
             "objPartialMappings": JSON.stringify(objPartialMappings),
-            "policyGroupDesc" :policyGroupDesc
+            "policyGroupDesc" :policyGroupDesc,
+            "authorizedAdminCookie":authorizedAdminCookie
         },
         success: function (data) {
             var policyPartialsMapping = [];
@@ -423,7 +424,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
         });
 
         $.ajax({
-            url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId,
+            url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId+ '/' +  session.get("idp-auth-cookie"),
             type: 'DELETE',
             success: function (data) {
                 //to remove index and value from policy array

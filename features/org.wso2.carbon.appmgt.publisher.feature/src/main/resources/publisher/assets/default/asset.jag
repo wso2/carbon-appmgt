@@ -480,7 +480,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             username = username + "@" + tenantDomain;
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
-            appMgtProviderObj.generateEntitlementPolicies(webappId);
+            var authorizedAdminCookie = session.get("idp-auth-cookie");
+            appMgtProviderObj.generateEntitlementPolicies(webappId, authorizedAdminCookie);
             var tenantAwareUserName =  jagg.getUser().username;
             if (oldVersion == null || oldVersion == '') {
                 auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +

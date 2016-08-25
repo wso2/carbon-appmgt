@@ -361,9 +361,12 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                         .getResponse();
             }
 
+            //todo: provide appropriate auth cookie
             //update policy
+            String authorizedAdminCookie = null;
             apiProvider.updateEntitlementPolicyPartial(policyPartialId, body.getPolicyPartial(), currentUser,
-                                                       body.getIsSharedPartial(), body.getPolicyPartialDesc());
+                                                       body.getIsSharedPartial(), body.getPolicyPartialDesc(),
+                                                       authorizedAdminCookie);
         } catch (AppManagementException e) {
             String errorMessage = "Error while updating XACML policy";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
