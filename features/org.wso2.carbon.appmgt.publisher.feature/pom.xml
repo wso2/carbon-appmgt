@@ -92,7 +92,7 @@
                             </importFeatures>
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon.commons:org.wso2.carbon.hostobjects.sso:${carbon.commons.version}</importBundleDef>
-
+                                <importBundleDef>org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.hostobjects:${carbon.apimgt.version}</importBundleDef>
                             </importBundles>
                         </configuration>
                     </execution>
