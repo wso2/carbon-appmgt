@@ -424,7 +424,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
         });
 
         $.ajax({
-            url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId+ '/' +  session.get("idp-auth-cookie"),
+            url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId+ '/' +  session.get("idp-authenticated-cookie"),
             type: 'DELETE',
             success: function (data) {
                 //to remove index and value from policy array

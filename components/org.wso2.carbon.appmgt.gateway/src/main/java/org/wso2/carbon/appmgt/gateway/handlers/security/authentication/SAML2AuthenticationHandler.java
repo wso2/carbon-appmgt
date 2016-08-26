@@ -294,16 +294,16 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             if (idpMessage.getRawSAMLResponse() != null) {
                 //pass saml response and request for an authorized cookie to access admin services
-                String authorizedAdminCookie = authenticateWithSAML2Response(idpMessage.getRawSAMLResponse());
+                String authorizedAdminCookie = getAuthenticatedCookieFromIdP(idpMessage.getRawSAMLResponse());
                 if (authorizedAdminCookie == null) {
-                    String errorMessage = String.format(
+                    String errorMessage =
                             "Error while requesting the authorized cookie to access IDP admin services via " +
-                                    "SAML2SSOAuthenticationService");
+                                    "SAML2SSOAuthenticationService";
                     GatewayUtils.logAndThrowException(log, errorMessage, null);
                 }
                 //add to session
-                if (session.getAttribute(AppMConstants.IDP_AUTH_ADMIN_COOKIE) == null) {
-                    session.addAttribute(AppMConstants.IDP_AUTH_ADMIN_COOKIE, authorizedAdminCookie);
+                if (session.getAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE) == null) {
+                    session.addAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE, authorizedAdminCookie);
                     SessionStore.getInstance().updateSession(session);
                 }
             }
@@ -586,15 +586,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     /**
-     * Process the passed SAML response and returns an authorized cookie to access IDP admin services
+     * Pass THE SAML response and returns an authorized cookie to access IDP admin services
      *
      * @param samlResponse
      * @return Cookie to access IDP admin services
      */
-    public String authenticateWithSAML2Response(String samlResponse) {
+    private String getAuthenticatedCookieFromIdP(String samlResponse) {
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfiguration();
-        String backendServerURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
+        String backendServerURL = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
 
         SAML2SSOAuthenticationServiceStub stub = null;
         try {
@@ -607,15 +607,17 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if (loggedIn) {
                 cookie = (String) stub._getServiceClient().getServiceContext().getProperty(HTTPConstants.COOKIE_STRING);
                 if (log.isDebugEnabled()) {
-                    log.debug("Logged in Cookie : " + cookie);
+                    log.debug("IdP authenticated cookie successfully retrieved via SAML2SSOAuthenticationService");
                 }
                 return cookie;
             } else {
-                String errorMessage = "Login failure";
+                String errorMessage =
+                        "Login failed to IdP while tying to get the authenticated cookie via " +
+                                "SAML2SSOAuthenticationService";
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
         } catch (RemoteException e) {
-            String errorMessage = "Registry Exception while initializing service";
+            String errorMessage = "Backend Server Remote Exception while initializing service";
             GatewayUtils.logAndThrowException(log, errorMessage, e);
         } finally {
             if (stub != null) {

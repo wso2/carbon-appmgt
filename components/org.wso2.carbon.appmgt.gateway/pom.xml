@@ -105,7 +105,6 @@
         <dependency>
             <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.authenticator.saml2.sso.stub</artifactId>
-            <version>5.0.7</version>
         </dependency>
 
     </dependencies>

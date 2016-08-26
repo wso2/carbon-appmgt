@@ -731,6 +731,11 @@
         <artifactId>org.wso2.carbon.databridge.commons.server</artifactId>
         <version>${carbon.analytics-common.version}</version>
       </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.authenticator.saml2.sso.stub</artifactId>
+            <version>${carbon-identity-authenticator-saml2-stub-version}</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -847,6 +852,7 @@
     <identity-user-ws.version>5.1.1</identity-user-ws.version>
     <identity-agent-entitlement-proxy.version>5.1.2-SNAPSHOT</identity-agent-entitlement-proxy.version>
     <carbon.identity.pkg.version>[5.1.0, 6.0.0)</carbon.identity.pkg.version>
+    <carbon-identity-authenticator-saml2-stub-version>5.0.7</carbon-identity-authenticator-saml2-stub-version>
 
     <!-- Registry -->
     <governance.registry.extensions.imp.pkg.version>[4.5.8,4.6.0)</governance.registry.extensions.imp.pkg.version>

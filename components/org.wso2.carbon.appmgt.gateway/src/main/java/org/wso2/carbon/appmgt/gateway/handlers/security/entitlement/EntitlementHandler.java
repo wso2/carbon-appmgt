@@ -120,8 +120,9 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 			GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Applying XACML policy '%s'", applicablePolicyId));
     		
     		EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
-    		return isResourcePermitted(entitlementDecisionRequest, messageContext);
-    	}
+            Session session = GatewayUtils.getSession(messageContext);
+            return isResourcePermitted(entitlementDecisionRequest, session);
+        }
     }
 
     private List<String> getApplicableEntitlementPolicyIds(MessageContext messageContext) throws AppManagementException {
@@ -133,8 +134,8 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedURITemplate.getUriTemplate(), matchedURITemplate.getHTTPVerb());
 	}
 
-	private boolean isResourcePermitted(EntitlementDecisionRequest request, MessageContext messageContext) throws AppManagementException {
-        EntitlementService entitlementService = getEntitlementService(messageContext);
+	private boolean isResourcePermitted(EntitlementDecisionRequest request, Session session) throws AppManagementException {
+        EntitlementService entitlementService = getEntitlementService(session);
         return entitlementService.isPermitted(request);
     }
 
@@ -170,9 +171,8 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      * Service endpoint is not available when init is called.
      * @return
      */
-    private EntitlementService getEntitlementService(MessageContext messageContext) throws AppManagementException {
-        Session session = GatewayUtils.getSession(messageContext);
-        String authorizedAdminCookie = (String) session.getAttribute(AppMConstants.IDP_AUTH_ADMIN_COOKIE);
+    private EntitlementService getEntitlementService(Session session) throws AppManagementException {
+        String authorizedAdminCookie = (String) session.getAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE);
         return EntitlementServiceFactory.getEntitlementService(configuration, authorizedAdminCookie);
     }
 }

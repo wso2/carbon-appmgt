@@ -777,7 +777,7 @@ public final class AppMConstants {
     public static final String STATE_PUBLISH ="Publish";
     public static final String APP_STORE_GET_UUID_URL ="/api/asset/get/uuid/webapp/";
 
-    public static final String IDP_AUTH_ADMIN_COOKIE = "idp-auth-cookie";
+    public static final String IDP_AUTHENTICATED_COOKIE = "idp-authenticated-cookie";
 
     public  static class MediaType {
         public static final String WEB_APP = "application/vnd.wso2-webapp+xml";

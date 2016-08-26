@@ -1247,7 +1247,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args[0] == null) {
             handleException("Error while validating policy partial. The policy partial content is null");
         }
-        String policyPartial = args[0].toString();;
+        String policyPartial = args[0].toString();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.validateEntitlementPolicyPartial(policyPartial);

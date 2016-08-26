@@ -343,7 +343,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
-                var authorizedAdminCookie = session.get("idp-auth-cookie");
+                var authorizedAdminCookie = session.get("idp-authenticated-cookie");
                 var isAdvertiseOnly = attributes["overview_advertiseOnly"];
                 if (isAdvertiseOnly != null) {
                     isAdvertiseOnly = isAdvertiseOnly.trim();
@@ -685,7 +685,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             artifactManager.update(artifact);
 
             // dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
-            var authorizedAdminCookie = session.get("idp-auth-cookie");
+            var authorizedAdminCookie = session.get("idp-authenticated-cookie");
             var update = apiProvider.updateAPI(artifact, authorizedAdminCookie);
 
             var attributes = artifact.attributes;
@@ -805,7 +805,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         webappId.name= overviewName;
         webappId.version= overviewVersion;
 
-        var authorizedAdminCookie = session.get("idp-auth-cookie");
+        var authorizedAdminCookie = session.get("idp-authenticated-cookie");
         apiProvider.generateEntitlementPolicies(webappId, authorizedAdminCookie);
     }
 
