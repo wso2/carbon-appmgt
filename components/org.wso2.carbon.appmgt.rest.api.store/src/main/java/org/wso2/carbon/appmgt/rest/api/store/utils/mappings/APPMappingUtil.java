@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.store.utils.mappings;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -59,6 +60,8 @@ import java.util.Set;
 public class APPMappingUtil {
 
     private static final Log log = LogFactory.getLog(APPMappingUtil.class);
+    private final static String treatAsSiteTrue = "TREATASASITE:TRUE";
+    private final static String treatAsSiteFalse = "TREATASASITE:FALSE";
 
     /**
      * Converts a List object of Apps into a DTO
@@ -567,5 +570,28 @@ public class APPMappingUtil {
         }
     }
 
+    public static String buildQuery(String appType, String query) {
+        if (AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) {
+            if (StringUtils.isNotEmpty(query)) {
+                return query + "," + treatAsSiteTrue;
+            } else {
+                return treatAsSiteTrue;
+            }
+        } else if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)) {
+            if (StringUtils.isNotEmpty(query)) {
+                return query + "," + treatAsSiteFalse;
+            } else {
+                return treatAsSiteFalse;
+            }
+        }
+        return "";
+    }
 
+    public static String updateAssetType(String appType) {
+        if (AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType))) {
+            return AppMConstants.WEBAPP_ASSET_TYPE;
+        }
+        return appType;
+    }
 }

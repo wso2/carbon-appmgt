@@ -235,6 +235,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     fileContent.setFileName(filename);
                     fileContent.setContent(fileInputStream);
+                    fileContent.setContentType(fileDetail.getContentType().toString());
                     if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
                         RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         response.put("id", filename);
@@ -244,7 +245,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                             UUID contentUUID = UUID.randomUUID();
                             fileContent.setUuid(contentUUID.toString());
                             fileContent.setContentLength(fileInputStream.available());
-                            fileContent.setContentType(fileDetail.getContentType().toString());
                             defaultAppRepository.persistStaticContents(fileContent);
                             response.put("id", contentUUID.toString() + File.separator + filename);
                         } catch (IOException e) {
