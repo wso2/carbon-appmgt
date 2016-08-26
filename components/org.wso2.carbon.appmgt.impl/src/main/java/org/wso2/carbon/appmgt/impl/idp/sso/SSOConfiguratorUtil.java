@@ -305,6 +305,33 @@ public class SSOConfiguratorUtil {
         return getGatewayUrl(webApp) + acsURLPostfix;
     }
 
+    public static boolean isResponseSigningEnabled() {
+
+        String responseSigningEnabled = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_ENABLE_RESPONSE_SIGNING);
+
+        /*responseSigningEnabled can be null, when element is not present in the app-manager.xml.
+         For backward compatibility reason, we need to handle null scenario.(AppManager-1.2.0 released with
+         response signing true without having a config option)
+         */
+        if (responseSigningEnabled == null) {
+            responseSigningEnabled = "true";
+        }
+
+        return Boolean.parseBoolean(responseSigningEnabled);
+    }
+
+    public static boolean isAssertionSigningEnabled() {
+
+        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_ENABLE_ASSERTION_SIGNING));
+    }
+
+    public static boolean isValidateAssertionValidityPeriod() {
+        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_VALIDATE_ASSERTION_EXPIRY));
+    }
+
     private static void handleException(String msg, Throwable t) throws AppManagementException {
         log.error(msg, t);
         throw new AppManagementException(msg, t);

@@ -456,6 +456,10 @@ public final class AppMConstants {
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
     public static final String SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS = SSO_CONFIGURATION + "ResponseSigningKeyAlias";
     public static final String SSO_CONFIGURATION_ACS_URL_POSTFIX = SSO_CONFIGURATION + "ACSURLPostfix";
+    public static final String SSO_CONFIGURATION_RESPONSE_VALIDITY_TIME_STAMP_SKEW = SSO_CONFIGURATION + "SAMLResponseValidityTimeStampSkew";
+    public static final String SSO_CONFIGURATION_ENABLE_RESPONSE_SIGNING = SSO_CONFIGURATION + "EnableResponseSigning";
+    public static final String SSO_CONFIGURATION_ENABLE_ASSERTION_SIGNING = SSO_CONFIGURATION + "EnableAssertionSigning";
+    public static final String SSO_CONFIGURATION_VALIDATE_ASSERTION_EXPIRY = SSO_CONFIGURATION + "ValidateAssertionExpiry";
     public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
     public static final String SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS = SSO_CONFIGURATION + "CreateServiceProviderForSkipGatewayApps";
     public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";

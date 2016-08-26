@@ -307,26 +307,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     SessionStore.getInstance().updateSession(session);
                 }
             }
-
-            // Validate the signature if there is any.
-            String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
-
-            // User the certificate of the super tenant since the responses are signed by the super tenant.
-            Credential certificate = GatewayUtils.getIDPCertificate("carbon.super", responseSigningKeyAlias);
-            
-            boolean isValidSignature = idpMessage.validateSignature(certificate);
-            if(!isValidSignature){
-                String errorMessage = String.format("The signature of the SAML message received by the ASC URL ('%s'), can't be validated.", fullResourceURL);
-                GatewayUtils.logAndThrowException(log, errorMessage, null);
-            }
-
-
         } catch (SAMLException e) {
             String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
-        } catch (IdentitySAML2SSOException e) {
-            String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
+            log.error(errorMessage);
+            if (log.isDebugEnabled()) { //Do not log the stack trace without checking isDebugEnabled, because log can be filled by SAML Response XSW attacks.
+                log.debug(errorMessage, e);
+            }
+            GatewayUtils.send401(messageContext, "Unauthorized SAML Response");
+            return false;
         }
 
         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));
@@ -344,12 +332,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             return false;
         } else{
 
-            if(idpMessage.isResponseValidityPeriodExpired()){
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, "The validity period of the SAML Response is expired.");
-                }
+            //Validate SAML response validity period
+            if (!idpMessage.validateAssertionValidityPeriod()) {
                 requestAuthentication(messageContext);
+                return false;
+            }
+
+            //Validate SAML response signature, assertion signature and audience restrictions
+            if(!idpMessage.validateSignatureAndAudienceRestriction(idpMessage.getSAMLResponse(), webApp, configuration)){
+                GatewayUtils.send401(messageContext, "Unauthorized SAML Response");
                 return false;
             }
 
@@ -599,7 +590,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         SAML2SSOAuthenticationServiceStub stub = null;
         try {
             stub = new SAML2SSOAuthenticationServiceStub(null,
-                                                         backendServerURL + "/services/SAML2SSOAuthenticationService");
+                    backendServerURL + "/services/SAML2SSOAuthenticationService");
             AuthnReqDTO authnReqDTO = new AuthnReqDTO();
             authnReqDTO.setResponse(samlResponse);
             boolean loggedIn = stub.login(authnReqDTO);
