@@ -115,7 +115,7 @@ public class IDPMessage {
     }
 
     /**
-     * Validate the SAML Response before continue with anything
+     * Validate SAML response signature, assertion signature and audiences.
      * @param samlResponse
      * @param webapp
      * @param configuration
@@ -176,7 +176,7 @@ public class IDPMessage {
     }
 
     /**
-     * Validate SAML Response signature
+     * Validate SAML Response signature.
      * @param credential
      * @return
      */
@@ -194,7 +194,7 @@ public class IDPMessage {
     }
 
     /**
-     * Validate SAML Response Assertion signature
+     * Validate SAML Assertion signature.
      * @param credential
      * @return
      */
@@ -253,7 +253,7 @@ public class IDPMessage {
     }
 
     /**
-     * Validates the 'Not Before' and 'Not On Or After' conditions of the SAML Assertion
+     * Validates the 'Not Before' and 'Not On Or After' conditions of the SAML Assertion.
      *
      */
     public boolean validateAssertionValidityPeriod() {
@@ -305,7 +305,7 @@ public class IDPMessage {
     }
 
     /**
-     * Validate the AudienceRestriction of SAML2 Response
+     * Validate the AudienceRestriction of SAML2 Response.
      *
      * @param assertion SAML2 Assertion
      * @param webApp Web App
