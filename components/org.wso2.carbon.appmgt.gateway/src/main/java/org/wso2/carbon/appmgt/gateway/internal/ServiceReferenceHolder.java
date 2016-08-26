@@ -20,6 +20,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.sequences.services.SequenceAdminService;
 
@@ -31,6 +32,7 @@ public class ServiceReferenceHolder {
     private AppManagerConfigurationService amConfigService;
     private TokenGenerator tokenGenerator;
     private SequenceAdminService sequenceAdminService;
+    private TenantConfigurationService tenantConfigurationService;
 
     private ServiceReferenceHolder() {
 
@@ -76,4 +78,11 @@ public class ServiceReferenceHolder {
         this.sequenceAdminService = sequenceAdminService;
     }
 
+    public void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        this.tenantConfigurationService = tenantConfigurationService;
+    }
+
+    public TenantConfigurationService getTenantConfigurationService() {
+        return tenantConfigurationService;
+    }
 }

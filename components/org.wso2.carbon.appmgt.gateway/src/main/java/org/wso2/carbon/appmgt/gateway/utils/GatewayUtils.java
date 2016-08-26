@@ -75,15 +75,36 @@ public class GatewayUtils {
     public static String getAppRootURL(MessageContext messageContext){
 
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        String servicePrefix = axis2MessageContext.getProperty("SERVICE_PREFIX").toString();
 
-        String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
-        String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-
-        URL serverRootURL = null;
         try {
-            serverRootURL = new URL(servicePrefix);
-            URL appRootURL = new URL(serverRootURL, String.format("%s/%s/", webAppContext, webAppVersion));
+
+            // SERVICE_PREFIX gives the URL of the root. e.g. https://192.168.0.1:8243
+
+            // WARNING : Service prefix always gives the IP address even if the request is made with a host name.
+            // So we should only get the protocol from the service prefix.
+
+            String servicePrefix = axis2MessageContext.getProperty("SERVICE_PREFIX").toString();
+            URL serverRootURL = new URL(servicePrefix);
+            String protocol = serverRootURL.getProtocol();
+
+            Map<String, String> headers = (Map<String, String>) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+            // As per the spec (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html) the HOST header can't be null.
+            // So a null check is not needed.
+            String hostHeaderValue = headers.get("HOST"); //e.g. wso2.com[:8280]
+            String[] hostNameAndPort = hostHeaderValue.split(":");
+
+            String hostName = hostNameAndPort[0];
+
+            int port = -1;
+            if(hostNameAndPort.length > 1){
+                port = Integer.parseInt(hostNameAndPort[1]);
+            }
+
+            String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
+            String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+
+            URL appRootURL = new URL(protocol, hostName, port, webAppContext + "/"  + webAppVersion + "/" );
             return appRootURL.toString();
         } catch (MalformedURLException e) {
             log.error("Error occurred while constructing the app root URL.", e);

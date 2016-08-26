@@ -59,7 +59,8 @@ require('/modules/store.js').exec(function (ctx) {
     //Get the store public visibility. Read the registry file store.json(tenanted) and get the value of publicVisibility
     var storePublicVisibility = store.getPublicVisibility();
     if (storePublicVisibility == null) {
-        log.warn('\'publicVisibility\' property has not been configured in the store.json config file');
+        storePublicVisibility = false;
+        log.warn('\'publicVisibility\' property has not been configured in the store.json config file. Use the default value as \'false\'');
     }
     var tagInfo = {};
 

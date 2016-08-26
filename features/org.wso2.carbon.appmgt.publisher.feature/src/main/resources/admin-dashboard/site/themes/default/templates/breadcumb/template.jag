@@ -54,12 +54,6 @@
                     </li>
 
                     <% } %>
-                    <% if(request.getParameter("task")=="cacheHitMiss"){%>
-                    <li>
-                    <a href="<%=listMappedUrl%>?task=cacheHitMiss" onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl%>',e:event})"><%=i18n.localize("cacheHitMissHeader")%></a>
-                    </li>
-
-                    <% } %>
 
                     <% if(request.getParameter("task")=="businessowners"){%>
                     <li>

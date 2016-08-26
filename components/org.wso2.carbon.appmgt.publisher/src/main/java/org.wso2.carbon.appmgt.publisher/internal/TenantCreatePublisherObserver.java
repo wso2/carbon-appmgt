@@ -22,6 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.config.ConfigurationException;
+import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
+import org.wso2.carbon.appmgt.impl.config.TenantConfigurationLoader;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.Permission;
@@ -53,11 +56,25 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
         }
 
         try {
-            AppManagerUtil.loadTenantConf(tenantId);
+            AppManagerUtil.createTenantSpecificConfigurationFilesInRegistry(tenantId);
         } catch (AppManagementException e) {
-            log.error(String.format("Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry", tenantDomain));
-            e.printStackTrace();
+            log.error(String.format("Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry", tenantDomain), e);
         }
+
+        try{
+            // Write the tenant configuration file to the tenant registry.
+            AppManagerUtil.createTenantConfInRegistry(tenantId);
+
+            // Load the tenant configuration to memory
+            TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(tenantId);
+            ServiceReferenceHolder.getInstance().getTenantConfigurationService().addTenantConfiguration(tenantConfiguration);
+
+        }catch (AppManagementException e){
+            log.error(String.format("Failed to create carbon-appmgt tenant specific configuration file in the registry of the tenant '%s'", tenantDomain), e);
+        } catch (ConfigurationException e) {
+            log.error(String.format("Failed to load carbon-appmgt tenant specific configurations from the registry for the tenant '%s'", tenantDomain), e);
+        }
+
         try {
             //Add the creator & publisher roles if not exists
             //Apply permissons to appmgt collection for creator role

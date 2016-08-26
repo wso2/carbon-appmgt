@@ -17,6 +17,7 @@
 package org.wso2.carbon.appmgt.hostobjects.internal;
 
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.indexing.service.TenantIndexingLoader;
 import org.wso2.carbon.user.core.UserRealm;
@@ -32,6 +33,7 @@ public class ServiceReferenceHolder {
     private RealmService realmService;
     private static UserRealm userRealm;
     private TenantIndexingLoader indexLoader;
+    private TenantConfigurationService tenantConfigurationService;
 
     public static ConfigurationContextService getContextService() {
         return contextService;
@@ -88,5 +90,13 @@ public class ServiceReferenceHolder {
 
     public TenantIndexingLoader getIndexLoaderService(){
         return indexLoader;
+    }
+
+    public void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        this.tenantConfigurationService = tenantConfigurationService;
+    }
+
+    public TenantConfigurationService getTenantConfigurationService() {
+        return tenantConfigurationService;
     }
 }

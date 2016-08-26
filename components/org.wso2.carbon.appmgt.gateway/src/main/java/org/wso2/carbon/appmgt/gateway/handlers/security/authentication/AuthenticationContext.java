@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.gateway.handlers.security.authentication;
 
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Map;
 /**
  * Represents an authenticated user and the context.
  */
-public class AuthenticationContext {
+public class AuthenticationContext implements Serializable {
 
     private String tenantDomain;
     private boolean authenticated;

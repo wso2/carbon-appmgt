@@ -1,0 +1,13 @@
+
+<!--
+
+Tenant specific configurations for appmgt
+-->
+<AppMgt>
+
+    <Subscriptions>
+        <EnableSelfSubscription>false</EnableSelfSubscription>
+        <EnableEnterpriseSubscription>false</EnableEnterpriseSubscription>
+    </Subscriptions>
+
+</AppMgt>

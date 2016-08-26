@@ -91,6 +91,8 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
+import javax.activation.MimetypesFileTypeMap;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -208,8 +210,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
                 binaryFile = RestApiUtil.readFileFromStorage(fileName);
-
-                contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
+                contentType = new MimetypesFileTypeMap().getContentType(binaryFile);
                 if (!contentType.startsWith("application")) {
                     RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
                                                  log);

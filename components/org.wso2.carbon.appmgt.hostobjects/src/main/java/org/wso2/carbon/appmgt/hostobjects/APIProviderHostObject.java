@@ -2894,14 +2894,6 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
-    //Removed feature.
-    public static NativeArray jsFunction_getcashHitMiss(Context cx, Scriptable thisObj,
-                                                           Object[] args, Function funObj)
-            throws AppManagementException {
-        NativeArray myn = new NativeArray(0);
-        return myn;
-    }
-
     public static NativeArray jsFunction_getProviderAPIVersionUserUsage(Context cx,
                                                                         Scriptable thisObj,
                                                                         Object[] args,

@@ -95,7 +95,3 @@ function deletePolicy(policylId) {
 function deleteEntitlementPolicyPartial(policyPartialId) {
     return apiProvider.deleteEntitlementPolicyPartial(policyPartialId);
 }
-
-var getCacheHitMiss= function (startDate,endDate) {
-    return apiProvider.getcashHitMiss("__all_providers__",startDate,endDate);
-};

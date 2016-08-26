@@ -80,6 +80,8 @@ public final class AppMConstants {
 
     public static final String CUSTOM_PROPERTY_DEFINITIONS_PATH = "custom-property-definitions";
 
+    public static final String TENANT_CONF_FILENAME = "appm-tenant-conf.xml";
+
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
 
