@@ -343,16 +343,19 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
+                var authorizedAdminCookie = session.get("idp-authenticated-cookie");
                 var isAdvertiseOnly = attributes["overview_advertiseOnly"];
                 if (isAdvertiseOnly != null) {
                     isAdvertiseOnly = isAdvertiseOnly.trim();
                     if (isAdvertiseOnly.toLowerCase() == "true") {
                         isDeleted = removeArtifactOnly(shortName, id);
                     } else {
-                        isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                        isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj,
+                                                          authorizedAdminCookie);
                     }
                 } else {
-                    isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                    isDeleted =
+                    apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj, authorizedAdminCookie);
                 }
 
                 response.contentType = CONTENT_TYPE_JSON;
@@ -682,8 +685,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             artifactManager.update(artifact);
 
             // dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
-
-            var update = apiProvider.updateAPI(artifact);
+            var authorizedAdminCookie = session.get("idp-authenticated-cookie");
+            var update = apiProvider.updateAPI(artifact, authorizedAdminCookie);
 
             var attributes = artifact.attributes;
             var appName = attributes["overview_name"];
@@ -801,7 +804,9 @@ require('/modules/publisher.js').exec(function(ctx) {
         webappId.provider= overviewProvider;
         webappId.name= overviewName;
         webappId.version= overviewVersion;
-        apiProvider.generateEntitlementPolicies(webappId);
+
+        var authorizedAdminCookie = session.get("idp-authenticated-cookie");
+        apiProvider.generateEntitlementPolicies(webappId, authorizedAdminCookie);
     }
 
     /*
@@ -1194,8 +1199,9 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
                 if(!meta.weburl){
                     //Saved only 'package' section as the URL to prevent the data mismatch if URL got change
-                    //For the Android the full URL should be as https://play.google.com/store/apps/details?id={meta.package}
-                    //For the Android the full URL should be as https://itunes.apple.com/en/app/id{meta.package}
+                    //For the Android the full URL should be as
+                    // https://play.google.com/store/apps/details?id={meta.package} For the Android the full URL should
+                    // be as https://itunes.apple.com/en/app/id{meta.package}
                     if (ctx.markettype.toUpperCase() == 'ENTERPRISE') {
                         model.set('overview.url', meta.path);
                     } else if (ctx.markettype.toUpperCase() == 'PUBLIC') {

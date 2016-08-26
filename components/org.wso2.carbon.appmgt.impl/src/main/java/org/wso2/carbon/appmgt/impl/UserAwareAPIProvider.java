@@ -67,9 +67,9 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public void updateAPI(WebApp api) throws AppManagementException {
+    public void updateAPI(WebApp api, String authorizedAdminCookie) throws AppManagementException {
         checkWebappUpdatePermission();
-        super.updateAPI(api);
+        super.updateAPI(api, authorizedAdminCookie);
     }
 
     @Override
@@ -160,17 +160,17 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public void generateEntitlementPolicies(APIIdentifier apiIdentifier) throws
-                                                                         AppManagementException {
+    public void generateEntitlementPolicies(APIIdentifier apiIdentifier, String authorizedAdminCookie) throws
+                                                                                                 AppManagementException {
         checkCreatePermission();
-        super.generateEntitlementPolicies(apiIdentifier);
+        super.generateEntitlementPolicies(apiIdentifier, authorizedAdminCookie);
     }
 
     @Override
-    public void updateEntitlementPolicies(List<EntitlementPolicy> policies) throws
+    public void updateEntitlementPolicies(List<EntitlementPolicy> policies,String authorizedAdminCookie) throws
                                                                             AppManagementException {
         checkWebappUpdatePermission();
-        super.updateEntitlementPolicies(policies);
+        super.updateEntitlementPolicies(policies, authorizedAdminCookie);
     }
 
     public void checkPublishPermissionTenantMode(String userId) throws AppManagementException {
@@ -186,11 +186,12 @@ public class UserAwareAPIProvider extends APIProviderImpl {
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared, String policyPartialDesc)
+                                                  String author, boolean isShared, String policyPartialDesc,
+                                                  String authorizedAdminCookie)
             throws AppManagementException {
         checkWebappUpdatePermission();
         return super.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared,
-                policyPartialDesc);
+                                                    policyPartialDesc, authorizedAdminCookie);
 
     }
 

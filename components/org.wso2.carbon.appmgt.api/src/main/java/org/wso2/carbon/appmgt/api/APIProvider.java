@@ -214,25 +214,31 @@ public interface APIProvider extends APIManager {
     /**
      * Generates entitlement policies for the given app.
      *
-     * @param apiIdentifier ID of the app.
+     * @param apiIdentifier   ID of the app.
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws AppManagementException when entitlement service implementation is unable to generate policies.
      */
-    public void generateEntitlementPolicies(APIIdentifier apiIdentifier) throws
-                                                                         AppManagementException;
+    public void generateEntitlementPolicies(APIIdentifier apiIdentifier, String authorizedAdminCookie) throws
+                                                                                                 AppManagementException;
 
     /**
      * Updates given entitlement policies.
-     * @param policies Entitlement policies to be updated.
+     *
+     * @param policies        Entitlement policies to be updated.
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws AppManagementException when entitlement service implementation is unable to update policies.
      */
-    void updateEntitlementPolicies(List<EntitlementPolicy> policies) throws AppManagementException;
+    void updateEntitlementPolicies(List<EntitlementPolicy> policies, String authorizedAdminCookie)
+            throws AppManagementException;
 
     /**
      * Get entitlement policy content from policyId
-     * @param policyId Entitlement policy id
+     *
+     * @param policyId        Entitlement policy id
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return Entitlement policy content
      */
-    String getEntitlementPolicy(String policyId) throws AppManagementException;
+    String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException;
 
     /**
      * Get web application id
@@ -258,17 +264,18 @@ public interface APIProvider extends APIManager {
     /**
      * Update the policy partial
      *
-     * @param policyPartialId policy partial id
-     * @param policyPartial   policy content
-     * @param author          author of the partial
-     * @param isShared        policy status
+     * @param policyPartialId          policy partial id
+     * @param policyPartial            policy content
+     * @param author                   author of the partial
+     * @param isShared                 policy status
      * @param policyPartialDescription policy description
+     * @param authorizedAdminCookie          Authorized cookie to access IDP admin services
      * @return if update success return true else false
      * @throws AppManagementException
      */
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared, String policyPartialDescription) throws
-                                                                                   AppManagementException;
+                                                  String author, boolean isShared, String policyPartialDescription,
+                                                  String authorizedAdminCookie) throws AppManagementException;
 
     /**
      *
@@ -310,12 +317,13 @@ public interface APIProvider extends APIManager {
 
     /**
      * Validates the given entitlement policy partial.
+     *
      * @param policyPartial
      * @return Result of the validation.
      * @throws AppManagementException
      */
-    EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial)throws
-                                                                                            AppManagementException;
+    public EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial)
+            throws AppManagementException;
 
     /**
      * Adds a new WebApp to the Store
@@ -352,14 +360,15 @@ public interface APIProvider extends APIManager {
     public String createNewVersion(App app)throws AppManagementException;
 
     /**
-     * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
-     * should throw an exceptions when such attempts are made. All life cycle state changes
-     * should be carried out using the changeAPIStatus method of this interface.
+     * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations should throw an
+     * exceptions when such attempts are made. All life cycle state changes should be carried out using the
+     * changeAPIStatus method of this interface.
      *
-     * @param api WebApp
+     * @param api             WebApp
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws AppManagementException if failed to update WebApp
      */
-    public void updateAPI(WebApp api) throws AppManagementException;
+    public void updateAPI(WebApp api, String authorizedAdminCookie) throws AppManagementException;
 
     /**
      * Updates an existing Mobile Application. This method must not be used to change Mobile App status. Implementations
@@ -586,12 +595,13 @@ public interface APIProvider extends APIManager {
     /**
      * Delete an WebApp
      *
-     * @param identifier APIIdentifier
-     * @param ssoProvider SSOProvider
+     * @param identifier      APIIdentifier
+     * @param ssoProvider     SSOProvider
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws AppManagementException if failed to remove the WebApp
      */
-    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
-                                                                                AppManagementException;
+    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider, String authorizedAdminCookie) throws
+                                                                                                        AppManagementException;
 
     /**
      * Get the list of Custom InSequences.
