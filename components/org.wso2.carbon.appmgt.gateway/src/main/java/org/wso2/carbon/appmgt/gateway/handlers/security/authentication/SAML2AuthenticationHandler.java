@@ -594,7 +594,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private String getAuthenticatedCookieFromIdP(String samlResponse) {
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfiguration();
-        String backendServerURL = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
+        String backendServerURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
 
         SAML2SSOAuthenticationServiceStub stub = null;
         try {
