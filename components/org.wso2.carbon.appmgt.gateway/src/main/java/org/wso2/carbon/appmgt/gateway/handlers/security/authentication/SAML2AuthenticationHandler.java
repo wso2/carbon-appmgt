@@ -56,6 +56,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.authenticator.saml2.sso.stub.SAML2SSOAuthenticationServiceStub;
 import org.wso2.carbon.identity.authenticator.saml2.sso.stub.types.AuthnReqDTO;
@@ -309,12 +310,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
         } catch (SAMLException e) {
             String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            log.error(errorMessage);
-            if (log.isDebugEnabled()) { //Do not log the stack trace without checking isDebugEnabled, because log can be filled by SAML Response XSW attacks.
-                log.debug(errorMessage, e);
-            }
-            GatewayUtils.send401(messageContext, "Unauthorized SAML Response");
-            return false;
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } catch (IdentitySAML2SSOException e) {
+            String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
         }
 
         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));

@@ -1974,7 +1974,7 @@ public class DefaultAppRepository implements AppRepository {
         }
 
         SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
-        ssoConfiguratorUtil.createSSOProvider(app, false);
+        ssoConfiguratorUtil.createSSOProvider(app, false, new HashMap<String, String>());
     }
 
     private String buildIssuerName(APIIdentifier appIdentifier) {

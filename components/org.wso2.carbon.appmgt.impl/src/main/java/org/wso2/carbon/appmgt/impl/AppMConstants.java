@@ -359,6 +359,9 @@ public final class AppMConstants {
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
 
+        // Service provider management permissions
+        public static final String IDENTITY_APPLICATION_MANAGEMENT = "/permission/admin/manage/identity/applicationmgt";
+        
         public static final String XACML_POLICY_ADD = "/permission/admin/configure/entitlement/policy/manage/add";
         public static final String XACML_POLICY_DELETE = "/permission/admin/configure/entitlement/policy/manage/delete";
         public static final String XACML_POLICY_EDIT = "/permission/admin/configure/entitlement/policy/manage/edit";
