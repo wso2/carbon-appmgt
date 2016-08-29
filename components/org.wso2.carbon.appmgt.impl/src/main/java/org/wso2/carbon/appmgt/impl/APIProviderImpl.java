@@ -750,12 +750,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts =
                 appMDAO.getEntitlementPolicyTemplateContexts(apiIdentifier);
 
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config,
-                                                                                                authorizedAdminCookie);
-        entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+        if (xacmlPolicyTemplateContexts != null && !xacmlPolicyTemplateContexts.isEmpty()) {
+            EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config,
+                                                                                                    authorizedAdminCookie);
 
-        // Update URL mapping => XACML partial mapping with the generated policy IDs.
-        appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+            entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+
+            // Update URL mapping => XACML partial mapping with the generated policy IDs.
+            appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+        }
     }
 
     /**
