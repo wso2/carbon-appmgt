@@ -57,7 +57,10 @@
         "identityAlias": "wso2carbon",
         "responseSigningEnabled": "true",
         "publisherAcs": "%https.host%/publisher/sso",
-        "keyStoreName": "/repository/resources/security/wso2carbon.jks"
+        "keyStoreName": "/repository/resources/security/wso2carbon.jks",
+        "validateAssertionValidityPeriod": true,
+        "validateAudienceRestriction": true,
+        "assertionSigningEnabled": true
     },
     "constants" :{
     "assetCreatedDateLength" : 20
