@@ -312,6 +312,22 @@
         <!-- Postfix of the ACS URL -->
         <ACSURLPostfix>appm/acs</ACSURLPostfix>
 
+        <!-- Enable SAML Response Signing when adding Service Provider and validate response signature in gateway.
+             If you are switching from false to true, then already created services providers should be updated manully to have response signing true.
+        -->
+	<EnableResponseSigning>true</EnableResponseSigning>
+
+        <!-- Enable SAML Assertion Signing when adding Service Provider and validate assertion signature in gateway.
+             If you are switching from false to true, then already created services providers should be updated manully to have assertion signing true.
+        -->
+	<EnableAssertionSigning>true</EnableAssertionSigning>
+
+        <!-- Validates Assertion expiry time of SAML Response -->
+        <ValidateAssertionExpiry>true</ValidateAssertionExpiry>
+
+	<!-- Timestamp skew applied to SAML Response Validity period. Default set to 5min --> 
+        <SAMLResponseValidityTimeStampSkew>300</SAMLResponseValidityTimeStampSkew>
+
         <!-- This alias is used to validate the signature of the responses form the IDP -->
         <ResponseSigningKeyAlias>wso2carbon</ResponseSigningKeyAlias>
 

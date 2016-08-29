@@ -28,6 +28,8 @@ import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -204,11 +206,11 @@ public class HostObjectUtils {
      * @return Subscription Configuration.
      */
     public static Map<String, Boolean> getSubscriptionConfiguration() {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        Boolean selfSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
-                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
-                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+        TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
+
+        Boolean selfSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getPropertyAsString(TenantConfiguration.PropertyNames.IS_SELF_SUBSCRIPTION_ENABLED));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getPropertyAsString(TenantConfiguration.PropertyNames.IS_ENTERPRISE_SUBSCRIPTION_ENABLED));
 
         Map<String, Boolean> subscriptionCofig = new HashMap<String, Boolean>(2);
         subscriptionCofig.put("EnableSelfSubscription", selfSubscriptionStatus);

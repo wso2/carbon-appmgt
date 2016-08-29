@@ -35,9 +35,12 @@ import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
 import org.wso2.carbon.appmgt.gateway.handlers.security.authentication.AuthenticationContext;
+import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
+import org.wso2.carbon.context.CarbonContext;
 
 import java.util.List;
 
@@ -49,8 +52,6 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
     private static final Log log = LogFactory.getLog(SubscriptionsHandler.class);
 
     private Subscription enterpriseSubscription;
-
-    private AppManagerConfiguration configuration;
 
     @Override
     public boolean handleRequest(MessageContext messageContext) {
@@ -67,7 +68,7 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
         Session session = GatewayUtils.getSession(messageContext);
         AuthenticationContext authenticationContext = session.getAuthenticationContext();
 
-        if(configuration.isEnterpriseSubscriptionEnabled()){
+        if(isEnterpriseSubscriptionEnabled()){
 
             if(enterpriseSubscription == null){
                 try {
@@ -89,15 +90,12 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
                         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("User '%s' has an enterprise subscription (IDP(s) : ['%s']) for '%s':'%s'",
                             authenticationContext.getSubject(), authenticatedIDPNames, webAppContext, webAppVersion));
                     }
-
                 }
                 return true;
             }
-
-
         }
 
-        if(configuration.isSelfSubscriptionEnabled()){
+        if(isSelfSubscriptionEnabled()){
             // TODO : Validate self subscriptions
             return true;
         }
@@ -114,7 +112,7 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
 
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {
-        configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
     }
 
     @Override
@@ -144,6 +142,24 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
     }
 
     private boolean isHandlerApplicable() {
-        return configuration.isSelfSubscriptionEnabled() || configuration.isEnterpriseSubscriptionEnabled();
+        return isSelfSubscriptionEnabled() || isEnterpriseSubscriptionEnabled();
     }
+
+
+    private boolean isSelfSubscriptionEnabled() {
+        String propertyValue = readConfiguration("Subscriptions.EnableSelfSubscription");
+        return Boolean.parseBoolean(propertyValue);
+    }
+
+
+    private boolean isEnterpriseSubscriptionEnabled() {
+        String propertyValue = readConfiguration("Subscriptions.EnableEnterpriseSubscription");
+        return Boolean.parseBoolean(propertyValue);
+    }
+
+    private String readConfiguration(String key) {
+        TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
+        return tenantConfigurationService.getPropertyAsString(key);
+    }
+
 }

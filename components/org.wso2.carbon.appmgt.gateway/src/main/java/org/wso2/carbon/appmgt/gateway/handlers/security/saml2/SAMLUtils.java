@@ -31,10 +31,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.*;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.util.Base64;
+import org.w3c.dom.NodeList;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
@@ -257,7 +259,21 @@ public class SAMLUtils {
     public static XMLObject decodeAndUnmarshallSAMLRequestOrResponse(String encodedSAMLResponse) throws SAMLException {
 
         try {
-            return SAMLSSOUtil.unmarshall(new String(Base64.decode(encodedSAMLResponse), "UTF-8") );
+            XMLObject unmarshalledSamlResponse = SAMLSSOUtil.unmarshall(new String(Base64.decode(encodedSAMLResponse), "UTF-8") );
+            // Check for duplicate samlp:Response
+            NodeList list = unmarshalledSamlResponse.getDOM().getElementsByTagNameNS(SAMLConstants.SAML20P_NS, "Response");
+            if (list != null && list.getLength() > 0) {
+                log.error("Invalid schema for the SAML2 reponse");
+                throw new SAMLException("Error occured while processing saml2 response");
+            }
+
+            NodeList assertionList = unmarshalledSamlResponse.getDOM().getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion");
+            if (assertionList.getLength() > 1) {
+                log.error("Invalid schema for the SAML2 response. Multiple assertions detected");
+                throw new SAMLException("Error occurred while processing saml2 response");
+            }
+
+            return unmarshalledSamlResponse;
         } catch (IdentityException e) {
             throw new SAMLException("Can't decode and unmarshall SAML response", e);
         } catch (UnsupportedEncodingException e) {

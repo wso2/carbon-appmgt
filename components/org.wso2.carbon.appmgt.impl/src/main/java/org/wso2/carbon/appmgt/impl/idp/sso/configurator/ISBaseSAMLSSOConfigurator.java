@@ -21,6 +21,8 @@ package org.wso2.carbon.appmgt.impl.idp.sso.configurator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.identity.sso.saml.stub.types.SAMLSSOServiceProviderDTO;
 
 /**
@@ -46,7 +48,14 @@ public abstract class ISBaseSAMLSSOConfigurator {
         dto.setIssuer(provider.getIssuerName());
         dto.setAssertionConsumerUrls(new String[]{provider.getAssertionConsumerURL()});
         dto.setDefaultAssertionConsumerUrl(provider.getAssertionConsumerURL());
-        dto.setDoSignResponse(true);
+
+        if (SSOConfiguratorUtil.isResponseSigningEnabled()) {
+            dto.setDoSignResponse(true);
+        }
+
+        if (SSOConfiguratorUtil.isAssertionSigningEnabled()) {
+            dto.setDoSignAssertions(true);
+        }
 
         dto.setNameIDFormat(provider.getNameIdFormat());
         if (dto.getNameIDFormat() != null) {

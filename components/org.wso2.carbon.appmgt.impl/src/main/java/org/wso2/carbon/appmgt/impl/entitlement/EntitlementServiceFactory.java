@@ -28,27 +28,38 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 public class EntitlementServiceFactory {
 
     private static final String SERVER_URL = "EntitlementServiceConfiguration.Parameters.ServerUrl";
-    private static final String USERNAME = "EntitlementServiceConfiguration.Parameters.Username";
-    private static final String PASSWORD = "EntitlementServiceConfiguration.Parameters.Password";
 
     /**
      * NOTE : Only XACML entitlement service is supported as of now.
+     * @param configuration
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
+     * @return
+     * @throws AppManagementException
+     */
+    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration,
+                                                           String authorizedAdminCookie)
+            throws AppManagementException {
+        String serverUrl = configuration.getFirstProperty(SERVER_URL);
+        EntitlementService entitlementService = new XacmlEntitlementServiceImpl(serverUrl, authorizedAdminCookie);
+        entitlementService.init();
+        return entitlementService;
+    }
+
+    /**
+     * NOTE : Only XACML entitlement service is supported as of now.
+     *
      * @param configuration
      * @return
      * @throws AppManagementException
      */
     public static EntitlementService getEntitlementService(AppManagerConfiguration configuration)
             throws AppManagementException {
-
         String serverUrl = configuration.getFirstProperty(SERVER_URL);
-        String username = configuration.getFirstProperty(USERNAME);
-        String password = configuration.getFirstProperty(PASSWORD);
-
-        EntitlementService entitlementService =  new XacmlEntitlementServiceImpl(serverUrl, username, password);
+        EntitlementService entitlementService = new XacmlEntitlementServiceImpl(serverUrl);
         entitlementService.init();
-
         return entitlementService;
     }
+
 
 
 }
