@@ -159,7 +159,7 @@ public class SubscriptionsHandler extends AbstractHandler implements ManagedLife
 
     private String readConfiguration(String key) {
         TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
-        return tenantConfigurationService.getPropertyAsString(key);
+        return tenantConfigurationService.getFirstProperty(key);
     }
 
 }

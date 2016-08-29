@@ -19,12 +19,6 @@
         <DisplayMultipleVersions>true</DisplayMultipleVersions>
     </APPStoreConfiguration>
 
-    <!--subscription configuration is used by gateway,store,publisher-->
-    <SubscriptionConfiguration>
-        <EnableSelfSubscription>false</EnableSelfSubscription>
-        <EnableEnterpriseSubscription>false</EnableEnterpriseSubscription>
-    </SubscriptionConfiguration>
-
     <!-- The authorization manager configuration to be used by store / publisher components -->
     <AuthManager>
 
@@ -443,14 +437,6 @@
     <ServicesAPI>
         <AuthorizedRole>admin</AuthorizedRole>
     </ServicesAPI>
-
-    <!--These types in the configuration provides a list of enabled types in the APP Manager.
-    If web app is commented, it will be hidden from APP Manager. These type values can be read as artifact types in RXT template -->
-    <EnabledAssetTypeList>
-        <Type>webapp</Type>
-        <Type>mobileapp</Type>
-        <Type>site</Type>
-    </EnabledAssetTypeList>
 
     <RESTAPI>
         <!--Configure publisher and store REST API context path-->

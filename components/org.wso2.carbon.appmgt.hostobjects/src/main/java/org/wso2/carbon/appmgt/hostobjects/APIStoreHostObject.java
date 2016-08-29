@@ -3729,7 +3729,7 @@ public class APIStoreHostObject extends ScriptableObject {
                                                                  Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray availableAssetTypes = new NativeArray(0);
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
         for (int i = 0; i < typeList.size(); i++) {
             availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
         }
@@ -3757,7 +3757,7 @@ public class APIStoreHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid argument type. App name should be a String.");
         }
         String assetType = (String) args[0];
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
 
         for (String type : typeList) {
             if (assetType.equals(type)) {

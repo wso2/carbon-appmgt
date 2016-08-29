@@ -37,6 +37,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HostObjectUtils {
@@ -209,13 +210,18 @@ public class HostObjectUtils {
 
         TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
 
-        Boolean selfSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getPropertyAsString(TenantConfiguration.PropertyNames.IS_SELF_SUBSCRIPTION_ENABLED));
-        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getPropertyAsString(TenantConfiguration.PropertyNames.IS_ENTERPRISE_SUBSCRIPTION_ENABLED));
+        Boolean selfSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getFirstProperty(TenantConfiguration.PropertyNames.IS_SELF_SUBSCRIPTION_ENABLED));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getFirstProperty(TenantConfiguration.PropertyNames.IS_ENTERPRISE_SUBSCRIPTION_ENABLED));
 
         Map<String, Boolean> subscriptionCofig = new HashMap<String, Boolean>(2);
         subscriptionCofig.put("EnableSelfSubscription", selfSubscriptionStatus);
         subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
         return subscriptionCofig;
+    }
+
+    public static List<String> getEnabledAssetTypes(){
+        TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
+        return tenantConfigurationService.getProperties(TenantConfiguration.PropertyNames.ENABLED_ASSET_TYPES);
     }
 
     /**
