@@ -22,7 +22,10 @@
         "identityAlias": "wso2carbon",
         "responseSigningEnabled": "true",
         "storeAcs" : "%https.host%/store/acs",
-        "keyStoreName": "/repository/resources/security/wso2carbon.jks"
+        "keyStoreName": "/repository/resources/security/wso2carbon.jks",
+        "validateAssertionValidityPeriod": true,
+        "validateAudienceRestriction": true,
+        "assertionSigningEnabled": true
     },
 
     "pagination": {

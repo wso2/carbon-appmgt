@@ -35,7 +35,8 @@
             sso_sessions = application.get('sso_sessions');
             contextPath = caramel.configs().context,
             reversProxyEnabled = caramel.configs().reverseProxyEnabled,
-            reverseProxyHost = caramel.configs().reverseProxyHost;
+            reverseProxyHost = caramel.configs().reverseProxyHost,
+                    attr = configs.ssoConfiguration;
 
     if(reversProxyEnabled) {
         relayState = reverseProxyHost+relayState;
@@ -48,31 +49,38 @@
 
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+
+        if (!samlRespObj) {
+            log.error('SAML response object validation failure.');
+            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+            return;
+        }
+
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
-            // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
+            if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
+                log.error('SAML response object validation failure.');
+                response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
+            }
 
-                if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-                    var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
 
-                    if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                        session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        session.put("Loged", "true");
+            if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                session.put("Loged", "true");
 
-                        sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
 
-                        var user = require('/modules/user.js');
+                var user = require('/modules/user.js');
 
-                        if (user.loginWithSAML(sessionObj.loggedInUser)) {
-			    if(log.isDebugEnabled()){
-                            	log.debug('user is set :::' + sessionObj.loggedInUser);
-                            }
-			    response.sendRedirect(relayState);
-                        }
-
+                if (user.loginWithSAML(sessionObj.loggedInUser)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug('user is set :::' + sessionObj.loggedInUser);
                     }
+                    response.sendRedirect(relayState);
                 }
+
             }
 
         } else {
