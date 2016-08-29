@@ -480,13 +480,14 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             username = username + "@" + tenantDomain;
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
-            appMgtProviderObj.generateEntitlementPolicies(webappId);
+            var authorizedAdminCookie = session.get("idp-authenticated-cookie");
+            appMgtProviderObj.generateEntitlementPolicies(webappId, authorizedAdminCookie);
             var tenantAwareUserName =  jagg.getUser().username;
             if (oldVersion == null || oldVersion == '') {
                 auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
-                                                                                   ", apiName='" + webappId.name + '\''
+                                                                                   ", appName='" + webappId.name + '\''
                                                                                    +
                                                                                    ", version='" + webappId.version
                                                                                    + '\'' +
@@ -496,7 +497,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                 auditLog.writeLog(tenantId, tenantAwareUserName, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
-                                                                                    ", apiName='" + webappId.name + '\''
+                                                                                    ", appName='" + webappId.name + '\''
                                                                                     +
                                                                                     ", version='" + webappId.version
                                                                                     + '\'' +

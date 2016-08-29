@@ -57,8 +57,11 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.authenticator.saml2.sso.stub.SAML2SSOAuthenticationServiceStub;
+import org.wso2.carbon.identity.authenticator.saml2.sso.stub.types.AuthnReqDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -289,25 +292,29 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
 
-            // Validate the signature if there is any.
-            String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
-
-            // User the certificate of the super tenant since the responses are signed by the super tenant.
-            Credential certificate = GatewayUtils.getIDPCertificate("carbon.super", responseSigningKeyAlias);
-            
-            boolean isValidSignature = idpMessage.validateSignature(certificate);
-            if(!isValidSignature){
-                String errorMessage = String.format("The signature of the SAML message received by the ASC URL ('%s'), can't be validated.", fullResourceURL);
-                GatewayUtils.logAndThrowException(log, errorMessage, null);
+            if (idpMessage.getRawSAMLResponse() != null) {
+                //pass saml response and request for an authorized cookie to access admin services
+                String authorizedAdminCookie = getAuthenticatedCookieFromIdP(idpMessage.getRawSAMLResponse());
+                if (authorizedAdminCookie == null) {
+                    String errorMessage =
+                            "Error while requesting the authorized cookie to access IDP admin services via " +
+                                    "SAML2SSOAuthenticationService";
+                    GatewayUtils.logAndThrowException(log, errorMessage, null);
+                }
+                //add to session
+                if (session.getAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE) == null) {
+                    session.addAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE, authorizedAdminCookie);
+                    SessionStore.getInstance().updateSession(session);
+                }
             }
-
-
         } catch (SAMLException e) {
             String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
-        } catch (IdentitySAML2SSOException e) {
-            String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
-            GatewayUtils.logAndThrowException(log, errorMessage, e);
+            log.error(errorMessage);
+            if (log.isDebugEnabled()) { //Do not log the stack trace without checking isDebugEnabled, because log can be filled by SAML Response XSW attacks.
+                log.debug(errorMessage, e);
+            }
+            GatewayUtils.send401(messageContext, "Unauthorized SAML Response");
+            return false;
         }
 
         GatewayUtils.logWithRequestInfo(log, messageContext, String.format("%s is available in request.", idpMessage.getSAMLRequest() != null ? "SAMLRequest" : "SAMLResponse"));
@@ -325,12 +332,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             return false;
         } else{
 
-            if(idpMessage.isResponseValidityPeriodExpired()){
-
-                if(log.isDebugEnabled()){
-                    GatewayUtils.logWithRequestInfo(log, messageContext, "The validity period of the SAML Response is expired.");
-                }
+            //Validate SAML response validity period
+            if (!idpMessage.validateAssertionValidityPeriod()) {
                 requestAuthentication(messageContext);
+                return false;
+            }
+
+            //Validate SAML response signature, assertion signature and audience restrictions
+            if(!idpMessage.validateSignatureAndAudienceRestriction(idpMessage.getSAMLResponse(), webApp, configuration)){
+                GatewayUtils.send401(messageContext, "Unauthorized SAML Response");
                 return false;
             }
 
@@ -564,5 +574,51 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
         return false;
+    }
+
+    /**
+     * Pass THE SAML response and returns an authorized cookie to access IDP admin services
+     *
+     * @param samlResponse
+     * @return Cookie to access IDP admin services
+     */
+    private String getAuthenticatedCookieFromIdP(String samlResponse) {
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfiguration();
+        String backendServerURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
+
+        SAML2SSOAuthenticationServiceStub stub = null;
+        try {
+            stub = new SAML2SSOAuthenticationServiceStub(null,
+                    backendServerURL + "/services/SAML2SSOAuthenticationService");
+            AuthnReqDTO authnReqDTO = new AuthnReqDTO();
+            authnReqDTO.setResponse(samlResponse);
+            boolean loggedIn = stub.login(authnReqDTO);
+            String cookie;
+            if (loggedIn) {
+                cookie = (String) stub._getServiceClient().getServiceContext().getProperty(HTTPConstants.COOKIE_STRING);
+                if (log.isDebugEnabled()) {
+                    log.debug("IdP authenticated cookie successfully retrieved via SAML2SSOAuthenticationService");
+                }
+                return cookie;
+            } else {
+                String errorMessage =
+                        "Login failed to IdP while tying to get the authenticated cookie via " +
+                                "SAML2SSOAuthenticationService";
+                GatewayUtils.logAndThrowException(log, errorMessage, null);
+            }
+        } catch (RemoteException e) {
+            String errorMessage = "Backend Server Remote Exception while initializing service";
+            GatewayUtils.logAndThrowException(log, errorMessage, e);
+        } finally {
+            if (stub != null) {
+                try {
+                    stub.cleanup();
+                } catch (RemoteException e) {
+                    log.error("Error while cleaning up SAML2SSOAuthenticationServiceStub", e);
+                }
+            }
+        }
+        return null;
     }
 }

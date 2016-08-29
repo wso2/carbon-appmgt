@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.sequences.services.SequenceAdminService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
@@ -31,12 +32,19 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
  * Application manager gateway component
  *
  * @scr.component name="org.wso2.carbon.appmgt.gateway.services" immediate="true"
+ *
  * @scr.reference name="arg.wso2.appmgt.impl.services.appm"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
  * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
+ *
  * @scr.reference name="org.wso2.carbon.sequences" immediate="true"
  * interface="org.wso2.carbon.sequences.services.SequenceAdminService" cardinality="1..1"
  * policy="dynamic" bind="setSequenceAdminService" unbind="unsetSequenceAdminService"
+ *
+ * @scr.reference name="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService"
+ * interface="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService" cardinality="1..1"
+ * policy="dynamic" bind="setTenantConfigurationService" unbind="unsetTenantConfigurationService"
+ *
  */
 public class AppManagerGatewayComponent {
 
@@ -72,6 +80,20 @@ public class AppManagerGatewayComponent {
             log.debug("App manager configuration service is unset to gateway bundle");
         }
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+    }
+
+    protected void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(tenantConfigurationService);
+    }
+
+    protected void unsetTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Un-setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(null);
     }
 
     protected void setSequenceAdminService(SequenceAdminService sequenceAdminService) {
