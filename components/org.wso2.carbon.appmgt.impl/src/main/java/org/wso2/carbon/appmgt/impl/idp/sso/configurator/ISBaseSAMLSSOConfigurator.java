@@ -65,6 +65,8 @@ public abstract class ISBaseSAMLSSOConfigurator {
         dto.setDoSingleLogout(true);
         // Let the ACS URL be the SLO Request accepting URL.
 
+        dto.addRequestedAudiences("carbonServer");
+
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);
 

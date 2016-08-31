@@ -110,7 +110,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         // This ensures that the SPs are created in the tenant of the logged in user (creator)
 
         var serviceConfig = new Packages.java.util.HashMap();
-        serviceConfig.put("adminServiceCookie", session.get("idp-auth-cookie"));
+        serviceConfig.put("adminServiceCookie", session.get("idp-authenticated-cookie"));
 
         var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
         if (type == 'editConfig') {

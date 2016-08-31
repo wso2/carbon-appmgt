@@ -361,7 +361,8 @@ public final class AppMConstants {
 
         // Service provider management permissions
         public static final String IDENTITY_APPLICATION_MANAGEMENT = "/permission/admin/manage/identity/applicationmgt";
-        
+        public static final String IDENTITY_IDP_MANAGEMENT = "/permission/admin/manage/identity/idpmgt";
+
         public static final String XACML_POLICY_ADD = "/permission/admin/configure/entitlement/policy/manage/add";
         public static final String XACML_POLICY_DELETE = "/permission/admin/configure/entitlement/policy/manage/delete";
         public static final String XACML_POLICY_EDIT = "/permission/admin/configure/entitlement/policy/manage/edit";
