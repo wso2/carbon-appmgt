@@ -922,7 +922,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null) {
+        if (args[0] == null) {
             handleException("Error while generating entitlement policy. The application identifier is null");
         }
 
@@ -3229,7 +3229,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[2] == null || args[3] == null) {
+        if (args[0] == null || args[2] == null) {
             handleException("Error while deleting application. The required parameters are null.");
         }
         boolean isAppDeleted = false;

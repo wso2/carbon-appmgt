@@ -5549,18 +5549,23 @@ public class AppMDAO {
 			//Define Entitlement Service
 			AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
 					getAPIManagerConfigurationService().getAPIManagerConfiguration();
-			EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
 
-			while (rs.next()) {
 
-				String policyId = rs.getString("POLICY_ID");
-				//If policyId is not null, remove the Entitlement policy with reference to policy id
-				if (policyId != null) {
-					entitlementService.removePolicy(policyId);
-				}
-			}
-			rs.close();
-		} catch (SQLException e) {
+            EntitlementService entitlementService = null;
+            int count = 0;
+            while (rs.next()) {
+                if (count == 0) {
+                    entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
+                }
+                String policyId = rs.getString("POLICY_ID");
+                //If policyId is not null, remove the Entitlement policy with reference to policy id
+                if (policyId != null) {
+                    entitlementService.removePolicy(policyId);
+                }
+                count++;
+            }
+            rs.close();
+        } catch (SQLException e) {
 			handleException("Error while retrieving URL XACML policy ids for WebApp : " +
 					applicationId, e);
 		} finally {
