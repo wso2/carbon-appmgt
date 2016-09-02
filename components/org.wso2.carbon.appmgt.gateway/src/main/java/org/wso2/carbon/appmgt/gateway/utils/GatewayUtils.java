@@ -48,6 +48,7 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAMLUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.utils.UrlPatternMatcher;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
@@ -87,24 +88,26 @@ public class GatewayUtils {
             URL serverRootURL = new URL(servicePrefix);
             String protocol = serverRootURL.getProtocol();
 
-            Map<String, String> headers = (Map<String, String>) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            // Get the published gateway URL for the protocol
+            Environment defaultGatewayEnv = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getApiGatewayEnvironments().get(0);
 
-            // As per the spec (https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html) the HOST header can't be null.
-            // So a null check is not needed.
-            String hostHeaderValue = headers.get("HOST"); //e.g. wso2.com[:8280]
-            String[] hostNameAndPort = hostHeaderValue.split(":");
+            String commaSeparatedGatewayEndpoints = defaultGatewayEnv.getApiGatewayEndpoint();
+            String[] gatewayEndpoints = commaSeparatedGatewayEndpoints.split(",");
 
-            String hostName = hostNameAndPort[0];
+            URL gatewayEndpointURL = null;
+            for(String gatewayEndpoint : gatewayEndpoints){
+                URL parsedEndpointURL = new URL(gatewayEndpoint);
 
-            int port = -1;
-            if(hostNameAndPort.length > 1){
-                port = Integer.parseInt(hostNameAndPort[1]);
+                if(parsedEndpointURL.getProtocol().equals(protocol)){
+                    gatewayEndpointURL = parsedEndpointURL;
+                    break;
+                }
             }
 
             String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
             String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
 
-            URL appRootURL = new URL(protocol, hostName, port, webAppContext + "/"  + webAppVersion + "/" );
+            URL appRootURL = new URL(gatewayEndpointURL.getProtocol(), gatewayEndpointURL.getHost(), gatewayEndpointURL.getPort(), webAppContext + "/"  + webAppVersion + "/" );
             return appRootURL.toString();
         } catch (MalformedURLException e) {
             log.error("Error occurred while constructing the app root URL.", e);
