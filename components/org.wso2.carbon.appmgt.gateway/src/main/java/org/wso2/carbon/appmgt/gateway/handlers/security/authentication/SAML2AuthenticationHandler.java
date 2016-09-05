@@ -56,6 +56,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.authenticator.saml2.sso.stub.SAML2SSOAuthenticationServiceStub;
 import org.wso2.carbon.identity.authenticator.saml2.sso.stub.types.AuthnReqDTO;

@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,25 +63,24 @@ public class TenantConfigurationServiceImpl implements TenantConfigurationServic
     }
 
     @Override
-    public Object getProperty(String key) {
+    public String getFirstProperty(String key) {
         int tenantID = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        return getProperty(key, tenantID);
+        return getFirstProperty(key, tenantID);
     }
 
     @Override
-    public Object getProperty(String key, int tenantID) {
-        return tenantConfigurations.get(tenantID).getProperty(key);
+    public String getFirstProperty(String key, int tenantID) {
+        return tenantConfigurations.get(tenantID).getFirstProperty(key);
     }
 
     @Override
-    public String getPropertyAsString(String key) {
+    public List<String> getProperties(String key) {
         int tenantID = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        return getPropertyAsString(key, tenantID);
+        return tenantConfigurations.get(tenantID).getProperties(key);
     }
 
     @Override
-    public String getPropertyAsString(String key, int tenantID) {
-        Object property = getProperty(key, tenantID);
-        return (String) property;
+    public List<String> getProperties(String key, int tenantID) {
+        return tenantConfigurations.get(tenantID).getProperties(key);
     }
 }

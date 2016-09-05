@@ -39,6 +39,8 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
 import java.util.List;
@@ -150,12 +152,19 @@ public class IDPMessage {
         Credential certificate = null;
 
         if (responseSigningEnabled || assertionSigningEnabled) {
+
             // validate signature
             String responseSigningKeyAlias = configuration.getFirstProperty(AppMConstants.SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS);
 
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            if(!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+                responseSigningKeyAlias = tenantDomain;
+            }
+
             // User the certificate of the super tenant since the responses are signed by the super tenant.
             try {
-                certificate = GatewayUtils.getIDPCertificate("carbon.super", responseSigningKeyAlias);
+                certificate = GatewayUtils.getIDPCertificate(tenantDomain, responseSigningKeyAlias);
             } catch (IdentitySAML2SSOException e) {
                 String errorMessage = "Error while getting IdP Certificate";
                 GatewayUtils.logAndThrowException(log, errorMessage, e);
