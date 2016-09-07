@@ -2,7 +2,6 @@
 include("/jagg/jagg.jag");
 include("header.jag");
 var site = require("/site/conf/site.json");
-
 var i18n = require("i18n");
 var localeResourcesBasePath="/site/conf/locales/jaggery/";
 i18n.init(request,localeResourcesBasePath);
@@ -28,6 +27,10 @@ if(pageName=="subscription"){
     middlePage="businessowners-task";
 }else if(pageName=="editBusinessOwner"){
     middlePage="editBusinessOwner";
+}else if(pageName == "themeUpload") {
+    middlePage = "theme-upload-task"
+} else if(pageName == "themeList") {
+    middlePage = "theme-list"
 }
 
 (function () {

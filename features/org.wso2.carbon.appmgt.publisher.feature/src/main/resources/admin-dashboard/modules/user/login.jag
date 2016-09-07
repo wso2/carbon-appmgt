@@ -48,7 +48,10 @@ try{
     }else{
     isSuperTenant =tenantMode;
     var sessionCookie = cookie.split(';')[0];
-    jagg.setUser({username:username, isSuperTenant:isSuperTenant, cookie:sessionCookie});
+    var userDomain =  getTenantDomain(store, username);
+
+    jagg.setUser({username:username, isSuperTenant:isSuperTenant, cookie:sessionCookie,
+                     userDomain : userDomain});
 
 
     return {
@@ -116,7 +119,7 @@ var logout = function () {
 var getWorkflowCookie = function(username,password) {
 	var log=new Log();
 	try{
-		var BPSRunning = false; 
+		var BPSRunning = false;
 		var xhr = new XMLHttpRequest();
 		var site = require("/site/conf/site.json");
 		var endpoint =  site.workflows.applicationWorkFlowServerURL+"AuthenticationAdmin";
@@ -160,8 +163,12 @@ var isUserAllowed = function (username, password) {
         var store = jagg.module("manager").getAPIStoreObj();
         var isEmailLoginEnabled = store.isEnableEmailUsername();
         var checkedUserName = username;
-        if (!isEmailLoginEnabled && (username.indexOf("@") != -1)) {
-            checkedUserName = username.split("@")[0];
+        if (username.indexOf("@") != -1) {
+            var split = username.split("@");
+            checkedUserName = split[0];
+            if (isEmailLoginEnabled) {
+                checkedUserName = checkedUserName + "@" + split[1];
+            }
         }
         var endpoint = store.getAuthServerURL() + "services/RemoteUserStoreManagerService/";
         var payload = '<ser:getRoleListOfUser xmlns:ser="http://service.ws.um.carbon.wso2.org">' +
@@ -194,4 +201,19 @@ var parseRolesResponse = function parseResponse(result) {
     return false;
 };
 
+function getTenantDomain(store, username) {
+    var isEmailLoginEnabled = store.isEnableEmailUsername();
+    if (isEmailLoginEnabled) {
+        var splitRes = username.split("@");
+        if (splitRes[2]) {
+            return splitRes[2];
+        }
+    } else {
+        if (username.indexOf("@") != -1) {
+            var splitRes = username.split("@");
+            return splitRes[1];
+        }
+    }
+    return "carbon.super";
+}
 %>

@@ -13,6 +13,9 @@ include("/jagg/jagg.jag");
 	if (username.indexOf("@") != -1) {
             var s=username.split("@");
             username=s[0] + "@" + s[1].toLowerCase();
+            if(s[2] != null) {
+                username = username + "@" + s[2].toLowerCase();
+            }
         }
 	
         var tenant = request.getParameter("tenant");

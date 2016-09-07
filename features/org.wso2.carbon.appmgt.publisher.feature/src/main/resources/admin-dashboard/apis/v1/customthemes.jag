@@ -1,0 +1,60 @@
+<%
+/*
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+include('/jagg/jagg.jag');
+var log = new Log("customthemes.jag");
+var site = require("/site/conf/site.json");
+var method = request.getMethod();
+var uriMatcher = new URIMatcher(request.getRequestURI());
+var deleteTheme = '/{context}/apis/customthemes/{type}';
+var appManager = require("thememanager");
+var managerHostObj = new appManager.APPManager();
+
+if(method == "DELETE") {
+    if (uriMatcher.match(deleteTheme)) {
+        var user = jagg.getUser();
+        if(!user) {
+            response.sendError(401, 'Unauthorized');
+        }
+        var tenantDomain = user.userDomain;
+        var type = uriMatcher.elements().type;
+        var themeTypes = getCustomStoreThemeTypes();
+        if(!type || themeTypes.indexOf(type) == -1) {
+                response.content = {"error":true ,"errorMsg" : "Unsupported theme type"}
+        }
+
+        try{
+            //delete theme
+            var success = managerHostObj.deleteCustomTheme(tenantDomain,type);
+            print({"error" : success});
+        }catch (e) {
+            var msg = "Could not delete theme : " + type  +" of tenant :" +tenantDomain;
+            log.error(msg,e);
+            print({"error" : true, "errorMsg":mgs});
+        }
+
+    }
+} else {
+    response.sendError(405, 'Method not supported by this endpoint');
+}
+
+function getCustomStoreThemeTypes() {
+    return site.customStoreThemeConfig.themeTypes;
+};
+%>
