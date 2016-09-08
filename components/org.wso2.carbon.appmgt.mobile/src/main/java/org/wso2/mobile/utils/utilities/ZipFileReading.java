@@ -16,38 +16,41 @@
 
 package org.wso2.mobile.utils.utilities;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.dd.plist.BinaryPropertyListParser;
+import com.dd.plist.NSDictionary;
+import com.dd.plist.PropertyListParser;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import com.dd.plist.BinaryPropertyListParser;
-import com.dd.plist.NSDictionary;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ZipFileReading {
-	
-	//ios CF Bundle keys
-	public static final String IPA_BUNDLE_VERSION_KEY = "CFBundleVersion";
-	public static final String IPA_BUNDLE_NAME_KEY = "CFBundleName";
-	public static final String IPA_BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
-	
-	//Android attributes
-	public static final String APK_VERSION_KEY = "versionName";
-	public static final String APK_PACKAGE_KEY = "package";
-	
+    
+    //ios CF Bundle keys
+    public static final String IPA_BUNDLE_VERSION_KEY = "CFBundleVersion";
+    public static final String IPA_BUNDLE_NAME_KEY = "CFBundleName";
+    public static final String IPA_BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
+    
+    //Android attributes
+    public static final String APK_VERSION_KEY = "versionName";
+    public static final String APK_PACKAGE_KEY = "package";
+
+
+    private static final Log log = LogFactory.getLog(ZipFileReading.class);
+    
     public static Document loadXMLFromString(String xml) throws Exception {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource is = new InputSource(new StringReader(xml));
         return builder.parse(is);
@@ -62,7 +65,6 @@ public class ZipFileReading {
                 ZipEntry entry;
                 while ((entry = stream.getNextEntry()) != null) {
                     if (entry.getName().equals("AndroidManifest.xml")) {
-                        StringBuilder builder = new StringBuilder();
                         xml = AndroidXMLParsing.decompressXML(IOUtils
                                 .toByteArray(stream));
                     }
@@ -93,7 +95,7 @@ public class ZipFileReading {
             try {
                 ZipEntry entry;
                 while ((entry = stream.getNextEntry()) != null) {
-                   	if (entry.getName().matches("^(Payload/)(.)+(.app/Info.plist)$")) {
+                    if (entry.getName().matches("^(Payload/)(.)+(.app/Info.plist)$")) {
                         InputStream is = stream;
 
                         int nRead;
@@ -107,8 +109,14 @@ public class ZipFileReading {
                         break;
                     }
                 }
-                NSDictionary rootDict = (NSDictionary) BinaryPropertyListParser
-                        .parse(buffer.toByteArray());
+                NSDictionary rootDict;
+                try{
+                    rootDict = (NSDictionary) BinaryPropertyListParser
+                            .parse(buffer.toByteArray());
+                }catch(IllegalArgumentException e){
+                    log.debug("Uploaded file didn't have a Binary Plist");
+                    rootDict = (NSDictionary) PropertyListParser.parse(buffer.toByteArray());
+                }
                 JSONObject obj = new JSONObject();
                 obj.put("version", rootDict.objectForKey(IPA_BUNDLE_VERSION_KEY).toString());
                 obj.put("name", rootDict.objectForKey(IPA_BUNDLE_NAME_KEY).toString());
