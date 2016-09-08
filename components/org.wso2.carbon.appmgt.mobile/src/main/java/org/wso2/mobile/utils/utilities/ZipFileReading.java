@@ -34,19 +34,19 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipFileReading {
-	
-	//ios CF Bundle keys
-	public static final String IPA_BUNDLE_VERSION_KEY = "CFBundleVersion";
-	public static final String IPA_BUNDLE_NAME_KEY = "CFBundleName";
-	public static final String IPA_BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
-	
-	//Android attributes
-	public static final String APK_VERSION_KEY = "versionName";
-	public static final String APK_PACKAGE_KEY = "package";
+
+    
+    //ios CF Bundle keys
+    public static final String IPA_BUNDLE_VERSION_KEY = "CFBundleVersion";
+    public static final String IPA_BUNDLE_NAME_KEY = "CFBundleName";
+    public static final String IPA_BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
+    
+    //Android attributes
+    public static final String APK_VERSION_KEY = "versionName";
+    public static final String APK_PACKAGE_KEY = "package";
 
 
     private static final Log log = LogFactory.getLog(ZipFileReading.class);
-	
     public static Document loadXMLFromString(String xml) throws Exception {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -95,7 +95,7 @@ public class ZipFileReading {
             try {
                 ZipEntry entry;
                 while ((entry = stream.getNextEntry()) != null) {
-                   	if (entry.getName().matches("^(Payload/)(.)+(.app/Info.plist)$")) {
+                    if (entry.getName().matches("^(Payload/)(.)+(.app/Info.plist)$")) {
                         InputStream is = stream;
 
                         int nRead;
