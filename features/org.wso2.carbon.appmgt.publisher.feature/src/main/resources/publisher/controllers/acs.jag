@@ -43,6 +43,15 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             return;
         }
         if (!sso.client.isLogoutResponse(samlRespObj)) {
+            var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
+
+            //load tenant registry for non super tenant users
+            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                jagg.module("manager").loadTenantRegistry(String(domainName));
+            }
 
             if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
                 log.error('SAML response object validation failure.');
@@ -50,11 +59,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 return;
             }
 
-            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
             if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
                 if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
                     var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');

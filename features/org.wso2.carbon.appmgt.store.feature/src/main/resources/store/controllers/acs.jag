@@ -55,13 +55,23 @@ var auditLog = require('/modules/auditLog/logger.js');
                 relayState = contextPath;
             }
 
+            var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
+
+            //load tenant registry for non super tenant users
+            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                jagg.module("manager").loadTenantRegistry(String(domainName));
+            }
+
             if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
                 log.error('SAML response object validation failure.');
                 response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
                 return;
             }
 
-            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+
             var username = sessionObj.loggedInUser;
             if (username.indexOf("@carbon.super") > -1) {
                 username = username.replace("@carbon.super", "");
@@ -80,9 +90,6 @@ var auditLog = require('/modules/auditLog/logger.js');
                     urlTenantDomain = elements.domain;
                 }
 
-                var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
                 if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
                     var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
