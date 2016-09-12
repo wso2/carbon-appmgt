@@ -10,11 +10,11 @@ public class CommonValidator {
 
     public static boolean isValidAppType(String appType) {
         if (AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(
-                        appType)) {
+                AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) {
             return true;
         } else {
-            throw RestApiUtil.buildBadRequestException("Type not supported.");
+            throw RestApiUtil.buildBadRequestException("Invalid Asset Type : " + appType);
         }
     }
 }

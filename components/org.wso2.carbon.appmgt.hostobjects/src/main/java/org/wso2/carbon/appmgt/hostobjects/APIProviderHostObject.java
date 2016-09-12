@@ -631,12 +631,13 @@ public class APIProviderHostObject extends ScriptableObject {
                                             Object[] args,
                                             Function funObj)
             throws AppManagementException, ScriptException {
-        if (args==null||args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         boolean success;
         NativeObject apiData = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
         String provider = String.valueOf(apiData.get("provider", apiData));
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
@@ -877,7 +878,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
                 /*Set permissions to anonymous role for thumbPath*/
                 AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), null, null, thumbPath);
-                apiProvider.updateAPI(api);
+                apiProvider.updateAPI(api, authorizedAdminCookie);
             }
 
             success = true;
@@ -918,7 +919,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                               Object[] args,
                                                               Function funObj) throws
             AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null) {
@@ -926,12 +927,13 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         NativeObject appIdentifierNativeObject = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
         APIIdentifier apiIdentifier = new APIIdentifier(
                 (String) (appIdentifierNativeObject.get("provider", appIdentifierNativeObject)),
                 (String) (appIdentifierNativeObject.get("name", appIdentifierNativeObject)),
                 (String) (appIdentifierNativeObject.get("version", appIdentifierNativeObject)));
         APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.generateEntitlementPolicies(apiIdentifier);
+        apiProvider.generateEntitlementPolicies(apiIdentifier, authorizedAdminCookie);
     }
 
     /**
@@ -948,16 +950,18 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                 Object[] args,
                                                                 Function funObj) throws
                                                                                  AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null) {
+        if (args[0] == null || args[1] == null) {
             handleException("Error while retrieving entitlement policy content. Entitlement policy id is null");
         }
 
         String policyId = args[0].toString();
+        String authorizedAdminCookie = args[1].toString();
+
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.getEntitlementPolicy(policyId);
+        return apiProvider.getEntitlementPolicy(policyId, authorizedAdminCookie);
     }
 
     /**
@@ -1032,10 +1036,10 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                     Object[] args,
                                                                     Function funObj) throws
                                                                                      AppManagementException {
-        if (args == null || args.length != 4) {
+        if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null || args[2] == null) {
+        if (args[0] == null || args[1] == null || args[2] == null || args[4] == null) {
             handleException("Error in updating policy parital :NULL value in expected parameters ->"
                     + "[policyPartialId:" + args[0] + ",policyPartial:" + args[1] + ",isShared:" + args[0] + "]");
         }
@@ -1045,9 +1049,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
+        String authorizedAdminCookie = args[4].toString();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial, policyPartialDesc);
+        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial,
+                                                          policyPartialDesc, authorizedAdminCookie);
     }
 
     /**
@@ -1261,13 +1267,14 @@ public class APIProviderHostObject extends ScriptableObject {
     public static void jsFunction_updateEntitlementPolicies(Context cx, Scriptable thisObj, Object[] args,
                                                             Function funObj) throws
                                                                                  AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         NativeArray policies = (NativeArray) args[0];
+        String authorizedAdminCookie = (String) args[1];
         APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.updateEntitlementPolicies(policies);
+        apiProvider.updateEntitlementPolicies(policies, authorizedAdminCookie);
     }
 
 
@@ -1275,11 +1282,13 @@ public class APIProviderHostObject extends ScriptableObject {
                                                Object[] args,
                                                Function funObj) throws AppManagementException {
 
-        if (args==null || args.length == 0) {
+        if (args==null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         NativeObject apiData = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
+
         String uuid = (String) apiData.get("id");
         apiData = (NativeObject)apiData.get("attributes",apiData) ;
         boolean success;
@@ -1395,7 +1404,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setVisibleRoles(visibleRoles);
 
         try {
-            apiProvider.updateAPI(api);
+            apiProvider.updateAPI(api, authorizedAdminCookie);
             boolean hasAPIUpdated=false;
             if(!oldApi.equals(api)){
                 hasAPIUpdated=true;
@@ -3217,7 +3226,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static boolean jsFunction_deleteApp(Context context, Scriptable thisObj,
                                                Object[] args,
                                                Function funObj) throws AppManagementException {
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[2] == null) {
@@ -3233,6 +3242,7 @@ public class APIProviderHostObject extends ScriptableObject {
         SSOProvider ssoProvider = (SSOProvider) ssoProviderNativeJavaObject.unwrap();
 
         boolean isTenantFlowStarted = false;
+        String authorizedAdminCookie = (String) args[3];
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3241,7 +3251,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
             APIProvider appProvider = getAPIProvider(thisObj);
-            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider);
+            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider, authorizedAdminCookie);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -4156,7 +4166,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                  Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray availableAssetTypes = new NativeArray(0);
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
         for (int i = 0; i < typeList.size(); i++) {
             availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
         }
@@ -4184,7 +4194,7 @@ public class APIProviderHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid argument type. App name should be a String.");
         }
         String assetType = (String) args[0];
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
 
         for (String type : typeList) {
             if (assetType.equals(type)) {

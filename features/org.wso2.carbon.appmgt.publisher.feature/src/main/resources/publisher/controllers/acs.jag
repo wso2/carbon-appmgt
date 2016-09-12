@@ -18,7 +18,8 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 KEY_STORE_PASSWORD: configs.ssoConfiguration.keyStorePassword,
                 IDP_ALIAS: configs.ssoConfiguration.identityAlias
             },
-            sso_sessions = application.get('sso_sessions');
+            sso_sessions = application.get('sso_sessions'),
+                attr = configs.ssoConfiguration;
 
     var caramel = require('caramel');
     var contextPath = caramel.configs().context;
@@ -33,32 +34,44 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
         application.put('sso_sessions', {});
         sso_sessions = application.get('sso_sessions');
     }
-    
+
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+        if (!samlRespObj) {
+            log.error('SAML response object validation failure.');
+            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+            return;
+        }
         if (!sso.client.isLogoutResponse(samlRespObj)) {
-
-            // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
-
-            if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
+            var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
             var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-			if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-			                var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
+            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
-                            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                                var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
-                                var ctx = service.getServerConfigContext();
-                                var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-                                TenantAxisUtils.setTenantAccessed(domainName, ctx);
-                            }
+            //load tenant registry for non super tenant users
+            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                jagg.module("manager").loadTenantRegistry(String(domainName));
+            }
 
-                    		jagg.setUser({username:sessionObj.loggedInUser});
+            if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
+                log.error('SAML response object validation failure.');
+                response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
+            }
+
+            if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+
+                if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                    var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
+                    var ctx = service.getServerConfigContext();
+                    var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+                    TenantAxisUtils.setTenantAccessed(domainName, ctx);
+                }
+
+                jagg.setUser({username: sessionObj.loggedInUser});
                 var tenantId = carbon.server.tenantId({
-                                                          domain: domainName
-                                                      });
+                    domain: domainName
+                });
 
                 session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                 session.put("Loged", "true");
@@ -66,61 +79,38 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 log.info(stringify(sessionObj.loggedInUser));
 
 
-                        	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
+                //sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
 
-                        	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-                            var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
-				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
-				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
-				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
-                                                          commonUtil.getRootSystemRegistry(tenantId));
+                var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+                var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
+                var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
+                var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
+                commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
+                        commonUtil.getRootSystemRegistry(tenantId));
 
-                        	log.debug("session index :: " + sessionObj.sessionIndex);
-                        	log.debug("session :: " + sessionObj.sessionId);
-				log.debug("real session :: " + session.getId());
+                log.debug("session index :: " + sessionObj.sessionIndex);
+                log.debug("session :: " + sessionObj.sessionId);
+                log.debug("real session :: " + session.getId());
 
-				//sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
-				sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
-                        	username = username + "";
-                        	var username = sessionObj.loggedInUser;
-                       		var role = require('/modules/role.js').checkeRole(username, session);
+                //sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
+                sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                username = username + "";
+                var username = sessionObj.loggedInUser;
+                var role = require('/modules/role.js').checkeRole(username, session);
 
-                        	if(role){
-                                auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
-                        		var user = require('store').user;
-					log.debug('user is set :::' + sessionObj.loggedInUser);
+                if (role) {
+                    auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
+                    var user = require('store').user;
+                    log.debug('user is set :::' + sessionObj.loggedInUser);
 
+                    setAuthenticatedCookieToIDP(samlResponse);
+                    response.sendRedirect(contextPath);
 
-                                //Retrieve a cookie which authenticate IDP and add to session.
-                                // This will be used in Service provider/XACML policies related IDP admin services for
-                                // authentication
-                                var ws = require("ws");
-                                var requestIDP = new ws.WSRequest();
-                                var options = new Array();
-                                options.useSOAP = 1.2;
-                                options.action = "urn:login";
-                                var manager = jagg.module("manager");
-                                var endPoint = manager.getAuthServerURL() + "/services/SAML2SSOAuthenticationService";
-                                var payload = '<sso:login xmlns:sso="http://sso.saml2.authenticator.identity.carbon.wso2.org"><sso:authDto><xsd:response xmlns:xsd="http://dto.sso.saml2.authenticator.identity.carbon.wso2.org/xsd">'
-                                              + samlResponse + '</xsd:response></sso:authDto></sso:login>';
-                                requestIDP.open(options, endPoint, false);
-                                requestIDP.send(payload);
-                                var responseIDP = requestIDP.responseE4X;
-                                var adminSession = requestIDP.getResponseHeader("Set-Cookie");
-                                session.put("idp-auth-cookie", adminSession);
-
-                                response.sendRedirect(contextPath);
-
-                        	} else {
-					log.warn('User '+sessionObj.loggedInUser+' does not have permission to access the publisher application.Make sure the user has the publisher role.');
-					response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
-                        	}
-
-                   	}
+                } else {
+                    log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the publisher application.Make sure the user has the publisher role.');
+                    response.sendError(403, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
                 }
             }
-
-
         } else {
             session.invalidate();
             response.sendRedirect(contextPath);
@@ -136,4 +126,32 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 	session.invalidate();
     }
 }());
+
+/**
+ * Retrieve a cookie which authenticate IDP and add to session.
+ * This will be used in Service provider/XACML policies related IDP admin services for authentication
+ * @param samlResponse
+ */
+function setAuthenticatedCookieToIDP(samlResponse) {
+    var log = new Log();
+    try {
+        var ws = require("ws");
+        var requestIDP = new ws.WSRequest();
+        var options = new Array();
+        options.useSOAP = 1.2;
+        options.action = "urn:login";
+        var manager = jagg.module("manager");
+        var endPoint = manager.getAuthServerURL() + "/services/SAML2SSOAuthenticationService";
+        var payload = '<sso:login xmlns:sso="http://sso.saml2.authenticator.identity.carbon.wso2.org"><sso:authDto><xsd:response xmlns:xsd="http://dto.sso.saml2.authenticator.identity.carbon.wso2.org/xsd">'
+                      + samlResponse + '</xsd:response></sso:authDto></sso:login>';
+        requestIDP.open(options, endPoint, false);
+        requestIDP.send(payload);
+        var responseIDP = requestIDP.responseE4X;
+        var adminSession = requestIDP.getResponseHeader("Set-Cookie");
+        session.put("idp-authenticated-cookie", adminSession);
+    }
+    catch (e) {
+        log.error("Error occurred while calling SAML2SSOAuthenticationService and retrieving the cookie to authenticate IdP");
+    }
+};
 %>

@@ -30,12 +30,16 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppUsageStatisticsClient;
 import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.*;
+import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
+import org.wso2.carbon.appmgt.impl.config.TenantConfigurationLoader;
 import org.wso2.carbon.appmgt.impl.idp.sso.configurator.IS510IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.listners.UserAddListener;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationServiceImpl;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
@@ -150,9 +154,10 @@ public class AppManagerComponent {
             //load self sigup configuration to the registry
             AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
             AppManagerUtil.createSelfSignUpRoles(tenantId);
-            AppManagerUtil.loadTenantConf(tenantId);
+            AppManagerUtil.createTenantSpecificConfigurationFilesInRegistry(tenantId);
+            AppManagerUtil.createTenantConfInRegistry(tenantId);
             SignupObserver signupObserver = new SignupObserver();
-            bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
+            bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver, null);
 
             AppManagerConfigurationServiceImpl configurationService =
                     new AppManagerConfigurationServiceImpl(configuration);
@@ -161,6 +166,15 @@ public class AppManagerComponent {
             registration = componentContext.getBundleContext().registerService(
                     AppManagerConfigurationService.class.getName(), configurationService, null);
             APIStatusObserverList.getInstance().init(configuration);
+
+            // Register the default implementation of the tenant configuration service.
+            TenantConfigurationService tenantConfigurationService = new TenantConfigurationServiceImpl();
+
+            // Load the tenant configurations for the super tenant.
+            TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(MultitenantConstants.SUPER_TENANT_ID);
+            tenantConfigurationService.addTenantConfiguration(tenantConfiguration);
+
+            componentContext.getBundleContext().registerService(TenantConfigurationService.class, tenantConfigurationService, null);
 
             AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
                                                         RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
@@ -189,7 +203,15 @@ public class AppManagerComponent {
                     new Permission(AppMConstants.Permissions.DOCUMENT_EDIT, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
-                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION)};
+                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_APPLICATION_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_IDP_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ADD, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_EDIT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ENABLE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_PUBLISH, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_VIEW, UserMgtConstants.EXECUTE_ACTION)};
 
             AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, creatorPermissions, realm);
 

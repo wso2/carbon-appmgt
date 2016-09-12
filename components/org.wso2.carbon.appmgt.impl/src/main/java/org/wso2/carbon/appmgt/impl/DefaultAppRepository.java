@@ -628,7 +628,7 @@ public class DefaultAppRepository implements AppRepository {
                         isSearchHit = false;
                         break;
                     }
-                }else if(!term.getValue().equals(artifact.getAttribute(getRxtAttributeName(term.getKey())))){
+                }else if(!term.getValue().equalsIgnoreCase(artifact.getAttribute(getRxtAttributeName(term.getKey())))){
                     isSearchHit = false;
                     break;
                 }
@@ -645,14 +645,16 @@ public class DefaultAppRepository implements AppRepository {
 
         String rxtAttributeName = null;
 
-        if(searchKey.equalsIgnoreCase("NAME")){
+        if (searchKey.equalsIgnoreCase("NAME")) {
             rxtAttributeName = AppMConstants.API_OVERVIEW_NAME;
-        }else if(searchKey.equalsIgnoreCase("PROVIDER")){
+        } else if (searchKey.equalsIgnoreCase("PROVIDER")) {
             rxtAttributeName = AppMConstants.API_OVERVIEW_PROVIDER;
-        }else if(searchKey.equalsIgnoreCase("VERSION")){
+        } else if (searchKey.equalsIgnoreCase("VERSION")) {
             rxtAttributeName = AppMConstants.API_OVERVIEW_VERSION;
-        }else if(searchKey.equalsIgnoreCase("BUSINESS_OWNER_ID")){
+        } else if (searchKey.equalsIgnoreCase("BUSINESS_OWNER_ID")) {
             rxtAttributeName = AppMConstants.API_OVERVIEW_BUSS_OWNER;
+        } else if (searchKey.equalsIgnoreCase("TREATASASITE")) {
+            rxtAttributeName = AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE;
         }
 
         return rxtAttributeName;
@@ -1972,7 +1974,7 @@ public class DefaultAppRepository implements AppRepository {
         }
 
         SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
-        ssoConfiguratorUtil.createSSOProvider(app, false);
+        ssoConfiguratorUtil.createSSOProvider(app, false, new HashMap<String, String>());
     }
 
     private String buildIssuerName(APIIdentifier appIdentifier) {

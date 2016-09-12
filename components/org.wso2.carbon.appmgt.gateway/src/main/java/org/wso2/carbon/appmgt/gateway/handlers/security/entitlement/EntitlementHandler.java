@@ -18,10 +18,6 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.entitlement;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
@@ -29,19 +25,20 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
-import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
+import org.wso2.carbon.appmgt.gateway.handlers.security.Session;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
+
+import java.util.List;
 
 /**
  * Handler class to check entitlement.
@@ -123,8 +120,9 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 			GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Applying XACML policy '%s'", applicablePolicyId));
     		
     		EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
-    		return isResourcePermitted(entitlementDecisionRequest);
-    	}
+            Session session = GatewayUtils.getSession(messageContext);
+            return isResourcePermitted(entitlementDecisionRequest, session);
+        }
     }
 
     private List<String> getApplicableEntitlementPolicyIds(MessageContext messageContext) throws AppManagementException {
@@ -136,8 +134,8 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedURITemplate.getUriTemplate(), matchedURITemplate.getHTTPVerb());
 	}
 
-	private boolean isResourcePermitted(EntitlementDecisionRequest request) throws AppManagementException {
-        EntitlementService entitlementService = getEntitlementService();
+	private boolean isResourcePermitted(EntitlementDecisionRequest request, Session session) throws AppManagementException {
+        EntitlementService entitlementService = getEntitlementService(session);
         return entitlementService.isPermitted(request);
     }
 
@@ -173,7 +171,8 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      * Service endpoint is not available when init is called.
      * @return
      */
-    private EntitlementService getEntitlementService() throws AppManagementException {
-        return EntitlementServiceFactory.getEntitlementService(configuration);
+    private EntitlementService getEntitlementService(Session session) throws AppManagementException {
+        String authorizedAdminCookie = (String) session.getAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE);
+        return EntitlementServiceFactory.getEntitlementService(configuration, authorizedAdminCookie);
     }
 }

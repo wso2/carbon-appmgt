@@ -19,12 +19,6 @@
         <DisplayMultipleVersions>true</DisplayMultipleVersions>
     </APPStoreConfiguration>
 
-    <!--subscription configuration is used by gateway,store,publisher-->
-    <SubscriptionConfiguration>
-        <EnableSelfSubscription>false</EnableSelfSubscription>
-        <EnableEnterpriseSubscription>false</EnableEnterpriseSubscription>
-    </SubscriptionConfiguration>
-
     <!-- The authorization manager configuration to be used by store / publisher components -->
     <AuthManager>
 
@@ -312,6 +306,22 @@
         <!-- Postfix of the ACS URL -->
         <ACSURLPostfix>appm/acs</ACSURLPostfix>
 
+        <!-- Enable SAML Response Signing when adding Service Provider and validate response signature in gateway.
+             If you are switching from false to true, then already created services providers should be updated manully to have response signing true.
+        -->
+	<EnableResponseSigning>true</EnableResponseSigning>
+
+        <!-- Enable SAML Assertion Signing when adding Service Provider and validate assertion signature in gateway.
+             If you are switching from false to true, then already created services providers should be updated manully to have assertion signing true.
+        -->
+	<EnableAssertionSigning>true</EnableAssertionSigning>
+
+        <!-- Validates Assertion expiry time of SAML Response -->
+        <ValidateAssertionExpiry>true</ValidateAssertionExpiry>
+
+	<!-- Timestamp skew applied to SAML Response Validity period. Default set to 5min --> 
+        <SAMLResponseValidityTimeStampSkew>300</SAMLResponseValidityTimeStampSkew>
+
         <!-- This alias is used to validate the signature of the responses form the IDP -->
         <ResponseSigningKeyAlias>wso2carbon</ResponseSigningKeyAlias>
 
@@ -443,14 +453,6 @@
     <ServicesAPI>
         <AuthorizedRole>admin</AuthorizedRole>
     </ServicesAPI>
-
-    <!--These types in the configuration provides a list of enabled types in the APP Manager.
-    If web app is commented, it will be hidden from APP Manager. These type values can be read as artifact types in RXT template -->
-    <EnabledAssetTypeList>
-        <Type>webapp</Type>
-        <Type>mobileapp</Type>
-        <Type>site</Type>
-    </EnabledAssetTypeList>
 
     <RESTAPI>
         <!--Configure publisher and store REST API context path-->
