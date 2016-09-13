@@ -47,6 +47,7 @@ public class AndroidApplicationOperationUtil {
 				enterpriseApplication.setType(application.getType().toString());
 				enterpriseApplication.setUrl(application.getLocation());
 				enterpriseApplication.setSchedule(schedule);
+				enterpriseApplication.setPackageName(application.getPackageName());
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
