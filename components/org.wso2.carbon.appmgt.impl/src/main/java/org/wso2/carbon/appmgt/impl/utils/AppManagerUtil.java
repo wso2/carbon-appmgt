@@ -4052,4 +4052,51 @@ public final class AppManagerUtil {
 
         return ssoProvider;
     }
+
+    public static boolean isSelfSubscriptionEnable() throws AppManagementException {
+        return readSubscriptionConfigurations("EnableSelfSubscription");
+    }
+
+    public static boolean isEnterpriseSubscriptionEnable() throws AppManagementException {
+        return readSubscriptionConfigurations("EnableEnterpriseSubscription");
+    }
+
+    private static boolean readSubscriptionConfigurations(String key) throws AppManagementException {
+        Resource tenantConfResource;
+        Registry registryType = null;
+        String tenantConfRegistryPath = "/_system/governance" + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" +
+                AppMConstants.TENANT_CONF_FILENAME;
+        try {
+            registryType = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getRegistry(CarbonConstants.REGISTRY_SYSTEM_USERNAME);
+            if (registryType.resourceExists(tenantConfRegistryPath)) {
+                tenantConfResource = registryType.get(tenantConfRegistryPath);
+                String content = new String((byte[]) tenantConfResource.getContent());
+                OMElement element = AXIOMUtil.stringToOM(content);
+                Iterator appStoreIterator = element.getChildrenWithLocalName("Subscriptions");
+                if (appStoreIterator.hasNext()) {
+                    OMElement storeElem = (OMElement) appStoreIterator.next();
+                    OMElement subscriptionElem = storeElem.getFirstChildWithName(new QName(key));
+                    String subscriptionValue = subscriptionElem.getText();
+                    return Boolean.parseBoolean(subscriptionValue);
+                }
+            }
+        } catch (RegistryException e) {
+            String msg = "Error while retrieving EnableSelfSubscription configuration from registry path: "
+                    + tenantConfRegistryPath;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (XMLStreamException e) {
+            String msg = "Malformed XML found in the subscription configuration resource : "
+                    + tenantConfRegistryPath;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (OMException e) {
+            String msg = "Malformed XML found in the subscription configuration resource : "
+                    + tenantConfRegistryPath;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
+        return false;
+    }
 }
