@@ -1100,13 +1100,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             int tenantId = AppManagerUtil.getTenantId(userName);
 
-            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
-            Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                    AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-            Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                    AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-            if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            if (AppManagerUtil.isSelfSubscriptionEnable() || AppManagerUtil.isEnterpriseSubscriptionEnable()) {
                 //Check for subscriber existence
                 Subscriber subscriber = apiConsumer.getSubscriber(userName);
                 if (subscriber == null) {
@@ -1201,15 +1195,8 @@ public class AppsApiServiceImpl extends AppsApiService {
         UserIdListDTO userIdListDTO = new UserIdListDTO();
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-
-                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) || AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+                if (AppManagerUtil.isSelfSubscriptionEnable() || AppManagerUtil.isEnterpriseSubscriptionEnable()) {
                     WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
                     Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
                     userIdListDTO.setUserIds(subscriberSet);
