@@ -36,7 +36,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -56,67 +61,9 @@ import org.apache.commons.io.FileUtils;
  * admin-dasboard/site/config/site.json
  */
 public class ThemeManagerHostObject extends ScriptableObject {
+
     private static final Log log = LogFactory.getLog(ThemeManagerHostObject.class);
     private static final String DEFAULT = "default";
-
-    /**
-     * Construct and return the default theme path of store.
-     * [/repository/deployment/server/jaggeryapps/store/themes]
-     *
-     * @return path
-     */
-    private static String getStoreThemePath() {
-        StringBuilder path = new StringBuilder("repository").append(File.separator).append("deployment").append(
-                File.separator).append("server").append(File.separator).append("jaggeryapps").append(File.separator)
-                .append("store").append(File.separator).append("themes");
-        return path.toString();
-    }
-
-    /**
-     * Construct and return the custom theme path of tenant.
-     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>]
-     *
-     * @return path
-     */
-    private static String getTenantThemePath(String tenant) {
-        StringBuilder path = new StringBuilder(getStoreThemePath());
-        path.append(File.separator).append(tenant);
-        return path.toString();
-    }
-
-    /**
-     * Construct and return the custom tenant theme extensions path.
-     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>/extensions/assets]
-     *
-     * @return path
-     */
-    private static String getExtThemePath(String tenantDomain) {
-        StringBuilder path = new StringBuilder(getTenantThemePath(tenantDomain));
-        path.append(File.separator).append("extensions").append(File.separator)
-                .append("assets");
-        return path.toString();
-    }
-
-    /**
-     * Construct and return the custom tenant theme path.
-     *
-     * @param tenantDomain Tenant Domain
-     * @param themeType    Theme Type (Default ,<assetType> e.g webapp)
-     * @return path
-     */
-    private static String getCustomThemePath(String tenantDomain, String themeType) {
-        StringBuilder path = new StringBuilder(getTenantThemePath(tenantDomain));
-        if (DEFAULT.equals(themeType)) {
-            path.append(File.separator).append("themes").append(File.separator)
-                    .append("custom");
-        } else {
-            path.append(File.separator).append("extensions").append(File.separator)
-                    .append("assets").append(File.separator).append(themeType).append(File.separator).append("themes")
-                    .append(File.separator).append("custom");
-        }
-        return path.toString();
-    }
-
 
     @Override
     public String getClassName() {
@@ -188,12 +135,11 @@ public class ThemeManagerHostObject extends ScriptableObject {
                                                             Function funObj)
             throws AppManagementException {
 
-        if (args == null || args.length != 2) {
+        if (args == null || args.length != 1) {
             handleException(
                     "Invalid input parameters for getDeployedThemes.Expected parameters : tenantDomain,themeTypes");
         }
         String tenantDomain = (String) args[0];
-        NativeArray themeTypes = (NativeArray) args[1];
         NativeObject themes = new NativeObject();
 
         if (log.isDebugEnabled()) {
@@ -201,19 +147,49 @@ public class ThemeManagerHostObject extends ScriptableObject {
             log.debug(msg);
         }
         //check tenant theme dir exists
-        String path = getTenantThemePath(tenantDomain);
-        File dir = new File(path);
-        if (!dir.exists()) {
+        Path path = getTenantThemePath(tenantDomain);
+        if (!Files.exists(path)) {
             return themes;
         }
 
-        for (Object themeType : themeTypes) {
-            String theme = (String) themeType;
-            path = getCustomThemePath(tenantDomain, (String) themeType);
-            themes.put(theme, themes, isThemeExists(path));
+        //check custom default theme
+        path = getCustomThemePath(tenantDomain, DEFAULT);
+        themes.put(DEFAULT, themes, isThemeExists(path));
+
+        //check custom asset level themes
+        List<String> assetTypes = HostObjectUtils.getEnabledAssetTypes();
+        for (String type : assetTypes) {
+            path = getCustomThemePath(tenantDomain, type);
+            themes.put(type, themes, isThemeExists(path));
         }
         return themes;
     }
+
+    /**
+     * Get the theme types
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getCustomThemeTypes(Context cx, Scriptable thisObj, Object[] args,
+                                                             Function funObj)
+            throws AppManagementException {
+        List<String> assetTypes = HostObjectUtils.getEnabledAssetTypes();
+        NativeArray themeTypes = new NativeArray(0);
+        int i = 0;
+        themeTypes.put(i, themeTypes, DEFAULT);
+        for (String type : assetTypes) {
+            i++;
+            themeTypes.put(i, themeTypes, type);
+        }
+
+        return themeTypes;
+    }
+
 
     /**
      * Remove given deployed custom them for given tenant.
@@ -233,8 +209,8 @@ public class ThemeManagerHostObject extends ScriptableObject {
         }
         String tenantDomain = (String) args[0];
         String themeType = (String) args[1];
-        return undeployTheme(tenantDomain, themeType);
 
+        return undeployTheme(tenantDomain, themeType);
     }
 
     /**
@@ -251,19 +227,18 @@ public class ThemeManagerHostObject extends ScriptableObject {
             log.debug(msg);
         }
         // store/themes/<tenantDomain>
-        String tenantThemePath = getTenantThemePath(tenantDomain);
+        Path tenantThemePath = getTenantThemePath(tenantDomain);
         // store/themes/<tenantDomain>/extensions/assets
-        String extAssetsPath = getExtThemePath(tenantDomain);
+        Path extAssetsPath = getExtThemePath(tenantDomain);
         // store/themes/<tenantDomain>/themes
-        String defaultThemePath = tenantThemePath + File.separator + "themes";
+        Path defaultThemePath = tenantThemePath.resolve("themes");
         // store/themes/<tenantDomain>/extensions
-        String extPath = tenantThemePath + File.separator + "extensions";
+        Path extPath = tenantThemePath.resolve("extensions");
 
-        File dir = new File(tenantThemePath);
-        if (!dir.exists()) {
+        if (!Files.exists(tenantThemePath)) {
             //no tenant theme directory found
             if (log.isDebugEnabled()) {
-                String msg = String.format("Tenant theme directory does not exist");
+                String msg = String.format("Tenant theme directory does not exist : %s", tenantThemePath.toString());
                 log.debug(msg);
             }
             return true;
@@ -273,23 +248,21 @@ public class ThemeManagerHostObject extends ScriptableObject {
             deleteDir(defaultThemePath);
             //if custom extension theme path does not exist
             //then  delete tenant theme dir
-            dir = new File(extPath);
-            if (!dir.exists()) {
+            if (!Files.exists(extPath)) {
                 deleteDir(tenantThemePath);
             }
         } else {
             // store/themes/<tenantDomain>/extensions/assets/<assetType>
-            String path = extAssetsPath + File.separator + themeType;
+            Path path = extAssetsPath.resolve(themeType);
             deleteDir(path);
             //if there are no any custom asset themes
             // then delete the extensions dir
-            dir = new File(extAssetsPath);
+            File dir = extAssetsPath.toFile();
             if (dir.list().length == 0) {
                 deleteDir(extPath);
                 //if custom default theme is not exists
                 //then delete tenand theme dir
-                dir = new File(defaultThemePath);
-                if (!dir.exists()) {
+                if (!Files.exists(defaultThemePath)) {
                     deleteDir(tenantThemePath);
                 }
             }
@@ -302,16 +275,16 @@ public class ThemeManagerHostObject extends ScriptableObject {
      *
      * @throws AppManagementException
      */
-    private static void deleteDir(String path) throws AppManagementException {
+    private static void deleteDir(Path path) throws AppManagementException {
         if (log.isDebugEnabled()) {
-            String msg = String.format("Delete directory : %s", path);
+            String msg = String.format("Delete directory : %s", path.toString());
             log.debug(msg);
         }
-        File dir = new File(path);
+
         try {
-            FileUtils.deleteDirectory(dir);
+            FileUtils.deleteDirectory(path.toFile());
         } catch (IOException e) {
-            handleException("Could not delete directory :" + dir.getPath());
+            handleException("Could not delete directory :" + path.toString());
         }
     }
 
@@ -321,13 +294,13 @@ public class ThemeManagerHostObject extends ScriptableObject {
      * @param path File Path
      * @return true if exists else false
      */
-    private static boolean isThemeExists(String path) {
-        File dir = new File(path);
+    private static boolean isThemeExists(Path path) {
+        boolean isExists = Files.exists(path);
         if (log.isDebugEnabled()) {
-            String msg = "Custom theme found status : " + dir.exists() + " in path : " + path;
+            String msg = "Custom theme found status : " + isExists + " in path : " + path.toString();
             log.debug(msg);
         }
-        return dir.exists();
+        return isExists;
     }
 
     /**
@@ -347,18 +320,19 @@ public class ThemeManagerHostObject extends ScriptableObject {
             String msg = String.format("Deploy custom theme of type :%1s for tenant :%2s", themeType, tenant);
             log.debug(msg);
         }
+
         ZipInputStream zis = null;
         byte[] buffer = new byte[1024];
 
         //check store theme directory exists
-        File themeDir = new File(getStoreThemePath());
-        if (!themeDir.exists()) {
-            String msg = "Could not found directory :" + themeDir;
+
+        Path themeDir = getStoreThemePath();
+        if (!Files.exists(themeDir)) {
+            String msg = "Could not found directory :" + themeDir.toString();
             handleException(msg);
         }
 
-        String themePath = null;
-        themePath = getCustomThemePath(tenant, themeType);
+        Path themePath = getCustomThemePath(tenant, themeType);
         InputStream zipInputStream = null;
         try {
             zipInputStream = themeFile.getInputStream();
@@ -372,11 +346,8 @@ public class ThemeManagerHostObject extends ScriptableObject {
                 log.debug(msg);
             }
             //create output directory if it is not exists
-            File dir = new File(themePath);
-            if (!dir.exists()) {
-                if (!dir.mkdirs()) {
-                    handleException("Unable to create tenant custom directory :" + dir);
-                }
+            if (!Files.exists(themePath)) {
+                createDirectory(themePath);
             }
 
             if (log.isDebugEnabled()) {
@@ -391,22 +362,21 @@ public class ThemeManagerHostObject extends ScriptableObject {
 
             while (ze != null) {
                 String fileName = ze.getName();
-                File newFile = new File(dir + File.separator + fileName);
+                Path newFilePath = themePath.resolve(fileName);
                 if (ze.isDirectory()) {
-                    if (!newFile.exists()) {
-                        boolean status = newFile.mkdir();
-                        if (!status) {
-                            handleException("Could not create directory :" + newFile.getPath());
-                        }
+                    if (!Files.exists(newFilePath)) {
+                        createDirectory(newFilePath);
                     }
                 } else {
                     ext = FilenameUtils.getExtension(ze.getName());
                     if (whitelistedExt.contains(ext)) {
                         //create all non exists folders
                         //else you will hit FileNotFoundException for compressed folder
-                        File parentDir = new File(newFile.getParent());
-                        parentDir.mkdirs();
-                        FileOutputStream fos = new FileOutputStream(newFile);
+                        Path parentDir = newFilePath.getParent();
+                        if (!Files.exists(parentDir)) {
+                            createDirectory(parentDir);
+                        }
+                        FileOutputStream fos = new FileOutputStream(newFilePath.toFile());
 
                         int len;
                         while ((len = zis.read(buffer)) > 0) {
@@ -416,7 +386,7 @@ public class ThemeManagerHostObject extends ScriptableObject {
                         fos.close();
                     } else {
                         String msg = String.format(
-                                "Unsupported file is uploaded with custom theme by tenant %1s.File : %2s ",
+                                "Unsupported file is uploaded with custom theme by tenant %1s. File : %2s ",
                                 tenant, ze.getName());
                         log.warn(msg);
                     }
@@ -427,10 +397,70 @@ public class ThemeManagerHostObject extends ScriptableObject {
             zis.closeEntry();
             zis.close();
         } catch (IOException e) {
-            handleException("Failed to deploy Custom theme", e);
+            handleException("Failed to deploy custom theme", e);
         } finally {
             IOUtils.closeQuietly(zis);
             IOUtils.closeQuietly(zipInputStream);
+        }
+    }
+
+
+    private static void createDirectory(Path directoryPath) throws AppManagementException {
+        try {
+            Files.createDirectories(directoryPath);
+        } catch (FileAlreadyExistsException e) {
+            handleException("Cannot create directory '" + directoryPath +
+                                    "' as a file already exists in the same path.", e);
+        } catch (IOException e) {
+            handleException(
+                    "An error occurred when creating directory '" + directoryPath + "'.", e);
+        }
+    }
+
+    /**
+     * Construct and return the default theme path of store. [/repository/deployment/server/jaggeryapps/store/themes]
+     *
+     * @return path
+     */
+    private static Path getStoreThemePath() {
+        return Paths.get("repository", "deployment", "server", "jaggeryapps", "store", "themes");
+    }
+
+    /**
+     * Construct and return the custom theme path of tenant.
+     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>]
+     *
+     * @return path
+     */
+    private static Path getTenantThemePath(String tenant) {
+        return getStoreThemePath().resolve(tenant);
+    }
+
+    /**
+     * Construct and return the custom tenant theme extensions path.
+     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>/extensions/assets]
+     *
+     * @return path
+     */
+    private static Path getExtThemePath(String tenantDomain) {
+        Path path = getTenantThemePath(tenantDomain);
+        Path tempPath = Paths.get("extensions", "assets");
+        return path.resolve(tempPath);
+    }
+
+    /**
+     * Construct and return the custom tenant theme path.
+     *
+     * @param tenantDomain Tenant Domain
+     * @param themeType    Theme Type (Default ,<assetType> e.g webapp)
+     * @return path
+     */
+    private static Path getCustomThemePath(String tenantDomain, String themeType) {
+        Path path = getTenantThemePath(tenantDomain);
+        if (DEFAULT.equals(themeType)) {
+            return path.resolve(Paths.get("themes", "custom"));
+        } else {
+            return path.resolve(Paths.get("extensions", "assets", themeType, "themes", "custom"));
         }
     }
 

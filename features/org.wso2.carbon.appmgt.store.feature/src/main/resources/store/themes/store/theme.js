@@ -36,8 +36,9 @@ var engine = caramel.engine('handlebars', (function () {
             //register partials from custom default theme
             if(isCustomThemeExist(tenantDomain,'default')) {
                 var path =  getCustomDefaultThemePath(tenantDomain) + "/" + PARTIALS;
-                if (new File(path).isExists()) {
-                    partials(new File(path));
+                var dir = new File(path);
+                if (dir.isExists()) {
+                    partials(dir);
                 }
             }
 
@@ -47,15 +48,17 @@ var engine = caramel.engine('handlebars', (function () {
                 var themeName = caramel.configs().themer();
                 //register partials from asset  extension theme
                 var path = getAssetThemePath(asset,themeName)+ "/" + PARTIALS;
-                if (new File(path).isExists()) {
-                    partials(new File(path));
+                var dir = new File(path);
+                if (dir.isExists()) {
+                    partials(dir);
                 }
 
                 //register partial from custom theme of asset extension theme
                 if(isCustomThemeExist(tenantDomain, asset)) {
                     var path = getCustomAssetThemePath(tenantDomain,asset)+ "/" + PARTIALS;
-                    if (new File(path).isExists()) {
-                        partials(new File(path));
+                    var dir = new File(path);
+                    if (dir.isExists()) {
+                        partials(dir);
                     }
                 }
             }
@@ -390,7 +393,8 @@ var cacheCustomThemeInfo = function(tenantDomain) {
         //check asset level custom theme exists
         var extPath = customThemePath + "/extensions/assets/";
         var assets = require('/config/store-tenant.json').assets;
-        for(var i =0 ; i < assets.length ; i++) {
+        var count = assets.length;
+        for(var i =0 ; i < count ; i++) {
             var path = extPath + assets[i];
             if(new File(path).isExists()) {
                 customThemes.push(assets[i])

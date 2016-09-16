@@ -19,6 +19,7 @@
 
 jagg.template("theme-upload-task", function(inputs, outputs, jagg) {
     var themeUploadUrl = jagg.getAbsoluteUrl("/themeupload");
+    var log = new Log();
 %>
 <div id="listing">
     <div class="title-section">
@@ -27,12 +28,12 @@ jagg.template("theme-upload-task", function(inputs, outputs, jagg) {
     <div class="content-section shadow-up">
 
         <div class="content-data">
-        <% if(outputs.error != false){ %>
+        <% if(outputs.error){ %>
           <div class="alert alert-error">
-              <%= outputs.error %>              
+              <%= outputs.errorMsg %>
           </div>
         <% } %>
-        <% if(outputs.success != false){ %>
+        <% if(!outputs.error){ %>
           <div class="alert alert-success">
               Theme was uploaded successfully.              
           </div>

@@ -1,15 +1,15 @@
 <%
 include("/jagg/jagg.jag");
-var site = require("/site/conf/site.json");
+var appManager = require("thememanager");
+var managerHostObj = new appManager.ThemeManager();
+var log = new Log();
 jagg.block("theme-list", {
     initializer: function (data) {
 
     },
 
     getInputs: function () {
-        return {
-
-        }
+        return {}
     },
 
     getOutputs: function (inputs) {
@@ -18,10 +18,9 @@ jagg.block("theme-list", {
         var user = jagg.getUser();
         var tenantDomain = user.userDomain;
         //get list of theme exists
-        var appManager = require("thememanager");
-        var managerHostObj = new appManager.ThemeManager();
+
         try {
-            themes = managerHostObj.getDeployedThemes(tenantDomain, getCustomStoreThemeTypes());
+            themes = managerHostObj.getDeployedThemes(tenantDomain);
         } catch (e) {
             var errorMsg = "Error while retrieving deployed theme information";
             log.error(errorMsg, e);
@@ -38,7 +37,4 @@ jagg.block("theme-list", {
 
 });
 
-var getCustomStoreThemeTypes = function () {
-    return site.customStoreThemeConfig.themeTypes;
-};
 %>

@@ -26,8 +26,7 @@
         "keyStoreName" :""
     },
     "customStoreThemeConfig" : {
-        "whitelist" : ["css", "svg"],
-        "themeTypes" : ["default","webapp","site","mobileapp"]
+        "whitelist" : ["css", "svg"]
     }
 
 }

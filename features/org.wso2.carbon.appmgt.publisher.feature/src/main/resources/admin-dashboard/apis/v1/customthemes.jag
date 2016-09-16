@@ -19,34 +19,33 @@
 
 include('/jagg/jagg.jag');
 var log = new Log("customthemes.jag");
-var site = require("/site/conf/site.json");
 var method = request.getMethod();
 var uriMatcher = new URIMatcher(request.getRequestURI());
 var deleteTheme = '/{context}/apis/customthemes/{type}';
 var appManager = require("thememanager");
-var managerHostObj = new appManager.APPManager();
+var managerHostObj = new appManager.ThemeManager();
 
-if(method == "DELETE") {
+if (method == "DELETE") {
     if (uriMatcher.match(deleteTheme)) {
         var user = jagg.getUser();
-        if(!user) {
+        if (!user) {
             response.sendError(401, 'Unauthorized');
         }
         var tenantDomain = user.userDomain;
         var type = uriMatcher.elements().type;
         var themeTypes = getCustomStoreThemeTypes();
-        if(!type || themeTypes.indexOf(type) == -1) {
-                response.content = {"error":true ,"errorMsg" : "Unsupported theme type"}
+        if (!type || (stringify(themeTypes).indexOf(type) == -1)) {
+            response.content = {"error": true, "errorMsg": "Unsupported theme type"}
         }
 
-        try{
+        try {
             //delete theme
-            var success = managerHostObj.deleteCustomTheme(tenantDomain,type);
-            print({"error" : success});
-        }catch (e) {
-            var msg = "Could not delete theme : " + type  +" of tenant :" +tenantDomain;
-            log.error(msg,e);
-            print({"error" : true, "errorMsg":mgs});
+            var status = managerHostObj.deleteCustomTheme(tenantDomain, type);
+            print({"error": status});
+        } catch (e) {
+            var msg = "Could not delete theme : " + type + " of tenant :" + tenantDomain;
+            log.error(msg, e);
+            print({"error": true, "errorMsg": msg});
         }
 
     }
@@ -55,6 +54,6 @@ if(method == "DELETE") {
 }
 
 function getCustomStoreThemeTypes() {
-    return site.customStoreThemeConfig.themeTypes;
-};
+    return managerHostObj.getCustomThemeTypes();
+}
 %>

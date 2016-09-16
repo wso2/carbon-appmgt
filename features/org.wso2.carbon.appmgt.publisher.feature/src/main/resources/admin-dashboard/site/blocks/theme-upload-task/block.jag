@@ -1,15 +1,16 @@
 <%
 include("/jagg/jagg.jag");
 var site = require("/site/conf/site.json");
+var appManager = require("thememanager");
+var managerHostObj = new appManager.ThemeManager();
+
 jagg.block("theme-upload-task", {
     initializer: function (data) {
 
     },
 
     getInputs: function () {
-        return {
-
-        }
+        return {}
     },
 
     getOutputs: function (inputs) {
@@ -17,41 +18,42 @@ jagg.block("theme-upload-task", {
         var log = new Log("Theme Upload Task :");
         var error = false;
         var success = false;
+        var errorMsg;
 
         if (request.getMethod() == "POST") {
             var themeType = request.getParameter("type");
             var themeTypes = getCustomStoreThemeTypes();
-            if (!themeType || themeTypes.indexOf(themeType) == -1) {
-                error = "Please select the correct theme type";
+            if (!themeType || (stringify(themeTypes).indexOf(themeType) == -1)) {
+                error =true;
+                errorMsg = "Please select the correct theme type";
                 log.error("Theme type : " + themeType + " is not found in :" + stringify(themeTypes));
             } else {
                 if (user.userDomain != null && user.userDomain != '') {
                     var file = request.getFile("theme");
                     if (file) {
-                        var file_name = file.getName();
-                        var file_ext = file_name.substr(file_name.length - 4);
-                        if (file_ext != ".zip") {
-                            error = "Please upload a valid zip file.";
-                            log.error("File extension : " + file_ext + " of file : " + file_name + " is not supported");
+                        var fileName = file.getName();
+                        var fileExt = fileName.substr(fileName.length - 4);
+                        if (fileExt != ".zip") {
+                            error =true;
+                            errorMsg = "Please upload a valid zip file.";
+                            log.error("File extension : " + fileExt + " of file : " + fileName + " is not supported");
                         }
                         else {
                             var whiteListedExt = getWhiteListedFileExt();
-                            var appManager = require("thememanager");
-                            var managerHostObj = new appManager.ThemeManager();
                             try {
-                                success =
                                 managerHostObj.addCustomTheme(file, user.userDomain, themeType, whiteListedExt);
                             } catch (e) {
-                                error = "Error while deploying theme.";
+                                error =true;
+                                errorMsg = "Error while deploying theme.";
                                 log.error(error, e);
                             }
                         }
                     } else {
-                        error = "Please upload theme file.";
+                        errorMsg = "Please upload theme file.";
                     }
                 }
                 else {
-                    error = "Tenant is not specified, unable to deploy the theme.";
+                    errorMsg = "Tenant is not specified, unable to deploy the theme.";
                 }
             }
 
@@ -59,7 +61,7 @@ jagg.block("theme-upload-task", {
 
         return {
             "error": error,
-            "success": success,
+            "errorMsg": errorMsg,
             "themes": getCustomStoreThemeTypes()
         }
     }
@@ -67,7 +69,7 @@ jagg.block("theme-upload-task", {
 });
 
 var getCustomStoreThemeTypes = function () {
-    return site.customStoreThemeConfig.themeTypes;
+   return managerHostObj.getCustomThemeTypes();
 };
 
 var getWhiteListedFileExt = function () {
