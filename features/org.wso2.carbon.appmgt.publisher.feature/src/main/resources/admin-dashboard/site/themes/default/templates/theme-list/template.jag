@@ -1,0 +1,80 @@
+<%
+/*
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+jagg.template("theme-list", function (inputs, outputs, jagg) {
+    var isThemesExist = false;
+    var themes = outputs.themes;
+    if (themes && Object.keys(themes).length > 0) {
+        isThemesExist = true;
+    } %>
+    <div id="listing">
+        <div class="title-section">
+            <h2><%=i18n.localize("themeList")%></h2>
+        </div>
+            <div class="content-section shadow-up">
+
+                <div class="content-data">
+                    <% if (outputs.error != false) { %>
+                     <div class="alert alert-error"> <%=outputs.errorMsg%></div>
+               <%} %>
+           <%if (isThemesExist) { %>
+          <div>
+               <fieldset class="policy-list" >
+                  <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Theme Type</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                             <%
+                                for (var key in themes) {
+                                    if (themes[key]) {
+                                        %>
+                                        <tr>
+                                        <td ><%=i18n.localize(key)%></td>
+                                        <td><a class="theme-delete-button" data-theme="<%=i18n.localize(key) %>" data-theme-type="<%=key%>">
+                                        <i class="icon-trash"></i></a></td>
+                                        </tr>
+                                        <%
+                                    }
+                                }
+                                %>
+                             </tbody>
+                  </table>
+               </fieldset>
+           </div>
+                <%
+    } else { %>
+          <div class="alert alert-info">
+              No themes deployed
+          </div>
+        <%
+    }
+    %>
+
+
+
+                </div>
+            </div>
+
+   </div>
+   <%
+}); %>

@@ -1,0 +1,7 @@
+<module name="thememanager" namespace="ns" expose="true" xmlns="http://wso2.org/projects/jaggery/module.xml">
+    <hostObject>
+        <className>org.wso2.carbon.appmgt.hostobjects.ThemeManagerHostObject</className>
+        <name>ThemeManager</name>
+    </hostObject>
+</module>
+

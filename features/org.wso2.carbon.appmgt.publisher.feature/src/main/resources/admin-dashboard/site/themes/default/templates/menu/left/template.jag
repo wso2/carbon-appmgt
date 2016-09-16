@@ -70,6 +70,25 @@
             </ul>
         </li>
 
+        <li class="dropdown custom-verticle">
+            <a href="<%=listMappedUrl%>?task=themeUpload" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-eye-open"></i> <br> <%= i18n.localize("customTheme") %>  <i class="icon-chevron-right"></i>
+           </b></a>
+            <ul class="dropdown-menu">
+                 <li <%if(request.getParameter("task")=="themeList"){%>class="active"<% } %>>
+                    <a href="<%=listMappedUrl%>?task=themeList"  onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl
+                    %>?task=themeList',e:event,ssoEnabled:<%=ssoEnabled%>})"><i class="icon-eye-open"></i><br>
+                    List Themes</a>
+             </li>
+
+                 <li <%if(request.getParameter("task")=="themeUpload"){%>class="active"<% } %>>
+                        <a href="<%=listMappedUrl%>?task=themeUpload"  onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl
+        %>?task=themeUpload',e:event,ssoEnabled:<%=ssoEnabled%>})"><i class="icon-eye-open"></i><br>
+                        Upload Theme</a>
+                 </li>
+            </ul>
+        </li>
+
      </ul>
 </div>
 
