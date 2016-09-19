@@ -56,6 +56,7 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
@@ -3063,5 +3064,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         appRepository.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
     }
 
+    public String getGatewayEndpoint() {
+        Environment gatewayEnvironment = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getApiGatewayEnvironments().get(0);
+
+        String gatewayUrl = gatewayEnvironment.getApiGatewayEndpoint().split(",")[0];
+        return gatewayUrl;
+    }
 
 }

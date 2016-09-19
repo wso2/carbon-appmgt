@@ -124,6 +124,8 @@ public class WebApp extends App{
     public String createdTime;
     private String originVersion;
 
+    private boolean saveServiceProvider;
+
     public WebApp() {
     }
 
@@ -798,5 +800,13 @@ public class WebApp extends App{
             }
         }
         return visibleRoleList;
+    }
+
+    public void setSaveServiceProvider(boolean saveServiceProvider) {
+        this.saveServiceProvider = saveServiceProvider;
+    }
+
+    public boolean isSaveServiceProvider() {
+        return saveServiceProvider;
     }
 }

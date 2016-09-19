@@ -4258,6 +4258,23 @@ public class APIProviderHostObject extends ScriptableObject {
                     fileNames.get(i).toString()));
         }
     }
+
+
+    /**
+     * Get Gateway endpoint url
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return Gateway endpoint url
+     * @throws AppManagementException
+     */
+    public static String jsFunction_getGatewayEndpoint(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        APIProvider provider = getAPIProvider(thisObj);
+        return provider.getGatewayEndpoint();
+    }
 }
 
 

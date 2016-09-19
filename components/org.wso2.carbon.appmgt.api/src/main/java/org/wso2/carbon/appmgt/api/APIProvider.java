@@ -835,4 +835,6 @@ public interface APIProvider extends APIManager {
      */
     public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
 
+    public String getGatewayEndpoint();
+
 }
