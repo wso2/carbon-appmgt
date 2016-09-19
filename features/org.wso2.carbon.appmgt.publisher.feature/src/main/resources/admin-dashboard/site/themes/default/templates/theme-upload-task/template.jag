@@ -1,0 +1,77 @@
+<%
+/*
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+jagg.template("theme-upload-task", function(inputs, outputs, jagg) {
+    var themeUploadUrl = jagg.getAbsoluteUrl("/themeupload");
+    var log = new Log();
+%>
+<div id="listing">
+    <div class="title-section">
+        <h2><%=i18n.localize("themeUpload")%></h2>
+    </div>
+    <div class="content-section shadow-up">
+
+        <div class="content-data">
+        <% if(outputs.error){ %>
+          <div class="alert alert-error">
+              <%= outputs.errorMsg %>
+          </div>
+        <% } %>
+        <% if(!outputs.error){ %>
+          <div class="alert alert-success">
+              Theme was uploaded successfully.              
+          </div>
+        <% }else{ %>
+          <div class="alert alert-info">
+              The theme should be a zip file containing css and images which is compliant to APP Manager theme format
+          </div>
+        <% } %>
+        
+
+          <form action="<%=themeUploadUrl%>" enctype="multipart/form-data" method="post" class="form-horizontal">
+           <div class="control-group">
+           <label class="control-label">Theme Type</label>
+               <div class="controls">
+                  <select name="type">
+                      <option selected="true" disabled="disabled">---Choose---</option>
+                      <% for(var i=0; i < outputs.themes.length ; i++) { %>
+                        <option value="<%=outputs.themes[i]%>"><%=i18n.localize(outputs.themes[i])%></option>
+                      <% }%>
+
+                  </select>
+                </div>
+
+            </div>
+            <div class="control-group">
+            <label class="control-label" >Theme File</label>
+              <div class="controls">
+                <input type="file" name="theme" size="40">
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">              
+                <button type="submit" class="btn btn-primary">Upload</button>
+              </div>
+            </div>
+          </form>
+        </div>
+    </div>
+
+</div>
+<% }); %>
