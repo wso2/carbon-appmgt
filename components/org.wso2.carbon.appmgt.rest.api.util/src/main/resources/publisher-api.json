@@ -3133,6 +3133,10 @@
                     "type": "string",
                     "example": "true/false"
                 },
+                "serviceProviderCreationEnabled": {
+                    "type": "boolean",
+                    "example": "true/false"
+                },
                 "allowAnonymousAccess": {
                     "type": "string",
                     "example": "true/false"

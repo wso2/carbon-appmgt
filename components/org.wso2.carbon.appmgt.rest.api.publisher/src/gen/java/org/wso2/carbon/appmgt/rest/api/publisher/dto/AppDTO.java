@@ -71,7 +71,10 @@ public class AppDTO  {
   
   
   private String skipGateway = null;
-  
+
+
+  private Boolean serviceProviderCreationEnabled = null;
+
   
   private String allowAnonymousAccess = null;
   
@@ -386,7 +389,18 @@ public class AppDTO  {
     this.skipGateway = skipGateway;
   }
 
-  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("serviceProviderCreationEnabled")
+  public Boolean isServiceProviderCreationEnabled() {
+    return serviceProviderCreationEnabled;
+  }
+  public void setServiceProviderCreationEnabled(Boolean serviceProviderCreationEnabled) {
+    this.serviceProviderCreationEnabled = serviceProviderCreationEnabled;
+  }
+
+
   /**
    **/
   @ApiModelProperty(value = "")

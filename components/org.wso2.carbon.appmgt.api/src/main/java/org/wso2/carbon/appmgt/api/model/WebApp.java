@@ -124,7 +124,7 @@ public class WebApp extends App{
     public String createdTime;
     private String originVersion;
 
-    private boolean saveServiceProvider;
+    private boolean serviceProviderCreationEnabled;
 
     public WebApp() {
     }
@@ -802,11 +802,11 @@ public class WebApp extends App{
         return visibleRoleList;
     }
 
-    public void setSaveServiceProvider(boolean saveServiceProvider) {
-        this.saveServiceProvider = saveServiceProvider;
+    public void setServiceProviderCreationEnabled(boolean serviceProviderCreationEnabled) {
+        this.serviceProviderCreationEnabled = serviceProviderCreationEnabled;
     }
 
-    public boolean isSaveServiceProvider() {
-        return saveServiceProvider;
+    public boolean isServiceProviderCreationEnabled() {
+        return serviceProviderCreationEnabled;
     }
 }

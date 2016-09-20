@@ -657,6 +657,15 @@ public class APPMappingUtil {
         webApp.setBusinessOwner(appDTO.getBusinessOwnerId());
         webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(), ","));
         webApp.setSkipGateway(Boolean.parseBoolean(appDTO.getSkipGateway()));
+
+		if(appDTO.isServiceProviderCreationEnabled() != null){
+			webApp.setServiceProviderCreationEnabled(appDTO.isServiceProviderCreationEnabled());
+		}else{
+			// Default behaviour is creating the service provider.
+			webApp.setServiceProviderCreationEnabled(true);
+		}
+
+        webApp.setServiceProviderCreationEnabled(appDTO.isServiceProviderCreationEnabled());
         webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
         webApp.setAcsURL(appDTO.getAcsUrl());
         webApp.setSsoProviderDetails(AppManagerUtil.getDefaultSSOProvider());
