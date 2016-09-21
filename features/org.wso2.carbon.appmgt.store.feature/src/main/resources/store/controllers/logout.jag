@@ -16,7 +16,7 @@
                 config.ssoConfiguration.issuer),
             relayState = '/store',
             serverHost = process.getProperty('server.host'),
-            postUrl = ssoIdpProvider.getIdentityProviderUrl();
+            postUrl = config.ssoConfiguration.identityProviderURL;
 
         caramel = require('caramel');
         var contextPath = caramel.configs().context;
