@@ -108,7 +108,6 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String trackingCode = headers.get("trackingCode");
             WebAppInfoDTO webAppInfoDTO = AppMDAO.getWebAppByTrackingCode(trackingCode);
             String version = webAppInfoDTO.getVersion();
-            //referer = referer + version;
             String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
             if (context.contains("/t/")) {
             	tenantDomain = contextAndVersion[1];
