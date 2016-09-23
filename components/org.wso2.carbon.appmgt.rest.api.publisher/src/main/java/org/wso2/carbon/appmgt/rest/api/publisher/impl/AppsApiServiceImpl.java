@@ -1648,11 +1648,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         RestApiUtil.getLoggedInUserTenantDomain());
 
                 String uuid = appProvider.getAppUUIDbyName(appName, version, tenantId);
-                if (uuid == null) {
-                    String errorMessage =
-                            "Could not found an App with UUID for app: " + appName + " and version: " + version;
-                    RestApiUtil.handleBadRequest(errorMessage, log);
-
+                if (log.isDebugEnabled()) {
+                    log.debug("UUID of the app: " + appName + ", version: " + version + " is " + uuid);
                 }
                 appDTO.setId(uuid);
             } catch (AppManagementException e) {

@@ -517,8 +517,8 @@ public class DefaultAppRepository implements AppRepository {
         Connection conn = null;
         ResultSet resultSet = null;
         PreparedStatement ps = null;
-        ResultSet result = null;
-        String uuid = null;
+        ResultSet result;
+        String uuid = "";
         String sqlQuery =
                 "SELECT UUID FROM APM_APP WHERE APP_NAME=? AND APP_VERSION=? AND TENANT_ID=?";
 
@@ -530,7 +530,6 @@ public class DefaultAppRepository implements AppRepository {
             ps.setInt(3, tenantId);
 
             result = ps.executeQuery();
-
             if (result.next()) {
                 uuid = result.getString("UUID");
             }
