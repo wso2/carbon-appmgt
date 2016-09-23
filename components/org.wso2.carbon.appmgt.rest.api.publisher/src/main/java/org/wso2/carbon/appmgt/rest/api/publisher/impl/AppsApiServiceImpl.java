@@ -92,7 +92,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1638,6 +1637,37 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(responseMap).build();
     }
 
+    @Override
+    public Response appsAppTypeNameAppNameVersionVersionUuidGet(String appType, String appName, String version,
+                                                                String accept, String ifNoneMatch) {
+        AppDTO appDTO = new AppDTO();
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                        RestApiUtil.getLoggedInUserTenantDomain());
+
+                String uuid = appProvider.getAppUUIDbyName(appName, version, tenantId);
+                if (uuid == null) {
+                    String errorMessage =
+                            "Could not found an App with UUID for app: " + appName + " and version: " + version;
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+
+                }
+                appDTO.setId(uuid);
+            } catch (AppManagementException e) {
+                String errorMessage = "Error while retrieving UUID for app: " + appName + " and version: " + version;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            } catch (UserStoreException e) {
+                String errorMessage = "Error while retrieving tenant details";
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        } else {
+            RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+        }
+        return Response.ok().entity(appDTO).build();
+    }
 
     //remove artifact from registry
     private void removeRegistryArtifact(App webApp, String username)
