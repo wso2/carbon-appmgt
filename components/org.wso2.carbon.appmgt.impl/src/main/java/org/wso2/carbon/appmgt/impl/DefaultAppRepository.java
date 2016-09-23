@@ -511,6 +511,37 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
+    @Override
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId)
+            throws AppManagementException {
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String uuid = null;
+        String sqlQuery =
+                "SELECT UUID FROM APM_APP WHERE APP_NAME=? AND APP_VERSION=? AND TENANT_ID=?";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, appName);
+            ps.setString(2, appVersion);
+            ps.setInt(3, tenantId);
+
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                uuid = result.getString("UUID");
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve app uuid of app: " + appName + " and version: " + appVersion, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+        return uuid;
+    }
+
     /**
      * Retrieve one-time download link details from database
      * @param UUID

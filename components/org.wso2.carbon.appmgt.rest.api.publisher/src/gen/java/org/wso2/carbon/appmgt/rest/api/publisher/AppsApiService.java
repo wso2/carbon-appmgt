@@ -39,5 +39,6 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeStatsStatTypeGet(String appType,String statType,String startTimeStamp,String endTimeStamp,Integer limit,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeValidateContextPost(String appType,String appContext,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeNameAppNameVersionVersionUuidGet(String appType,String appName,String version,String accept,String ifNoneMatch);
 }
 
