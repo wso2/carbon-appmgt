@@ -87,7 +87,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param install     InstallDTO
      * @return
      */
-    private static final String DATE_FORMAT = "MM-dd-yyyy HH:mm a";
+    
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
         String username = RestApiUtil.getLoggedInUsername();
