@@ -4275,6 +4275,36 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider provider = getAPIProvider(thisObj);
         return provider.getGatewayEndpoint();
     }
+
+    /**
+     * Returns the generated Issuer name
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static String jsFunction_generateIssuerName(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        if (args == null || args.length != 2) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String appName = (String) args[0];
+        String version = (String) args[1];
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+
+        String saml2SsoIssuer;
+        if (!"carbon.super".equalsIgnoreCase(tenantDomain)) {
+            saml2SsoIssuer = appName + "-" + tenantDomain + "-" + version;
+        } else {
+            saml2SsoIssuer = appName + "-" + version;
+        }
+        return saml2SsoIssuer;
+    }
 }
 
 
