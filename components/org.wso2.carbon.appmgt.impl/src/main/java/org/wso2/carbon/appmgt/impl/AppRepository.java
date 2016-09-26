@@ -129,4 +129,6 @@ public interface AppRepository {
     public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
 
     Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException;
+
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException;
 }
