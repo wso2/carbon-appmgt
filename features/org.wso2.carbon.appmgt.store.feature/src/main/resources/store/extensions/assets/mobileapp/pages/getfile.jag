@@ -10,7 +10,13 @@ matcher.match('/{context}/api/mobileapp/getfile/{filename}');
 var fileName = matcher.elements().filename;
 
 var binaryFileLocation = storeObj.getBinaryFileStorage();
-var path = binaryFileLocation + fileName;
+
+if (binaryFileLocation.substring(0, 1) === "/") {
+    var path = binaryFileLocation + fileName;
+} else {
+    var path = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + fileName;
+}
+
 var mime = "application/octet-stream"
 
 var ext = (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName) : undefined;
@@ -52,7 +58,7 @@ try {
     response.sendError(400);
 }
 
-function isUserSubscribed() {
+function isUserSubscribed(){
 
 }
 

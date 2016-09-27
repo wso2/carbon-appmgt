@@ -5,7 +5,7 @@
         <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
             <div class="ratio-responsive-16by9 hover-overlay-container">
                 <div class="ratio-responsive-img">
-                    <img src="{{#if asset.attributes.images_banner}}{{url "/api/mobileapp/getfile/"}}{{asset.attributes.images_banner}}{{/if}}">
+                    <img src="{{#if asset.attributes.images_banner}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_banner}}{{/if}}">
                 </div>
             </div>
         </div>
@@ -15,26 +15,11 @@
                 <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
                     <div class="ratio-responsive-4by3">
                         <div class="ratio-responsive-img">
-                            <img src="{{#if asset.attributes.images_thumbnail}}{{url "/api/mobileapp/getfile/"}}{{asset.attributes.images_thumbnail}}{{/if}}" />
+                            <img src="{{#if asset.attributes.images_thumbnail}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_thumbnail}}{{/if}}" />
                         </div>
-                        {{#ifCond asset.attributes.overview_platform "==" "android"}}
-                            <div class="app-thumbnail-type background-color-android
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-android"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond asset.attributes.overview_platform "==" "ios"}}
-                            <div class="app-thumbnail-type background-color-apple
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-apple"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond asset.attributes.overview_platform "==" "webapp"}}
-                            <div class="app-thumbnail-type background-color-webapps
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw  fw-cloud"></i></span>
-                            </div>
-                        {{/ifCond}}
+                        <div class="app-thumbnail-type background-color-android col-xs-2 col-sm-3 col-md-3 col-lg-3">
+                            <span><i class="fw {{iconImage asset.attributes.overview_platform}}"></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,13 +51,11 @@
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
                                 {{/if}}
-
                             {{!--Check if already subscribed to previous version of the app--}}
                             {{else}} {{#if isUpdatedApp}}
                                 {{#if isDeviceSubscriptionEnabled}}
                                     <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-
                                        data-target="#modalUpdateApp"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
                                 {{else}}
@@ -135,7 +118,7 @@
                         {{#if this}}
                             <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                 <div class="thumbnail">
-                                    <img class="img-responsive" src="{{url "/api/mobileapp/getfile/"}}{{this}}" />
+                                    <img class="img-responsive" src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{this}}" />
                                 </div>
                             </div>
                         {{/if}}

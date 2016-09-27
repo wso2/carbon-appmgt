@@ -99,7 +99,7 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.domain = tenantDomain;
     headerData.assetType = "mobileapp";
 
-    var searchQuery = { search: "", searchTerm: "overview_displayName"};
+    var searchQuery = { search: "", searchTerm: "overview_name"};
 
     //set rating
     var ratings = JSON.parse(social.getRating("mobileapp:" + asset.id));

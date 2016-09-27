@@ -129,13 +129,6 @@ $("#devicesList").on( "click", ".device-image-block-modal", function() {
 $("#devicesList").on( "click", ".device-image-block-update-modal", function() {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    performUpdate(deviceId, devicePlatform, appToInstall);
-});
-
-
-$("#devicesList").on( "click", ".device-image-block-update-modal", function() {
-    var deviceId = $(this).data("deviceId");
-    var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
     var instantUpdate = $('#instant-update').is(":checked");
     if (!instantUpdate) {
         var scheduleUpdate = $('#schedule-update').val();
@@ -145,6 +138,7 @@ $("#devicesList").on( "click", ".device-image-block-update-modal", function() {
     }
     
 });
+
 
 function performInstalltion(deviceId, devicePlatform, app, schedule){
     jQuery.ajax({
@@ -173,15 +167,12 @@ function performInstalltion(deviceId, devicePlatform, app, schedule){
 }
 
 
-
 function performUpdate(deviceId, devicePlatform, app, schedule){
-
     jQuery.ajax({
         url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
               encodeURIComponent(devicePlatform) + "/update",
         type: "POST",
         dataType: "json",
-
         data : {"asset": app, "schedule": schedule}
     });
 
