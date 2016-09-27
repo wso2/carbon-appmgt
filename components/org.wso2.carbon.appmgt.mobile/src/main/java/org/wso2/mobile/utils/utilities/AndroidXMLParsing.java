@@ -162,7 +162,8 @@ public class AndroidXMLParsing {
                 break;
 
             } else {
-                off += 4;  //Skip the unidentified work
+
+                break;
             }
         }
 

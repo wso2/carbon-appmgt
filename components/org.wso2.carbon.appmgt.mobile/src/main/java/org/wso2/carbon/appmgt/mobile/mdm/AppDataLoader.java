@@ -22,12 +22,8 @@ package org.wso2.carbon.appmgt.mobile.mdm;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
@@ -59,21 +55,16 @@ public class AppDataLoader {
             app.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
-                APIProvider appProvider = getLoggedInUserProvider();
-                String oneTimeDownloadUUID = appProvider.generateOneTimeDownloadLink(artifact.getId());
                 app.setType(artifact.getAttribute("overview_type"));
                 if("install".equals(action) || "update".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
-                        String oneTimeDownloadLink = MobileConfigurations.getInstance().getBinaryFileStorageConfig().get(
-                                MobileConfigurations.APP_BINARY_FILE_API_LOCATION);
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + oneTimeDownloadLink + oneTimeDownloadUUID);
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+                        String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
-                                MobileConfigurations.getInstance().getInstance().getMDMConfigs()
-                                        .get(MobileConfigurations.IOS_PLIST_PATH) + File.separator + artifact.getId() +
-                                File.separator  + oneTimeDownloadUUID);
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance()
+                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
                     }
                 }
 
@@ -100,10 +91,5 @@ public class AppDataLoader {
             return app;
         }
 
-    }
-
-    public static APIProvider getLoggedInUserProvider() throws AppManagementException {
-        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
-        return APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
     }
 }

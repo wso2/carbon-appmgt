@@ -34,7 +34,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipFileReading {
-
     
     //ios CF Bundle keys
     public static final String IPA_BUNDLE_VERSION_KEY = "CFBundleVersion";
@@ -47,6 +46,7 @@ public class ZipFileReading {
 
 
     private static final Log log = LogFactory.getLog(ZipFileReading.class);
+    
     public static Document loadXMLFromString(String xml) throws Exception {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

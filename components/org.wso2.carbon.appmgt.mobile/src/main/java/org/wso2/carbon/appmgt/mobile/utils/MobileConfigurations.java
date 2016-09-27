@@ -55,12 +55,10 @@ public class MobileConfigurations {
     private static String activeMDMBundle;
     private static HashMap<String, String> activeMDMProperties;
     private static HashMap<String, String> mDMConfigs;
-    private static HashMap<String, String> binaryFileStorageConfig;
 
     public final static String  ENABLED = "Enabled";
     public final static String  ENABLE_SAMPLE_DEVICES = "EnableSampleDevices";
     public final static String  APP_DOWNLOAD_URL_HOST = "AppDownloadURLHost";
-    public final static String  APP_BINARY_FILE_API_LOCATION = "FileAPILocation";
     public final static String  ACTIVE_MDM = "ActiveMDM";
     public final static String  IOS_PLIST_PATH = "IosPlistPath";
     public final static String  ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
@@ -139,28 +137,6 @@ public class MobileConfigurations {
         }
 
         return mDMConfigs;
-    }
-
-    /**
-     *
-     * @return list of active MDM configurations
-     */
-    public HashMap<String, String> getBinaryFileStorageConfig(){
-        if(binaryFileStorageConfig == null){
-
-            OMElement mDMConfigsElement = documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("BinaryFileStorage"));
-            HashMap<String, String> configs = new HashMap<String, String>();
-            Iterator<OMElement> iterator = mDMConfigsElement.getChildElements();
-
-            while(iterator.hasNext()){
-                OMElement propertyElement = iterator.next();
-                configs.put(propertyElement.getLocalName(), propertyElement.getText());
-            }
-            return binaryFileStorageConfig = configs;
-        }
-
-        return binaryFileStorageConfig;
     }
 
     /**
