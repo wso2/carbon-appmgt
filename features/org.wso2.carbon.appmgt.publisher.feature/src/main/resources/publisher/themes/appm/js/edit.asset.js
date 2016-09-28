@@ -139,7 +139,7 @@ $(function() {
     	var appVersion = $("#overview_version").val();
 
     	$.ajax({
-	          url: caramel.context + '/api/sso/'+ y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion ,
+	          url: caramel.context + '/api/sso/'+ y[0] + '/' + y[1] + '/' + encodeURIComponent(appProvider) + '/' + appName + '/' + appVersion ,
 	          type: 'GET',
 	          contentType: 'application/json',
 	          success: function(response) {

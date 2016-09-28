@@ -34,7 +34,7 @@ $('#update-store').click(function () {
     var head = "External Stores";
     $('#spinner').show();
     $.ajax({
-        url:  caramel.context + '/api/asset/webapp/update/external/stores/' + provider + '/' + appName + '/' + version,
+        url:  caramel.context + '/api/asset/webapp/update/external/stores/' + encodeURIComponent(provider) + '/' + appName + '/' + version,
         type: 'POST',
         processData: false,
         contentType: 'application/json',
