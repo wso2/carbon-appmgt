@@ -837,4 +837,5 @@ public interface APIProvider extends APIManager {
 
     public String getGatewayEndpoint();
 
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException;
 }

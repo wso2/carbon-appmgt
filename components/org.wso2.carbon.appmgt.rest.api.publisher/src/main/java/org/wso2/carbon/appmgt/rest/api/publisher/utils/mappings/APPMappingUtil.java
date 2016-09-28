@@ -413,6 +413,7 @@ public class APPMappingUtil {
         dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
+        dto.setSkipGateway(String.valueOf(webapp.getSkipGateway()));
 
         Set<String> apiTags = webapp.getTags();
         dto.setTags(new ArrayList<String>(apiTags));

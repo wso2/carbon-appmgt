@@ -1633,6 +1633,71 @@
                 }
             }
         },
+        "/apps/{appType}/name/{appName}/version/{version}/uuid": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "",
+                "x-wso2-response": "",
+                "summary": "Get app UUID",
+                "description": "Get app UUId by name and version \n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appName"
+                    },
+                    {
+                        "$ref": "#/parameters/version"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\nApp uuid is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppDTO"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/mobile/binaries": {
             "post": {
                 "consumes": [
@@ -2894,6 +2959,20 @@
             "description": "Business owner ID.\n",
             "required": true,
             "type": "integer"
+        },
+        "appName": {
+            "name": "appName",
+            "in": "path",
+            "description": "The App appName.\n",
+            "required": true,
+            "type": "string"
+        },
+        "version": {
+            "name": "version",
+            "in": "path",
+            "description": "The App version.\n",
+            "required": true,
+            "type": "string"
         },
         "Accept": {
             "name": "Accept",

@@ -3072,4 +3072,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return gatewayUrl;
     }
 
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException{
+       return appRepository.getAppUUIDbyName(appName, appVersion, tenantId);
+    }
 }
