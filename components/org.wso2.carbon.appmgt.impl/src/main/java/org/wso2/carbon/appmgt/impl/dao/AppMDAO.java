@@ -96,6 +96,12 @@ public class AppMDAO {
     private static final String PRIMARY_LOGIN = "primary";
     private static final String CLAIM_URI = "ClaimUri";
 
+    private static final String oracleDriverName = "Oracle";
+    private static final String mySQLDriverName = "MySQL";
+    private static final String msSQLDriverName = "MS SQL";
+    private static final String microsoftDriverName = "Microsoft";
+    private static final String postgreDriverName = "PostgreSQL";
+
     public AppMDAO() {
     }
 
@@ -4163,13 +4169,19 @@ public class AppMDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
 
-            //oracle specific query
-            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+            String driverName = connection.getMetaData().getDriverName();
+            if (driverName.contains(oracleDriverName)) {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
                         "FROM APM_WORKFLOWS " +
                         "WHERE WF_REFERENCE = ? AND ROWNUM <= 1 " +
                         "ORDER BY WF_CREATED_TIME ";
+            } else if (driverName.contains(msSQLDriverName) || driverName.contains(microsoftDriverName)) {
+                query = "SELECT TOP 1 WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
+                        "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
+                        "FROM APM_WORKFLOWS " +
+                        "WHERE WF_REFERENCE = ? " +
+                        "ORDER BY WF_CREATED_TIME";
             } else {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
@@ -4565,19 +4577,19 @@ public class AppMDAO {
 
         String query = "SELECT DISTINCT "
                 + "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, POLICY_GROUP.POLICY_GRP_ID AS POLICY_GRP_ID,"
-                + "RULE.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, RULE.CONTENT AS RULE_CONTENT "
+                + "ENTITLEMENT_POLICY.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, ENTITLEMENT_POLICY.CONTENT AS RULE_CONTENT "
                 + "FROM "
                 + "APM_APP APP, "
                 + "APM_POLICY_GROUP POLICY_GROUP, "
                 + "APM_POLICY_GROUP_MAPPING APP_GROUP, "
-                + "APM_ENTITLEMENT_POLICY_PARTIAL RULE, "
+                + "APM_ENTITLEMENT_POLICY_PARTIAL ENTITLEMENT_POLICY, "
                 + "APM_POLICY_GRP_PARTIAL_MAPPING GROUP_RULE "
                 + "WHERE APP.APP_ID = "
                 + "(SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) "
                 + "AND APP_GROUP.APP_ID = APP.APP_ID "
                 + "AND APP_GROUP.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
                 + "AND GROUP_RULE.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
-                + "AND GROUP_RULE.POLICY_PARTIAL_ID = RULE.ENTITLEMENT_POLICY_PARTIAL_ID";
+                + "AND GROUP_RULE.POLICY_PARTIAL_ID = ENTITLEMENT_POLICY.ENTITLEMENT_POLICY_PARTIAL_ID";
 
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
