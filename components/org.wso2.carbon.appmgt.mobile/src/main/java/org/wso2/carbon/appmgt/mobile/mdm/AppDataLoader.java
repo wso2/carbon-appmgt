@@ -59,7 +59,8 @@ public class AppDataLoader {
                 if("install".equals(action) || "update".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + MobileConfigurations.PUBLISHER_APP_GET_URL
+                                + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()

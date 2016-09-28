@@ -38,9 +38,6 @@ if (matcher.match('/{context}/api/mobileapp/getfile/{filename}')) {
 
         var file = new File("file://" + path);
         if (file.isExists()) {
-            if (ext == "apk" || ext == "ipa") {
-                response.sendError(415);
-            }
             response.addHeader('Content-Type', mime);
             file.open("r");
             print(file.getStream());
