@@ -140,7 +140,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
+            //mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
             return Response.ok().entity(response.toString()).build();
 
         } catch (AppManagementException e) {
