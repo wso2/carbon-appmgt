@@ -2914,7 +2914,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 handleException("Could not retrieve tags. Unsupported applictaion type :" + appType +" provided");
             }
 
-            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
 
             org.wso2.carbon.registry.core.Collection collection = registry.executeQuery(tagsQueryPath, params);
             for (String fullTag : collection.getChildren()) {

@@ -28,7 +28,7 @@ var CONTENT_TYPE_JSON = "application/json";
 routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}', function (context) {
     var type = context.params.type;
     var QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE = '/_system/config/repository/components/' +
-                                                'org.wso2.carbon.registry/queries/tag-summary';
+                                                'org.wso2.carbon.registry/queries/tag-summary-appmgt';
     var WEB_APP_MEDIA_TYPE = 'application/vnd.wso2-webapp+xml';
     var MOBILE_APP_MEDIA_TYPE = 'application/vnd.wso2-mobileapp+xml';
     var MOBILE_APP_LIFE_CYCLE= 'registry.lifecycle.MobileAppLifeCycle.state';
