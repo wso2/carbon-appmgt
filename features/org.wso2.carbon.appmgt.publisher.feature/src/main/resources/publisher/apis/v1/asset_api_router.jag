@@ -1130,11 +1130,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                 var username= server.current(session).username.replace('@', '-AT-');
                 var ctx = context.post;
                 var appName = ctx.name;
+                var displayName = ctx.displayName;
+                var version = ctx.version;
+                var description = ctx.description;
 
                 if (log.isDebugEnabled()) {
                     log.debug(ctx);
                 }
-                if (!appName) {
+                if (!appName || !appName.replace(/\s/g, '').length) {
                     response.contentType = CONTENT_TYPE_JSON;
                     print({
                         "ok": false,
@@ -1151,7 +1154,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     });
                     return;
                 }
-                if (!ctx.displayName) {
+                if (!displayName || !displayName.replace(/\s/g, '').length) {
                     response.contentType = CONTENT_TYPE_JSON;
                     print({
                         "ok": false,
@@ -1160,12 +1163,21 @@ require('/modules/publisher.js').exec(function(ctx) {
                     });
                     return;
                 }
-                if (!ctx.description) {
+                if (!description || !description.replace(/\s/g, '').length) {
                     response.contentType = CONTENT_TYPE_JSON;
                     print({
                         "ok": false,
                         "message": "Validation failure",
                         "report": {"failed": true, "name": ["Mobile app description cannot be empty"]}
+                    });
+                    return;
+                }
+                if (!version || !version.replace(/\s/g, '').length) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false,
+                        "message": "Validation failure",
+                        "report": {"failed": true, "name": ["Mobile app version cannot be empty"]}
                     });
                     return;
                 }
@@ -1222,7 +1234,6 @@ require('/modules/publisher.js').exec(function(ctx) {
                     return;
                 }
                 meta = parse(unescape(meta));
-                var version = ctx.version;
                 model.set('overview.bundleversion', version);
                 model.set('overview.packagename', meta.package);
                 if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
@@ -1281,12 +1292,12 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
                 model.set('overview.version', version);
                 model.set('overview.name', appName);
-                model.set('overview.displayName', ctx.displayName);
+                model.set('overview.displayName', displayName);
                 model.set('overview.category',ctx.category);
                 model.set('overview.platform',ctx.platform);
                 model.set('overview.provider', username);
                 model.set('overview.visibility',ctx.visibility);
-                model.set('overview.description',ctx.description);
+                model.set('overview.description',description);
                 model.set('overview.type',ctx.markettype);
                 if(ctx.recentChanges == ""){
                     ctx.recentChanges = "-";
