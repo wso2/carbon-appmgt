@@ -1129,13 +1129,60 @@ require('/modules/publisher.js').exec(function(ctx) {
             if(shortName =="mobileapp"){
                 var username= server.current(session).username.replace('@', '-AT-');
                 var ctx = context.post;
-                log.debug(ctx);
+                var appName = ctx.name;
+
+                if (log.isDebugEnabled()) {
+                    log.debug(ctx);
+                }
+                if (!appName) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false,
+                        "message": "Validation failure",
+                        "report": {"failed": true, "name": ["Mobile app name cannot be empty"]}
+                    });
+                    return;
+                } else if (!checkNonSpecial(appName)) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false,
+                        "message": "Validation failure",
+                        "report": {"failed": true, "name": ["Special characters found in name"]}
+                    });
+                    return;
+                }
+                if (!ctx.displayName) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false,
+                        "message": "Validation failure",
+                        "report": {"failed": true, "name": ["Mobile app display name cannot be empty"]}
+                    });
+                    return;
+                }
+                if (!ctx.description) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false,
+                        "message": "Validation failure",
+                        "report": {"failed": true, "name": ["Mobile app description cannot be empty"]}
+                    });
+                    return;
+                }
                 var files = request.getAllFiles();
+
                 var banner = files['bannerFile'];
                 banner = saveFile(banner);
 
-                var icon = files['iconFile'];
-                icon = saveFile(icon);
+                if (banner == "") {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false, "message": "Validation failure", "report": {
+                            "failed": true, "name": ["Banner not added"]
+                        }
+                    });
+                    return;
+                }
 
                 var screenshot1 = files['screenshot1File'];
                 screenshot1 = saveFile(screenshot1);
@@ -1147,11 +1194,24 @@ require('/modules/publisher.js').exec(function(ctx) {
                 screenshot3 = saveFile(screenshot3);
 
                 var screenshots = screenshot1+","+screenshot2+","+screenshot3;
-                log.debug(screenshots);
-
+                if (log.isDebugEnabled) {
+                    log.debug(screenshots);
+                }
                 if(screenshots==",,"){
                     response.contentType = CONTENT_TYPE_JSON;
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Screenshots not added"]}})
+                    return;
+                }
+
+                var icon = files['iconFile'];
+                icon = saveFile(icon);
+                if (icon == "") {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({
+                        "ok": false, "message": "Validation failure", "report": {
+                            "failed": true, "name": ["Icon not added"]
+                        }
+                    });
                     return;
                 }
                 var meta = ctx['appmeta'];
@@ -1163,7 +1223,6 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
                 meta = parse(unescape(meta));
                 var version = ctx.version;
-                var appName = ctx.name;
                 model.set('overview.bundleversion', version);
                 model.set('overview.packagename', meta.package);
                 if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
@@ -1221,25 +1280,6 @@ require('/modules/publisher.js').exec(function(ctx) {
                     }
                 }
                 model.set('overview.version', version);
-                if (!appName) {
-                    response.contentType = CONTENT_TYPE_JSON;
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app name cannot be empty"]}})
-                    return;
-                } else if (!checkNonSpecial(appName)) {
-                    response.contentType = CONTENT_TYPE_JSON;
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}})
-                    return;
-                }
-                if(!ctx.displayName) {
-                    response.contentType = CONTENT_TYPE_JSON;
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app display name cannot be empty"]}})
-                    return;
-                }
-                if(!ctx.description) {
-                    response.contentType = CONTENT_TYPE_JSON;
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Mobile app description cannot be empty"]}})
-                    return;
-                }
                 model.set('overview.name', appName);
                 model.set('overview.displayName', ctx.displayName);
                 model.set('overview.category',ctx.category);
