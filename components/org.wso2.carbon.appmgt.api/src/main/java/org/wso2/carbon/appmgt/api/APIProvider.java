@@ -18,7 +18,25 @@
 package org.wso2.carbon.appmgt.api;
 
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -835,5 +853,10 @@ public interface APIProvider extends APIManager {
      */
     public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
 
+    public String getGatewayEndpoint();
+
     public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException;
+
+    public String uploadImage(FileContent fileContent) throws AppManagementException;
+
 }

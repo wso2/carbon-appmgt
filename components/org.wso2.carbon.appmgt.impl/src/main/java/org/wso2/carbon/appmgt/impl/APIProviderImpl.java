@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -56,6 +58,7 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
@@ -92,7 +95,9 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -3063,8 +3068,39 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         appRepository.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
     }
 
+    public String getGatewayEndpoint() {
+        Environment gatewayEnvironment = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getApiGatewayEnvironments().get(0);
+
+        String gatewayUrl = gatewayEnvironment.getApiGatewayEndpoint().split(",")[0];
+        return gatewayUrl;
+    }
 
     public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException{
        return appRepository.getAppUUIDbyName(appName, appVersion, tenantId);
+    }
+
+    public String uploadImage(FileContent fileContent) throws AppManagementException {
+        UUID contentUUID = UUID.randomUUID();
+        String fileExtension = FilenameUtils.getExtension(fileContent.getFileName());
+        String filename = generateBinaryUUID() + "." + fileExtension;
+        fileContent.setFileName(filename);
+        fileContent.setContentType("image/" + fileExtension);
+        fileContent.setUuid(contentUUID.toString());
+        try {
+            fileContent.setContentLength(fileContent.getContent().available());
+        } catch (IOException e) {
+            handleException("Error occurred while uploading static content", e);
+        }
+        appRepository.persistStaticContents(fileContent);
+        return contentUUID.toString() + File.separator + fileContent.getFileName();
+    }
+
+    private static String generateBinaryUUID() {
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[8];
+        secRandom.nextBytes(result);
+        String uuid = String.valueOf(Hex.encodeHex(result));
+        return uuid;
     }
 }

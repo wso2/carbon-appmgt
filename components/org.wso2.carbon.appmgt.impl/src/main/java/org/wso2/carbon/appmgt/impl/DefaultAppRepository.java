@@ -877,7 +877,9 @@ public class DefaultAppRepository implements AppRepository {
 
             persistLifeCycleEvent(webAppDatabaseId, null, APIStatus.CREATED, connection);
 
-            createSSOProvider(webApp);
+            if(webApp.isServiceProviderCreationEnabled()){
+                createSSOProvider(webApp);
+            }
 
             // Commit JDBC and Registry transactions.
             connection.commit();

@@ -747,6 +747,7 @@
     <!-- AppM Component Version -->
     <carbon.appmgt.version>1.2.4-SNAPSHOT</carbon.appmgt.version>
     <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
+
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
     <carbon.appmgt.server.version>1.2.1</carbon.appmgt.server.version>
 
