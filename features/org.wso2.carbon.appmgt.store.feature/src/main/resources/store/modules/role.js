@@ -29,7 +29,7 @@ var checkeRole = function (username, session) {
   	//}
 
     if (!(apiUtil.checkPermissionWrapper(username, config.permissions.webapp_subscribe)
-          || apiUtil.checkPermissionWrapper(username, config.permissions.mobileapp_install))) {
+          || apiUtil.checkPermissionWrapper(username, config.permissions.mobileapp_subscribe))) {
            return false;
   	}
 
