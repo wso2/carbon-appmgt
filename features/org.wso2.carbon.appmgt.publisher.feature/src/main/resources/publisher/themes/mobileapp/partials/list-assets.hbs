@@ -143,16 +143,16 @@
     {{#if query}}
         <div class="emptyAssets-MsgDiv">
             <i class="icon-inbox largeMsgIcon"></i>
-            <br />
+            <br/>
             Sorry, We could not find any app for your search!
-            <br />
+            <br/>
             Your search filter was, "{{query}}".
-            <br />
+            <br/>
         </div>
     {{else}}
         <div class="emptyAssets-MsgDiv">
-            <i class="icon-inbox largeMsgIcon"></i><br />
-            No mobile applications added yet. <br />
+            <i class="icon-inbox largeMsgIcon"></i><br/>
+            No mobile applications added yet. <br/>
             {{#if mobileAppCreatePermission}}
                 <a type="button" class="btn btn-addNewAssetLarge" href="{{url "/asset/"}}{{shortName}}">
                     <i class="icon-plus-sign-alt"></i> Add New Mobile App
