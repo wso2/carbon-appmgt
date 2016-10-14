@@ -897,7 +897,6 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(mobileApp.getAppVisibility()));
-            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, AppMConstants.MOBILE_ASSET_TYPE);
 
 
 		} catch (GovernanceException e) {
