@@ -467,9 +467,9 @@ public class RestApiUtil {
     public static NotFoundException buildNotFoundException(String resource, String id) {
         String description;
         if (!StringUtils.isEmpty(id)) {
-            description = "Requested " + resource + " with Id '" + id + "' not found";
+            description = "Requested " + resource + " with Id '" + id + "' was not found.";
         } else {
-            description = "Requested " + resource + " not found";
+            description = "Requested " + resource + " was not found.";
         }
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT, 404l, description);
         return new NotFoundException(errorDTO);
