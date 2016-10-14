@@ -163,7 +163,7 @@ public class AndroidXMLParsing {
 
             } else {
 
-                break;
+                off += 4;  //Skip the unidentified work
             }
         }
 
