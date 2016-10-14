@@ -2340,6 +2340,8 @@ public final class AppManagerUtil {
 				                                                         .getRealmService()
 				                                                         .getTenantUserRealm(tenantId)
 				                                                         .getAuthorizationManager();
+                authManager.clearResourceAuthorizations(resourcePath);
+
 				if (visibility != null &&
 				    visibility.equalsIgnoreCase(AppMConstants.API_RESTRICTED_VISIBILITY)) {
 					boolean isRoleEveryOne = false;
@@ -2373,6 +2375,7 @@ public final class AppManagerUtil {
 				RegistryAuthorizationManager authorizationManager =
 				                                                    new RegistryAuthorizationManager(
 				                                                                                     ServiceReferenceHolder.getUserRealm());
+                authorizationManager.clearResourceAuthorizations(resourcePath);
 
 				if (visibility != null &&
 				    visibility.equalsIgnoreCase(AppMConstants.API_RESTRICTED_VISIBILITY)) {

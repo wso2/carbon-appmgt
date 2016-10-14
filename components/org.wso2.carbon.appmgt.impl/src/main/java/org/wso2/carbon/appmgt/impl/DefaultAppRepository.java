@@ -1177,6 +1177,9 @@ public class DefaultAppRepository implements AppRepository {
             // Add / Update / Delete URL templates.
             addUpdateDeleteURLTemplates(webApp, webAppDatabaseId, connection);
 
+            //Update app master metadata
+            updateWebAppToDatabase(webApp, connection);
+
             // Delete the existing policy groups in the repository which are not in the updating web app.
             // URI templates should be passed too, since the association between templates and policy groups should be checked.
             deletePolicyGroupsNotIn(webApp.getAccessPolicyGroups(), webApp.getUriTemplates(),webAppDatabaseId, connection);
@@ -1198,20 +1201,40 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private void updateRegistryArtifact(App app) throws RegistryException {
+    private void updateRegistryArtifact(App app) throws RegistryException, AppManagementException {
 
         if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(app.getType())){
             updateWebAppRegistryArtifact((WebApp) app);
         }
     }
 
-    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException {
+    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException, AppManagementException {
 
         GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
 
         GenericArtifact updatedWebAppArtifact = buildRegistryArtifact(artifactManager, AppMConstants.WEBAPP_ASSET_TYPE, webApp);
         updatedWebAppArtifact.setId(webApp.getUUID());
         artifactManager.updateGenericArtifact(updatedWebAppArtifact);
+
+        // Apply tags
+        String artifactPath = GovernanceUtils.getArtifactPath(registry, webApp.getUUID());
+        if (webApp.getTags() != null) {
+            for (String tag : webApp.getTags()) {
+                registry.applyTag(artifactPath, tag);
+            }
+        }
+
+        // Set resources permissions based on app visibility.
+        if (webApp.getAppVisibility() == null) {
+            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                                                  AppMConstants.API_GLOBAL_VISIBILITY, webApp.getAppVisibility(),
+                                                  artifactPath);
+        } else {
+            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                                                  AppMConstants.API_RESTRICTED_VISIBILITY, webApp.getAppVisibility(),
+                                                  artifactPath);
+        }
+
     }
 
     private void addUpdateDeleteURLTemplates(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
@@ -1504,7 +1527,8 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
-        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(webApp.getAppVisibility()));
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, webApp.getVisibility());
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_ROLES, webApp.getVisibleRoles());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS, webApp.getVisibleTenants());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, webApp.getTransports());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_TIER, "Unlimited");
@@ -1629,6 +1653,27 @@ public class DefaultAppRepository implements AppRepository {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, generatedKeys);
         }
 
+    }
+
+
+    private void updateWebAppToDatabase(WebApp webApp, Connection connection)
+            throws SQLException, AppManagementException {
+        String query = "UPDATE APM_APP SET TRACKING_CODE=?, " +
+                "APP_ALLOW_ANONYMOUS=?, APP_ENDPOINT=?, TREAT_AS_SITE=?, VISIBLE_ROLES=? " +
+                "WHERE UUID=?";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, webApp.getTrackingCode());
+            preparedStatement.setBoolean(2, webApp.getAllowAnonymous());
+            preparedStatement.setString(3, webApp.getUrl());
+            preparedStatement.setBoolean(4, Boolean.parseBoolean(webApp.getTreatAsASite()));
+            preparedStatement.setString(5, webApp.getVisibleRoles());
+            preparedStatement.setString(6, webApp.getUUID());
+            preparedStatement.execute();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
     }
 
     private void persistJavaPolicyMappings(String javaPolicies, int webAppDatabaseId, Connection connection) throws SQLException {
