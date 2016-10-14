@@ -816,7 +816,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         Registry userRegistry = null;
         String tagsQueryPath = null;
         try {
-            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
             Map<String, String> params = new HashMap<String, String>();
             params.put(RegistryConstants.RESULT_TYPE_PROPERTY_NAME, RegistryConstants.TAG_SUMMARY_RESULT_TYPE);
 
