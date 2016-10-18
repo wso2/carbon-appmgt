@@ -12,11 +12,27 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             cookie= request.getHeader("Cookie"),
             sso = require('sso'),
 	        server = require('carbon').server,
-            samlRespObj,
-            keyStoreProps = {
-                KEY_STORE_NAME: process.getProperty('carbon.home') + configs.ssoConfiguration.keyStoreName,
-                KEY_STORE_PASSWORD: configs.ssoConfiguration.keyStorePassword,
-                IDP_ALIAS: configs.ssoConfiguration.identityAlias
+            samlRespObj;
+
+        var keyStoreName = configs.ssoConfiguration.keyStoreName;
+        var keyStorePassword = configs.ssoConfiguration.keyStorePassword;
+        var identityAlias = configs.ssoConfiguration.identityAlias;
+        var CarbonUtils = Packages.org.wso2.carbon.utils.CarbonUtils;
+        if (keyStorePassword == null || keyStorePassword == "") {
+            keyStorePassword = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.Password");
+        }
+        if (identityAlias == null || identityAlias == "") {
+            identityAlias = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.KeyAlias");
+        }
+        if (keyStoreName == null || keyStoreName == "") {
+            keyStoreName = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.Location");
+        } else {
+            keyStoreName = process.getProperty('carbon.home') + keyStoreName;
+        }
+        var keyStoreProps = {
+                KEY_STORE_NAME: keyStoreName,
+                KEY_STORE_PASSWORD: keyStorePassword,
+                IDP_ALIAS: identityAlias
             },
             sso_sessions = application.get('sso_sessions'),
                 attr = configs.ssoConfiguration;
