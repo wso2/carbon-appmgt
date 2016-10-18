@@ -17,7 +17,7 @@
 	<parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.5-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -25,7 +25,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.wso2.carbon.appmgt.services.api.feature</artifactId>
 	<packaging>pom</packaging>
-    <version>1.2.4</version>
+    <version>1.2.5-SNAPSHOT</version>
 	<name>WSO2 Carbon - App Manager Services API Feature</name>
 	<url>http://wso2.org</url>
 	<build>
