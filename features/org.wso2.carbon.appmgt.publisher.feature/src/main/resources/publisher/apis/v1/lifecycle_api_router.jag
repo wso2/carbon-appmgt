@@ -206,6 +206,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             }
         }
 
+
+
         // check whether current user has enough permission to change the life cycle
         var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
         if (!hasPermission) {
@@ -245,6 +247,14 @@ require('/modules/publisher.js').exec(function (ctx) {
             content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
             response.content = stringify(content);
             return;
+        }
+
+        if(appType == 'mobileapp'){
+            if(action == 'Publish' || action == 'Re-Publish' ){
+                userManager.authorizeRole('system/wso2.anonymous.role', currentArtifact.path,carbon.registry.actions.GET);
+            }else  if(action == 'Unpublish'){
+                userManager.denyRole('system/wso2.anonymous.role', currentArtifact.path,carbon.registry.actions.GET);
+            }
         }
 
         // grant permissions
