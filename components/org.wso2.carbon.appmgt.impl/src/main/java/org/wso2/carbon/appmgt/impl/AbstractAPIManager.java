@@ -82,7 +82,8 @@ public abstract class AbstractAPIManager implements APIManager {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
                 this.tenantId=tenantId;
                 this.tenantDomain=tenantDomainName;
-                this.username=tenantUserName;
+                this.username = username;
+                //this.username=tenantUserName;
 
                 AppManagerUtil.loadTenantRegistry(tenantId);
 

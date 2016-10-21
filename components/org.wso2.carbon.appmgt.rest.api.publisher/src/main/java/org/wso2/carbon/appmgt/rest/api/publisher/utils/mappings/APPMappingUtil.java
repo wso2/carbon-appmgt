@@ -45,6 +45,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -646,7 +647,17 @@ public class APPMappingUtil {
         }
 
         webApp.setUrl(appDTO.getAppUrL());
-        webApp.setContext(appDTO.getContext());
+
+        String webAppContext = appDTO.getContext();
+        String tenantDomain = MultitenantUtils.getTenantDomain(providerName);
+        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (webAppContext.charAt(0) != '/') {
+                webAppContext = '/' + webAppContext;
+            }
+            webAppContext = "/t/" + tenantDomain + webAppContext;
+        }
+
+        webApp.setContext(webAppContext);
         webApp.setDisplayName(appDTO.getDisplayName());
         webApp.setStatus(APIStatus.CREATED);
         webApp.setTransports(appDTO.getTransport());
