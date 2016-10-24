@@ -2832,7 +2832,7 @@ public class AppMDAO {
                     }
                 }
                 if (fromDate != null && toDate != null) {
-                    if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                    if (!connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                         sqlQuery += "? AND ? ";
                     } else {
                         sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
@@ -2861,7 +2861,7 @@ public class AppMDAO {
                             "AND HIT.HIT_TIME BETWEEN ";
                 }
 
-                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                if (!connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                     sqlQuery += "? AND ? ";
                 } else {
                     sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
@@ -8917,7 +8917,7 @@ public class AppMDAO {
         if (andNeeded) {
             query += " AND ";
         }
-        if (!connectionType.contains("Oracle")) {
+        if (!connectionType.contains(oracleDriverName)) {
             query += rangeField + " BETWEEN ? AND ? ";
         } else {
             query += rangeField + " BETWEEN TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
