@@ -4330,13 +4330,14 @@ public class APIProviderHostObject extends ScriptableObject {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-
-                APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
-                WebApp webApp = new WebApp(appIdentifier);
-                webApp.setTransports(transport);
-                webApp.setContext(context);
-                acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
             }
+
+            APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
+            WebApp webApp = new WebApp(appIdentifier);
+            webApp.setTransports(transport);
+            webApp.setContext(context);
+            acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
+
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
