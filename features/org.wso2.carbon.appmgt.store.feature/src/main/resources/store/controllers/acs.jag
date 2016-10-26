@@ -129,12 +129,7 @@ var auditLog = require('/modules/auditLog/logger.js');
                 authResult = authenticator.login(userDetails);
                 sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
 
-                var isSubscriberRoleAttached = storeHostObj.checkIfSubscriberRoleAttached(username);
-                var role = null;
-
-                if (!isSubscriberRoleAttached.error) {
-                    role = require('/modules/role.js').checkeRole(username, session);
-                }
+                role = require('/modules/role.js').checkeRole(username, session);
 
                 if (urlTenantDomain && urlTenantDomain != domainName) {
                     log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
@@ -143,7 +138,6 @@ var auditLog = require('/modules/auditLog/logger.js');
                     return;
                 }
 
-                if (role) {
                     var user = require('store').user;
                     if (log.isDebugEnabled()) {
                         log.debug('User has been set to : ' + sessionObj.loggedInUser);
@@ -177,11 +171,6 @@ var auditLog = require('/modules/auditLog/logger.js');
                         relayState = reverseProxyHost + relayState;
                     }
                     response.sendRedirect(relayState);
-                } else {
-                    log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the subscribe permission.');
-                    response.sendError(403, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
-
-                }
             }
         } else {
             session.invalidate();
