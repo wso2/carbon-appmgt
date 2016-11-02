@@ -132,7 +132,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
             String appName = webApp.getId().getApiName();
             version = webApp.getId().getVersion();
-            String api_version = appName + ":" + version;
+            String appNameWithVersion = appName + ":" + version;
 
             String hashcode = webApp.getTrackingCode();
 
@@ -220,7 +220,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
                 RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO();
                 requestPublisherDTO.setContext(context);
-                requestPublisherDTO.setApi_version(api_version);
+                requestPublisherDTO.setApi_version(appNameWithVersion);
                 requestPublisherDTO.setApi(appName);
                 requestPublisherDTO.setVersion(version);
                 requestPublisherDTO.setResource(resource);
@@ -256,7 +256,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
                 mc.setProperty(APIMgtUsagePublisherConstants.USER_ID, username);
                 mc.setProperty(APIMgtUsagePublisherConstants.CONTEXT, context);
-                mc.setProperty(APIMgtUsagePublisherConstants.APP_VERSION, api_version);
+                mc.setProperty(APIMgtUsagePublisherConstants.APP_VERSION, appNameWithVersion);
                 mc.setProperty(APIMgtUsagePublisherConstants.API, appName);
                 mc.setProperty(APIMgtUsagePublisherConstants.VERSION, version);
                 mc.setProperty(APIMgtUsagePublisherConstants.RESOURCE, resource);
@@ -381,9 +381,9 @@ public class APIMgtUsageHandler extends AbstractHandler {
      * @throws AppManagementException
      */
     public WebApp getNonVersionedWebApp(String context, String tenantDomain) throws AppManagementException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         WebApp webApp = null;
 
         String sqlQuery = "SELECT APM_APP.APP_NAME, APM_APP.APP_PROVIDER, APM_APP.TRACKING_CODE, " +
@@ -392,17 +392,17 @@ public class APIMgtUsageHandler extends AbstractHandler {
                 "APM_APP_DEFAULT_VERSION.APP_PROVIDER=APM_APP.APP_PROVIDER WHERE APM_APP.CONTEXT=? AND APM_APP" +
                 ".TENANT_ID=?";
         try {
-            conn = APIMgtDBUtil.getConnection();
-            ps = conn.prepareStatement(sqlQuery);
+            connection = APIMgtDBUtil.getConnection();
+            preparedStatement = connection.prepareStatement(sqlQuery);
             int tenantId = UsageComponent.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            ps.setString(1,context);
-            ps.setInt(2,tenantId);
-            rs = ps.executeQuery();
-            while(rs.next()){
-                String webAppName = rs.getString("APP_NAME");
-                String provider = rs.getString("APP_PROVIDER");
-                String trackingCode = rs.getString("TRACKING_CODE");
-                String version = rs.getString("PUBLISHED_DEFAULT_APP_VERSION");
+            preparedStatement.setString(1,context);
+            preparedStatement.setInt(2,tenantId);
+            resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                String webAppName = resultSet.getString(AppMConstants.FIELD_API_NAME);
+                String provider = resultSet.getString(AppMConstants.FIELD_API_PUBLISHER );
+                String trackingCode = resultSet.getString(AppMConstants.FIELD_TRACKING_CODE);
+                String version = resultSet.getString(AppMConstants.FIELD_PUBLISHED_DEFAULT_APP_VERSION);
                 APIIdentifier apiIdentifier = new APIIdentifier(provider,webAppName,version);
                 webApp = new WebApp(apiIdentifier);
                 webApp.setTrackingCode(trackingCode);
@@ -416,7 +416,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String errorMessage = "Error occurred while getting tenant Id for tenant domain: " + tenantDomain;
             throw new AppManagementException(errorMessage, e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
         }
         return webApp;
     }

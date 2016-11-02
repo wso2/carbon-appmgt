@@ -271,6 +271,8 @@ public final class AppMConstants {
     public static final String FIELD_API_NAME = "APP_NAME";
     public static final String FIELD_CONSUMER_KEY = "CONSUMER_KEY";
     public static final String FIELD_API_PUBLISHER = "APP_PROVIDER";
+    public static final String FIELD_TRACKING_CODE = "TRACKING_CODE";
+    public static final String FIELD_PUBLISHED_DEFAULT_APP_VERSION = "PUBLISHED_DEFAULT_APP_VERSION";
 
     //table columns for APM_APPLICATION
     public static final String APPLICATION_ID = "APPLICATION_ID";
