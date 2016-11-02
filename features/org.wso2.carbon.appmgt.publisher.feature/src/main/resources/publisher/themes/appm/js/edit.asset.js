@@ -226,7 +226,7 @@ $(function() {
     });
     
     function addToClaimsTable(claim,clickable){
-        var isAlreadyExist = $.inArray(claim, addedClaimList);
+        var isAlreadyExist = addedClaimList.indexOf(claim);
         if(isAlreadyExist == -1) {
             addedClaimList.push(claim);
             var propertyCount = $('#claimPropertyCounter');
