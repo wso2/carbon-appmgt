@@ -292,7 +292,8 @@ $(document).ready(function() {
 
     function validateImages(files){
         var inputType = files[0].type;
-        return inputType.toLowerCase().startsWith('image');
+        var valideImagePattern = /^image/i;
+        return valideImagePattern.test(inputType);
     }
 
     /* expand collapse container */
