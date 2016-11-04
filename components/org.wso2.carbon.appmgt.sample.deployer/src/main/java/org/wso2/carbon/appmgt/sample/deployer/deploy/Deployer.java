@@ -137,10 +137,10 @@ public class Deployer {
     private boolean isSubscriptionEnabled() {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        Boolean isSubscriptionEnabled = false;
-        Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+        boolean isSubscriptionEnabled = false;
+        boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                 AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-        Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+        boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                 AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
         if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
             isSubscriptionEnabled = true;
