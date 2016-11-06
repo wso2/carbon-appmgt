@@ -15,6 +15,9 @@
  */
 package org.wso2.carbon.appmgt.gateway.dto;
 
+/**
+ * DTO object which maps to synapse rest APIs.
+ */
 public class WebAppData {
     private String name;
     private String host;

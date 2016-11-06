@@ -278,25 +278,25 @@ public class AppGatewayAdmin extends AbstractAdmin {
         if (data == null) {
             return null;
         }
-        WebAppData apiData = new WebAppData();
-        apiData.setContext(data.getContext());
-        apiData.setFileName(data.getFileName());
-        apiData.setHost(data.getHost());
-        apiData.setName(data.getName());
-        apiData.setPort(data.getPort());
+        WebAppData webAppData = new WebAppData();
+        webAppData.setContext(data.getContext());
+        webAppData.setFileName(data.getFileName());
+        webAppData.setHost(data.getHost());
+        webAppData.setName(data.getName());
+        webAppData.setPort(data.getPort());
         org.wso2.carbon.rest.api.stub.types.carbon.ResourceData[] resources = data.getResources();
-        List<ResourceData> resList = new ArrayList<ResourceData>();
+        List<ResourceData> resourceDataList = new ArrayList<ResourceData>();
         if (resources != null && resources.length > 0) {
-            for (org.wso2.carbon.rest.api.stub.types.carbon.ResourceData res : resources) {
-                if (res == null) {
+            for (org.wso2.carbon.rest.api.stub.types.carbon.ResourceData resourceData : resources) {
+                if (resourceData == null) {
                     continue;
                 }
-                ResourceData resource = convert(res);
-                resList.add(resource);
+                ResourceData resource = convert(resourceData);
+                resourceDataList.add(resource);
             }
-            apiData.setResources(resList.toArray(new ResourceData[0]));
+            webAppData.setResources(resourceDataList.toArray(new ResourceData[0]));
         }
-        return apiData;
+        return webAppData;
     }
 
     private ResourceData convert(org.wso2.carbon.rest.api.stub.types.carbon.ResourceData data) {

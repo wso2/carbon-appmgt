@@ -82,21 +82,21 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
 
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-    	int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            // first check which configuration should be active
+            // First check which configuration should be active.
             org.wso2.carbon.registry.core.Registry registry =
                     (org.wso2.carbon.registry.core.Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getRegistry(RegistryType.SYSTEM_CONFIGURATION);
 
             AxisConfiguration axisConfig = configurationContext.getAxisConfiguration();
 
-            // initialize the lock
+            // Initialize the lock.
             Lock lock = new ReentrantLock();
             axisConfig.addParameter("synapse.config.lock", lock);
 
-            // creates the synapse configuration directory hierarchy if not exists
-            // useful at the initial tenant creation
+            // Creates the synapse configuration directory hierarchy if not exists.
+            // Useful at the initial tenant creation.
             File tenantAxis2Repo = new File(configurationContext.getAxisConfiguration().getRepository().getFile());
             File synapseConfigsDir = new File(tenantAxis2Repo, "synapse-configs");
             if (!synapseConfigsDir.exists()) {
@@ -108,10 +108,10 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
             }
 
             String synapseConfigsDirLocation = synapseConfigsDir.getAbsolutePath();
-            // set the required configuration parameters to initialize the ESB
+            // Set the required configuration parameters to initialize the ESB.
             axisConfig.addParameter(SynapseConstants.Axis2Param.SYNAPSE_CONFIG_LOCATION, synapseConfigsDirLocation);
 
-            // init the multiple configuration tracker
+            // Init the multiple configuration tracker.
             ConfigurationManager manger = new ConfigurationManager((UserRegistry) registry, configurationContext);
             manger.init();
 
@@ -121,7 +121,7 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
                                                       File.separator + buildSequenceName + ".xml");
 
             //Here we will check build sequence exist in synapse artifact. If it is not available we will create
-            //sequence synapse configurations by using resource artifacts
+            //sequence synapse configurations by using resource artifacts.
             if (!buildSequenceFile.exists()) {
                 createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
             }
@@ -136,12 +136,6 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         }catch (AppManagementException e){
             log.error("Failed to load tiers.xml to tenant's registry");
         }
-    }
-
-
-    private ServerContextInformation initESB(String configurationName, ConfigurationContext configurationContext)
-            throws AxisFault {
-        return null;
     }
 
     /**

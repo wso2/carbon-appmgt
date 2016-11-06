@@ -28,7 +28,7 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
 /**
  *
- * App Manager publisher component
+ * App Manager publisher component.
  *
  * @scr.component name="org.wso2.appmgt.services.publisher" immediate="true"
  *
@@ -44,18 +44,18 @@ public class AppManagerPublisherComponent {
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Publisher component activated");
+            log.debug("Publisher component activated.");
         }
         BundleContext bundleContext = componentContext.getBundleContext();
 
-        //Register Tenant service creator to deploy tenant specific common synapse configurations
+        //Register Tenant service creator to deploy tenant specific common synapse configurations.
         TenantCreatePublisherObserver listener = new TenantCreatePublisherObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
-            log.debug("Deactivating Publisher component");
+            log.debug("Deactivating Publisher component.");
         }
     }
 

@@ -42,17 +42,17 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
-            //load workflow-extension configuration to the registry.
+            //Load workflow-extension configuration to the registry.
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
         } catch (AppManagementException e) {
-            log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry");
+            log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry.");
         }
 
         try {
-            //load external-stores configuration to the registry
+            //Load external-stores configuration to the registry
             AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
         } catch (AppManagementException e) {
-            log.error("Failed to load external-stores.xml to tenant " + tenantDomain + "'s registry");
+            log.error("Failed to load external-stores.xml to tenant " + tenantDomain + "'s registry.");
         }
 
         try {
@@ -76,8 +76,8 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
         }
 
         try {
-            //Add the creator & publisher roles if not exists
-            //Apply permissons to appmgt collection for creator role
+            //Add the creator & publisher roles if not exists.
+            //Apply permissons to appmgt collection for creator role.
             UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
 
             Permission[] creatorPermissions = new Permission[]{
@@ -110,19 +110,19 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
 
             AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE,publisherPermissions, realm);
 
-            //Add the store-admin role
+            //Add the store-admin role.
             Permission[] storeAdminPermissions = new Permission[]
                     {new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION)};
             AppManagerUtil.addNewRole(AppMConstants.STORE_ADMIN_ROLE, storeAdminPermissions , realm);
 
         } catch(AppManagementException e) {
-            log.error("App manager configuration service is set to publisher bundle");
+            log.error("App manager configuration service is set to publisher bundle.");
         }
 
         try{
             AppManagerUtil.writeDefinedSequencesToTenantRegistry(tenantId);
         }catch(AppManagementException e){
-            log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry");
+            log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry.");
         }
     }
 }

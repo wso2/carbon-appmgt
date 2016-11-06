@@ -20,7 +20,7 @@ package org.wso2.carbon.appmgt.gateway.dto;
 import org.apache.synapse.rest.RESTConstants;
 
 /**
- * REST Resources Data.
+ * DTO object which maps to resources in synapse rest APIs.
  */
 public class ResourceData {
     private String[] httpMethods;
