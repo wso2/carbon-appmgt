@@ -530,19 +530,19 @@ $(function() {
 
 
 	function createServiceProvider(){
-	    var sso_config = {};
-	    var provider_name  = $('#providers').val();
-	    var logout_url = $('#overview_logoutUrl').val();
-	    var idp_provider = $('#sso_idpProviderUrl').val();
-	    var app_name = $('#overview_name').val();
-	    var app_version = $('#overview_version').val();
-	    var app_transport = $('#overview_transports').val();
-	    var app_treatAsASite = $('#overview_treatAsASite').val();
-	    var app_context = $('#overview_context').val();
-	    var app_provider = $('#overview_provider').val();
-	    var app_allowAnonymous=$('#overview_allowAnonymous').val();
-	    var app_acsURL = $('#overview_acsUrl').val();
-        var app_isDefaultVersion = $('#overview_makeAsDefaultVersion').val();
+	    var ssoConfig = {};
+	    var providerName  = $('#providers').val();
+	    var logoutUrl = $('#overview_logoutUrl').val();
+	    var idpProvider = $('#sso_idpProviderUrl').val();
+	    var appName = $('#overview_name').val();
+	    var appVersion = $('#overview_version').val();
+	    var appTransport = $('#overview_transports').val();
+	    var appTreatAsASite = $('#overview_treatAsASite').val();
+	    var appContext = $('#overview_context').val();
+	    var appProvider = $('#overview_provider').val();
+	    var appAllowAnonymous=$('#overview_allowAnonymous').val();
+	    var appAcsURL = $('#overview_acsUrl').val();
+	    var appIsDefaultVersion = $('#overview_makeAsDefaultVersion').val();
 
 	    var claims = [];
 	    var index=0;
@@ -554,26 +554,26 @@ $(function() {
 	        }
 	        index++;
 	    }
-	    sso_config.provider = provider_name;
-	    sso_config.logout_url = logout_url;
+	    sso_config.provider = providerName;
+	    sso_config.logout_url = logoutUrl;
 	    sso_config.claims = claims;
-	    sso_config.idp_provider = idp_provider;
-	    sso_config.app_name = app_name;
-	    sso_config.app_verison = app_version;
-	    sso_config.app_transport = app_transport;
-	    sso_config.app_treatAsASite = app_treatAsASite;
-	    sso_config.app_context = app_context;
-	    sso_config.app_provider = app_provider;
-	    sso_config.app_allowAnonymous=app_allowAnonymous;
-	    sso_config.app_acsURL = app_acsURL;
-        sso_config.app_isDefaultVersion = app_isDefaultVersion;
+	    sso_config.idp_provider = idpProvider;
+	    sso_config.app_name = appName;
+	    sso_config.app_verison = appVersion;
+	    sso_config.app_transport = appTransport;
+	    sso_config.app_treatAsASite = appTreatAsASite;
+	    sso_config.app_context = appContext;
+	    sso_config.app_provider = appProvider;
+	    sso_config.app_allowAnonymous=appAllowAnonymous;
+	    sso_config.app_acsURL = appAcsURL;
+	    sso_config.app_isDefaultVersion = appIsDefaultVersion;
 
 
         $.ajax({
             url: caramel.context + '/api/sso/addConfig',
             type: 'POST',
             contentType: 'application/json',
-            data:JSON.stringify(sso_config),
+            data:JSON.stringify(ssoConfig),
             success: function(response) {
                 console.log("Added SSO config successfully");
             },
