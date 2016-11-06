@@ -296,7 +296,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args[0] == null) {
             handleException("Error while deleting business owner. Owner content is null");
         }
-        String ownerId = args[0].toString();
+        int ownerId = Integer.valueOf(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.deleteBusinessOwner(ownerId);
     }
@@ -345,7 +345,7 @@ public class APIProviderHostObject extends ScriptableObject {
             String propertyValue = businessOwnerValuesObject.get(0).toString();
             String showInStore = businessOwnerValuesObject.get(1).toString();
             BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-            businessOwnerProperty.setPropertyId(key);
+            businessOwnerProperty.setPropertyKey(key);
             businessOwnerProperty.setPropertyValue(propertyValue);
             businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(showInStore));
 
@@ -408,36 +408,43 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args[0] == null || args[0] == "null") {
             handleException("Error while reading business owner. Owner id is null");
         }
-        NativeObject row = new NativeObject();
+        NativeObject businessOwnerNativeObject = new NativeObject();
         int ownerId;
         try {
             ownerId = Integer.valueOf(args[0].toString());
             APIProvider apiProvider = getAPIProvider(thisObj);
             BusinessOwner businessOwner = apiProvider.getBusinessOwner(ownerId);
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+            businessOwnerNativeObject.put("businessOwnerId", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerId());
+            businessOwnerNativeObject.put("businessOwnerId", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerId());
+            businessOwnerNativeObject.put("businessOwnerName", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerName());
+            businessOwnerNativeObject.put("businessOwnerEmail", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerEmail());
+            businessOwnerNativeObject.put("businessOwnerDescription", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerDescription());
+            businessOwnerNativeObject.put("businessOwnerSite", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerSite());
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
-            if(businessOwnerPropertiesList != null) {
+            if (businessOwnerPropertiesList != null) {
                 JSONObject businessOwnerPropertiesObject = new JSONObject();
                 for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                     JSONObject businessOwnerPropertyObject = new JSONObject();
                     BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
                     businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
-                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyId(),businessOwnerPropertyObject);
+                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(), businessOwnerPropertyObject);
                 }
-                row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
+                businessOwnerNativeObject.put("businessOwnerProperties", businessOwnerNativeObject,
+                                              businessOwnerPropertiesObject.toJSONString());
             } else {
-                row.put("businessOwnerProperties", row, null);
+                businessOwnerNativeObject.put("businessOwnerProperties", businessOwnerNativeObject, null);
             }
         } catch (NumberFormatException e) {
             log.warn("Business owner id : " + args[0] + " is not an integer.", e);
         }
-        return row;
+        return businessOwnerNativeObject;
     }
 
     /**
@@ -461,33 +468,34 @@ public class APIProviderHostObject extends ScriptableObject {
         String searchValue = args[3].toString();
         List<BusinessOwner> businessOwnerList = apiProvider.searchBusinessOwners(startIndex, pageSize, searchValue);
         int totalBusinessOwners = apiProvider.getBusinessOwnersCount();
-        NativeObject nativeObject = new NativeObject();
-        nativeObject.put("draw", nativeObject, currentPage);
-        nativeObject.put("recordsTotal", nativeObject, totalBusinessOwners);
+        NativeObject businessOwnersNativeObject = new NativeObject();
+        businessOwnersNativeObject.put("draw", businessOwnersNativeObject, currentPage);
+        businessOwnersNativeObject.put("recordsTotal", businessOwnersNativeObject, totalBusinessOwners);
         if(searchValue.trim() == "") {
-            nativeObject.put("recordsFiltered", nativeObject, totalBusinessOwners);
+            businessOwnersNativeObject.put("recordsFiltered", businessOwnersNativeObject, totalBusinessOwners);
         } else {
             int filteredNoOfRecords = businessOwnerList.size();
-            nativeObject.put("recordsFiltered", nativeObject, filteredNoOfRecords);
+            businessOwnersNativeObject.put("recordsFiltered", businessOwnersNativeObject, filteredNoOfRecords);
         }
 
         NativeArray businessOwnersNativeArray = new NativeArray(0);
+
         int businessOwnersArrayCount = 0;
 
         for (BusinessOwner businessOwner : businessOwnerList) {
-            NativeArray businessOwnerArray = new NativeArray(0);
+            NativeObject businessOwnerObject = new NativeObject();
             int count = 0;
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerId());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerName());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerEmail());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerSite());
-            businessOwnerArray.put(count, businessOwnerArray, businessOwner.getBusinessOwnerDescription());
-            businessOwnersNativeArray.put(businessOwnersArrayCount, businessOwnersNativeArray, businessOwnerArray);
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerId());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerName());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerEmail());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerSite());
+            businessOwnerObject.put(count, businessOwnerObject, businessOwner.getBusinessOwnerDescription());
+            businessOwnersNativeArray.put(businessOwnersArrayCount, businessOwnersNativeArray, businessOwnerObject);
             businessOwnersArrayCount++;
         }
 
-        nativeObject.put("data", nativeObject, businessOwnersNativeArray);
-        return nativeObject;
+        businessOwnersNativeObject.put("data", businessOwnersNativeObject, businessOwnersNativeArray);
+        return businessOwnersNativeObject;
     }
 
     /**
@@ -539,7 +547,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 String propertyValue = businessOwnerValuesObject.get(0).toString();
                 Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
                 BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
-                businessOwnerPropertiesValues.setPropertyId(key);
+                businessOwnerPropertiesValues.setPropertyKey(key);
                 businessOwnerPropertiesValues.setPropertyValue(propertyValue);
                 businessOwnerPropertiesValues.setShowingInStore(showInStore);
 

@@ -61,7 +61,6 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealmService;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.carbon.utils.xml.StringUtils;
@@ -152,7 +151,7 @@ public class AppMDAO {
      *
      * @param businessOwnerId
      */
-    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException {
+    public void deleteBusinessOwner(int businessOwnerId) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToDeleteRecord = null;
@@ -167,13 +166,13 @@ public class AppMDAO {
             String queryToDeleteRecordTwo = "DELETE FROM APM_BUSINESS_OWNER_PROPERTY WHERE OWNER_ID = ?";
 
             statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo);
-            statementToDeleteRecordTwo.setString(1, businessOwnerId);
+            statementToDeleteRecordTwo.setInt(1, businessOwnerId);
             statementToDeleteRecordTwo.executeUpdate();
 
             String queryToDeleteRecord = "DELETE FROM APM_BUSINESS_OWNER WHERE OWNER_ID = ?";
 
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
-            statementToDeleteRecord.setString(1, businessOwnerId);
+            statementToDeleteRecord.setInt(1, businessOwnerId);
             statementToDeleteRecord.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -198,7 +197,7 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public boolean isBusinessOwnerAssociatedWithApps(String businessOwnerId, Registry registry, String tenantDomain)
+    public boolean isBusinessOwnerAssociatedWithApps(int businessOwnerId, Registry registry, String tenantDomain)
             throws AppManagementException {
         boolean isTenantFlowStarted = false;
         try {
@@ -214,7 +213,7 @@ public class AppMDAO {
             for (GenericArtifact artifact : artifacts) {
                 String artifactContext = artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER);
                 if (artifactContext != null) {
-                    if (artifactContext.equalsIgnoreCase(businessOwnerId)) {
+                    if (artifactContext.equalsIgnoreCase(String.valueOf(businessOwnerId))) {
                         return true;
                     }
                 }
@@ -270,7 +269,7 @@ public class AppMDAO {
             if (businessOwnerPropertiesList != null) {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
                     BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                    String propertyId = businessOwnerProperties.getPropertyId();
+                    String propertyId = businessOwnerProperties.getPropertyKey();
                     if(!StringUtils.isEmpty(propertyId)) {
                         statementToInsertRecordTwo.setInt(1, businessOwner.getBusinessOwnerId());
                         statementToInsertRecordTwo.setString(2, propertyId);
@@ -317,7 +316,7 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getString("NAME"));
+                businessOwnerProperty.setPropertyKey(resultSetOfbusinessOwnerDetails.getString("NAME"));
                 businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getString("VALUE"));
                 businessOwnerProperty.setShowingInStore(resultSetOfbusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
                 businessOwnerPropertiesList.add(businessOwnerProperty);
@@ -414,9 +413,6 @@ public class AppMDAO {
             if (generatedKeys.next()) {
                 businessOwnerId = generatedKeys.getInt(1);
             }
-            else {
-                throw new SQLException("Creating user failed, no ID obtained.");
-                   }
 
             String queryToInsertRecordTwo =
                     "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
@@ -427,8 +423,8 @@ public class AppMDAO {
             if (businessOwnerPropertiesList != null) {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
                     BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                    String propertyId = businessOwnerProperties.getPropertyId();
-                    if(!StringUtils.isEmpty(propertyId)) {
+                    String propertyId = businessOwnerProperties.getPropertyKey();
+                    if (!StringUtils.isEmpty(propertyId)) {
                         statementToInsertBusinessOwnerDetails.setInt(1, businessOwnerId);
                         statementToInsertBusinessOwnerDetails.setString(2, propertyId);
                         statementToInsertBusinessOwnerDetails.setString(3, businessOwnerProperties.getPropertyValue());
@@ -471,7 +467,7 @@ public class AppMDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             String queryToGetBusinessOwner = null;
-            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+            if (connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                 queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
                         "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM >= ? AND ROWNUM <= ?";
             } else {
@@ -510,7 +506,7 @@ public class AppMDAO {
 
     /**
      * Get business owner count.
-     * @return
+     * @return number of business owners.
      * @throws AppManagementException
      */
     public int getBusinessOwnersCount(int tenantId) throws AppManagementException {
@@ -8628,7 +8624,7 @@ public class AppMDAO {
      * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
      * @param searchOption    Search Option
      * @param searchValue     Search Value
-     * @param registry Registry of the current store.
+     * @param registry        Registry of the current store.
      * @return List of App Identifiers
      * @throws AppManagementException
      */
@@ -8656,13 +8652,13 @@ public class AppMDAO {
                 ps = connection.prepareStatement(SQLConstants.SEARCH_USER_ACCESSIBLE_APPS_BY_APP_PROVIDER );
                 searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else if (searchOption == WebAppSearchOption.SEARCH_BY_BUSINESS_OWNER) {
-                Map<String, List<String>> businessOwnerIdsMap = new HashMap<String, List<String>>();
+                Map<String, List<String>> appPropertiesMap = new HashMap<String, List<String>>();
                 List<String> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
                 for (String businessOwnerId : businessOwnerIdList) {
-                    businessOwnerIdsMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , Arrays.asList(businessOwnerId));
-                    businessOwnerIdsMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, Arrays.asList(String.valueOf
+                    appPropertiesMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , Arrays.asList(businessOwnerId));
+                    appPropertiesMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, Arrays.asList(String.valueOf
                             (treatAsSite)));
-                    getUserAccessibleAppsByBusinessOwner(apiIdentifiers, businessOwnerIdsMap, registry, tenantIdOfStore,
+                    getUserAccessibleAppsByBusinessOwner(apiIdentifiers, appPropertiesMap, registry, tenantIdOfStore,
                                                          tenantIdOfUser, username);
                 }
             } else {
@@ -8700,7 +8696,7 @@ public class AppMDAO {
     }
 
     private void getUserAccessibleAppsByBusinessOwner(List<APIIdentifier> apiIdentifiers, Map<String, List<String>>
-            businessOwnerIdsMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName) throws
+            appPropertiesMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName) throws
                                                                                            AppManagementException {
         boolean isTenantFlowStarted = false;
         try {
@@ -8716,16 +8712,17 @@ public class AppMDAO {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(requestedTenantDomain, true);
             }
 
-            APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
             if (tenantIdOfStore != tenantOfUser) {
                 // User has to set anonnymous to get myapps.
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants
                         .REGISTRY_ANONNYMOUS_USERNAME);
             }
+
+            APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
             GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
                                                                                 AppMConstants.API_KEY);
-            GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(businessOwnerIdsMap);
+            GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(appPropertiesMap);
             for (GenericArtifact artifact : artifacts) {
                 String provider = artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);
                 String appName = artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME);

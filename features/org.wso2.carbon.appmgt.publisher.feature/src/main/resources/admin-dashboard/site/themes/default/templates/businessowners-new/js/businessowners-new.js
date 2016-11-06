@@ -124,11 +124,11 @@ $(document).on("click", "#btn-owner-save", function () {
         while(i > 0){
             var key_id = "#key-".concat(i-1);
             var val_id = "#value-".concat(i-1);
-            var showInStoreId = "showInStore-".concat(i-1);
+            var showInStoreId = "#showInStore-".concat(i-1);
             var key = $(key_id).val();
             var value = [];
             value.push($(val_id).val());
-            if(document.getElementById(showInStoreId).checked) {
+            if($(showInStoreId).prop("checked") == true) {
                 value.push(true);
             } else {
                 value.push(false);

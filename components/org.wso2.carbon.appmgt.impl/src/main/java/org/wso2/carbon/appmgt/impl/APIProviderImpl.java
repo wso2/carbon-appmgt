@@ -135,7 +135,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+    public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException{
         boolean isBusinessOwnerAssociatedWithApps = appMDAO.isBusinessOwnerAssociatedWithApps(businessOwnerId,
                                                                                               registry, tenantDomain);
         if (!isBusinessOwnerAssociatedWithApps) {
@@ -197,6 +197,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue, tenantId);
     }
 
+    /**
+     * Get the count of business owners.
+     * @return number of business owners.
+     * @throws AppManagementException
+     */
     @Override
     public  int getBusinessOwnersCount() throws AppManagementException {
         return appMDAO.getBusinessOwnersCount(tenantId);

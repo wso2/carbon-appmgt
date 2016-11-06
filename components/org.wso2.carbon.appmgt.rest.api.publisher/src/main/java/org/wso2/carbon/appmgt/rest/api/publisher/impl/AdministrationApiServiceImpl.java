@@ -70,7 +70,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
                 for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
                     BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
-                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyKey());
                     businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
                     businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
@@ -126,7 +126,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 if (StringUtils.isEmpty(propertyId) || StringUtils.isEmpty(propertyValue) || isVisible == null) {
                     RestApiUtil.handleBadRequest("Business owner properties cannot be empty or null.", log);
                 }
-                businessOwnerProperty.setPropertyId(propertyId.trim());
+                businessOwnerProperty.setPropertyKey(propertyId.trim());
                 businessOwnerProperty.setPropertyValue(propertyValue.trim());
                 businessOwnerProperty.setShowingInStore(isVisible);
                 businessOwnerPropertyList.add(businessOwnerProperty);
@@ -168,7 +168,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 businessOwnerPropertiesDTOList = new ArrayList<>();
                 for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
                     BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
-                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyKey());
                     businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
                     businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
@@ -227,7 +227,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 }
 
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(propertyId);
+                businessOwnerProperty.setPropertyKey(propertyId);
                 businessOwnerProperty.setPropertyValue(propertyValue);
                 businessOwnerProperty.setShowingInStore(isVisible);
                 businessOwnerPropertyList.add(businessOwnerProperty);
@@ -254,7 +254,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             BusinessOwner businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
             if (businessOwner != null) {
                 //Delete the business owner.
-                boolean isDeleted = apiProvider.deleteBusinessOwner(businessOwnerId.toString());
+                boolean isDeleted = apiProvider.deleteBusinessOwner(businessOwnerId);
                 if (!isDeleted) {
                     RestApiUtil.handlePreconditionFailedRequest("Business Owner is assigned to one or more apps. Please remove "
                                                                         + "it from them before deleting." , log);

@@ -1785,21 +1785,21 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
                                                         String searchValue) throws AppManagementException {
-        Registry anonnymousUserRegistry = null;
+        Registry userRegistry = null;
         try {
             if (tenantIdOfStore != tenantIdOfUser) {
                 // Get registry for anonnymous users when searching is going in tenant.
-                anonnymousUserRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                userRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
                         .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIdOfStore);
             } else {
-                anonnymousUserRegistry = registry;
+                userRegistry = registry;
             }
         } catch (RegistryException e) {
             handleException("Error while obtaining registry.", e);
         }
 
         return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,
-                                                searchValue, anonnymousUserRegistry);
+                                                searchValue, userRegistry);
     }
 
     @Override

@@ -38,6 +38,8 @@ var subscriptionConfig = require('../../../../themes/store/js/subscription-confi
 var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
 var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
+var businessOwnerHelper = require('../themes/store/js/logic/businessOwners/businessOwners.js')
+
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title, currentTenant, userTenant, tenantIdVal,
         log = ctx.log,
@@ -228,8 +230,7 @@ require('/modules/store.js').exec(function (ctx) {
                 businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
 
                 if (businessOwner != null && businessOwner.businessOwnerName != null) {
-                    businessOwnerCustomData =
-                    require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+                    businessOwnerCustomData = businessOwnerHelper.transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;
                     ownerEmail = businessOwnerCustomData[1].value;
                 }
