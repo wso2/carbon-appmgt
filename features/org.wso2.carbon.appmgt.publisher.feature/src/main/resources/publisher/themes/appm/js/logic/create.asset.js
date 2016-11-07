@@ -554,19 +554,19 @@ $(function() {
 	        }
 	        index++;
 	    }
-	    sso_config.provider = providerName;
-	    sso_config.logout_url = logoutUrl;
-	    sso_config.claims = claims;
-	    sso_config.idp_provider = idpProvider;
-	    sso_config.app_name = appName;
-	    sso_config.app_verison = appVersion;
-	    sso_config.app_transport = appTransport;
-	    sso_config.app_treatAsASite = appTreatAsASite;
-	    sso_config.app_context = appContext;
-	    sso_config.app_provider = appProvider;
-	    sso_config.app_allowAnonymous=appAllowAnonymous;
-	    sso_config.app_acsURL = appAcsURL;
-	    sso_config.app_isDefaultVersion = appIsDefaultVersion;
+	    ssoConfig.provider = providerName;
+	    ssoConfig.logout_url = logoutUrl;
+	    ssoConfig.claims = claims;
+	    ssoConfig.idp_provider = idpProvider;
+	    ssoConfig.app_name = appName;
+	    ssoConfig.app_verison = appVersion;
+	    ssoConfig.app_transport = appTransport;
+	    ssoConfig.app_treatAsASite = appTreatAsASite;
+	    ssoConfig.app_context = appContext;
+	    ssoConfig.app_provider = appProvider;
+	    ssoConfig.app_allowAnonymous=appAllowAnonymous;
+	    ssoConfig.app_acsURL = appAcsURL;
+	    ssoConfig.app_isDefaultVersion = appIsDefaultVersion;
 
 
         $.ajax({
@@ -574,9 +574,6 @@ $(function() {
             type: 'POST',
             contentType: 'application/json',
             data:JSON.stringify(ssoConfig),
-            success: function(response) {
-                console.log("Added SSO config successfully");
-            },
             error: function(response) {
                 showAlert('Error adding service provider.', 'error');
             }
