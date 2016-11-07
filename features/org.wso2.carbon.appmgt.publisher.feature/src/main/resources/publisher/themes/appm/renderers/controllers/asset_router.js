@@ -7,7 +7,7 @@ var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
-var businessOwnerHelper = require('../../helpers/businessowners.js');
+var businessOwnerHelper = require('../../helpers/businessowner.js');
 
 var render = function(theme, data, meta, require) {
 
