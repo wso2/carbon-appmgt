@@ -305,6 +305,7 @@ public class DefaultAppRepository implements AppRepository {
                 webApp.setDefaultVersion(webApp.getId().getVersion().equals(defaultVersion));
 
                 // There should be only one record for the above query.
+
                 break;
             }
 
@@ -1516,7 +1517,7 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, webApp.getId().getVersion());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, webApp.getContext());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, webApp.getDisplayName());
-        artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomain(
                 webApp.getId().getProviderName()));
         artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());

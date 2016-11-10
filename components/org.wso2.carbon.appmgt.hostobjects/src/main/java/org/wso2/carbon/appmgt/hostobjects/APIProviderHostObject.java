@@ -4289,17 +4289,19 @@ public class APIProviderHostObject extends ScriptableObject {
      */
     public static String jsFunction_populateIssuerName(Context cx, Scriptable thisObj, Object[] args,
                                                        Function funObj) throws AppManagementException {
-        if (args == null || args.length != 2) {
+        if (args == null || args.length != 3) {
             throw new AppManagementException(
                     "Invalid number of arguments. Arguments length should be one.");
         }
 
-        String appName = (String) args[0];
-        String version = (String) args[1];
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        String provider = (String) args[0];
+        String appName = (String) args[1];
+        String version = (String) args[2];
+
+        String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(provider));
 
         String saml2SsoIssuer;
-        if (!"carbon.super".equalsIgnoreCase(tenantDomain)) {
+        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
             saml2SsoIssuer = appName + "-" + tenantDomain + "-" + version;
         } else {
             saml2SsoIssuer = appName + "-" + version;
@@ -4308,21 +4310,40 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     public static String jsFunction_getAscUrl(Context cx, Scriptable thisObj, Object[] args,
-                                                   Function funObj) throws AppManagementException {
-        if (args == null || args.length != 3) {
+                                              Function funObj) throws AppManagementException {
+        if (args == null || args.length != 4) {
             throw new AppManagementException(
                     "Invalid number of arguments. Arguments length should be one.");
         }
 
-        String version = (String) args[0];
-        String context = (String) args[1];
-        String transport = (String) args[2];
+        String provider = (String) args[0];
+        String version = (String) args[1];
+        String context = (String) args[2];
+        String transport = (String) args[3];
 
-        APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
-        WebApp webApp = new WebApp(appIdentifier);
-        webApp.setTransports(transport);
-        webApp.setContext(context);
-        String acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
+        String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(provider));
+        boolean isTenantFlowStarted = false;
+        String acsUrl = null;
+
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
+            WebApp webApp = new WebApp(appIdentifier);
+            webApp.setTransports(transport);
+            webApp.setContext(context);
+            acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
         return acsUrl;
     }
 }

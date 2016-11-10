@@ -53,55 +53,55 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     public String addSubscription(APIIdentifier identifier, String subscriptionType,
                                 String userId, int applicationId, String trustedIdps) throws
                                                                                       AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.addSubscription(identifier, subscriptionType, userId, applicationId, trustedIdps);
     }
 
     @Override
     public Subscription getSubscription(APIIdentifier apiIdentifier, int applicationId, String subscriptionType) throws
                                                                                                                  AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.getSubscription(apiIdentifier, applicationId, subscriptionType);
     }
 
     @Override
     public void removeSubscription(APIIdentifier identifier, String userId,
                                    int applicationId) throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.removeSubscription(identifier, userId, applicationId);
     }
 
     @Override
     public String addApplication(Application application, String userId) throws
                                                                          AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.addApplication(application, userId);
     }
 
     @Override
     public void updateApplication(Application application) throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.updateApplication(application);
     }
 
     @Override
     public void addToFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.addToFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
     public void removeFromFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser,
                                         int tenantIdOfStore) throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.removeFromFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
     public boolean isFavouriteApp(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.isFavouriteApp(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
@@ -109,7 +109,7 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                 WebAppSortOption sortOption)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, sortOption);
     }
 
@@ -117,28 +117,28 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     public List<APIIdentifier> searchFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                    WebAppSearchOption searchOption, String searchValue)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.searchFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, searchOption, searchValue);
     }
 
     @Override
     public void setFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.setFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
     public void removeFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         super.removeFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
     public boolean hasFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        checkSubscribePermission();
+        //checkSubscribePermission();
         return super.hasFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
 
     }

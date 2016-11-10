@@ -68,6 +68,7 @@ import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.appmgt.impl.utils.APINameComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -2617,6 +2618,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
+            //String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
             if (!AppManagerUtil.checkPermissionQuietly(this.username, requiredPermission)) {
                 handleResourceAuthorizationException("The user " + this.username +
                         " is not authorized to perform lifecycle action " + lifecycleAction + " on " +
@@ -2642,7 +2644,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + appArtifact.getPath());
 
             if (appArtifact != null) {
-                if (!authManager.isUserAuthorized(username, resourcePath, "authorize")) {
+                if (!authManager.isUserAuthorized(MultitenantUtils.getTenantAwareUsername(AppManagerUtil.replaceEmailDomainBack(username)), resourcePath, "authorize")) {
                     //Throws resource authorization exception
                     handleResourceAuthorizationException("The user " + this.username +
                             " is not authorized to" + appType + " with uuid " + appId);

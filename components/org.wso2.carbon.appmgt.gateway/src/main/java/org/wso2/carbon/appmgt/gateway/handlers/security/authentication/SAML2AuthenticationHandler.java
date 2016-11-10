@@ -293,7 +293,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logAndThrowException(log, errorMessage, null);
             }
 
-            if (idpMessage.getRawSAMLResponse() != null) {
+            /*if (idpMessage.getRawSAMLResponse() != null) {
                 //pass saml response and request for an authorized cookie to access admin services
                 String authorizedAdminCookie = getAuthenticatedCookieFromIdP(idpMessage.getRawSAMLResponse());
                 if (authorizedAdminCookie == null) {
@@ -307,7 +307,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     session.addAttribute(AppMConstants.IDP_AUTHENTICATED_COOKIE, authorizedAdminCookie);
                     SessionStore.getInstance().updateSession(session);
                 }
-            }
+            } */
         } catch (SAMLException e) {
             String errorMessage = String.format("Error while processing the IDP call back request to the ACS URL ('%s')", fullResourceURL);
             log.error(errorMessage);
@@ -373,7 +373,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 GatewayUtils.logWithRequestInfo(log, messageContext, String.format("Session index : %s", sessionIndex));
 
                 // Add Session Index -> Session ID to a cache.
-                CacheManager.getInstance().getSessionIndexMappingCache().put(sessionIndex, session.getUuid());
+                if(sessionIndex != null) {
+                    CacheManager.getInstance().getSessionIndexMappingCache().put(sessionIndex, session.getUuid());
+                }
 
                 // Mark this web app as an access web app in this session.
                 session.addAccessedWebAppUUID(webApp.getUUID());

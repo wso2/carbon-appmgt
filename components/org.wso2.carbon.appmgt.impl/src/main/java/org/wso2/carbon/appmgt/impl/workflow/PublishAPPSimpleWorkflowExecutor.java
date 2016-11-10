@@ -92,11 +92,12 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String fullName;
-            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
-                fullName = loggedInUser + "@" + tenantDomain;
-            }else{
-                fullName = loggedInUser;
-            }
+//            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
+//                fullName = loggedInUser + "@" + tenantDomain;
+//            }else{
+//                fullName = loggedInUser;
+//            }
+            fullName = loggedInUser;
             //make Provider Name (Secondary User Store) registry friendly by replacing '/' with ':'
             uId = AppManagerUtil.makeSecondaryUSNameRegFriendly(uId);
 

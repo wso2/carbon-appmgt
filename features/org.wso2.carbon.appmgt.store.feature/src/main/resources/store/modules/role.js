@@ -24,15 +24,6 @@ var checkeRole = function (username, session) {
   	usr = um.getUser(usr.username);
   	usr.tenantDomain = carbon.server.tenantDomain({tenantId: usr.tenantId});
 
-  	//if (!usr.hasRoles([role[0]])) {
-      	//	return false;
-  	//}
-
-    if (!(apiUtil.checkPermissionWrapper(username, config.permissions.webapp_subscribe)
-          || apiUtil.checkPermissionWrapper(username, config.permissions.mobileapp_subscribe))) {
-           return false;
-  	}
-
     //append domain for tenant users
     if (usr.tenantId != -1234) {
         usr.username += "@" + usr.tenantDomain;

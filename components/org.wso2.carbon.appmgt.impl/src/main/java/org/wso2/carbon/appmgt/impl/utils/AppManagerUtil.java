@@ -279,7 +279,11 @@ public final class AppManagerUtil {
                 if(!context.startsWith(RegistryConstants.PATH_SEPARATOR)){
                     context = RegistryConstants.PATH_SEPARATOR + context;
                 }
-                api.setContext(RegistryConstants.PATH_SEPARATOR + "t" + RegistryConstants.PATH_SEPARATOR + tenantDomainName + context);
+                if (!context.startsWith("/t")) { //Todo: /t/tenantDomain is already appeneded when calling through REST API. This condition is a temp fix for it.
+                    api.setContext(RegistryConstants.PATH_SEPARATOR + "t" + RegistryConstants.PATH_SEPARATOR + tenantDomainName + context);
+                } else {
+                    api.setContext(context);
+                }
             }
 			api.setLatest(Boolean.valueOf(artifact.getAttribute(AppMConstants.API_OVERVIEW_IS_LATEST)));
 
