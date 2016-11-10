@@ -8,9 +8,6 @@ var checkeRole = function (username, session) {
 
     var config = require('/config/store.json');
 
-    var apiUtil = Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-    var apiUtil = new apiUtil();
-
 	var user = require('store').user;
 	if (!user.configs(usr.tenantId)) {
 		event.emit('tenantLoad', usr.tenantId);
