@@ -34,7 +34,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     var isEnterpiseAdmin = false;
-
+    user.username = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user.username);
     if(user.hasRoles([mdmConfig.EnterpriseOperations_AuthorizedRole])){
         isEnterpiseAdmin = true;
     }
