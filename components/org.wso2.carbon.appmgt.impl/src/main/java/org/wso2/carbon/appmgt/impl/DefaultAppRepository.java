@@ -13,7 +13,6 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -350,6 +349,10 @@ public class DefaultAppRepository implements AppRepository {
         String query = "INSERT INTO resource (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES (?,?,?,?,?,?)";
         try {
             connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            if (connection.getMetaData().getDriverName().contains(AppMConstants.DRIVER_TYPE_ORACLE)) {
+                query = "INSERT INTO \"resource\" (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES " +
+                        "(?,?,?,?,?,?)";
+            }
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, fileContent.getUuid());
             preparedStatement.setString(2, getTenantDomainOfCurrentUser());
