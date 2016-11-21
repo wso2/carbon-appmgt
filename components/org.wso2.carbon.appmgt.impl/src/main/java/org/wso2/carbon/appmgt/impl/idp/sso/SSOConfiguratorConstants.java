@@ -35,4 +35,6 @@ public class SSOConfiguratorConstants {
 
     public final static String PARAMETERS = "parameters";
 
+    public final static String DEFAUL_PARAMETERS_PASSWORD = "password";
+
 }
