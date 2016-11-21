@@ -7,7 +7,7 @@ require('/modules/store.js').exec(function (ctx) {
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = ctx.tenantId,
+            tenantId = user.tenantId,
             tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
@@ -48,8 +48,10 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(user && mdmConfig.EnterpriseOperations_Enabled){
         var server = require('store').server;
-        var um = new carbon.user.UserManager(server, tenantId);
-        var userRoles = um.getRoleListOfUser(user.username);
+        var um = new carbon.user.UserManager(server, user.tenantId);
+        var tenantAwareUserName = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user
+                .username);
+        var userRoles = um.getRoleListOfUser(tenantAwareUserName);
         for(var i = 0; i < userRoles.length; i++){
             if(userRoles[i] == mdmConfig.EnterpriseOperations_AuthorizedRole){
                 isEnterpriseInstallEnabled = true;
