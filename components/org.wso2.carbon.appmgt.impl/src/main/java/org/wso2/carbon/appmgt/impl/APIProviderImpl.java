@@ -130,8 +130,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Delete business owner.
+     *
      * @param businessOwnerId ID of the owner.
-     * @return
+     * @return whether business owner was deleted or not
      * @throws AppManagementException
      */
     @Override
@@ -147,8 +148,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return false;
     }
     /**
-     *Update a business owner.
+     * Update a business owner.
+     *
      * @param businessOwner
+     * @return whether business owner was updated or not
      * @throws AppManagementException
      */
     @Override
@@ -164,7 +167,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Get all business Owners.
-     * @return
+     *
+     * @return list of business owners
      * @throws AppManagementException
      */
     @Override
@@ -173,9 +177,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get business owners.
+     * Get business owner.
+     *
      * @param businessOwnerId Business owner Id.
-     * @return
+     * @return business owner
      * @throws AppManagementException
      */
     @Override
@@ -188,7 +193,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @param startIndex
      * @param pageSize
      * @param searchValue
-     * @return
+     * @return list of business owners
      * @throws AppManagementException
      */
     @Override
@@ -208,8 +213,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     *Save business owner.
+     * Save business owner.
+     *
      * @param businessOwner
+     * @return saved business owner id
      * @throws AppManagementException
      */
     @Override

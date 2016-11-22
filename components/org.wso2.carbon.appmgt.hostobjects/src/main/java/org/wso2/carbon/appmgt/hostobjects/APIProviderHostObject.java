@@ -471,7 +471,7 @@ public class APIProviderHostObject extends ScriptableObject {
         NativeObject businessOwnersNativeObject = new NativeObject();
         businessOwnersNativeObject.put("draw", businessOwnersNativeObject, currentPage);
         businessOwnersNativeObject.put("recordsTotal", businessOwnersNativeObject, totalBusinessOwners);
-        if(searchValue.trim() == "") {
+        if (searchValue.trim() == "") {
             businessOwnersNativeObject.put("recordsFiltered", businessOwnersNativeObject, totalBusinessOwners);
         } else {
             int filteredNoOfRecords = businessOwnerList.size();
@@ -479,7 +479,6 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         NativeArray businessOwnersNativeArray = new NativeArray(0);
-
         int businessOwnersArrayCount = 0;
 
         for (BusinessOwner businessOwner : businessOwnerList) {

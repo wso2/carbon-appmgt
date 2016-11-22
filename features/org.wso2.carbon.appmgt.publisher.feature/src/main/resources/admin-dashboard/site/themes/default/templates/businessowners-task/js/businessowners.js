@@ -290,9 +290,9 @@ $(document).on("click", ".owner-delete-button", function () {
                    contentType: 'application/json',
                    dataType: 'json',
                    success: function (response) {
-                       if(response.response) {
+                       if (response.response) {
                            updateOwners();
-                           Showalert("Business Owner : " + ownerName + " Deleted Successfully ", "alert-success", "statusSuccess");
+                           Showalert("Business Owner : " + ownerName + " was deleted successfully ", "alert-success", "statusSuccess");
                            location.reload();
                        } else {
                            Showalert('Business Owner : ' + ownerName + ' is assigned to one or more apps. Please remove'

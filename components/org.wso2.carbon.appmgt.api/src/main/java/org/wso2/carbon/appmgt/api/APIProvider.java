@@ -53,23 +53,27 @@ public interface APIProvider extends APIManager {
 
 
     /**
-     * This methode is to delete a given business owner
+     * This method is to delete a given business owner
      *
      * @param businessOwnerId ID of the owner.
+     * @return whether business owner was deleted or not
      * @throws AppManagementException
      */
     public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * update a Business Owner.
-     * @return Integer
+     * Update a Business Owner.
+     *
+     * @param businessOwner business owner.
+     * @return whether business owner was updated or not
      * @throws AppManagementException
      */
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
 
-    /**
-     * @return
+    /** Get all business owners.
+     *
+     * @return list of business owners
      * @throws AppManagementException
      */
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
@@ -78,17 +82,18 @@ public interface APIProvider extends APIManager {
      * Return the owner properties of the given owner Id.
      *
      * @param businessOwnerId Business owner Id.
-     * @return
+     * @return business owner
      * @throws AppManagementException if failed to get business owner.
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
      * Search the business owners with page limitation.
+     *
      * @param startIndex
      * @param pageSize
      * @param searchValue
-     * @return
+     * @return list of business owners
      * @throws AppManagementException
      */
     public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
@@ -96,14 +101,17 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get the count of business owners.
-     * @return
+     *
+     * @return the count of business owners
      * @throws AppManagementException
      */
     public  int getBusinessOwnersCount() throws AppManagementException;
 
     /**
      * Save a Business Owner.
-     * @return Integer
+     *
+     * @param businessOwner
+     * @return saved business owner id
      * @throws AppManagementException
      */
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
@@ -112,7 +120,7 @@ public interface APIProvider extends APIManager {
      * Get Business owner Id by owner name and email.
      * @param businessOwnerName
      * @param businessOwnerEmail
-     * @return
+     * @return business owner Id
      * @throws AppManagementException
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException;

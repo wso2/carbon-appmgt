@@ -105,13 +105,14 @@ public class AppMDAO {
     }
 
     /**
-     * This methode is to return a List of existing business owners with out their custom properties.
+     * Get business owner.
+     *
      * @param businessOwnerId
-     * @return
+     * @param tenantId
+     * @return business owner
      * @throws AppManagementException
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId, int tenantId) throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         BusinessOwner businessOwner = null;
@@ -119,7 +120,6 @@ public class AppMDAO {
 
         String queryToGetBusinessOwner = "SELECT OWNER_NAME, OWNER_EMAIL, OWNER_DESC, OWNER_SITE FROM " +
                 "APM_BUSINESS_OWNER WHERE OWNER_ID = ? AND TENANT_ID = ?";
-
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
@@ -141,18 +141,17 @@ public class AppMDAO {
             handleException("Failed to retrieve business owners.", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
-
         }
         return businessOwner;
     }
 
     /**
-     * Delete a given business owner.
+     *  Delete a given business owner.
      *
      * @param businessOwnerId
+     * @throws AppManagementException
      */
     public void deleteBusinessOwner(int businessOwnerId) throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToDeleteRecord = null;
         PreparedStatement statementToDeleteRecordTwo = null;
@@ -191,10 +190,11 @@ public class AppMDAO {
 
     /**
      * Check the business owner usage of web app from the registry.
+     *
      * @param businessOwnerId
      * @param registry
      * @param tenantDomain
-     * @return
+     * @return whether business owner is associated with an app or not
      * @throws AppManagementException
      */
     public boolean isBusinessOwnerAssociatedWithApps(int businessOwnerId, Registry registry, String tenantDomain)
@@ -233,7 +233,6 @@ public class AppMDAO {
      * @throws AppManagementException
      */
     public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToInsertRecord = null;
         PreparedStatement statementToInsertRecordTwo = null;
@@ -280,7 +279,6 @@ public class AppMDAO {
                 }
             }
             connection.commit();
-
         } catch (SQLException e) {
             if (connection != null) {
                 try {
@@ -334,15 +332,14 @@ public class AppMDAO {
         return businessOwnerPropertiesList;
     }
 
-
     /**
-     * This methode is to return a List of existing business owners with their properties.
+     * Get all business owners with their properties.
      *
-     * @return
+     * @param tenantId
+     * @return list of businsess owners
      * @throws AppManagementException
      */
     public List<BusinessOwner> getBusinessOwners(int tenantId) throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
@@ -379,10 +376,13 @@ public class AppMDAO {
 
     /**
      * Save a business owner.
+     *
      * @param businessOwner
+     * @param tenantId
+     * @return saved business owner id
+     * @throws AppManagementException
      */
     public int saveBusinessOwner(BusinessOwner businessOwner, int tenantId) throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToInserBusinessOwner = null;
         PreparedStatement statementToInsertBusinessOwnerDetails = null;
@@ -451,10 +451,12 @@ public class AppMDAO {
 
     /**
      * Search business owners.
+     *
      * @param startIndex
      * @param pageSize
      * @param searchValue
-     * @return
+     * @param tenantId
+     * @return list of business owners.
      * @throws AppManagementException
      */
     public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue, int tenantId)
@@ -506,13 +508,15 @@ public class AppMDAO {
 
     /**
      * Get business owner count.
+     *
+     * @param tenantId
      * @return number of business owners.
      * @throws AppManagementException
      */
     public int getBusinessOwnersCount(int tenantId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        int rowcount = 0;
+        int rowCount = 0;
         ResultSet resultSet = null;
 
         String sqlQuery = "SELECT COUNT(*) AS ROWCOUNT FROM APM_BUSINESS_OWNER WHERE TENANT_ID = ?";
@@ -524,21 +528,22 @@ public class AppMDAO {
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                rowcount = resultSet.getInt("ROWCOUNT");
+                rowCount = resultSet.getInt("ROWCOUNT");
             }
         } catch (SQLException e) {
             handleException("Error when getting the row count of business owners table. ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
         }
-        return rowcount;
+        return rowCount;
     }
 
     /**
      * Search business owners.
+     *
      * @param searchPrefix
      * @param tenantId
-     * @return
+     * @return list of business owner id
      * @throws AppManagementException
      */
     public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws AppManagementException {
@@ -572,11 +577,12 @@ public class AppMDAO {
     }
 
     /**
-     * Get Businesss owner Id by owner name, email and tenant Id
+     * Get business owner Id by owner name, email and tenant Id.
+     *
      * @param businessOwnerName
      * @param businessOwnerEmail
      * @param tenantId
-     * @return
+     * @return business owner id
      * @throws AppManagementException
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId) throws
