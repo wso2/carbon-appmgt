@@ -80,6 +80,11 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
     private SequenceMediator productionKeyErrorSequence = null;
 
 
+    /**
+     * Create synapse sequence.
+     *
+     * @param configurationContext
+     */
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -131,9 +136,9 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
             log.error("Failed to create Tenant's synapse sequences for tenant. ");
         }
 
-        try{
+        try {
             AppManagerUtil.loadTenantAPIPolicy(tenantDomain, tenantId);
-        }catch (AppManagementException e){
+        } catch (AppManagementException e) {
             log.error("Failed to load tiers.xml to tenant's registry");
         }
     }
@@ -197,10 +202,6 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         } catch (Exception e) {
             handleException("Couldn't serialise the initial synapse configuration for the domain : " + tenantDomain, e);
         }
-    }
-
-    public static boolean isRunningSamplesMode() {
-        return true;
     }
 
     private void handleException(String message, Exception e) {

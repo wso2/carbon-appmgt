@@ -24,14 +24,24 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 
 import java.rmi.RemoteException;
 
+/**
+ * Client class to communicate with RestApiAdmin service.
+ */
 public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
-
 	private RestApiAdminStub restApiAdminStub;
 	private String qualifiedName;
 	private String qualifiedNonVersionedWebAppName;
 
 	private static final String backendURLl = "local:///services/";
 
+	/**
+	 * Constructor.
+	 *
+	 * @param apiProviderName
+	 * @param apiName
+	 * @param version
+	 * @throws AppManagementException
+     */
 	public RESTAPIAdminClient(String apiProviderName, String apiName, String version) throws AppManagementException {
 		try {
 			this.qualifiedName = apiProviderName + "--" + apiName + ":v" + version;

@@ -353,7 +353,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
             ps.setString(1,context);
             ps.setString(2,version);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 String webAppname = rs.getString("APP_NAME");
                 String provider = rs.getString("APP_PROVIDER");
                 String trackingCode = rs.getString("TRACKING_CODE");

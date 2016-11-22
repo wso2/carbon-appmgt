@@ -34,12 +34,22 @@ import javax.xml.stream.XMLStreamException;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
 
+/**
+ * Client class to communicate with AppGatewayAdmin service.
+ */
 public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     private AppGatewayAdminStub appGatewayAdminStub;
     private String qualifiedName;
     private String qualifiedDefaultApiName;
     private Environment environment;
 
+    /**
+     * Constructor.
+     *
+     * @param apiId
+     * @param environment
+     * @throws AppManagementException
+     */
     public AppGatewayAdminClient(APIIdentifier apiId, Environment environment) throws AppManagementException {
         String providerName = apiId.getProviderName();
         String appName = apiId.getProviderName();
@@ -59,8 +69,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * Add versioned web app configuration to the gateway.
      *
      * @param builder
+     * @param apiId
      * @param tenantDomain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public void addVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -91,9 +102,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Return versioned web app configuration from the gateway.
      *
+     * @param apiId
      * @param tenantDomain
-     * @return
-     * @throws AppManagementException on errors.
+     * @return versioned webapp configuration
+     * @throws AppManagementException
      */
     public WebAppData getVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -122,11 +134,12 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     }
 
     /**
-     * Update versioned web app configuration in the gateway
+     * Update versioned web app configuration in the gateway.
      *
      * @param builder
+     * @param apiId
      * @param tenantDomain
-     * @throws AxisFault
+     * @throws AppManagementException
      */
     public void updateVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -155,10 +168,11 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     }
 
     /**
-     * Delete versioned web app configuration from the gateway
+     * Delete versioned web app configuration from the gateway.
      *
+     * @param apiId
      * @param tenantDomain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public void deleteVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -184,8 +198,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * Add non-versioned web app configuration to the gateway.
      *
      * @param builder
+     * @param apiId
      * @param tenantDomain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public void addNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -213,11 +228,12 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     }
 
     /**
-     * Update non-versioned web app configuration in the gateway
+     * Update non-versioned web app configuration in the gateway.
      *
      * @param builder
+     * @param apiId
      * @param tenantDomain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public void updateNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -246,10 +262,11 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     }
 
     /**
-     * Delete non-versioned web app configuration form the gateway
+     * Delete non-versioned web app configuration form the gateway.
      *
+     * @param apiId
      * @param tenantDomain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public void deleteNonVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -276,9 +293,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Return the non-versioned web app configuration from the gateway.
      *
+     * @param apiId
      * @param tenantDomain
-     * @return
-     * @throws AppManagementException on errors.
+     * @return non versioned webapp configuration
+     * @throws AppManagementException
      */
     public WebAppData getNonVersionedWebAppData(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -362,7 +380,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Get the sequence from gateway.
      *
-     * @param sequenceName - The sequence name,
+     * @param sequenceName - The sequence name
      * @param tenantDomain - The Tenant Domain
      * @throws AppManagementException on errors.
      */
@@ -385,9 +403,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
 
     /**
      * Check whether the sequence is exiting or not.
+     *
      * @param sequenceName
      * @param tenantDomain
-     * @return
+     * @return whether sequence exists or not
      * @throws AppManagementException on errors.
      */
     public boolean isExistingSequence(String sequenceName, String tenantDomain) throws AppManagementException {

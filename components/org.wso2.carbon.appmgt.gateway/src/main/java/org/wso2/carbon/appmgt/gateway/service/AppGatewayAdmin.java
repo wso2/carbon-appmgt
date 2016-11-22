@@ -37,6 +37,11 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This service is used to proxy RESTAPIAdmin service which is exposed by carbon mediation.
+ * If Publisher needs to call RESTAPIAdmin service, it should call AppGatewayAdmin service instead.
+ * This is introduced to separate Publisher from mediation services.
+ */
 public class AppGatewayAdmin extends AbstractAdmin {
     private static Log log = LogFactory.getLog(AppGatewayAdmin.class);
     /**
@@ -406,8 +411,9 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Get the sequence from gateway for super tenant users.
      *
-     * @param sequenceName -The sequence name.
-     * @throws AppManagementException on errors.
+     * @param sequenceName
+     * @return sequence
+     * @throws AppManagementException
      */
     public OMElement getSequence(String sequenceName) throws AppManagementException {
         try {
@@ -421,9 +427,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Get the sequence from gateway for tenant users.
      *
-     * @param sequenceName -The sequence name
-     * @param tenantDomain the tenant domain of the user.
-     * @throws AppManagementException on errors.
+     * @param sequenceName
+     * @param tenantDomain
+     * @return sequence
+     * @throws AppManagementException
      */
     public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
@@ -437,7 +444,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Check whether there is already a sequence in gateway for super tenant users.
      * @param sequenceName the sequence name.
-     * @return true or false.
+     * @return whether the given sequence is exist or not
      * @throws AppManagementException
      */
     public boolean isExistingSequence(String sequenceName) throws AppManagementException {
@@ -453,7 +460,7 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * Check whether there is already a sequence in gateway for tenant users.
      * @param sequenceName the sequence name.
      * @param tenantDomain the tenant domain of the user.
-     * @return true or false.
+     * @return whether the given sequence is exist or not
      * @throws AppManagementException
      */
     public boolean isExistingSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {

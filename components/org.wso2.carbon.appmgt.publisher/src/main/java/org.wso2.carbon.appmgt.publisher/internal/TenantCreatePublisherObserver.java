@@ -61,7 +61,7 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
             log.error(String.format("Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry", tenantDomain), e);
         }
 
-        try{
+        try {
             // Write the tenant configuration file to the tenant registry.
             AppManagerUtil.createTenantConfInRegistry(tenantId);
 
@@ -69,7 +69,7 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
             TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(tenantId);
             ServiceReferenceHolder.getInstance().getTenantConfigurationService().addTenantConfiguration(tenantConfiguration);
 
-        }catch (AppManagementException e){
+        } catch (AppManagementException e) {
             log.error(String.format("Failed to create carbon-appmgt tenant specific configuration file in the registry of the tenant '%s'", tenantDomain), e);
         } catch (ConfigurationException e) {
             log.error(String.format("Failed to load carbon-appmgt tenant specific configurations from the registry for the tenant '%s'", tenantDomain), e);
@@ -119,9 +119,9 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
             log.error("App manager configuration service is set to publisher bundle.");
         }
 
-        try{
+        try {
             AppManagerUtil.writeDefinedSequencesToTenantRegistry(tenantId);
-        }catch(AppManagementException e){
+        } catch(AppManagementException e) {
             log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry.");
         }
     }

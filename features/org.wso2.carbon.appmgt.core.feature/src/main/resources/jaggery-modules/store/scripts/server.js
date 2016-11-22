@@ -149,7 +149,7 @@ var server = {};
             };
         }
 
-        if(obj.tenantId != -1){
+        if (obj.tenantId != -1) {
             //loads the tenant if it hasn't been loaded
             server.loadTenant(obj);
         }

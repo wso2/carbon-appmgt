@@ -1269,7 +1269,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
-                        } else if(status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
+                        } else if (status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
                             removeFromGateway(api);
                         }
                     }

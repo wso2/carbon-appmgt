@@ -101,9 +101,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
 
     @Override
     public void savePolicy(EntitlementPolicy policy) {
-
         try {
-
             if (!policy.isValid()) {
                 return;
             }
@@ -127,9 +125,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
 
     @Override
     public void updatePolicy(EntitlementPolicy policy) {
-
         EntitlementPolicy processedPolicy = preProcess(policy);
-
         if (processedPolicy == null) {
             return;
         }
@@ -142,12 +138,10 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
             log.error("Cannot update XACML policy with id : " + policy.getPolicyId() +
                     ". Error occurred in EntitlementPolicyAdminService", e);
         }
-
     }
 
     @Override
     public EntitlementPolicyValidationResult validatePolicyPartial(String partial) {
-
         // Generate mock policy from the given partial.
         org.wso2.carbon.identity.entitlement.dto.PolicyDTO policyDTO = new org.wso2.carbon.identity.entitlement.dto.PolicyDTO();
         policyDTO.setPolicy(generateMockPolicy(partial));
@@ -176,35 +170,38 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     public void generateAndSaveEntitlementPolicies(List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts) {
         XACMLTemplateBuilder xacmlTemplateBuilder = new XACMLTemplateBuilder();
 
-        for(XACMLPolicyTemplateContext context : xacmlPolicyTemplateContexts){
+        for (XACMLPolicyTemplateContext context : xacmlPolicyTemplateContexts) {
             generateAndSaveEntitlementPolicy(context, xacmlTemplateBuilder);
         }
     }
 
+    /**
+     * Check whether entitlement decision request is permitted or not.
+     *
+     * @param request Request to be checked.
+     * @return whether entitlement decision request is permitted or not
+     * @throws AppManagementException
+     */
     @Override
     public boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException {
-
         PEPProxy pepProxy = getPepProxy();
-
-        if(pepProxy == null){
+        if (pepProxy == null) {
             throw new AppManagementException("Cannot create PEP proxy.");
         }
 
         String decisionResult = null;
         try {
-
             decisionResult = pepProxy.getDecision(getEntitlementAttributes(request));
 
             OMElement decisionElement = AXIOMUtil.stringToOM(decisionResult);
             String decision = decisionElement.getFirstChildWithName(new QName(XML_NS_XACML_RESULT, XML_ELEMENT_RESULT)).
                     getFirstChildWithName(new QName(XML_NS_XACML_RESULT, XML_ELEMENT_DECISION)).getText();
 
-            if(decision != null && DECISION_DENY.equals(decision.toUpperCase())){
+            if (decision != null && DECISION_DENY.equals(decision.toUpperCase())) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
-
         } catch (Exception e) {
             String errorMessage = String.format("Error while evaluating entitlement for the policy id '%s'.", request.getPolicyId());
             log.error(errorMessage, e);
@@ -218,7 +215,6 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         try {
             PolicyDTO existingPolicy = getPolicy(policyId);
             return existingPolicy.getPolicy();
-
         } catch (RemoteException e) {
             log.error("Error occurred while retrieving policy with policy id : " + policyId, e);
         } catch (EntitlementPolicyAdminServiceEntitlementException e) {
