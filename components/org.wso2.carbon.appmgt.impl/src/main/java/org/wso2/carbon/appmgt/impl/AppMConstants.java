@@ -35,6 +35,8 @@ public final class AppMConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
 
+    public static final String DRIVER_TYPE_ORACLE = "Oracle";
+
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 

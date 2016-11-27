@@ -667,7 +667,6 @@ public class APPMappingUtil {
 			webApp.setServiceProviderCreationEnabled(true);
 		}
 
-        webApp.setServiceProviderCreationEnabled(appDTO.isServiceProviderCreationEnabled());
         webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
         webApp.setAcsURL(appDTO.getAcsUrl());
         webApp.setSsoProviderDetails(AppManagerUtil.getDefaultSSOProvider());
