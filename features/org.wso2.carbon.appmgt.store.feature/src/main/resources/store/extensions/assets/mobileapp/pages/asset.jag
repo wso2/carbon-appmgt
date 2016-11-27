@@ -89,8 +89,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var devices = [];
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-                //devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
-		devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], asset.attributes.overview_platform)));
+                devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], asset.attributes.overview_platform)));
         }
 
     var headerData = site.header(tenantId, {
