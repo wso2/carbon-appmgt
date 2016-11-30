@@ -736,7 +736,7 @@ public final class AppMConstants {
 
     //Mobile application binary file extensions
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
-    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+    public static final String MOBILE_APPS_IOS_EXT = "ipa";
 
     //Mobile application platform types
     public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";
