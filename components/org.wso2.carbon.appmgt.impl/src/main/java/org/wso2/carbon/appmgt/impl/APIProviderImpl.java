@@ -1987,6 +1987,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         boolean isAppDeleted = false;
 
         try {
+            WebApp webapp = this.getAPI(identifier);
             long subsCount = appMDAO.getAPISubscriptionCountByAPI(identifier);
             Resource appArtifactResource = registry.get(appArtifactPath);
             String applicationStatus = appArtifactResource.getProperty(AppMConstants.WEB_APP_LIFECYCLE_STATUS);
@@ -2046,9 +2047,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             boolean gatewayExists = config.getApiGatewayEnvironments().size() > 0;
             String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
 
-            WebApp webapp = new WebApp(identifier);
             // gatewayType check is required when WebApp Management is deployed on other servers to avoid synapse
-            if (gatewayExists && "Synapse".equals(gatewayType)) {
+            if (gatewayExists) {
                 webapp.setInSequence(inSequence); //need to remove the custom sequences
                 webapp.setOutSequence(outSequence);
                 removeFromGateway(webapp);
