@@ -868,7 +868,8 @@ Store.prototype.invalidate = function (type, key) {
 Store.prototype.search = function (options, paging) {
     var i, length, types, assets;
     var type = options.type;
-
+    var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
+    var tenantdomain = carbonContext.getTenantDomain();
     //var attributes = options.attributes || (options.attributes = {});
     //adding status field to get only the published assets
     //attributes['overview_status'] = /^(published)$/i;
@@ -880,6 +881,10 @@ Store.prototype.search = function (options, paging) {
         var assetz = this.assetManager(type).search(options, builtPaging);
         for (i = 0; i < assetz.length; i++) {
             assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
+            if (assetz[i].attributes.overview_description.indexOf(']') > -1 &&
+                assetz[i].attributes.overview_description.split(']')[0] == "sample") {
+                assetz[i].updatedAcsUrl = "?tenantDomain=" + tenantdomain;
+            }
         }
         return assetz;
     }
