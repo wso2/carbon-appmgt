@@ -94,7 +94,14 @@ var render = function (theme, data, meta, require) {
 };
 
 function getAppUrl(data) {
-    return (data.skipGateway) ? data.asset.attributes['overview_webAppUrl'] : data.apiData.serverURL.productionURL;
+    var acsUrl = data.asset.attributes['overview_webAppUrl'];
+    if (data.asset.attributes['overview_description'].indexOf(']') > -1 && 
+        data.asset.attributes['overview_description'].split(']')[0] == "sample") {
+        var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
+        var tenantdomain = carbonContext.getTenantDomain();
+        acsUrl += "?tenantDomain=" + tenantdomain;
+    }
+    return (data.skipGateway) ? acsUrl : data.apiData.serverURL.productionURL;
 }
 
 function createLeftNavLinks(data) {
