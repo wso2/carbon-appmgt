@@ -58,30 +58,13 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <ul class="nav navbar-nav">
-                    {{#if isTenanted}}
-                        <li class="dropdown">
-                            <a href="{{url "/"}}">
-                                <i class="fw fw-organization add-margin-right-1x"></i>
-                                Public Store
-                            </a>
-                        </li>
-                    {{/if}}
 
-                    <li class="{{#ifCond active "==" "store" }}active{{/ifCond}}">
-                        <a id="store-link" href="{{tenantedUrl "/"}}">
-                            <span class="icon add-margin-right-1x"><i class="fw fw-organization fw-lg"></i></span>Store
+                    <li>
+                        <a id="my-apps-link" href="{{tenantedUrl "/extensions/assets/webapp/apps" }}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-organization fw-lg"></i></span>Apps
                         </a>
                     </li>
 
-                    {{#if user}}
-                        {{#unless hideFavouriteMenu}}
-                    <li class="{{#ifCond active "==" "favourite" }}active{{/ifCond}}">
-                        <a href="{{tenantedUrl "/assets/favourite"}}">
-                            <span class="icon add-margin-right-1x"><i class="fw fw-heart fw-lg"></i></span>Favourites
-                        </a>
-                    </li>
-                        {{/unless}}
-                    {{/if}}
                 </ul>
             </div>
         </div>
