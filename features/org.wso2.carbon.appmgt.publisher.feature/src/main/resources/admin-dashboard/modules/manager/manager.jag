@@ -42,10 +42,10 @@ var getAPIStoreObj = function() {
     var store;
     if (user == null) {
         store = require('appstore');
-        return new store.APIStore();
+        return new store.AppStore();
     } else {
         store = require('appstore');
-        return new store.APIStore(user.username);
+        return new store.AppStore(user.username);
     }
 };
 
