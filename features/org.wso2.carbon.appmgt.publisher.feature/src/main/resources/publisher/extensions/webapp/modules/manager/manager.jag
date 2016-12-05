@@ -53,7 +53,7 @@ var loadTenantRegistry = function (tenantDomain) {
 };
 
 var getAPIStoreObj = function() {
-    var store = require('apistore');
+    var store = require('appstore');
     return new store.APIStore();
 };
 %>
