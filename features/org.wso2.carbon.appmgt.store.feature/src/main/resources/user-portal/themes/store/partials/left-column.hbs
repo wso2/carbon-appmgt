@@ -6,24 +6,12 @@ its own partion sinceit does not support tags--}}
         {{#each navigation}}
             {{#ifCond partial "==" "webapp"}}
                 <li class="purple {{#if active}}active{{/if}}">
-                    <a id="my-apps-link" href="{{tenantedUrl this.url}}">
-                        <i class="fw fw-web-app icon"></i>
-                        <span class="left-menu-item"> {{t "Web Apps"}}
+                    <a href="{{tenantedUrl "/assets/favourite"}}">
+                        <i class="fw fw-heart icon"></i>
+                        <span class="left-menu-item"> {{t "Favourites"}}
                             {{#if myappsUrl}}<i class="fw fw-up"></i>{{/if}}
                         </span>
                     </a>
-                    {{#if myappsUrl}}
-                        <ul class="sublevel-menu" style="display: block;">
-                            <li>
-                                <a href="{{tenantedUrl myappsUrl}}">
-                                    <i class=""></i>
-                                    <span class="name">
-                                        <i class="{{#if myapps}}web-sub-menu-active {{else}} icon {{/if}} fw fw-web-app"></i>{{t "My Apps"}}
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
-                    {{/if}}
                 </li>
             {{/ifCond}}
 
