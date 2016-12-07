@@ -1983,6 +1983,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                       identifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
                       identifier.getApiName() + RegistryConstants.PATH_SEPARATOR + identifier.getVersion();
 
+        path = AppManagerUtil.replaceEmailDomain(path);
         String appArtifactPath = AppManagerUtil.getAPIPath(identifier);
         boolean isAppDeleted = false;
 
