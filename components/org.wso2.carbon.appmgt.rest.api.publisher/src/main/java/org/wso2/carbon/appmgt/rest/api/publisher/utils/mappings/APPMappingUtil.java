@@ -654,7 +654,9 @@ public class APPMappingUtil {
             if (webAppContext.charAt(0) != '/') {
                 webAppContext = '/' + webAppContext;
             }
-            webAppContext = "/t/" + tenantDomain + webAppContext;
+            if(!webAppContext.startsWith("/t/")) {
+                webAppContext = "/t/" + tenantDomain + webAppContext;
+            }
         }
 
         webApp.setContext(webAppContext);
