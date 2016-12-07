@@ -39,7 +39,7 @@ public class RolesApiServiceImpl extends RolesApiService {
         for (int i = 0; i < roleNames.length; i++) {
             String roleName = roleNames[i];
             //exclude internal roles
-            if (roleName.indexOf("Internal/") <= -1) {
+            if (roleName.indexOf("Internal/") <= -1 && roleName.indexOf("Application/") <= -1) {
                 roleNamesArr.add(roleName);
             }
         }
