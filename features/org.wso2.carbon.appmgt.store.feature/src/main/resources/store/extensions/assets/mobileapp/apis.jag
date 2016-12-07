@@ -45,10 +45,25 @@ router.post('apps/devices/{deviceid}/{devicetype}/install', function(ctx){
     }
         var tenant = server.tenant(request, session);
         var asset =  ctx.asset;
+        var schedule =  ctx.schedule;
         var deviceId = ctx.deviceid;
         var deviceType = ctx.devicetype;
         var deviceIdentifier = {"id" : deviceId, "type" : deviceType};
-        enterpriseInstall.performAction('install', tenant.tenantId, 'device', asset, stringify(deviceIdentifier));
+        enterpriseInstall.performAction('install', tenant.tenantId, 'device', asset, stringify(deviceIdentifier), schedule);
+});
+
+router.post('apps/devices/{deviceid}/{devicetype}/update', function(ctx){
+    if (!user) {
+        response.sendError(401, 'Unauthorized');
+        return;
+    }
+        var tenant = server.tenant(request, session);
+        var asset =  ctx.asset;
+        var schedule =  ctx.schedule;
+        var deviceId = ctx.deviceid;
+        var deviceType = ctx.devicetype;
+        var deviceIdentifier = {"id" : deviceId, "type" : deviceType};
+        enterpriseInstall.performAction('update', tenant.tenantId, 'device', asset, stringify(deviceIdentifier), schedule);
 });
 
 router.post('apps/user/install', function(ctx){

@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
@@ -30,6 +31,7 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.EOFException;
+import java.text.ParseException;
 
 public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
@@ -51,49 +53,61 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         if (e instanceof ClientErrorException) {
             errorMessage = "Client error";
-            logError("Resource not found", e);
+            logError(errorMessage, e);
             return ((ClientErrorException) e).getResponse();
         }
 
         if (e instanceof NotFoundException) {
             errorMessage = "Resource not found";
-            logError("Resource not found", e);
+            logError(errorMessage, e);
             return ((NotFoundException) e).getResponse();
+        }
+        if (e instanceof MobileApplicationException) {
+            errorMessage = e.getMessage();
+            logError(errorMessage, e);
+            return ((BadRequestException) e).getResponse();
         }
 
         if (e instanceof PreconditionFailedException) {
             errorMessage = "Precondition failed";
-            logError("Precondition failed", e);
+            logError(errorMessage, e);
             return ((PreconditionFailedException) e).getResponse();
         }
 
         if (e instanceof BadRequestException) {
             errorMessage = "Bad request";
-            logError("Bad request", e);
+            logError(errorMessage, e);
             return ((BadRequestException) e).getResponse();
         }
 
+        if (e instanceof MobileApplicationException) {
+            errorMessage = e.getMessage();
+            logError(errorMessage, e);
+            return ((BadRequestException) e).getResponse();
+        }
+
+
         if (e instanceof ConstraintViolationException) {
             errorMessage = "Constraint violation";
-            logError("Constraint violation", e);
+            logError(errorMessage, e);
             return ((ConstraintViolationException) e).getResponse();
         }
 
         if (e instanceof ForbiddenException) {
-            errorMessage = "Resource forbiddenn";
-            logError("Resource forbidden", e);
+            errorMessage = "Resource forbidden";
+            logError(errorMessage, e);
             return ((ForbiddenException) e).getResponse();
         }
 
         if (e instanceof ConflictException) {
             errorMessage = "Conflict";
-            logError("Conflict", e);
+            logError(errorMessage, e);
             return ((ConflictException) e).getResponse();
         }
 
         if (e instanceof MethodNotAllowedException) {
             errorMessage = "Method not allowed";
-            logError("Method not allowed", e);
+            logError(errorMessage, e);
             return ((MethodNotAllowedException) e).getResponse();
         }
 
@@ -108,6 +122,12 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
             errorMessage = "Malformed request body.";
             logError(errorMessage, e);
             //noinspection ThrowableResultOfMethodCallIgnored
+            return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+        }
+
+        if (e instanceof ParseException) {
+            errorMessage = "Invalid schedule date format";
+            logError(errorMessage, e);
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
         }
 
@@ -149,7 +169,7 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
         //unknown exception log and return
         errorMessage = "An Unknown exception has been captured by global exception mapper.";
-        logError(errorMessage, e);
+        log.error(errorMessage, e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Content-Type", "application/json")
                 .entity(e500).build();
     }

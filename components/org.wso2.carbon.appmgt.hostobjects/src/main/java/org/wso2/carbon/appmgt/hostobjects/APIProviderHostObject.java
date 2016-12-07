@@ -82,6 +82,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
+import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -4257,6 +4258,72 @@ public class APIProviderHostObject extends ScriptableObject {
             apiProvider.removeBinaryFromStorage(AppManagerUtil.resolvePath(HostObjectUtils.getBinaryStorageConfiguration(),
                     fileNames.get(i).toString()));
         }
+    }
+
+
+    /**
+     * Get Gateway endpoint url
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return Gateway endpoint url
+     * @throws AppManagementException
+     */
+    public static String jsFunction_getGatewayEndpoint(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        APIProvider provider = getAPIProvider(thisObj);
+        return provider.getGatewayEndpoint();
+    }
+
+    /**
+     * Returns the generated Issuer name
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static String jsFunction_populateIssuerName(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        if (args == null || args.length != 2) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String appName = (String) args[0];
+        String version = (String) args[1];
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+
+        String saml2SsoIssuer;
+        if (!"carbon.super".equalsIgnoreCase(tenantDomain)) {
+            saml2SsoIssuer = appName + "-" + tenantDomain + "-" + version;
+        } else {
+            saml2SsoIssuer = appName + "-" + version;
+        }
+        return saml2SsoIssuer;
+    }
+
+    public static String jsFunction_getAscUrl(Context cx, Scriptable thisObj, Object[] args,
+                                                   Function funObj) throws AppManagementException {
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String version = (String) args[0];
+        String context = (String) args[1];
+        String transport = (String) args[2];
+
+        APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
+        WebApp webApp = new WebApp(appIdentifier);
+        webApp.setTransports(transport);
+        webApp.setContext(context);
+        String acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
+        return acsUrl;
     }
 }
 

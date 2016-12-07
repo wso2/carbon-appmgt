@@ -897,7 +897,6 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(mobileApp.getAppVisibility()));
-            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, AppMConstants.MOBILE_ASSET_TYPE);
 
 
 		} catch (GovernanceException e) {
@@ -2340,6 +2339,8 @@ public final class AppManagerUtil {
 				                                                         .getRealmService()
 				                                                         .getTenantUserRealm(tenantId)
 				                                                         .getAuthorizationManager();
+                authManager.clearResourceAuthorizations(resourcePath);
+
 				if (visibility != null &&
 				    visibility.equalsIgnoreCase(AppMConstants.API_RESTRICTED_VISIBILITY)) {
 					boolean isRoleEveryOne = false;
@@ -2373,6 +2374,7 @@ public final class AppManagerUtil {
 				RegistryAuthorizationManager authorizationManager =
 				                                                    new RegistryAuthorizationManager(
 				                                                                                     ServiceReferenceHolder.getUserRealm());
+                authorizationManager.clearResourceAuthorizations(resourcePath);
 
 				if (visibility != null &&
 				    visibility.equalsIgnoreCase(AppMConstants.API_RESTRICTED_VISIBILITY)) {
@@ -2953,7 +2955,7 @@ public final class AppManagerUtil {
 					if (inputStore.getName().equals(store.getName())) { // If
 						                                                // the
 						                                                // configured
-						                                                // apistore
+						                                                // appstore
 						                                                // already
 						                                                // stored
 						                                                // in

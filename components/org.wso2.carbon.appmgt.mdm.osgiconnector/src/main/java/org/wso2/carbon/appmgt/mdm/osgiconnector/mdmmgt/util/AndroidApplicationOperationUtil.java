@@ -36,10 +36,47 @@ public class AndroidApplicationOperationUtil {
 	 * @throws DeviceApplicationException
 	 */
 	public static Operation createInstallAppOperation(MobileApp application, String schedule) throws
+
 			DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
 		operation.setCode(MDMAppConstants.AndroidConstants.OPCODE_INSTALL_APPLICATION);
+		operation.setType(Operation.Type.PROFILE);
+		switch (application.getType()) {
+			case ENTERPRISE:
+				EnterpriseApplication enterpriseApplication = new EnterpriseApplication();
+				enterpriseApplication.setType(application.getType().toString());
+				enterpriseApplication.setUrl(application.getLocation());
+				enterpriseApplication.setSchedule(schedule);
+				enterpriseApplication.setPackageName(application.getPackageName());
+				operation.setPayLoad(enterpriseApplication.toJSON());
+				break;
+			case PUBLIC:
+				setOperationForPublicApp(operation, application);
+				break;
+			case WEBAPP:
+				setOperationForWebApp(operation, application);
+				break;
+			default:
+				String errorMessage = "Invalid application type.";
+				throw new DeviceApplicationException(errorMessage);
+		}
+		return operation;
+	}
+
+	/**
+	 * Create Update Application operation.
+	 *
+	 * @param application MobileApp application
+	 * @return operation
+	 * @throws DeviceApplicationException
+	 */
+	public static Operation createUpdateAppOperation(MobileApp application, String schedule) throws
+
+			DeviceApplicationException {
+
+		ProfileOperation operation = new ProfileOperation();
+		operation.setCode(MDMAppConstants.AndroidConstants.OPCODE_UPDATE_APPLICATION);
 		operation.setType(Operation.Type.PROFILE);
 		switch (application.getType()) {
 			case ENTERPRISE:
@@ -69,8 +106,8 @@ public class AndroidApplicationOperationUtil {
 	 * @return operation
 	 * @throws DeviceApplicationException
 	 */
-	public static Operation createUpdateAppOperation(MobileApp application, String schedule) throws
-			DeviceApplicationException {
+	public static Operation createUpdateAppOperation(MobileApp application) throws
+	                                                                         DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
 		operation.setCode(MDMAppConstants.AndroidConstants.OPCODE_UPDATE_APPLICATION);
@@ -80,7 +117,6 @@ public class AndroidApplicationOperationUtil {
 				EnterpriseApplication enterpriseApplication = new EnterpriseApplication();
 				enterpriseApplication.setType(application.getType().toString());
 				enterpriseApplication.setUrl(application.getLocation());
-				enterpriseApplication.setSchedule(schedule);
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
@@ -104,8 +140,8 @@ public class AndroidApplicationOperationUtil {
 	 * @throws DeviceApplicationException
 	 */
 	public static Operation createAppUninstallOperation(MobileApp application, String schedule) throws
-			DeviceApplicationException {
 
+			DeviceApplicationException {
 		ProfileOperation operation = new ProfileOperation();
 		operation.setCode(MDMAppConstants.AndroidConstants.OPCODE_UNINSTALL_APPLICATION);
 		operation.setType(Operation.Type.PROFILE);

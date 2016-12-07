@@ -34,7 +34,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     var isEnterpiseAdmin = false;
-
+    user.username = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user.username);
     if(user.hasRoles([mdmConfig.EnterpriseOperations_AuthorizedRole])){
         isEnterpiseAdmin = true;
     }
@@ -76,11 +76,11 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
 
-    if (matcher.match('/{context}/apis/enterprise/get-devices')) {
+    if (matcher.match('/{context}/apis/enterprise/get-devices/{type}')) {
 
         var devices = [];
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-            devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
+            devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], matcher.elements().type)));
         }
         response.contentType = "application/json";
         print(devices);

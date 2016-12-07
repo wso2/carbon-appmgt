@@ -92,7 +92,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -586,8 +585,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             List<App> result = apiProvider.searchApps(appType, searchTerms);
 
             if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                RestApiUtil.handleBadRequest(errorMessage, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             App app = result.get(0);
@@ -668,8 +666,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             App app = result.get(0);
@@ -1146,7 +1143,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
             //Validate App Id
             if (artifact == null) {
-                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             String state = artifact.getLifecycleState().toUpperCase();
@@ -1185,7 +1182,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
             //Validate App Id
             if (artifact == null) {
-                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             String historyRegPath = getHistoryPath(artifact);
@@ -1638,6 +1635,34 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(responseMap).build();
     }
 
+    @Override
+    public Response appsAppTypeNameAppNameVersionVersionUuidGet(String appType, String appName, String version,
+                                                                String accept, String ifNoneMatch) {
+        AppDTO appDTO = new AppDTO();
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                        RestApiUtil.getLoggedInUserTenantDomain());
+
+                String uuid = appProvider.getAppUUIDbyName(appName, version, tenantId);
+                if (log.isDebugEnabled()) {
+                    log.debug("UUID of the app: " + appName + ", version: " + version + " is " + uuid);
+                }
+                appDTO.setId(uuid);
+            } catch (AppManagementException e) {
+                String errorMessage = "Error while retrieving UUID for app: " + appName + " and version: " + version;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            } catch (UserStoreException e) {
+                String errorMessage = "Error while retrieving tenant details";
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        } else {
+            RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+        }
+        return Response.ok().entity(appDTO).build();
+    }
 
     //remove artifact from registry
     private void removeRegistryArtifact(App webApp, String username)

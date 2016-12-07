@@ -37,14 +37,14 @@ var getAPIStoreObj = function () {
     var user = jagg.getUser();
     var store;
     if (user == null) {
-        store = require('apistore');
+        store = require('appstore');
         var storeHostObj = new store.APIStore();
         if (tenantDomain != null && tenantDomain != "") {
             storeHostObj.loadRegistryOfTenant(tenantDomain);
         }
         return storeHostObj;
     } else {
-        store = require('apistore');
+        store = require('appstore');
         return new store.APIStore(user.username);
     }
 };

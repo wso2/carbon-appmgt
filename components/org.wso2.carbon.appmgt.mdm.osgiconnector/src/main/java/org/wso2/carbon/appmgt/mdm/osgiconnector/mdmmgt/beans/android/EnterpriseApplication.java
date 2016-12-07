@@ -27,7 +27,8 @@ public class EnterpriseApplication extends AndroidApplication implements Seriali
 
 	private String url;
 	private String schedule;
-
+	private String packageName;
+	
 	public String getSchedule() {
 		return schedule;
 	}
@@ -44,4 +45,11 @@ public class EnterpriseApplication extends AndroidApplication implements Seriali
 		this.url = url;
 	}
 
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
 }

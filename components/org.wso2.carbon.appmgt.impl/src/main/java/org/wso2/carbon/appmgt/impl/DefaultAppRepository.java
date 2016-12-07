@@ -13,7 +13,6 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -349,6 +348,10 @@ public class DefaultAppRepository implements AppRepository {
         String query = "INSERT INTO resource (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES (?,?,?,?,?,?)";
         try {
             connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            if (connection.getMetaData().getDriverName().contains(AppMConstants.DRIVER_TYPE_ORACLE)) {
+                query = "INSERT INTO \"resource\" (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES " +
+                        "(?,?,?,?,?,?)";
+            }
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, fileContent.getUuid());
             preparedStatement.setString(2, getTenantDomainOfCurrentUser());
@@ -509,6 +512,36 @@ public class DefaultAppRepository implements AppRepository {
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
+    }
+
+    @Override
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId)
+            throws AppManagementException {
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        ResultSet result;
+        String uuid = "";
+        String sqlQuery =
+                "SELECT UUID FROM APM_APP WHERE APP_NAME=? AND APP_VERSION=? AND TENANT_ID=?";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, appName);
+            ps.setString(2, appVersion);
+            ps.setInt(3, tenantId);
+
+            result = ps.executeQuery();
+            if (result.next()) {
+                uuid = result.getString("UUID");
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve app uuid of app: " + appName + " and version: " + appVersion, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+        return uuid;
     }
 
     /**
@@ -847,7 +880,9 @@ public class DefaultAppRepository implements AppRepository {
 
             persistLifeCycleEvent(webAppDatabaseId, null, APIStatus.CREATED, connection);
 
-            createSSOProvider(webApp);
+            if(webApp.isServiceProviderCreationEnabled()){
+                createSSOProvider(webApp);
+            }
 
             // Commit JDBC and Registry transactions.
             connection.commit();
@@ -1145,6 +1180,9 @@ public class DefaultAppRepository implements AppRepository {
             // Add / Update / Delete URL templates.
             addUpdateDeleteURLTemplates(webApp, webAppDatabaseId, connection);
 
+            //Update app master metadata
+            updateWebAppToDatabase(webApp, connection);
+
             // Delete the existing policy groups in the repository which are not in the updating web app.
             // URI templates should be passed too, since the association between templates and policy groups should be checked.
             deletePolicyGroupsNotIn(webApp.getAccessPolicyGroups(), webApp.getUriTemplates(),webAppDatabaseId, connection);
@@ -1166,20 +1204,40 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private void updateRegistryArtifact(App app) throws RegistryException {
+    private void updateRegistryArtifact(App app) throws RegistryException, AppManagementException {
 
         if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(app.getType())){
             updateWebAppRegistryArtifact((WebApp) app);
         }
     }
 
-    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException {
+    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException, AppManagementException {
 
         GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
 
         GenericArtifact updatedWebAppArtifact = buildRegistryArtifact(artifactManager, AppMConstants.WEBAPP_ASSET_TYPE, webApp);
         updatedWebAppArtifact.setId(webApp.getUUID());
         artifactManager.updateGenericArtifact(updatedWebAppArtifact);
+
+        // Apply tags
+        String artifactPath = GovernanceUtils.getArtifactPath(registry, webApp.getUUID());
+        if (webApp.getTags() != null) {
+            for (String tag : webApp.getTags()) {
+                registry.applyTag(artifactPath, tag);
+            }
+        }
+
+        // Set resources permissions based on app visibility.
+        if (webApp.getAppVisibility() == null) {
+            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                                                  AppMConstants.API_GLOBAL_VISIBILITY, webApp.getAppVisibility(),
+                                                  artifactPath);
+        } else {
+            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                                                  AppMConstants.API_RESTRICTED_VISIBILITY, webApp.getAppVisibility(),
+                                                  artifactPath);
+        }
+
     }
 
     private void addUpdateDeleteURLTemplates(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
@@ -1472,7 +1530,8 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
-        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(webApp.getAppVisibility()));
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, webApp.getVisibility());
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_ROLES, webApp.getVisibleRoles());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS, webApp.getVisibleTenants());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, webApp.getTransports());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_TIER, "Unlimited");
@@ -1597,6 +1656,27 @@ public class DefaultAppRepository implements AppRepository {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, generatedKeys);
         }
 
+    }
+
+
+    private void updateWebAppToDatabase(WebApp webApp, Connection connection)
+            throws SQLException, AppManagementException {
+        String query = "UPDATE APM_APP SET TRACKING_CODE=?, " +
+                "APP_ALLOW_ANONYMOUS=?, APP_ENDPOINT=?, TREAT_AS_SITE=?, VISIBLE_ROLES=? " +
+                "WHERE UUID=?";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, webApp.getTrackingCode());
+            preparedStatement.setBoolean(2, webApp.getAllowAnonymous());
+            preparedStatement.setString(3, webApp.getUrl());
+            preparedStatement.setBoolean(4, Boolean.parseBoolean(webApp.getTreatAsASite()));
+            preparedStatement.setString(5, webApp.getVisibleRoles());
+            preparedStatement.setString(6, webApp.getUUID());
+            preparedStatement.execute();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
     }
 
     private void persistJavaPolicyMappings(String javaPolicies, int webAppDatabaseId, Connection connection) throws SQLException {

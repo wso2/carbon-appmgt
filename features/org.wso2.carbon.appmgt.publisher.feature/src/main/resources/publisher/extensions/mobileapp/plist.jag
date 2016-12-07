@@ -13,9 +13,10 @@ var contextPath = caramel.configs().context;
 var rxt_management = require('/modules/rxt.manager.js').rxt_management();
 var rxtManager = new rxt_management.RxtManager(registry);
 var artifactManager = rxtManager.getArtifactManager('mobileapp');
+var log = new Log();
 
 var assets = artifactManager.find(function (adapter) {
-    return (adapter.attributes.overview_url == contextPath + "/api/mobileapp/getfile/" + fileName) ? true : false;
+    return (adapter.attributes.overview_url ==  fileName) ? true : false;
 }, null);
 
 
@@ -41,7 +42,7 @@ var carbon = require('carbon');
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string><%= carbon.server.address('https') + asset.attributes.overview_url%></string>
+                    <string><%= carbon.server.address('https') + '/publisher/api/mobileapp/getfile/' + asset.attributes.overview_url%></string>
                 </dict>
             </array>
             <key>metadata</key>

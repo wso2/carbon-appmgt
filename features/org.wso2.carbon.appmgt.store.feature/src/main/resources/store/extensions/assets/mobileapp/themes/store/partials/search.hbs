@@ -4,14 +4,14 @@
     <nav class="navbar navbar-default"  data-offset-top="80" data-offset-bottom="40">
         <a class="navbar-menu-toggle hidden-sm hidden-lg hidden-md" data-toggle="sidebar"
            data-target="#left-sidebar"
-           data-container=".page-content-wrapper" data-container-push="true" aria-expanded="false"
+           data-container=".page-content-wrapper" data-container-divide="true" aria-expanded="false"
            rel="leftmenu-sidebar">
-            <span class="icon fw-stack">
-                <i class="fw fw-menu fw-stack-1x toggle-icon-left-arrow"></i>
-            </span>
+                        <span class="icon fw-stack">
+                            <i class="fw fw-menu fw-stack-1x toggle-icon-left-arrow"></i>
+                        </span>
         </a>
 
-        <div class="search-box col-xs-10 col-sm-12 col-md-12 col-lg-6">
+        <div class="search-box col-xs-10 col-sm-12 col-md-12 col-lg-4">
             <div class="input-group input-wrap search-wrap">
                 <input type="hidden" value="{{tenantedUrl searchUrl}}" id="searchUrl">
                 <input type="text" id="searchTxt" value="{{searchQuery.search}}" class="search-field form-control"
@@ -23,7 +23,7 @@
                         {{#compare "overview_platform" searchQuery.searchTerm}}By Platform{{/compare}}
                         {{#compare "overview_category" searchQuery.searchTerm}}By Category{{/compare}}
                         {{#compare "overview_provider" searchQuery.searchTerm}}By Provider{{/compare}}
-                        {{#compare "overview_displayName" searchQuery.searchTerm}}By Name{{/compare}}
+                        {{#compare "overview_name" searchQuery.searchTerm}}By Name{{/compare}}
                         <span class="caret"></span>
                     </button>
                     <button type="button" class="btn" id="searchBtn">
@@ -38,7 +38,7 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" value="Name"
-                                           {{#compare "overview_displayName" searchQuery.searchTerm}}checked{{/compare}} />
+                                           {{#compare "overview_name" searchQuery.searchTerm}}checked{{/compare}} />
                                     By Name
                                 </label>
                             </div>
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 remove-padding-right float-remove-xs">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 remove-padding-right">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" value="Category"
@@ -65,7 +65,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 add-padding-left-2x float-remove-xs">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 remove-padding-left">
                             <select id="category-select" class="form-control" title="Choose a category">
                                 {{#each categories}}
                                     <option {{#compare ../selectedCategory this}}selected{{/compare}}>{{this}}</option>
@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 remove-padding-right float-remove-xs">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 remove-padding-right">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" value="Platform"
@@ -83,7 +83,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 add-padding-left-2x float-remove-xs">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 remove-padding-left">
                             <select id="platform-select" class="form-control">
                                 <option value="android" {{#compare selectedPlatform "android"}}selected{{/compare}}>
                                     Android

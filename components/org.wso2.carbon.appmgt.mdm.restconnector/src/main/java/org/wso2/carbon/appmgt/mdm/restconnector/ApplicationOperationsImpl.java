@@ -186,6 +186,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		String actionURL;
 		if (Constants.INSTALL.equals(applicationOperationAction.getAction())) {
+
 			actionURL = String.format(Constants.API_INSTALL_APP);
 		} else if (Constants.UPDATE.equals(applicationOperationAction.getAction())){
 			actionURL = String.format(Constants.API_UPDATE_APP);

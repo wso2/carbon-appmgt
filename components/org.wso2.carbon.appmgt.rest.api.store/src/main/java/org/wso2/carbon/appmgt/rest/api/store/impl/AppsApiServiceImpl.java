@@ -69,11 +69,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
+
     BeanValidator beanValidator;
 
     /**
@@ -83,6 +87,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param install     InstallDTO
      * @return
      */
+    
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
         String username = RestApiUtil.getLoggedInUsername();
@@ -114,7 +119,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                            String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -135,11 +140,13 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
-
+            //mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
             return Response.ok().entity(response.toString()).build();
 
-        } catch (AppManagementException | MobileApplicationException e) {
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
@@ -565,6 +572,15 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
+
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             Operations mobileOperation = new Operations();
             String action = "uninstall";
             String[] parameters = null;
@@ -577,7 +593,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                            String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -604,8 +620,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             return Response.ok().entity(response.toString()).build();
 
-        } catch (AppManagementException | MobileApplicationException e) {
+        } catch (AppManagementException e) {
+           // mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store related Error occurred while uninstalling", e, log);
         } catch (JSONException e) {
@@ -1317,29 +1336,40 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                                       String[].class);
+                    String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                             log);
+                        log);
             }
             String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
 
             JSONObject user = new JSONObject();
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
 
-            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId,
-                                                              parameters, scheduleTime);
+
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-        } catch (AppManagementException | MobileApplicationException e) {
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
         }
         return Response.ok().build();
     }
@@ -1525,12 +1555,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             String type = "device";
             String[] parameters;
             parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
-                                       String[].class);
+                    String[].class);
             if (parameters == null) {
                 RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                             log);
+                        log);
             }
             String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
 
             JSONObject user = new JSONObject();
             user.put("username", tenantUserName);
@@ -1543,12 +1577,18 @@ public class AppsApiServiceImpl extends AppsApiService {
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-        } catch (AppManagementException | MobileApplicationException e) {
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
         }
         return Response.ok().build();
     }

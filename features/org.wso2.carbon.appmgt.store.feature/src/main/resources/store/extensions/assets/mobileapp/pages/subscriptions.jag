@@ -63,12 +63,12 @@ require('/modules/store.js').exec(function (ctx) {
     var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT);
 
     var subscriptions = {mobileapp: []};
-    var searchQuery = {search: "", searchTerm: "overview_displayName"};
+    var searchQuery = {search: "", searchTerm: "overview_name"};
     if (query) {
         var array = query.split(":");
         var searchOption = array[0];
         var searchValue = array[1].replace(/\"/g, "");// replace all the occurrences of double quote with empty
-        var searchAttribute = "overview_displayName";
+        var searchAttribute = "overview_name";
 
         if (searchOption.toLowerCase() == "category") {
             searchAttribute = "overview_category";

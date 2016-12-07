@@ -35,6 +35,8 @@ public final class AppMConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
 
+    public static final String DRIVER_TYPE_ORACLE = "Oracle";
+
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 
@@ -410,7 +412,7 @@ public final class AppMConstants {
     public static final String API_KEY_MANAGER_ACCESS_TOKEN_PARTITIONING_DOMAINS = API_KEY_MANAGER + "AccessTokenPartitioning." + "AccessTokenPartitioningDomains";
     public static final String API_KEY_MANAGER_ENCRYPT_TOKENS = API_KEY_MANAGER + "EncryptPersistedTokens";
 
-    public static final String API_STORE = "APIStore.";
+    public static final String API_STORE = "AppStore.";
     public static final String API_STORE_DISPLAY_ALL_APIS = API_STORE + "DisplayAllAPIs";
     public static final String API_STORE_DISPLAY_MULTIPLE_VERSIONS = API_STORE + "DisplayMultipleVersions";
 	public static final String API_STORE_DISPLAY_COMMENTS = API_STORE + "DisplayComments";
@@ -734,7 +736,7 @@ public final class AppMConstants {
 
     //Mobile application binary file extensions
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
-    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+    public static final String MOBILE_APPS_IOS_EXT = "ipa";
 
     //Mobile application platform types
     public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";

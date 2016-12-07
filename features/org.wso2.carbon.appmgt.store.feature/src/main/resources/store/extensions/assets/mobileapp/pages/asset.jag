@@ -7,12 +7,13 @@ require('/modules/store.js').exec(function (ctx) {
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = ctx.tenantId,
+            tenantId = user.tenantId,
             tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
             matcher = ctx.matcher,
             inDashboard = false,
+            isUpdatedApp = false,
             utility = require('/modules/util.js'),
             mdm = require('/extensions/assets/mobileapp/modules/mdm.js').module,
             mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
@@ -47,8 +48,10 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(user && mdmConfig.EnterpriseOperations_Enabled){
         var server = require('store').server;
-        var um = new carbon.user.UserManager(server, tenantId);
-        var userRoles = um.getRoleListOfUser(user.username);
+        var um = new carbon.user.UserManager(server, user.tenantId);
+        var tenantAwareUserName = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user
+                .username);
+        var userRoles = um.getRoleListOfUser(tenantAwareUserName);
         for(var i = 0; i < userRoles.length; i++){
             if(userRoles[i] == mdmConfig.EnterpriseOperations_AuthorizedRole){
                 isEnterpriseInstallEnabled = true;
@@ -77,11 +80,16 @@ require('/modules/store.js').exec(function (ctx) {
         inDashboard = true;
     }
 
+    // If the user has subscribed to previous version of the app
+    if (store.isuserasset(asset.attributes.overview_previousVersionAppId, type)) {
+    	isUpdatedApp = true;
+    }
+
     var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
     var devices = [];
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-                devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
+                devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], asset.attributes.overview_platform)));
         }
 
     var headerData = site.header(tenantId, {
@@ -93,7 +101,7 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.domain = tenantDomain;
     headerData.assetType = "mobileapp";
 
-    var searchQuery = { search: "", searchTerm: "overview_displayName"};
+    var searchQuery = { search: "", searchTerm: "overview_name"};
 
     //set rating
     var ratings = JSON.parse(social.getRating("mobileapp:" + asset.id));
@@ -122,6 +130,7 @@ require('/modules/store.js').exec(function (ctx) {
         type: type,
         embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
         inDashboard: inDashboard,
+        isUpdatedApp: isUpdatedApp,
         asset: asset,
         config : mdmUIConfig,
         tags: {
