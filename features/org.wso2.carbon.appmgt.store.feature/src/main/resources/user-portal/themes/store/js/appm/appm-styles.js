@@ -57,5 +57,12 @@ function registerEventHandlersForSelectableDropdowns(elements) {
 }
 
 $(document).ready(function () {
+
+    if ($("#searchBtn").is(":visible")) {
+        $("#page-header").addClass("top-extra");
+    } else {
+        $("#page-header").removeClass("top-extra");
+
+    }
     registerEventHandlersForSelectableDropdowns($('.dropdown-selectable'));
 });

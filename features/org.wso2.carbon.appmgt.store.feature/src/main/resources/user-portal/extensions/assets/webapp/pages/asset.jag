@@ -524,6 +524,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
         headerData.assetType = "webapp";
+        headerData.strictUserName = user.username.substring(0,user.username.lastIndexOf("@") );
 
         var metadata = {
             appName: asset.attributes.overview_name,
