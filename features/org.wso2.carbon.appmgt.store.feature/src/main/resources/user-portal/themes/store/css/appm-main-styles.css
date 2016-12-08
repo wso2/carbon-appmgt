@@ -100,14 +100,20 @@ header .header-action:active {
 .search-bar {
     background-color: #035A93;
 }
-
+.search-box {
+    float: right;
+    margin-top: 20px;
+    padding: 0;
+    margin-bottom: 20px;
+    border: 1px solid #d3d3d3;
+}
 .search-box .input-group, .search-box .input-group > input,
 .search-box .input-group-btn, .search-box .input-group-btn > button {
     min-height: 40px;
     border: none;
     margin: 0;
-    background-color: #004079;
-    color: #ffffff;
+    background-color: #fff;
+    color: #444;
 }
 
 .search-box .input-group-btn > button {
@@ -122,7 +128,7 @@ header .header-action:active {
 
 .search-box .search-field::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
-    color: #fff;
+    color: #444;
     opacity: 0.8;
     font-weight: 100;
 }
@@ -152,8 +158,8 @@ header .header-action:active {
     padding-left: 10px;
 }
 .search-box .search-by, .search-box .search-by-dropdown {
-    background-color: #002760 !important;
-    color: #fff !important;
+    background-color: #d3d3d3 !important;
+    color: #444 !important;
 }
 
 .search-box .search-by-dropdown {
@@ -162,15 +168,15 @@ header .header-action:active {
 }
 
 .search-box .search-by-dropdown li a {
-    background-color: #002760;
-    color: #fff;
+    background-color: #d3d3d3;
+    color: #444;
 }
 
 .search-box .search-by-dropdown li a:hover,
 .search-box .search-by-dropdown li a:active,
 .search-box .search-by-dropdown li a:focus {
-    background-color: #004D86 !important;
-    color: #fff;
+    background-color: #b9b8b8 !important;
+    color: #444;
 }
 
 .search-options {
@@ -182,8 +188,8 @@ header .header-action:active {
     float: right;
     z-index: 1000;
     margin: 0 15px 0 15px;
-    background-color: #002760;
-    color: #fff;
+    background-color: #d3d3d3;
+    color: #444;
 }
 
 /**/
