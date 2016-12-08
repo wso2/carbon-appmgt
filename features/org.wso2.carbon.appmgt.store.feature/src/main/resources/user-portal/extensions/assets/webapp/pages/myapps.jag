@@ -91,6 +91,7 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.storeTenantDomain = tenantDomain;
+    headerData.strictUserName = user.username.substring(0,user.username.lastIndexOf("@") );
     headerData.assetType = "webapp";
     var navigationData = {
         showAllAppsLink: true
