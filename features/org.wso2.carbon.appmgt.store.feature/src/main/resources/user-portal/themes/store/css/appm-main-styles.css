@@ -135,21 +135,21 @@ header .header-action:active {
 
 .search-box .search-field:-moz-placeholder {
     /* Mozilla Firefox 4 to 18 */
-    color: #fff;
+    color: #444;
     opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field::-moz-placeholder {
     /* Mozilla Firefox 19+ */
-    color: #fff;
+    color: #444;
     opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field:-ms-input-placeholder {
     /* Internet Explorer 10-11 */
-    color: #fff;
+    color: #444;
     opacity: 0.8;
     font-weight: 100;
 }
