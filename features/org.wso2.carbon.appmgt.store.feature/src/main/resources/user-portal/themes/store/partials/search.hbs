@@ -17,10 +17,10 @@
                                     aria-haspopup="true"
                                     aria-expanded="false"
                                 {{#compare "overview_provider" searchQuery.searchTerm}}value="Provider"{{/compare}}
-                                {{#compare "overview_businessOwner" searchQuery.searchTerm}}value="Business Owner"{{/compare}}
+
                                 {{#compare "overview_displayName" searchQuery.searchTerm}}value="Name"{{/compare}}>
                                 {{#compare "overview_provider" searchQuery.searchTerm}}By Provider{{/compare}}
-                                {{#compare "overview_businessOwner" searchQuery.searchTerm}}By Business Owner{{/compare}}
+
                                 {{#compare "overview_displayName" searchQuery.searchTerm}}By Name{{/compare}}
                                 <span class="caret"></span>
                             </button>
@@ -30,7 +30,7 @@
                                 data-target="#searchSelect">
                                 <li data-value="Provider"><a>By Provider</a></li>
                                 <li data-value="Name"><a>By Name</a></li>
-                                <li data-value="Business Owner"><a>By Business Owner</a></li>
+
                             </ul>
                             <button type="button" class="btn" id="searchBtn">
                                 <i class="fw fw-search"></i>

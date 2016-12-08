@@ -101,7 +101,7 @@ header .header-action:active {
     background-color: #035A93;
 }
 .search-box {
-    float: right;
+    margin-left: 400px;
     margin-top: 20px;
     padding: 0;
     margin-bottom: 20px;
@@ -200,6 +200,9 @@ header .header-action:active {
     border-bottom: none;
     margin: 0;
 }
+.top-extra{
+    margin-top: -70px;
+}
 
 .page-header:after {
     clear: both;
@@ -235,6 +238,7 @@ header .header-action:active {
 
 .page-header .sorting-options > button {
     padding: 0 5px 0 5px;
+    margin-top: -60px;
 }
 
 .page-content .page-title {
