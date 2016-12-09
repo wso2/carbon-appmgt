@@ -136,8 +136,8 @@
 
     <div class="tab-content">
         <div id="menu1" class="tab-pane fade in active">
-            {{#ifCond asset.attributes.overview_description "!=" " "}}
-                <p>{{asset.attributes.overview_description}}</p>
+            {{#ifCond asset.attributes.overview_custom_description "!=" " "}}
+                <p>{{asset.attributes.overview_custom_description}}</p>
             {{else}}
                 <p class="text-muted">No description found.</p>
             {{/ifCond}}

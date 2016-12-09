@@ -532,6 +532,11 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
+        var assetDecs = asset.attributes.overview_description.split(']');
+        if (assetDecs.length > 1) {
+            asset.attributes.overview_custom_description = assetDecs[assetDecs.length - 1];
+        }
+
         var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
