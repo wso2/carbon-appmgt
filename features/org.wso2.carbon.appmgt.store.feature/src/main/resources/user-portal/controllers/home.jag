@@ -183,6 +183,9 @@ require('/modules/store.js').exec(function (ctx) {
                         }
                     }
                 }
+                if (asset.attributes.overview_skipGateway == "true") {
+                    asset.accessUrl += '?tenantDomain=' + storeTenantDomain;
+                }
             });
         }
 
