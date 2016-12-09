@@ -174,9 +174,9 @@ var auditLog = require('/modules/auditLog/logger.js');
             }
         } else {
             session.invalidate();
-            var reDirectUrl = contextPath;
+            var reDirectUrl = relayState;
             if(reversProxyEnabled) {
-                reDirectUrl = reverseProxyHost+contextPath;
+                reDirectUrl = reverseProxyHost + relayState;
             }
             response.sendRedirect(reDirectUrl);
         }
