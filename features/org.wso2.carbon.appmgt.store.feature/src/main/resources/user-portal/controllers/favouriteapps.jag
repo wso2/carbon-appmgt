@@ -135,7 +135,8 @@ require('/modules/store.js').exec(function (ctx) {
                 sso: sso,
                 storeTenantDomain: storeTenantDomain,
                 assetType: assetType,
-                enabledTypeList: enabledTypeList
+                enabledTypeList: enabledTypeList,
+                strictUserName : user.username.substring(0,user.username.lastIndexOf("@") )
             },
             assetType: assetType,
             tags: {
