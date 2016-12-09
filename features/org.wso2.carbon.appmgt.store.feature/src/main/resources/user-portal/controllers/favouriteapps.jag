@@ -117,7 +117,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     //filter webapp and sites
-    apps = filterAssets(apps, assetType);
+    apps = filterAssets(apps, assetType, storeTenantDomain);
     //Check whether use has selected favourite page as default landing page
     //This is needed to show correct icon(set as home page /remove from home page) to user.
     var hasFavouritePage = false;
@@ -170,7 +170,7 @@ function getServiceDir(serviceName) {
  * @param assets {Object[]} assets to be filtered & processed
  * @returns {{assets: Object[], type: string}[]} filtered assets
  */
-function filterAssets(assets,type) {
+function filterAssets(assets,type,storeTenantDomain) {
     var sites = [];
     var webApps = [];
     var apps = [];
@@ -178,6 +178,7 @@ function filterAssets(assets,type) {
     var numberOfAssets = assets.length;
     for (var i = 0; i < numberOfAssets; i++) {
         var asset = assets[i];
+        asset.gatewayUrl += '?tenantDomain=' + storeTenantDomain;
         // set default thumbnail
         var assetThumbnail = asset.thumburl;
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {

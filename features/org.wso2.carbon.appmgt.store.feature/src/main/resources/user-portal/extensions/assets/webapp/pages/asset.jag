@@ -537,6 +537,9 @@ require('/modules/store.js').exec(function (ctx) {
             asset.attributes.overview_custom_description = assetDecs[assetDecs.length - 1];
         }
 
+        if (asset.attributes.overview_skipGateway == "true") {
+            asset.attributes.overview_webAppUrl += '?tenantDomain=' + tenantDomain;
+        }
         var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({

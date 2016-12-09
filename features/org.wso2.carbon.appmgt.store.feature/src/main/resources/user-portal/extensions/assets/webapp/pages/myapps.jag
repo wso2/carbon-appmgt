@@ -402,6 +402,10 @@ require('/modules/store.js').exec(function (ctx) {
             }
             //check active or not
             assets[i].isActive = isActive(assets[i]);
+
+            if (assets[i].attributes.overview_skipGateway == "true") {
+                assets[i].accessUrl = assets[i].accessUrl + '?tenantDomain=' + tenantDomain;
+            }
             //set thumbnail
             setDefaultThumbnail(assets[i]);
         }
