@@ -178,7 +178,9 @@ function filterAssets(assets,type,storeTenantDomain) {
     var numberOfAssets = assets.length;
     for (var i = 0; i < numberOfAssets; i++) {
         var asset = assets[i];
-        asset.gatewayUrl += '?tenantDomain=' + storeTenantDomain;
+        if (asset.appDisplayName.indexOf('Sample') != -1) {
+            asset.gatewayUrl += '?tenantDomain=' + storeTenantDomain;
+        }
         // set default thumbnail
         var assetThumbnail = asset.thumburl;
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
