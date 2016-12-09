@@ -33,6 +33,17 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
             //Read the social.json file
             //var config=require('/configs/social.json');
             //social.configPublisher(config.dataPublisherConnectionInfo);
+
+            var tenantInfo = carbon.server.tenantUser(username);
+
+            var context,
+                PrivilegedCarbonContext = org.wso2.carbon.context.PrivilegedCarbonContext;
+
+            context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            context.setTenantDomain(tenantInfo.domain);
+            context.setTenantId(tenantInfo.tenantId);
+            context.setUsername(tenantInfo.username);
+
             var activity = JSON.parse(request.getParameter('activity'));
             activity.actor = {"id": username, "objectType": "person"};
             var id = social.publish(JSON.stringify(activity));
