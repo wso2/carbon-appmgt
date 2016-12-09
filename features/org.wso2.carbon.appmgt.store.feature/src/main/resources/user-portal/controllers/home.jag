@@ -266,7 +266,7 @@ require('/modules/store.js').exec(function (ctx) {
             storeTenantDomain: storeTenantDomain,
             enabledTypeList: enabledTypeList,
             isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant,
-            strictUserName : user.username.substring(0,user.username.lastIndexOf("@") )
+            strictUserName : (user != null && user.username != null) ? user.username.substring(0,user.username.lastIndexOf("@") ) : null
         },
         tags: {
             data: tagInfo
