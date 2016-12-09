@@ -201,7 +201,7 @@ header .header-action:active {
     margin: 0;
 }
 .top-extra{
-    margin-top: -70px;
+    margin-top: 20px!important;
 }
 
 .page-header:after {
@@ -238,9 +238,10 @@ header .header-action:active {
 
 .page-header .sorting-options > button {
     padding: 0 5px 0 5px;
-    margin-top: -60px;
 }
-
+.page-header .sorting-options {
+    margin-top: 25px;
+}
 .page-content .page-title {
     margin-left: 0px;
 }

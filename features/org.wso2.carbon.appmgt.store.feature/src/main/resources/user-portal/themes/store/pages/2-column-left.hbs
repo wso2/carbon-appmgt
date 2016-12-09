@@ -66,12 +66,17 @@
 
         <!-- media body -->
         <div class="media-body">
-            <!-- Search -->
-            {{include search}}
             <!-- page -->
             <div class="container-fluid body-wrapper">
                 <div id="page-header" class="page-header">
-                    {{include pageHeader}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{include pageHeader}}
+
+                            {{include search}}
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="page-content">
