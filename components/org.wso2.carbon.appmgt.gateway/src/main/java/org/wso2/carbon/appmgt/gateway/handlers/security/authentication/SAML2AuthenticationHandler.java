@@ -37,6 +37,8 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.ResponseImpl;
+import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.schema.impl.XSStringImpl;
 import org.opensaml.xml.security.credential.Credential;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
@@ -63,6 +65,7 @@ import org.wso2.carbon.identity.authenticator.saml2.sso.stub.types.AuthnReqDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -383,13 +386,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 Map<String, Object> userAttributes = getUserAttributes((ResponseImpl) idpMessage.getSAMLResponse());
                 session.getAuthenticationContext().setAttributes(userAttributes);
 
-                String roleAttributeValue = (String) userAttributes.get("http://wso2.org/claims/role");
-
-                if(roleAttributeValue != null){
-                    String[] roles = roleAttributeValue.split(",");
-                    for(String role : roles){
-                        session.getAuthenticationContext().addRole(role);
-                    }
+                List<String> roleAttributeValues = (List) userAttributes.get(AppMConstants.claims.CLAIM_ROLES);
+                for (int i = 0; i < roleAttributeValues.size(); i++) {
+                    session.getAuthenticationContext().addRole(roleAttributeValues.get(i));
                 }
 
                 // Generate the JWT and store in the session.
@@ -559,10 +558,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // Add other user attributes.
         List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
         if (attributeStatements != null) {
-            for(AttributeStatement attributeStatement : attributeStatements){
+            for (AttributeStatement attributeStatement : attributeStatements) {
                 List<Attribute> attributes = attributeStatement.getAttributes();
-                for(Attribute attribute : attributes){
-                    userAttributes.put(attribute.getName(), attribute.getAttributeValues().get(0).getDOM().getTextContent());
+                for (Attribute attribute : attributes) {
+                    if (attribute.getAttributeValues().size() > 1) {
+                        List<XMLObject> attributeValues = attribute.getAttributeValues();
+                        List<String> attributeValuesList = new ArrayList<String>();
+                        for (XMLObject attributeValue : attributeValues) {
+                            attributeValuesList.add(attributeValue.getDOM().getTextContent());
+                        }
+                        userAttributes.put(attribute.getName(), attributeValuesList);
+                    } else {
+                        userAttributes.put(attribute.getName(), attribute.getAttributeValues().get(0).getDOM().getTextContent());
+                    }
                 }
             }
         }
