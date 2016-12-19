@@ -16,6 +16,7 @@
         log = new Log(),
         serverHost = process.getProperty('server.host'),
         postUrl = dataConfi.ssoConfiguration.identityProviderURL;
+
         //Extract tenant domain from store URL
         if(requestURI.indexOf("/t/") !== -1) {
             var requestContextPaths = requestURI.split("/t/");

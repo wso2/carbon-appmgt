@@ -39,6 +39,10 @@ var mapper = function (path) {
     };
 };
 
+if (!session.get("Loged")) {
+    include("/controllers/login.jag");
+}
+
 //Check for incoming URL pattern and dispatch the request into relevant endpoint
 if (matcher.match(apiEndpoint)) {
 
@@ -68,7 +72,6 @@ if (matcher.match(apiEndpoint)) {
     resolveRouter(elements.domain, path, elements.type);
 
 } else if (matcher.match(storeLogin)) {
-
     var elements = matcher.elements();
     path = '/controllers/login.jag';
     resolveRouter(elements.domain, path, null);
