@@ -220,7 +220,7 @@ jQuery(function ($) {
 		});
 		
 		if(showDevices == false){
-			$('.modal-body').html("<div class='offset2'>Sorry you dont have devices to install this app<div>");
+			$('#devicesList .modal-body').html("<div class='offset2'>Sorry you dont have devices to install this app<div>");
 		}
 		
 		if(!(device > 0)){
