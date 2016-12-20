@@ -79,7 +79,7 @@ public class AssetStoreHostObject extends ScriptableObject {
 
     private static final long serialVersionUID = -3169012616750937045L;
     private static final Log log = LogFactory.getLog(AssetStoreHostObject.class);
-    private static final String hostObjectName = "APIStore";
+    private static final String hostObjectName = "AppStore";
     private static final String httpPort = "mgt.transport.http.port";
     private static final String httpsPort = "mgt.transport.https.port";
     private static final String hostName = "carbon.local.ip";

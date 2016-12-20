@@ -687,5 +687,25 @@ public class AppsApi  {
     {
     return delegate.appsAppTypeValidateContextPost(appType,appContext,contentType,ifModifiedSince);
     }
+    @GET
+    @Path("/{appType}/name/{appName}/version/{version}/uuid")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get app UUID", notes = "Get app UUId by name and version  ", response = AppDTO.class, tags={ "Apps", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. List of uuids is returned. ", response = AppDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. Invalid request or validation error. ", response = AppDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. The request must be conditional but no condition has been specified. ", response = AppDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. The resource to be updated does not exist. ", response = AppDTO.class) })
+    public Response appsAppTypeNameAppNameVersionVersionUuidGet(@ApiParam(value = "The App type (either Webapp/Mobile app). ",required=true) @PathParam("appType") String appType
+            ,@ApiParam(value = "The App appName. ",required=true) @PathParam("appName") String appName
+            ,@ApiParam(value = "The App version. ",required=true) @PathParam("version") String version
+            ,@ApiParam(value = "Media types acceptable for the response. Default is JSON. " , defaultValue="JSON")@HeaderParam("Accept") String accept
+            ,@ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. " )@HeaderParam("If-None-Match") String ifNoneMatch){
+        return delegate.appsAppTypeNameAppNameVersionVersionUuidGet(appType,appName,version,accept,ifNoneMatch);
+    }
 }
 

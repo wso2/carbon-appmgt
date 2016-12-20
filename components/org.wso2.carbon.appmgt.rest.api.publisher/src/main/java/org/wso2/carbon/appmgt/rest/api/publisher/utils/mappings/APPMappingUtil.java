@@ -413,6 +413,7 @@ public class APPMappingUtil {
         dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
+        dto.setSkipGateway(String.valueOf(webapp.getSkipGateway()));
 
         Set<String> apiTags = webapp.getTags();
         dto.setTags(new ArrayList<String>(apiTags));
@@ -606,6 +607,7 @@ public class APPMappingUtil {
         }
         mobileAppModel.setScreenShots(appDTO.getScreenshots());
         mobileAppModel.setRecentChanges(appDTO.getRecentChanges());
+        //mobileAppModel.setPreviousVersionAppID(appDTO.getPreviousVersionAppID());
 
         if (appDTO.getTags() != null) {
             Set<String> apiTags = new HashSet<>(appDTO.getTags());
@@ -657,6 +659,14 @@ public class APPMappingUtil {
         webApp.setBusinessOwner(appDTO.getBusinessOwnerId());
         webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(), ","));
         webApp.setSkipGateway(Boolean.parseBoolean(appDTO.getSkipGateway()));
+
+		if(appDTO.isServiceProviderCreationEnabled() != null){
+			webApp.setServiceProviderCreationEnabled(appDTO.isServiceProviderCreationEnabled());
+		}else{
+			// Default behaviour is creating the service provider.
+			webApp.setServiceProviderCreationEnabled(true);
+		}
+
         webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
         webApp.setAcsURL(appDTO.getAcsUrl());
         webApp.setSsoProviderDetails(AppManagerUtil.getDefaultSSOProvider());

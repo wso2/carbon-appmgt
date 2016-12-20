@@ -3,41 +3,7 @@ $('#media').carousel({
     interval: false,
 });
 
-$.ajax({
-    url:  caramel.context +"/apis/enterprise/get-devices",
-    dataType: "json"
-}).done(function(data) {
 
-    var objects = [];
-
-    var length = 6;
-    for(var i = 0; i <= parseInt(data.length / length); i++){
-        objects.push([]);
-    }
-
-    $.each(data, function(key,value) {
-        var index = parseInt(key/ length);
-        objects[index].push(value);
-    });
-
-    for(var j = 0; j < objects.length; j++){
-        var isActive = j === 0 ? "active" : "";
-        var item = $("<div>", {class: "item " + isActive });
-        var row = $("<div>", {class: "row"});
-
-        for (var k = 0; k < objects[j].length; k++) {
-            row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
-                '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-modal">' +
-                '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
-                '"><div>' + objects[j][k].name + '</div></a>' +
-                '</div>');
-        }
-        item.append(row);
-        $("#devicesList").append(item);
-
-    }
-
-});
 
 
 $(".device-image").each(function(index) {
@@ -110,17 +76,36 @@ $(".device-image-block").click(function(index) {
 $("#devicesList").on( "click", ".device-image-block-modal", function() {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    performInstalltion(deviceId, devicePlatform, appToInstall);
+    var instantInstall = $('#instant-install').is(":checked");
+    if (!instantInstall) {
+        var scheduleInstall = $('#schedule-install').val();
+        performInstalltion(deviceId, devicePlatform, appToInstall, scheduleInstall);
+    } else {
+        performInstalltion(deviceId, devicePlatform, appToInstall, null);
+    }
+});
+
+$("#devicesList").on( "click", ".device-image-block-update-modal", function() {
+    var deviceId = $(this).data("deviceId");
+    var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
+    var instantUpdate = $('#instant-update').is(":checked");
+    if (!instantUpdate) {
+        var scheduleUpdate = $('#schedule-update').val();
+    	performUpdate(deviceId, devicePlatform, appToInstall, scheduleUpdate);
+    } else {
+    	performUpdate(deviceId, devicePlatform, appToInstall, null);
+    }
+    
 });
 
 
-function performInstalltion(deviceId, devicePlatform, app){
+function performInstalltion(deviceId, devicePlatform, app, schedule){
     jQuery.ajax({
         url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
               encodeURIComponent(devicePlatform) + "/install",
         type: "POST",
         dataType: "json",
-        data : {"asset": app}
+        data : {"asset": app, "schedule": schedule}
     });
 
     $( document ).ajaxComplete(function() {
@@ -138,6 +123,29 @@ function performInstalltion(deviceId, devicePlatform, app){
 
     });
 
+}
+
+
+function performUpdate(deviceId, devicePlatform, app, schedule){
+    jQuery.ajax({
+        url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
+              encodeURIComponent(devicePlatform) + "/update",
+        type: "POST",
+        dataType: "json",
+        data : {"asset": app, "schedule": schedule}
+    });
+
+    $( document ).ajaxComplete(function() {
+        noty({
+            text : 'You have been subscribed to the application successfully',
+            'layout' : 'center',
+            'timeout': 1500,
+            'modal': false,
+             'onClose': function() {
+                 location.reload();
+            }
+        });
+    });
 }
 
 
@@ -202,13 +210,59 @@ function performInstalltionUser(app){
 $( document ).ready(function() {
     var id = getURLParameter("id");
 
-    devicePlatform = getURLParameter("platform");
-
+    devicePlatform = $("#devicePlatform").val();
     //var hasdevices = false;
     if(id != "null"){
-
         $('#devicesList').modal('show');
     }
+
+    $.ajax({
+        url:  caramel.context +"/apis/enterprise/get-devices/" + devicePlatform,
+        dataType: "json"
+    }).done(function(data) {
+
+        var objects = [];
+
+        var length = 6;
+        for(var i = 0; i <= parseInt(data.length / length); i++){
+            objects.push([]);
+        }
+
+        $.each(data, function(key,value) {
+            var index = parseInt(key/ length);
+            objects[index].push(value);
+        });
+
+        for(var j = 0; j < objects.length; j++){
+            var isActive = j === 0 ? "active" : "";
+            var item = $("<div>", {class: "item " + isActive });
+            var row = $("<div>", {class: "row"});
+
+            for (var k = 0; k < objects[j].length; k++) {
+                row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
+                    '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-modal">' +
+                    '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
+                    '"><div>' + objects[j][k].name + '</div></a>' +
+                    '</div>');
+                row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
+                    '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-update-modal">' +
+                    '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
+                    '"><div>' + objects[j][k].name + '</div></a>' +
+                    '</div>');
+            }
+            item.append(row);
+            $("#devicesList").append(item);
+
+        }
+
+
+
+    });
+
+
+
+
+
 });
 
 

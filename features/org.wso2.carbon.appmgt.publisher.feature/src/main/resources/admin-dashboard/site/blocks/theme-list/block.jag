@@ -1,0 +1,40 @@
+<%
+include("/jagg/jagg.jag");
+var appManager = require("thememanager");
+var managerHostObj = new appManager.ThemeManager();
+var log = new Log();
+jagg.block("theme-list", {
+    initializer: function (data) {
+
+    },
+
+    getInputs: function () {
+        return {}
+    },
+
+    getOutputs: function (inputs) {
+        var themes;
+        //resolve tenant
+        var user = jagg.getUser();
+        var tenantDomain = user.userDomain;
+        //get list of theme exists
+
+        try {
+            themes = managerHostObj.getDeployedThemes(tenantDomain);
+        } catch (e) {
+            var errorMsg = "Error while retrieving deployed theme information";
+            log.error(errorMsg, e);
+            return {
+                "error" : true,
+                "errorMsg" : errorMsg
+            }
+        }
+        return {
+            "error" : false,
+            "themes" : themes
+        }
+    }
+
+});
+
+%>

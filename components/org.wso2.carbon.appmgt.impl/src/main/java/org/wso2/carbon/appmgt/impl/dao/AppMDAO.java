@@ -96,6 +96,12 @@ public class AppMDAO {
     private static final String PRIMARY_LOGIN = "primary";
     private static final String CLAIM_URI = "ClaimUri";
 
+    private static final String oracleDriverName = "Oracle";
+    private static final String mySQLDriverName = "MySQL";
+    private static final String msSQLDriverName = "MS SQL";
+    private static final String microsoftDriverName = "Microsoft";
+    private static final String postgreDriverName = "PostgreSQL";
+
     public AppMDAO() {
     }
 
@@ -4163,13 +4169,19 @@ public class AppMDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
 
-            //oracle specific query
-            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+            String driverName = connection.getMetaData().getDriverName();
+            if (driverName.contains(oracleDriverName)) {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
                         "FROM APM_WORKFLOWS " +
                         "WHERE WF_REFERENCE = ? AND ROWNUM <= 1 " +
                         "ORDER BY WF_CREATED_TIME ";
+            } else if (driverName.contains(msSQLDriverName) || driverName.contains(microsoftDriverName)) {
+                query = "SELECT TOP 1 WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
+                        "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
+                        "FROM APM_WORKFLOWS " +
+                        "WHERE WF_REFERENCE = ? " +
+                        "ORDER BY WF_CREATED_TIME";
             } else {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
@@ -4565,19 +4577,19 @@ public class AppMDAO {
 
         String query = "SELECT DISTINCT "
                 + "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, POLICY_GROUP.POLICY_GRP_ID AS POLICY_GRP_ID,"
-                + "RULE.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, RULE.CONTENT AS RULE_CONTENT "
+                + "ENTITLEMENT_POLICY.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, ENTITLEMENT_POLICY.CONTENT AS RULE_CONTENT "
                 + "FROM "
                 + "APM_APP APP, "
                 + "APM_POLICY_GROUP POLICY_GROUP, "
                 + "APM_POLICY_GROUP_MAPPING APP_GROUP, "
-                + "APM_ENTITLEMENT_POLICY_PARTIAL RULE, "
+                + "APM_ENTITLEMENT_POLICY_PARTIAL ENTITLEMENT_POLICY, "
                 + "APM_POLICY_GRP_PARTIAL_MAPPING GROUP_RULE "
                 + "WHERE APP.APP_ID = "
                 + "(SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) "
                 + "AND APP_GROUP.APP_ID = APP.APP_ID "
                 + "AND APP_GROUP.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
                 + "AND GROUP_RULE.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
-                + "AND GROUP_RULE.POLICY_PARTIAL_ID = RULE.ENTITLEMENT_POLICY_PARTIAL_ID";
+                + "AND GROUP_RULE.POLICY_PARTIAL_ID = ENTITLEMENT_POLICY.ENTITLEMENT_POLICY_PARTIAL_ID";
 
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -4616,7 +4628,7 @@ public class AppMDAO {
 		return contexts;
 	}
 
-	public void updateAPI(WebApp api) throws AppManagementException {
+	public void updateAPI(WebApp api, String authorizedAdminCookie) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -4660,8 +4672,8 @@ public class AppMDAO {
 				JSONArray policyPartialIdList = (JSONArray) JSONValue.parse(api.getPolicyPartials());
 
 				//Remove existing updated entitlement policies from IDP
-				removeApplicationsEntitlementPolicies(webAppId,connection);
-			}
+                removeApplicationsEntitlementPolicies(webAppId, connection, authorizedAdminCookie);
+            }
 
             if (api.getPolicyGroups() != null && !api.getPolicyGroups().isEmpty()) {
                 JSONArray policyGroupIdList = (JSONArray) JSONValue.parse(api.getPolicyGroups());
@@ -4825,7 +4837,7 @@ public class AppMDAO {
 		return id;
 	}
 
-	public void deleteAPI(APIIdentifier apiId) throws AppManagementException {
+	public void deleteAPI(APIIdentifier apiId, String authorizedAdminCookie) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
@@ -4841,7 +4853,7 @@ public class AppMDAO {
 			id = getAPIID(apiId, connection);
 
             //Remove webapp url mapping related entitlement policies from IDP
-            removeApplicationsEntitlementPolicies(id,connection);
+            removeApplicationsEntitlementPolicies(id, connection, authorizedAdminCookie);
 
 			prepStmt = connection.prepareStatement(deleteSubscriptionQuery);
 			prepStmt.setInt(1, id);
@@ -5523,16 +5535,18 @@ public class AppMDAO {
 
 	}
 
-	/**
-	 * Remove existing updated entitlement policies from IDP
-	 *
-	 * @param applicationId - applicatoin id
-	 * @param connection    - DB Connection
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 */
-	private void removeApplicationsEntitlementPolicies(int applicationId, Connection connection) throws
-                                                                                                 AppManagementException {
-		PreparedStatement statementToRetrievePolicyIds = null;
+    /**
+     * Remove existing updated entitlement policies from IDP
+     *
+     * @param applicationId   Applicatoin id
+     * @param authorizedAdminCookie Autherized cookie to access IDP admin services
+     * @param connection      DB Connection
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    private void removeApplicationsEntitlementPolicies(int applicationId, Connection connection, String authorizedAdminCookie)
+            throws
+            AppManagementException {
+        PreparedStatement statementToRetrievePolicyIds = null;
 		ResultSet rs = null;
 
         String queryToGetPolicyIdList = "SELECT POLICY_ID " +
@@ -5547,18 +5561,23 @@ public class AppMDAO {
 			//Define Entitlement Service
 			AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
 					getAPIManagerConfigurationService().getAPIManagerConfiguration();
-			EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
 
-			while (rs.next()) {
 
-				String policyId = rs.getString("POLICY_ID");
-				//If policyId is not null, remove the Entitlement policy with reference to policy id
-				if (policyId != null) {
-					entitlementService.removePolicy(policyId);
-				}
-			}
-			rs.close();
-		} catch (SQLException e) {
+            EntitlementService entitlementService = null;
+            int count = 0;
+            while (rs.next()) {
+                if (count == 0) {
+                    entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
+                }
+                String policyId = rs.getString("POLICY_ID");
+                //If policyId is not null, remove the Entitlement policy with reference to policy id
+                if (policyId != null) {
+                    entitlementService.removePolicy(policyId);
+                }
+                count++;
+            }
+            rs.close();
+        } catch (SQLException e) {
 			handleException("Error while retrieving URL XACML policy ids for WebApp : " +
 					applicationId, e);
 		} finally {
@@ -6837,23 +6856,24 @@ public class AppMDAO {
 	}
 
 
-	/**
-	 * Update policy groups
-	 *
-	 * @param policyGroupName    :policy group name
-	 * @param throttlingTier     : throttling Tier
-	 * @param userRoles          : user roles
-	 * @param isAnonymousAllowed : is anonymous access allowed to URL pattern
-	 * @param policyGroupId      : policy group id
-	 * @param policyGroupDesc    :policy group Description
-	 * @return : last saved policy group id
-	 * @throws AppManagementException if any an error found while saving data to DB
-	 */
-	public static void updatePolicyGroup(String policyGroupName, String throttlingTier,
-										 String userRoles, String isAnonymousAllowed,
-										 int policyGroupId, Object[] objPartialMappings, String policyGroupDesc)
-			throws AppManagementException {
-		PreparedStatement ps = null;
+    /**
+     * Update policy groups
+     *
+     * @param policyGroupName    Policy group name
+     * @param throttlingTier     Throttling Tier
+     * @param userRoles          User roles
+     * @param isAnonymousAllowed Is anonymous access allowed to URL pattern
+     * @param policyGroupId      Policy group id
+     * @param policyGroupDesc    Policy group Description
+     * @param authorizedAdminCookie    Authorized cookie to access IDP admin services
+     * @return Last saved policy group id
+     * @throws AppManagementException if any an error found while saving data to DB
+     */
+    public static void updatePolicyGroup(String policyGroupName, String throttlingTier,
+                                         String userRoles, String isAnonymousAllowed,
+                                         int policyGroupId, Object[] objPartialMappings, String policyGroupDesc,
+                                         String authorizedAdminCookie) throws AppManagementException {
+        PreparedStatement ps = null;
 		Connection conn = null;
         String query = "UPDATE APM_POLICY_GROUP " +
                 "SET NAME = ?, THROTTLING_TIER = ?, USER_ROLES = ?, URL_ALLOW_ANONYMOUS = ?, DESCRIPTION = ? " +
@@ -6871,7 +6891,7 @@ public class AppMDAO {
 			ps.executeUpdate();
 
             //delete XACML Policies from Entitlement Service
-            deleteXACMLPoliciesFromEntitlementService(policyGroupId, conn);
+            deleteXACMLPoliciesFromEntitlementService(policyGroupId, conn, authorizedAdminCookie);
 
 			//delete partials mapped to group id
 			deletePolicyPartialMappings(policyGroupId, conn);
@@ -7034,23 +7054,25 @@ public class AppMDAO {
 		return arrPartials;
 	}
 
-	/**
-	 * delete policy groups
-	 *
-	 * @param applicationId Application Id
-	 * @param policyGroupId Policy Group Id
-	 * @throws AppManagementException on error
-	 */
-	public void deletePolicyGroup(String applicationId, String policyGroupId) throws AppManagementException {
-		Connection conn = null;
-		PreparedStatement ps = null;
+    /**
+     * delete policy groups
+     *
+     * @param applicationId   Application Id
+     * @param policyGroupId   Policy Group Id
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
+     * @throws AppManagementException on error
+     */
+    public void deletePolicyGroup(String applicationId, String policyGroupId, String authorizedAdminCookie)
+            throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
 		String query = "";
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
             conn.setAutoCommit(false);
 
             //Remove XACML Policies from Entitlement Service
-            deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn);
+            deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn, authorizedAdminCookie);
 
 		 	//delete from master table
 			query = "DELETE FROM APM_POLICY_GROUP WHERE POLICY_GRP_ID = ? ";
@@ -7153,10 +7175,12 @@ public class AppMDAO {
      *
      * @param policyGroupId
      * @param conn
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws SQLException,AppManagementException
      */
-    private static void deleteXACMLPoliciesFromEntitlementService(int policyGroupId, Connection conn)
-            throws SQLException,AppManagementException {
+    private static void deleteXACMLPoliciesFromEntitlementService(int policyGroupId, Connection conn,
+                                                                  String authorizedAdminCookie)
+            throws SQLException, AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String query = "SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
@@ -7164,7 +7188,7 @@ public class AppMDAO {
         //Define Entitlement Service
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
 
         try {
             ps = conn.prepareStatement(query);
@@ -8901,4 +8925,7 @@ public class AppMDAO {
         }
         return query;
     }
+
+
+
 }

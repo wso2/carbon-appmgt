@@ -816,7 +816,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         Registry userRegistry = null;
         String tagsQueryPath = null;
         try {
-            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
             Map<String, String> params = new HashMap<String, String>();
             params.put(RegistryConstants.RESULT_TYPE_PROPERTY_NAME, RegistryConstants.TAG_SUMMARY_RESULT_TYPE);
 
@@ -1535,7 +1535,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
-            log.warn("The configurations related to show deprecated APIs in APIStore " +
+            log.warn("The configurations related to show deprecated Apps in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }
@@ -1548,7 +1548,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         String displayMultiVersions = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
         if (displayMultiVersions == null) {
-            log.warn("The configurations related to show multiple versions of WebApp in APIStore " +
+            log.warn("The configurations related to show multiple versions of WebApp in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }
@@ -1723,7 +1723,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
-            log.warn("The configurations related to show deprecated APIs in APIStore " +
+            log.warn("The configurations related to show deprecated Apps in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }

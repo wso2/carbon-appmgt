@@ -24,7 +24,9 @@
         "identityAlias" : "",
         "responseSigningEnabled":"true",
         "keyStoreName" :""
+    },
+    "customStoreThemeConfig" : {
+        "whitelist" : ["css", "svg"]
     }
-
 
 }

@@ -203,7 +203,15 @@ public class AppManagerComponent {
                     new Permission(AppMConstants.Permissions.DOCUMENT_EDIT, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
-                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION)};
+                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_APPLICATION_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_IDP_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ADD, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_EDIT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ENABLE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_PUBLISH, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_VIEW, UserMgtConstants.EXECUTE_ACTION)};
 
             AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, creatorPermissions, realm);
 

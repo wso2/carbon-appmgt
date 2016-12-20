@@ -29,9 +29,7 @@ import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.api.Resource;
 
 import javax.xml.stream.XMLStreamException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents the set of configurations (properties) for a tenant.
@@ -41,11 +39,11 @@ public class TenantConfiguration {
     private static final Log log = LogFactory.getLog(TenantConfiguration.class);
 
     private int tenantID;
-    private Map<String, Object> properties;
+    private Map<String, List<String>> properties;
 
     public TenantConfiguration(int tenantID){
         this.tenantID = tenantID;
-        properties = new HashMap<String, Object>();
+        properties = new HashMap<String, List<String>>();
     }
 
     /**
@@ -80,8 +78,17 @@ public class TenantConfiguration {
      * @param key
      * @param value
      */
-    public void addProperty(String key, Object value) {
-        properties.put(key, value);
+    public void addProperty(String key, String value) {
+
+        List<String> valueHolder = (List<String>) properties.get(key);
+
+        if(valueHolder == null){
+            valueHolder = new ArrayList<String>();
+            properties.put(key, valueHolder);
+        }
+
+        valueHolder.add(value);
+
     }
 
     /**
@@ -89,7 +96,22 @@ public class TenantConfiguration {
      * @param key
      * @return
      */
-    public Object getProperty(String key) {
+    public String getFirstProperty(String key) {
+
+        List<String> propertyHolder = properties.get(key);
+
+        if(propertyHolder != null && propertyHolder.size() > 0){
+            return propertyHolder.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    public String getFirstPropertyAsString(String key){
+        return (String) getFirstProperty(key);
+    }
+
+    public List<String> getProperties(String key){
         return properties.get(key);
     }
 
@@ -141,5 +163,6 @@ public class TenantConfiguration {
 
         public static final String IS_SELF_SUBSCRIPTION_ENABLED = "Subscriptions.EnableSelfSubscription";
         public static final String IS_ENTERPRISE_SUBSCRIPTION_ENABLED = "Subscriptions.EnableEnterpriseSubscription";
+        public static final String ENABLED_ASSET_TYPES = "EnabledAssetTypes.Type";
     }
 }

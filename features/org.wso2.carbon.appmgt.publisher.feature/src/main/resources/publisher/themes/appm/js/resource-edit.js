@@ -31,7 +31,7 @@ $( document ).ready(function() {
     var appStatus = "APP_IS_ANY_LIFECYCLE_STATE";
 
     $.ajax({
-               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + encodeURIComponent(providerName) + '/' + appStatus,
                type: 'GET',
                async: false,
                success: function (data) {

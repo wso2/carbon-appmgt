@@ -39,7 +39,7 @@ var validateResult = function (policyContent) {
     var validationResult = validateEntitlementPolicyPartial(policyContent);
     var validationResultJson = {"isValid": validationResult.isValid()};
     return validationResultJson;
-}
+};
 /**
  * Validates the given policy content
  */
@@ -62,16 +62,19 @@ function saveEntitlementPolicyPartial(policyPartialName, policyPartial, isShared
 }
 
 
-function updatePolicy(id, policyPartial, isSharedPartial, policyPartialDesc) {
-    var isSuccess = updateEntitlementPolicyPartial(id, policyPartial, isSharedPartial, policyPartialDesc);
+function updatePolicy(id, policyPartial, isSharedPartial, policyPartialDesc, authorizedAdminCookie) {
+    var isSuccess = updateEntitlementPolicyPartial(id, policyPartial, isSharedPartial, policyPartialDesc,
+                                                   authorizedAdminCookie);
     return isSuccess;
 }
 
 /**
  * Update the given policy content
  */
-function updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc) {
-    return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc);
+function updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc,
+                                        authorizedAdminCookie) {
+    return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial,
+                                                      policyPartialDesc, authorizedAdminCookie);
 }
 
 /**

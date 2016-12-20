@@ -35,6 +35,8 @@ public final class AppMConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
 
+    public static final String DRIVER_TYPE_ORACLE = "Oracle";
+
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 
@@ -358,6 +360,18 @@ public final class AppMConstants {
         public static final String APP_WORKFLOWADMIN = "/permission/admin/manage/appm/workflowadmin";
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
+
+        // Service provider management permissions
+        public static final String IDENTITY_APPLICATION_MANAGEMENT = "/permission/admin/manage/identity/applicationmgt";
+        public static final String IDENTITY_IDP_MANAGEMENT = "/permission/admin/manage/identity/idpmgt";
+
+        public static final String XACML_POLICY_ADD = "/permission/admin/configure/entitlement/policy/manage/add";
+        public static final String XACML_POLICY_DELETE = "/permission/admin/configure/entitlement/policy/manage/delete";
+        public static final String XACML_POLICY_EDIT = "/permission/admin/configure/entitlement/policy/manage/edit";
+        public static final String XACML_POLICY_ENABLE = "/permission/admin/configure/entitlement/policy/manage/enable";
+        public static final String XACML_POLICY_PUBLISH = "/permission/admin/configure/entitlement/policy/publish";
+        public static final String XACML_POLICY_VIEW = "/permission/admin/configure/entitlement/policy/view";
+
     }
 
     public static final String SEARCH_CONTENT_NAME = "name";
@@ -398,7 +412,7 @@ public final class AppMConstants {
     public static final String API_KEY_MANAGER_ACCESS_TOKEN_PARTITIONING_DOMAINS = API_KEY_MANAGER + "AccessTokenPartitioning." + "AccessTokenPartitioningDomains";
     public static final String API_KEY_MANAGER_ENCRYPT_TOKENS = API_KEY_MANAGER + "EncryptPersistedTokens";
 
-    public static final String API_STORE = "APIStore.";
+    public static final String API_STORE = "AppStore.";
     public static final String API_STORE_DISPLAY_ALL_APIS = API_STORE + "DisplayAllAPIs";
     public static final String API_STORE_DISPLAY_MULTIPLE_VERSIONS = API_STORE + "DisplayMultipleVersions";
 	public static final String API_STORE_DISPLAY_COMMENTS = API_STORE + "DisplayComments";
@@ -448,6 +462,10 @@ public final class AppMConstants {
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
     public static final String SSO_CONFIGURATION_RESPONSE_SIGNING_KEY_ALIAS = SSO_CONFIGURATION + "ResponseSigningKeyAlias";
     public static final String SSO_CONFIGURATION_ACS_URL_POSTFIX = SSO_CONFIGURATION + "ACSURLPostfix";
+    public static final String SSO_CONFIGURATION_RESPONSE_VALIDITY_TIME_STAMP_SKEW = SSO_CONFIGURATION + "SAMLResponseValidityTimeStampSkew";
+    public static final String SSO_CONFIGURATION_ENABLE_RESPONSE_SIGNING = SSO_CONFIGURATION + "EnableResponseSigning";
+    public static final String SSO_CONFIGURATION_ENABLE_ASSERTION_SIGNING = SSO_CONFIGURATION + "EnableAssertionSigning";
+    public static final String SSO_CONFIGURATION_VALIDATE_ASSERTION_EXPIRY = SSO_CONFIGURATION + "ValidateAssertionExpiry";
     public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
     public static final String SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS = SSO_CONFIGURATION + "CreateServiceProviderForSkipGatewayApps";
     public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";
@@ -718,7 +736,7 @@ public final class AppMConstants {
 
     //Mobile application binary file extensions
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
-    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+    public static final String MOBILE_APPS_IOS_EXT = "ipa";
 
     //Mobile application platform types
     public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";
@@ -768,6 +786,8 @@ public final class AppMConstants {
     public static final String STATE_APPROVE ="Approve";
     public static final String STATE_PUBLISH ="Publish";
     public static final String APP_STORE_GET_UUID_URL ="/api/asset/get/uuid/webapp/";
+
+    public static final String IDP_AUTHENTICATED_COOKIE = "idp-authenticated-cookie";
 
     public  static class MediaType {
         public static final String WEB_APP = "application/vnd.wso2-webapp+xml";

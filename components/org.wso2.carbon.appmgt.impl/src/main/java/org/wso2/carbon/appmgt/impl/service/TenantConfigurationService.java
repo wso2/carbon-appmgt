@@ -22,6 +22,8 @@ package org.wso2.carbon.appmgt.impl.service;
 
 import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
 
+import java.util.List;
+
 /**
  * Service contract of a tenant specific configuration service.
  */
@@ -39,7 +41,7 @@ public interface TenantConfigurationService {
      * @param key
      * @return
      */
-    Object getProperty(String key);
+    String getFirstProperty(String key);
 
     /**
      * Returns the property for the given property name and the tenant ID.
@@ -48,23 +50,25 @@ public interface TenantConfigurationService {
      * @param tenantID
      * @return
      */
-    Object getProperty(String key, int tenantID);
+    String getFirstProperty(String key, int tenantID);
+
 
     /**
-     * Returns the property as a string, for the given property name and the current tenant.
+     * Returns the list of properties for the given property name and current tenant.
      *
      * @param key
      * @return
      */
-    String getPropertyAsString(String key);
+    List<String> getProperties(String key);
 
     /**
-     * Returns the property as a string, for the given property name and the tenant ID.
+     * Returns theh list of properties for the given property name and the tenant ID.
      *
      * @param key
      * @param tenantID
      * @return
      */
-    String getPropertyAsString(String key, int tenantID);
+    List<String> getProperties(String key, int tenantID);
+
 
 }

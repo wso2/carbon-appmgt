@@ -6,7 +6,7 @@ var render = function(theme, data, meta, require) {
 
     var searchQuery =  data.search.query;
     if(typeof(searchQuery) != typeof({})){
-        searchQuery = {overview_displayName : searchQuery, searchTerm: 'overview_displayName', search : searchQuery};
+        searchQuery = {overview_name : searchQuery, searchTerm: 'overview_name', search : searchQuery};
     }else{
         for (var key in searchQuery) {
             if (searchQuery.hasOwnProperty(key)) {
@@ -66,6 +66,7 @@ var render = function(theme, data, meta, require) {
                                                                            asset: data.asset,
                                                                            type: data.type,
                                                                            inDashboard: data.inDashboard,
+                                                                           isUpdatedApp: data.isUpdatedApp,
                                                                            isEnterpriseInstallEnabled: data.isEnterpriseInstallEnabled,
                                                                            isDeviceSubscriptionEnabled: data.isDeviceSubscriptionEnabled,
                                                                            isDirectDownloadEnabled: data.isDirectDownloadEnabled,

@@ -124,7 +124,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
     private static final long serialVersionUID = -3169012616750937045L;
     private static final Log log = LogFactory.getLog(APIStoreHostObject.class);
-    private static final String hostObjectName = "APIStore";
+    private static final String hostObjectName = "AppStore";
     private static final String httpPort = "mgt.transport.http.port";
     private static final String httpsPort = "mgt.transport.https.port";
     private static final String hostName = "carbon.local.ip";
@@ -2942,7 +2942,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             return domains;
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
-            throw new AppManagementException("Error while checking the APIStore is running in tenant mode or not.", e);
+            throw new AppManagementException("Error while checking the AppStore is running in tenant mode or not.", e);
         }
 
 
@@ -3729,7 +3729,7 @@ public class APIStoreHostObject extends ScriptableObject {
                                                                  Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray availableAssetTypes = new NativeArray(0);
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
         for (int i = 0; i < typeList.size(); i++) {
             availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
         }
@@ -3757,7 +3757,7 @@ public class APIStoreHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid argument type. App name should be a String.");
         }
         String assetType = (String) args[0];
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
 
         for (String type : typeList) {
             if (assetType.equals(type)) {

@@ -23,18 +23,42 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.JavaPolicy;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
@@ -64,7 +88,6 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -72,9 +95,19 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -710,10 +743,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Generates entitlement policies for the given app.
      *
      * @param apiIdentifier@throws AppManagementException
+     * @param authorizedAdminCookie      Authorized cookie to access IDP admin services
      */
     @Override
-    public void generateEntitlementPolicies(APIIdentifier apiIdentifier) throws
-                                                                         AppManagementException {
+    public void generateEntitlementPolicies(APIIdentifier apiIdentifier, String authorizedAdminCookie) throws
+                                                                                                 AppManagementException {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -721,21 +755,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts =
                 appMDAO.getEntitlementPolicyTemplateContexts(apiIdentifier);
 
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
-        entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+        if (xacmlPolicyTemplateContexts != null && !xacmlPolicyTemplateContexts.isEmpty()) {
+            EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config,
+                                                                                                    authorizedAdminCookie);
 
-        // Update URL mapping => XACML partial mapping with the generated policy IDs.
-        appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+            entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+
+            // Update URL mapping => XACML partial mapping with the generated policy IDs.
+            appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+        }
     }
 
     /**
      * Updates given entitlement policies.
      *
-     * @param policies Entitlement policies to be updated.
+     * @param policies        Entitlement policies to be updated.
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     @Override
-    public void updateEntitlementPolicies(List<EntitlementPolicy> policies) throws
+    public void updateEntitlementPolicies(List<EntitlementPolicy> policies,String authorizedAdminCookie) throws
                                                                             AppManagementException {
 
         if (policies == null || policies.isEmpty()) {
@@ -744,7 +783,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
 
         for (EntitlementPolicy policy : policies) {
             entitlementService.updatePolicy(policy);
@@ -754,19 +793,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Get entitlement policy content from policy id
      *
-     * @param policyId Entitlement policy id
+     * @param policyId        Entitlement policy id
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return entitlement policy content
      * @throws AppManagementException
      */
     @Override
-    public String getEntitlementPolicy(String policyId) throws AppManagementException {
+    public String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException {
         if (policyId == null) {
             return null;
         }
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
 
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
         return entitlementService.getPolicyContent(policyId);
     }
 
@@ -784,15 +824,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared,String policyPartialDesc) throws
-                                                                                   AppManagementException {
+                                                  String author, boolean isShared, String policyPartialDesc,
+                                                  String authorizedAdminCookie) throws AppManagementException {
         appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
 
         // Regenerate XACML policies of the apps which are using the updated policy partial.
         List<APIIdentifier> associatedApps = getAssociatedApps(policyPartialId);
 
         for(APIIdentifier associatedApp : associatedApps){
-        	generateEntitlementPolicies(associatedApp);
+        	generateEntitlementPolicies(associatedApp, authorizedAdminCookie);
         }
 
         return true;
@@ -885,11 +925,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Updates an existing WebApp
      *
-     * @param api WebApp
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *          if failed to update WebApp
+     * @param api             WebApp
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
+     * @throws AppManagementException if failed to update WebApp
      */
-    public void updateAPI(WebApp api) throws AppManagementException {
+    public void updateAPI(WebApp api, String authorizedAdminCookie) throws AppManagementException {
         WebApp oldApi = getAPI(api.getId());
         if (oldApi.getStatus().equals(api.getStatus())) {
             try {
@@ -903,7 +943,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     api.setApiHeaderChanged(true);
                 }
 
-                appMDAO.updateAPI(api);
+                appMDAO.updateAPI(api, authorizedAdminCookie);
 
                 AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -1931,9 +1971,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Delete applicatoion
      * @param identifier AppIdentifier
      * @param ssoProvider SSO provider
+     * @param authorizedAdminCookie The cookie which was generated from the SAML assertion.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
+    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider, String authorizedAdminCookie) throws
                                                                                 AppManagementException {
 
         SSOConfiguratorUtil ssoConfiguratorUtil;
@@ -1959,7 +2000,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Removing the SSO Provider with name : " + ssoProvider.getProviderName());
                 }
                 ssoConfiguratorUtil = new SSOConfiguratorUtil();
-                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider);
+
+                Map<String, String> serviceConfigs = new HashMap<String, String>();
+                serviceConfigs.put(SSOConfiguratorUtil.SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, authorizedAdminCookie);
+
+                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider, serviceConfigs);
             }
 
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
@@ -2011,7 +2056,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Gateway is not existed for the current applications Provider");
                 }
             }
-            appMDAO.deleteAPI(identifier);
+            appMDAO.deleteAPI(identifier, authorizedAdminCookie);
 
             /*remove empty directories*/
             String appCollectionPath = AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
@@ -2874,7 +2919,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 handleException("Could not retrieve tags. Unsupported applictaion type :" + appType +" provided");
             }
 
-            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
 
             org.wso2.carbon.registry.core.Collection collection = registry.executeQuery(tagsQueryPath, params);
             for (String fullTag : collection.getChildren()) {
@@ -3023,5 +3068,39 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         appRepository.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
     }
 
+    public String getGatewayEndpoint() {
+        Environment gatewayEnvironment = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getApiGatewayEnvironments().get(0);
 
+        String gatewayUrl = gatewayEnvironment.getApiGatewayEndpoint().split(",")[0];
+        return gatewayUrl;
+    }
+
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException{
+       return appRepository.getAppUUIDbyName(appName, appVersion, tenantId);
+    }
+
+    public String uploadImage(FileContent fileContent) throws AppManagementException {
+        UUID contentUUID = UUID.randomUUID();
+        String fileExtension = FilenameUtils.getExtension(fileContent.getFileName());
+        String filename = generateBinaryUUID() + "." + fileExtension;
+        fileContent.setFileName(filename);
+        fileContent.setContentType("image/" + fileExtension);
+        fileContent.setUuid(contentUUID.toString());
+        try {
+            fileContent.setContentLength(fileContent.getContent().available());
+        } catch (IOException e) {
+            handleException("Error occurred while uploading static content", e);
+        }
+        appRepository.persistStaticContents(fileContent);
+        return contentUUID.toString() + File.separator + fileContent.getFileName();
+    }
+
+    private static String generateBinaryUUID() {
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[8];
+        secRandom.nextBytes(result);
+        String uuid = String.valueOf(Hex.encodeHex(result));
+        return uuid;
+    }
 }

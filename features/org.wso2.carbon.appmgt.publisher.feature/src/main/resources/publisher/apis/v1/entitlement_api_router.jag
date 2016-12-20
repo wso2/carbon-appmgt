@@ -22,8 +22,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     });
 
     routeManager.register('POST', 'publisher', '/publisher/api/entitlement/policy/validate', function (context) {
-
-        var validationResult = validateEntitlementPolicyPartial(context.post.policyPartial);
+        var validationResult = validateEntitlementPolicyPartial(context.post.policyPartial, context.post.authorizedAdminCookie);
         var validationResultJson = {"isValid" : validationResult.isValid()};
         print(createResponseObject(validationResultJson));
     });
@@ -35,7 +34,10 @@ require('/modules/publisher.js').exec(function(ctx) {
     });
 
     routeManager.register('PUT', 'publisher', '/publisher/api/entitlement/policy/partial/update', function (context) {
-        var isSuccess = updateEntitlementPolicyPartial(context.content.id, context.content.policyPartial, context.content.isSharedPartial,context.content.policyPartialDesc);
+        var isSuccess = updateEntitlementPolicyPartial(context.content.id, context.content.policyPartial,
+                                                       context.content.isSharedPartial,
+                                                       context.content.policyPartialDesc,
+                                                       context.content.authorizedAdminCookie);
         print(isSuccess);
     });
 
@@ -90,11 +92,11 @@ require('/modules/publisher.js').exec(function(ctx) {
     });
 
     routeManager.register('POST', 'publisher', '/publisher/api/entitlement/policy/partial/policyGroup/details/update', function (context) {
-        updatePolicyGroup(context.post.policyGroupName, context.post.throttlingTier, context.post.userRoles, context.post.anonymousAccessToUrlPattern, context.post.policyGroupId, context.post.objPartialMappings, context.post.policyGroupDesc);
+        updatePolicyGroup(context.post.policyGroupName, context.post.throttlingTier, context.post.userRoles, context.post.anonymousAccessToUrlPattern, context.post.policyGroupId, context.post.objPartialMappings, context.post.policyGroupDesc, context.post.authorizedAdminCookie);
     });
 
     routeManager.register('DELETE', 'publisher', '/publisher/api/entitlement/policy/partial/policyGroup/details/delete/{applicationId}/{policyGroupId}', function (context) {
-        deletePolicyGroup(context.params.applicationId,context.params.policyGroupId);
+        deletePolicyGroup(context.params.applicationId,context.params.policyGroupId,context.params.authorizedAdminCookie);
     });
 
     routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/all/available/java/policy/handlers/details/list/{applicationUUID}/{isGlobalPolicy}', function (context) {
@@ -114,15 +116,15 @@ require('/modules/publisher.js').exec(function(ctx) {
     /**
      * Returns external entitlement policy for the given policy id.
      */
-    function getEntitlementPolicyContent(policyId){
-        return apiProvider.getEntitlementPolicyContent(policyId);
+    function getEntitlementPolicyContent(policyId, authorizedAdminCookie){
+        return apiProvider.getEntitlementPolicyContent(policyId, authorizedAdminCookie);
     }
 
     /**
-    * Validates the given policy content
-    */
-    function validateEntitlementPolicyPartial(policyContent){
-        return apiProvider.validateEntitlementPolicyPartial(policyContent);
+     * Validates the given policy content
+     */
+    function validateEntitlementPolicyPartial(policyContent, authorizedAdminCookie) {
+        return apiProvider.validateEntitlementPolicyPartial(policyContent, authorizedAdminCookie);
     }
 
     /**
@@ -135,8 +137,10 @@ require('/modules/publisher.js').exec(function(ctx) {
     /**
      * Update the given policy content
      */
-    function updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc) {
-        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc);
+    function updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial, policyPartialDesc,
+                                            authorizedAdminCookie) {
+        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, isSharedPartial,
+                                                          policyPartialDesc, authorizedAdminCookie);
     }
 
     /**
@@ -206,8 +210,8 @@ require('/modules/publisher.js').exec(function(ctx) {
      * @param policyGroupId : Policy Group Id
      * @param objPartialMappings : XACML policy partials
      */
-    function updatePolicyGroup(policyGroupName, throttlingTier, userRoles, anonymousAccessToUrlPattern, policyGroupId, objPartialMappings, policyGroupDesc) {
-        appMDAOObj.updatePolicyGroup(policyGroupName, throttlingTier, userRoles, anonymousAccessToUrlPattern, policyGroupId, JSON.parse(objPartialMappings), policyGroupDesc);
+    function updatePolicyGroup(policyGroupName, throttlingTier, userRoles, anonymousAccessToUrlPattern, policyGroupId, objPartialMappings, policyGroupDesc, authorizedAdminCookie) {
+        appMDAOObj.updatePolicyGroup(policyGroupName, throttlingTier, userRoles, anonymousAccessToUrlPattern, policyGroupId, JSON.parse(objPartialMappings), policyGroupDesc, authorizedAdminCookie);
     }
 
     /**
@@ -215,8 +219,8 @@ require('/modules/publisher.js').exec(function(ctx) {
      * @param applicationId : Application Id
      * @param policyGroupId : PolicyGroup Id
      */
-    function deletePolicyGroup(applicationId,policyGroupId) {
-        appMDAOObj.deletePolicyGroup(applicationId,policyGroupId);
+    function deletePolicyGroup(applicationId,policyGroupId,authorizedAdminCookie) {
+        appMDAOObj.deletePolicyGroup(applicationId,policyGroupId,authorizedAdminCookie);
     }
 
     /**
