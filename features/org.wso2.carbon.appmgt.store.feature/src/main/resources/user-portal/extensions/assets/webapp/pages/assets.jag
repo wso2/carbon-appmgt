@@ -479,7 +479,7 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.assetType = "webapp";
 
     caramel.render({
-                       title: 'Web Apps | Store',
+                       title: 'Web Apps | WSO2 Cloud - User Portal',
                        user: user,
                        sso: sso,
                        header: headerData,
