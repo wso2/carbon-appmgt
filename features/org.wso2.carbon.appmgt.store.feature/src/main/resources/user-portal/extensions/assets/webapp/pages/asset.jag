@@ -540,7 +540,7 @@ require('/modules/store.js').exec(function (ctx) {
         var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
-                           title: 'WebApp | Store',
+                           title: 'WebApp | WSO2 Cloud-User Portal',
                            user: user,
                            sso: sso,
                            header: headerData,

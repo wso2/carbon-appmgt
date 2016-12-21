@@ -74,7 +74,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isSite = 'true';//To get the site tags
 
     caramel.render({
-                       title: 'Inline Doc | Store',
+                       title: 'Inline Doc | WSO2 Cloud-User Portal',
                        user: user,
                        header: {
                            user: userData

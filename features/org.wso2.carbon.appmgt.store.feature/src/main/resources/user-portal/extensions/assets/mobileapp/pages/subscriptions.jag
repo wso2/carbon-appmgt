@@ -95,7 +95,7 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.assetType = "mobileapp";
 
     caramel.render({
-        'title': 'My Apps | Store',
+        'title': 'My Apps | WSO2 Cloud-User Portal',
         user: user,
         sso: sso,
         header: headerData,

@@ -129,7 +129,7 @@ require('/modules/store.js').exec(function (ctx) {
     var recentAssets = getRecentAssetsFromRegistry(store,assetType);
 
         caramel.render({
-            title: 'Favourite Apps | Store',
+            title: 'Favourite Apps | WSO2 Cloud-User Portal',
             header: {
                 user: user,
                 sso: sso,

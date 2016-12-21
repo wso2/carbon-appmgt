@@ -259,7 +259,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     caramel.render({
-        title: 'Apps | Store',
+        title: 'Apps | WSO2 Cloud-User Portal',
         header: {
             user: user,
             sso: sso,
