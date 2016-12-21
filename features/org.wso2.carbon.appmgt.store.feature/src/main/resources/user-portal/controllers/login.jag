@@ -9,21 +9,23 @@
         requestURI = request.getRequestURI(),
         requestedPage = request.getParameter("requestedPage"),
         header = request.getParameter("header"),
-        referer = request.getHeader("referer"),
-            referer = (referer ? referer : request.getParameter("referer")) ,
-            relayState = (referer ? referer : request.getRequestURL()),
+        refererFromHeader = request.getHeader("referer"),
+        requestURL = request.getRequestURL(),
         encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
         log = new Log(),
         serverHost = process.getProperty('server.host'),
         postUrl = dataConfi.ssoConfiguration.identityProviderURL;
+
+        //Set the relayState from the requestURL. If the requestURL is empty set it from the referer.
+        relayState = (requestURL ? requestURL : refererFromHeader);
 
         //Extract tenant domain from store URL
         if(requestURI.indexOf("/t/") !== -1) {
             var requestContextPaths = requestURI.split("/t/");
             var requestedTenant = requestContextPaths[1].split("/") [0];
             postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
-        }       
- 
+        }
+
         //This is to track that login request came when click the login link in the store.
         //Which is later used in acs.jag to select correct redirection page.
         if(header && header == true) {
