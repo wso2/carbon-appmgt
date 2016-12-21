@@ -386,9 +386,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 Map<String, Object> userAttributes = getUserAttributes((ResponseImpl) idpMessage.getSAMLResponse());
                 session.getAuthenticationContext().setAttributes(userAttributes);
 
-                List<String> roleAttributeValues = (List) userAttributes.get(AppMConstants.claims.CLAIM_ROLES);
-                for (int i = 0; i < roleAttributeValues.size(); i++) {
-                    session.getAuthenticationContext().addRole(roleAttributeValues.get(i));
+                Object roleAttributeValues = userAttributes.get(AppMConstants.claims.CLAIM_ROLES);
+                if (roleAttributeValues != null) {
+                    if (roleAttributeValues instanceof String) {
+                        String[] roles = roleAttributeValues.toString().split(",");
+                        for (String role : roles) {
+                            session.getAuthenticationContext().addRole(role);
+                        }
+                    } else {
+                        List<String> roleAttributeValueList = (List) roleAttributeValues;
+                        for (String roleAttributeValue : roleAttributeValueList) {
+                            session.getAuthenticationContext().addRole(roleAttributeValue);
+                        }
+                    }
                 }
 
                 // Generate the JWT and store in the session.
