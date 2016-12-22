@@ -773,7 +773,6 @@
     <carbon.registry.version>4.6.0</carbon.registry.version>
     <carbon.governance.version>4.7.0</carbon.governance.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
-    <carbon.apimgt.version>6.1.2-SNAPSHOT</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
     <carbon.store.version>1.4.4</carbon.store.version>
 
@@ -832,28 +831,28 @@
     <!-- Identity Versions -->
     <carbon.identity.auth.version>5.1.3</carbon.identity.auth.version>
     <carbon-identity-framework.version>5.6.89</carbon-identity-framework.version>
-    <identity-carbon-auth-iwa.version>5.1.1</identity-carbon-auth-iwa.version>
+    <identity-carbon-auth-iwa.version>5.1.4</identity-carbon-auth-iwa.version>
     <identity-carbon-auth-thrift.version>5.2.0</identity-carbon-auth-thrift.version>
-    <identity-inbound-auth-oauth.version>5.2.7</identity-inbound-auth-oauth.version>
-    <identity-inbound-auth-openid.version>5.2.0</identity-inbound-auth-openid.version>
+    <identity-inbound-auth-oauth.version>5.2.33</identity-inbound-auth-oauth.version>
+    <identity-inbound-auth-openid.version>5.2.1</identity-inbound-auth-openid.version>
     <identity-inbound-auth-saml.version>5.2.14</identity-inbound-auth-saml.version>
     <identity-carbon-auth-saml2.version>5.2.5</identity-carbon-auth-saml2.version>
     <identity-local-auth-basicauth.version>5.2.2</identity-local-auth-basicauth.version>
-    <identity-local-auth-iwa.version>5.1.1</identity-local-auth-iwa.version>
-    <identity-outbound-auth-facebook.version>5.1.1</identity-outbound-auth-facebook.version>
-    <identity-outbound-auth-google.version>5.1.1</identity-outbound-auth-google.version>
-    <identity-outbound-auth-oidc.version>5.1.1</identity-outbound-auth-oidc.version>
-    <identity-outbound-auth-openid.version>5.1.1</identity-outbound-auth-openid.version>
-    <identity-outbound-auth-passive-sts.version>5.1.1</identity-outbound-auth-passive-sts.version>
-    <identity-outbound-auth-requestpath-basicauth.version>5.1.1</identity-outbound-auth-requestpath-basicauth.version>
-    <identity-outbound-auth-requestpath-oauth.version>5.1.1</identity-outbound-auth-requestpath-oauth.version>
-    <identity-outbound-auth-samlsso.version>5.1.1</identity-outbound-auth-samlsso.version>
-    <identity-outbound-auth-windows-live.version>5.1.1</identity-outbound-auth-windows-live.version>
-    <identity-outbound-auth-yahoo.version>5.1.1</identity-outbound-auth-yahoo.version>
-    <identity-outbound-provisioning-google.version>5.1.1</identity-outbound-provisioning-google.version>
-    <identity-outbound-provisioning-salesforce.version>5.1.1</identity-outbound-provisioning-salesforce.version>
-    <identity-outbound-provisioning-spml.version>5.1.1</identity-outbound-provisioning-spml.version>
-    <identity-user-account-association.version>5.1.1</identity-user-account-association.version>
+    <identity-local-auth-iwa.version>5.1.4</identity-local-auth-iwa.version>
+    <identity-outbound-auth-facebook.version>5.1.3</identity-outbound-auth-facebook.version>
+    <identity-outbound-auth-google.version>5.1.3</identity-outbound-auth-google.version>
+    <identity-outbound-auth-oidc.version>5.1.3</identity-outbound-auth-oidc.version>
+    <identity-outbound-auth-openid.version>5.1.3</identity-outbound-auth-openid.version>
+    <identity-outbound-auth-passive-sts.version>5.1.3</identity-outbound-auth-passive-sts.version>
+    <identity-outbound-auth-requestpath-basicauth.version>5.1.3</identity-outbound-auth-requestpath-basicauth.version>
+    <identity-outbound-auth-requestpath-oauth.version>5.1.3</identity-outbound-auth-requestpath-oauth.version>
+    <identity-outbound-auth-samlsso.version>5.1.3</identity-outbound-auth-samlsso.version>
+    <identity-outbound-auth-windows-live.version>5.1.3</identity-outbound-auth-windows-live.version>
+    <identity-outbound-auth-yahoo.version>5.1.3</identity-outbound-auth-yahoo.version>
+    <identity-outbound-provisioning-google.version>5.1.3</identity-outbound-provisioning-google.version>
+    <identity-outbound-provisioning-salesforce.version>5.1.3</identity-outbound-provisioning-salesforce.version>
+    <identity-outbound-provisioning-spml.version>5.1.3</identity-outbound-provisioning-spml.version>
+    <identity-user-account-association.version>5.1.3</identity-user-account-association.version>
     <identity-user-ws.version>5.1.3</identity-user-ws.version>
     <identity-agent-entitlement-proxy.version>5.1.3</identity-agent-entitlement-proxy.version>
     <carbon.identity.pkg.version>[5.1.0, 6.0.0)</carbon.identity.pkg.version>
