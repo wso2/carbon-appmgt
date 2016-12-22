@@ -61,7 +61,6 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealmService;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.carbon.utils.xml.StringUtils;
@@ -474,6 +473,17 @@ public class AppMDAO {
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
                 queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
                         "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM >= ? AND ROWNUM <= ?";
+            } else if (connection.getMetaData().getDriverName().contains("MS SQL") ||
+                    connection.getMetaData().getDriverName().contains("Microsoft")) {
+                queryToGetBusinessOwner =
+                        "SELECT * from " +
+                                "(SELECT ROW_NUMBER() OVER(ORDER BY OWNER_ID) AS RowNum, * from APM_BUSINESS_OWNER " +
+                                "WHERE " +
+                                "(OWNER_NAME LIKE ? OR OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) " +
+                                "AND TENANT_ID = ?) " +
+                                "as Businee_Owners " +
+                                "WHERE RowNum >= ? AND RowNum <= ?";
+
             } else {
                 queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
                         "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? LIMIT ? , ? ";
@@ -516,10 +526,10 @@ public class AppMDAO {
     public int getBusinessOwnersCount(int tenantId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        int rowcount = 0;
+        int recordCount = 0;
         ResultSet resultSet = null;
 
-        String sqlQuery = "SELECT COUNT(*) AS ROWCOUNT FROM APM_BUSINESS_OWNER WHERE TENANT_ID = ?";
+        String sqlQuery = "SELECT COUNT(*) AS RECORD_COUNT FROM APM_BUSINESS_OWNER WHERE TENANT_ID = ?";
 
         try {
             connection = APIMgtDBUtil.getConnection();
@@ -528,14 +538,14 @@ public class AppMDAO {
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                rowcount = resultSet.getInt("ROWCOUNT");
+                recordCount = resultSet.getInt("RECORD_COUNT");
             }
         } catch (SQLException e) {
             handleException("Error when getting the row count of business owners table. ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
         }
-        return rowcount;
+        return recordCount;
     }
 
     /**
@@ -4321,7 +4331,7 @@ public class AppMDAO {
         int recordCount = 0;
 
         String sqlQuery =
-                "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? AND " +
+                "SELECT COUNT(*) AS RECORD_COUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? AND " +
                         "TENANT_ID=? ";
 
         try {
@@ -4334,7 +4344,7 @@ public class AppMDAO {
             rs = prepStmt.executeQuery();
 
             if (rs.next()) {
-                recordCount = rs.getInt("ROWCOUNT");
+                recordCount = rs.getInt("RECORD_COUNT");
             }
 
             if (recordCount == 0) {
@@ -8150,7 +8160,7 @@ public class AppMDAO {
         try {
             conn = APIMgtDBUtil.getConnection();
             String sqlQuery =
-                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP WHERE APP_NAME =? AND APP_PROVIDER =? AND APP_VERSION!=?";
+                    "SELECT COUNT(*) AS RECORD_COUNT FROM APM_APP WHERE APP_NAME =? AND APP_PROVIDER =? AND APP_VERSION!=?";
             ps = conn.prepareStatement(sqlQuery);
             ps.setString(1, apiIdentifier.getApiName());
             ps.setString(2, apiIdentifier.getProviderName());
@@ -8158,7 +8168,7 @@ public class AppMDAO {
 
             rs = ps.executeQuery();
             if (rs.next()) {
-                hasMoreVersions = (rs.getInt("ROWCOUNT") > 0);
+                hasMoreVersions = (rs.getInt("RECORD_COUNT") > 0);
             }
         } catch (SQLException e) {
             handleException("Error while getting more version details for the app" +
@@ -8186,7 +8196,7 @@ public class AppMDAO {
         try {
             conn = APIMgtDBUtil.getConnection();
             String sqlQuery =
-                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER =? " +
+                    "SELECT COUNT(*) AS RECORD_COUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER =? " +
                             "AND  " +
                             "(DEFAULT_APP_VERSION=? OR PUBLISHED_DEFAULT_APP_VERSION =?)";
             ps = conn.prepareStatement(sqlQuery);
@@ -8197,7 +8207,7 @@ public class AppMDAO {
 
             rs = ps.executeQuery();
             if (rs.next()) {
-                isDefaultVersion = (rs.getInt("ROWCOUNT") > 0);
+                isDefaultVersion = (rs.getInt("RECORD_COUNT") > 0);
             }
         } catch (SQLException e) {
             handleException("Error while checking if the default version for the app" +
@@ -8413,7 +8423,7 @@ public class AppMDAO {
         PreparedStatement ps = null;
         boolean status = false;
         ResultSet rs = null;
-        String query = "SELECT COUNT(*) AS ROWCOUNT FROM APM_FAVOURITE_APPS  " +
+        String query = "SELECT COUNT(*) AS RECORD_COUNT FROM APM_FAVOURITE_APPS  " +
                 "WHERE    APP_ID = (SELECT APP_ID  FROM APM_APP " +
                 "WHERE APP_NAME = ? " +
                 "AND APP_VERSION = ? AND APP_PROVIDER = ? AND TENANT_ID = ? ) " +
@@ -8432,7 +8442,7 @@ public class AppMDAO {
 
             rs = ps.executeQuery();
             if (rs.next()) {
-                if (rs.getInt("ROWCOUNT") > 0) {
+                if (rs.getInt("RECORD_COUNT") > 0) {
                     status = true;
                 }
             }
