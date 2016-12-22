@@ -46,7 +46,7 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
             <version>${extension.carbon.identity.application.mgt.version}</version>
         </dependency>

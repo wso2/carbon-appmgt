@@ -2,12 +2,15 @@
 var caramel;
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
+    var tenantId = ctx.tenant.tenantId;
+    if(user){
+        tenantId = user.tenantId;
+    }
     var asset, aid, title,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = user.tenantId,
             tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
