@@ -26,4 +26,19 @@ var getCategories = function (tenantId, type) {
     }
 };
 
+var resolveUserName = function(user) {
+    var userName = null;
+    if (user != null) {
+        userName = user.username;
+        if (userName != null) {
+            if (userName.indexOf("@") > -1) {
+                userName = userName.substring(0, userName.lastIndexOf("@"));
+            }
+            if (userName.indexOf("/") > -1) {
+                userName = userName.substring(userName.lastIndexOf("/") + 1);
+            }
+        }
+    }
+    return userName;
+};
 

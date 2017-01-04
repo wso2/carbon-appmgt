@@ -21,6 +21,7 @@ var authenticator;
 var caramel;
 
 include('../modules/jagg/jagg.jag');
+var util = require('/modules/util.js');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
 if (!storeHostObj.isAssetTypeEnabled("webapp")) {
@@ -91,7 +92,7 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.storeTenantDomain = tenantDomain;
-    headerData.strictUserName = user.username.substring(0,user.username.lastIndexOf("@") );
+    headerData.strictUserName = util.resolveUserName(user);
     headerData.assetType = "webapp";
     var navigationData = {
         showAllAppsLink: true
