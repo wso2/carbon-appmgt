@@ -10,6 +10,7 @@ var businessOwner = "";
 var ownerName;
 var ownerEmail;
 include('../modules/jagg/jagg.jag');
+var util = require('/modules/util.js');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
@@ -524,7 +525,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
         headerData.assetType = "webapp";
-        headerData.strictUserName = user.username.substring(0,user.username.lastIndexOf("@") );
+        headerData.strictUserName = util.resolveUserName(user);
 
         var metadata = {
             appName: asset.attributes.overview_name,

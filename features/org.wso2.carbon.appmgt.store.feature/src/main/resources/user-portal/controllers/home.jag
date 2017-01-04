@@ -5,7 +5,7 @@ var customType;
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
-
+var util = require('/modules/util.js');
 require('/modules/store.js').exec(function (ctx) {
     var paging, manager, assets, length,
             log = ctx.log,
@@ -266,7 +266,7 @@ require('/modules/store.js').exec(function (ctx) {
             storeTenantDomain: storeTenantDomain,
             enabledTypeList: enabledTypeList,
             isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant,
-            strictUserName : (user != null && user.username != null) ? user.username.substring(0,user.username.lastIndexOf("@") ) : null
+            strictUserName : util.resolveUserName(user)
         },
         tags: {
             data: tagInfo

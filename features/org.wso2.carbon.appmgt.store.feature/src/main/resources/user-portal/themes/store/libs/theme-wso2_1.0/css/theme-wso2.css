@@ -3119,3 +3119,7 @@ a.list-group-item:hover {
     display: block !important;
   }
 }
+
+.add-20-left-margin {
+  margin-left: 20px;
+}

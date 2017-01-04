@@ -27,7 +27,7 @@ var storeHostObj = manager.getAPIStoreObj();
 var  caramel = require('caramel');
 var context = caramel.configs().context;
 var log = new Log('favouriteapps');
-
+var util = require('/modules/util.js');
 
 require('/modules/store.js').exec(function (ctx) {
     var sso = ctx.sso,
@@ -136,7 +136,7 @@ require('/modules/store.js').exec(function (ctx) {
                 storeTenantDomain: storeTenantDomain,
                 assetType: assetType,
                 enabledTypeList: enabledTypeList,
-                strictUserName : user.username.substring(0,user.username.lastIndexOf("@") )
+                strictUserName : util.resolveUserName(user)
             },
             assetType: assetType,
             tags: {
