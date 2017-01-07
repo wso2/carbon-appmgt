@@ -2955,7 +2955,7 @@ public final class AppManagerUtil {
 					if (inputStore.getName().equals(store.getName())) { // If
 						                                                // the
 						                                                // configured
-						                                                // apistore
+						                                                // appstore
 						                                                // already
 						                                                // stored
 						                                                // in

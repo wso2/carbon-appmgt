@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.7-SNAPSHOT</version>
+        <version>1.2.10-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.core.feature</artifactId>
-    <version>1.2.7-SNAPSHOT</version>
+    <version>1.2.10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Core Feature</name>
     <url>http://wso2.org</url>
@@ -74,7 +74,7 @@
             <artifactId>org.wso2.carbon.appmgt.sample.deployer</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
         </dependency>
         <dependency>
@@ -93,12 +93,12 @@
 
         <!-- Entitlement Dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.agent.entitlement.mediator</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
 
@@ -206,11 +206,13 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.stub:${carbon.sequences.stub.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon-identity-framework.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon-identity-framework.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:compatible:${bam.presentation.stub.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security.stub:compatible:${carbon.mediation.security.stub}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon-identity-framework.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${identity-agent-entitlement-proxy.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon-identity-framework.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.base:compatible:${carbon-identity-framework.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.agent.entitlement.mediator:org.wso2.carbon.identity.entitlement.proxy:compatible:${identity-agent-entitlement-proxy.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.metadata.saml2:org.wso2.carbon.identity.sp.metadata.saml2:compatible:0.1.6</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.webapp.mgt.stub:${carbon.webapp.mgt.stub}</bundleDef>
@@ -224,8 +226,8 @@
                             </importBundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.base.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:compatible:${carbon.identity.base.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:compatible:${carbon.identity.base.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:compatible:${identity-inbound-auth-oauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:compatible:${identity-user-ws.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

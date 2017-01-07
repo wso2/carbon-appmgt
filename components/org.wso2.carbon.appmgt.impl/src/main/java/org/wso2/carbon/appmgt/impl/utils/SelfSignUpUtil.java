@@ -145,12 +145,14 @@ public final class SelfSignUpUtil {
                                         .item(0).getTextContent();
                         boolean tmpIsExternal = Boolean.parseBoolean(tmpEl.getElementsByTagName(
                                 AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL).item(0).getTextContent());
-                        String permissions = tmpEl.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_PERMISSIONS)
-                                .item(0).getTextContent();
-                        String[] permissionList = null;
-                        if (permissions != null) {
-                            permissionList = permissions.split(",");
+                        String permissions = null;
+                        NodeList permissionsNodeList = tmpEl.getElementsByTagName("Permissions");
+                        if (permissionsNodeList.item(0) != null) {
+                            permissions = permissionsNodeList.item(0).getTextContent();
                         }
+                        String[] permissionList = null;
+                        permissionList = permissions != null ? permissions.split(",") :
+                                new String[]{"/permission/admin/login", "/permission/admin/manage/webapp/subscribe"};
                         SignUpRole signUpRole = new SignUpRole();
                         signUpRole.setRoleName(tmpRole);
                         signUpRole.setExternalRole(tmpIsExternal);

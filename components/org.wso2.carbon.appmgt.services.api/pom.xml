@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.7-SNAPSHOT</version>
+        <version>1.2.10-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
   <groupId>org.wso2.carbon.appmgt</groupId>
   <artifactId>org.wso2.carbon.appmgt.services.api</artifactId>
-  <version>1.2.7-SNAPSHOT</version>
+  <version>1.2.10-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>WSO2 Carbon - App Manager Services API Component</name>
   <url>http://maven.apache.org</url>
@@ -36,17 +36,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
-            <artifactId>org.wso2.carbon.identity.provider</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             <artifactId>org.wso2.carbon.identity.oauth.common</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
             <scope>provided</scope>
         </dependency>

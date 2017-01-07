@@ -12,13 +12,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.7-SNAPSHOT</version>
+        <version>1.2.10-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
-    <version>1.2.7-SNAPSHOT</version>
+    <version>1.2.10-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - APP Management Implementation </name>
     <repositories>
@@ -59,11 +59,11 @@
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
         </dependency>
       <dependency>
@@ -85,11 +85,11 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
              <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.user.ws</groupId>
             <artifactId>org.wso2.carbon.um.ws.api</artifactId>
         </dependency>
         <dependency>
@@ -105,7 +105,7 @@
             <artifactId>org.wso2.carbon.event.core</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.wso2.carbon.identity</groupId>
+           <groupId>org.wso2.carbon.identity.framework</groupId>
            <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
         </dependency>
         <dependency>
@@ -125,19 +125,19 @@
           <artifactId>jaggery-scxml-executors</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
+          <groupId>org.wso2.carbon.identity.inbound.auth.saml2</groupId>
           <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
+          <groupId>org.wso2.carbon.identity.framework</groupId>
           <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
+          <groupId>org.wso2.carbon.identity.framework</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
+          <groupId>org.wso2.carbon.identity.agent.entitlement.mediator</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
       <dependency>
@@ -147,6 +147,10 @@
       <dependency>
           <groupId>org.wso2.carbon.store</groupId>
           <artifactId>org.wso2.carbon.social.core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.wso2.carbon.identity.framework</groupId>
+          <artifactId>org.wso2.carbon.identity.base</artifactId>
       </dependency>
     </dependencies>
 
