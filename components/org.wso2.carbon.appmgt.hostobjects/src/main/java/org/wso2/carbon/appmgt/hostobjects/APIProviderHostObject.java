@@ -393,12 +393,13 @@ public class APIProviderHostObject extends ScriptableObject {
 
     /**
      * Retrieve business owner.
+     *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return native object with business owner
+     * @throws AppManagementException on error while trying to get business owner
      */
     public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args,
                                                            Function funObj) throws AppManagementException {
@@ -434,7 +435,8 @@ public class APIProviderHostObject extends ScriptableObject {
                     BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
                     businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
-                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(), businessOwnerPropertyObject);
+                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(),
+                                                      businessOwnerPropertyObject);
                 }
                 businessOwnerNativeObject.put("businessOwnerProperties", businessOwnerNativeObject,
                                               businessOwnerPropertiesObject.toJSONString());
@@ -448,17 +450,18 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Search business owners with pagination
-     * @param cx
-     * @param thisObj
-     * @param args
-     * @param funObj
-     * @return
-     * @throws AppManagementException
+     * Search business owners with pagination.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return native object with business owners
+     * @throws AppManagementException on error while trying to search business owner
      */
     public static NativeObject jsFunction_searchBusinessOwners(Context cx, Scriptable thisObj, Object[] args,
-                                                           Function funObj) throws AppManagementException {
-        if (args==null||args.length != 4) {
+                                                               Function funObj) throws AppManagementException {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters received when searching business owners.");
         }
         APIProvider apiProvider = getAPIProvider(thisObj);
@@ -498,26 +501,25 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Saves business owner.
+     * Save business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     * @return saved business owner id
+     * @throws AppManagementException on error while trying to save business owner
      */
     public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
                                                    Object[] args,
-                                                   Function funObj) throws
-                                                                    AppManagementException, ParseException {
+                                                   Function funObj) throws AppManagementException {
         BusinessOwner businessOwner = new BusinessOwner();
         List<BusinessOwnerProperty> businessOwnerProperties = null;
 
         if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null ) {
+        if (args[0] == null || args[1] == null) {
             handleException("Error while saving business owner. Owner content is null");
         }
 
@@ -535,9 +537,14 @@ public class APIProviderHostObject extends ScriptableObject {
         businessOwner.setBusinessOwnerSite(businessOwnerSite);
 
         JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
+        JSONObject businessOwnerPropertyObject = null;
+        try {
+            businessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
+        } catch (ParseException e) {
+            handleException("Error occurred while parsing JSON", e);
+        }
 
-        Set<Map.Entry> entries = busiessOwnerPropertyObject.entrySet();
+        Set<Map.Entry> entries = businessOwnerPropertyObject.entrySet();
         if (entries.size() > 0) {
             businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
             for (Map.Entry entry : entries) {
