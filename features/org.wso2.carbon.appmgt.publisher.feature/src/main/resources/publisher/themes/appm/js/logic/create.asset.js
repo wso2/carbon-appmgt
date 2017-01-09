@@ -438,16 +438,15 @@ $(function() {
           }
     	});
 
-
-	var data =  $("#owner_list").val();
+	var data = $("#owner_list").val();
 	data = jQuery.parseJSON(data);
 
-	$(document).ready(function() {
+	$(document).ready(function () {
 		$("#businessOwnerName").select2({
-		    placeholder: 'Select an option',
-			data:data,
-			allowClear: true
-		});
+											placeholder: 'Select an option',
+											data: data,
+											allowClear: true
+										});
 	});
 
 

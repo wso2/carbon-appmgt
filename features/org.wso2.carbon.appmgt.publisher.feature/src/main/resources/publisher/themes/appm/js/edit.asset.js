@@ -37,11 +37,11 @@ $(function() {
         }
     });
 
-	var data =  $("#owner_list").val();
+	var data = $("#owner_list").val();
 	data = jQuery.parseJSON(data);
 
-	$(document).ready(function() {
-		$(".selectOwnerName").select2({data: data,allowClear: true,placeholder: "Select a business Owner"});
+	$(document).ready(function () {
+		$(".selectOwnerName").select2({data: data, allowClear: true, placeholder: "Select a business Owner"});
 	});
 
 

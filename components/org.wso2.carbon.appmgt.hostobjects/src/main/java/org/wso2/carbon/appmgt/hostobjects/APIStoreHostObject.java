@@ -249,7 +249,7 @@ public class APIStoreHostObject extends ScriptableObject {
         row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
         row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
         List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
-        if(businessOwnerPropertiesList != null) {
+        if (businessOwnerPropertiesList != null) {
             JSONObject businessOwnerPropertiesObject = new JSONObject();
             for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                 JSONObject businessOwnerPropertyObject = new JSONObject();
