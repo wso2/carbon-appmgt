@@ -51,30 +51,30 @@ import java.util.Set;
  */
 public interface APIProvider extends APIManager {
 
-
     /**
-     * This method is to delete a given business owner
+     * Delete a given business owner.
      *
-     * @param businessOwnerId ID of the owner.
+     * @param businessOwnerId ID of the business owner
      * @return whether business owner was deleted or not
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to delete business owner
      */
     public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Update a Business Owner.
+     * Update a business Owner.
      *
-     * @param businessOwner business owner.
+     * @param businessOwner {@link BusinessOwner} object
      * @return whether business owner was updated or not
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to update business owner
      */
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
 
-    /** Get all business owners.
+    /**
+     * Get all business owners.
      *
-     * @return list of business owners
-     * @throws AppManagementException
+     * @return list of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to get business owners
      */
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
 
@@ -82,46 +82,47 @@ public interface APIProvider extends APIManager {
      * Return the owner properties of the given owner Id.
      *
      * @param businessOwnerId Business owner Id.
-     * @return business owner
-     * @throws AppManagementException if failed to get business owner.
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
      * Search the business owners with page limitation.
      *
-     * @param startIndex
-     * @param pageSize
-     * @param searchValue
-     * @return list of business owners
-     * @throws AppManagementException
+     * @param startIndex  Start index
+     * @param pageSize    Page size
+     * @param searchValue Search value
+     * @return list of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to search business owners
      */
     public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                              AppManagementException;
+                                                                                                      AppManagementException;
 
     /**
      * Get the count of business owners.
      *
-     * @return the count of business owners
-     * @throws AppManagementException
+     * @return number of business owners.
+     * @throws AppManagementException on error while trying to get business owners count
      */
-    public  int getBusinessOwnersCount() throws AppManagementException;
+    public int getBusinessOwnersCount() throws AppManagementException;
 
     /**
      * Save a Business Owner.
      *
-     * @param businessOwner
+     * @param businessOwner {@link BusinessOwner} object
      * @return saved business owner id
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to save business owner
      */
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
     /**
-     * Get Business owner Id by owner name and email.
-     * @param businessOwnerName
-     * @param businessOwnerEmail
-     * @return business owner Id
-     * @throws AppManagementException
+     * Get Business owner Id by business owner name and email.
+     *
+     * @param businessOwnerName  Business owner name
+     * @param businessOwnerEmail Business owner email
+     * @return business owner id
+     * @throws AppManagementException on error while trying to get business owner id
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException;
 

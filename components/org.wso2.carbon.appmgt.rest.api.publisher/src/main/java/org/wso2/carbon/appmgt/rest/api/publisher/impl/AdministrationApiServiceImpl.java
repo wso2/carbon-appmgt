@@ -107,8 +107,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             businessOwnerEmail = businessOwnerEmail.trim();
             int businessOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
             if (businessOwnerId != -1) {
-                String message =  "A duplicate business owner already exists with the owner name :  " + businessOwnerName +
-                        " and owner email " + businessOwnerEmail;
+                String message =
+                        "A duplicate business owner already exists with the owner name :  " + businessOwnerName +
+                                " and owner email " + businessOwnerEmail;
                 RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
@@ -163,7 +164,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             businessOwnerDTO.setSite(businessOwner.getBusinessOwnerSite());
             businessOwnerDTO.setId(businessOwner.getBusinessOwnerId());
             List<BusinessOwnerProperty> businessOwnerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
-            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList =null;
+            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = null;
             if (businessOwnerPropertyList != null) {
                 businessOwnerPropertiesDTOList = new ArrayList<>();
                 for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
@@ -205,8 +206,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             businessOwnerEmail = businessOwnerEmail.trim();
             int existingOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
             if (!((existingOwnerId == businessOwnerId) || (existingOwnerId == -1))) {
-                String message =  "A duplicate business owner already exists with the owner name :  " + businessOwnerName +
-                        " and owner email " + businessOwnerEmail;
+                String message =
+                        "A duplicate business owner already exists with the owner name :  " + businessOwnerName +
+                                " and owner email " + businessOwnerEmail;
                 RestApiUtil.handleConflictException(message, log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
@@ -235,7 +237,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             businessOwner.setBusinessOwnerPropertiesList(businessOwnerPropertyList);
             boolean response = apiProvider.updateBusinessOwner(businessOwner);
             if (!response) {
-               RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log );
+                RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log);
             }
         } catch (AppManagementException e) {
             String errorMessage = "Error occurred while updating Business owner for business owner Id " +
@@ -256,13 +258,13 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 //Delete the business owner.
                 boolean isDeleted = apiProvider.deleteBusinessOwner(businessOwnerId);
                 if (!isDeleted) {
-                    RestApiUtil.handlePreconditionFailedRequest("Business Owner is assigned to one or more apps. Please remove "
-                                                                        + "it from them before deleting." , log);
+                    RestApiUtil.handlePreconditionFailedRequest(
+                            "Business Owner is assigned to one or more apps. Please remove it from them before " +
+                                    "deleting.", log);
                 }
             } else {
-                RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log );
+                RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log);
             }
-
         } catch (AppManagementException e) {
             String errorMessage = "Error occurred while deleting business owner for business owner id " +
                     businessOwnerId;

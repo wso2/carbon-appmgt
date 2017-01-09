@@ -107,10 +107,10 @@ public class AppMDAO {
     /**
      * Get business owner.
      *
-     * @param businessOwnerId
-     * @param tenantId
-     * @return business owner
-     * @throws AppManagementException
+     * @param businessOwnerId Business owner id
+     * @param tenantId        Tenant id
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId, int tenantId) throws AppManagementException {
         Connection connection = null;
@@ -146,30 +146,27 @@ public class AppMDAO {
     }
 
     /**
-     *  Delete a given business owner.
+     * Delete a given business owner.
      *
-     * @param businessOwnerId
-     * @throws AppManagementException
+     * @param businessOwnerId Id of the business owner
+     * @throws AppManagementException on error while trying to delete business owner
      */
     public void deleteBusinessOwner(int businessOwnerId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement statementToDeleteRecord = null;
         PreparedStatement statementToDeleteRecordTwo = null;
-        String deletedOwnerId = "";
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Deleting a Business Owner :" + businessOwnerId);
             }
             connection = APIMgtDBUtil.getConnection();
-
+            connection.setAutoCommit(false);
             String queryToDeleteRecordTwo = "DELETE FROM APM_BUSINESS_OWNER_PROPERTY WHERE OWNER_ID = ?";
-
             statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo);
             statementToDeleteRecordTwo.setInt(1, businessOwnerId);
             statementToDeleteRecordTwo.executeUpdate();
 
             String queryToDeleteRecord = "DELETE FROM APM_BUSINESS_OWNER WHERE OWNER_ID = ?";
-
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
             statementToDeleteRecord.setInt(1, businessOwnerId);
             statementToDeleteRecord.executeUpdate();
@@ -179,23 +176,23 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                   handleException("Failed to delete business owner " + businessOwnerId, e1);
+                    handleException("Failed to delete business owner " + businessOwnerId, e1);
                 }
             }
-            handleException("Cannot delete business owner",  e );
+            handleException("Cannot delete business owner", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
         }
     }
 
     /**
-     * Check the business owner usage of web app from the registry.
+     * Check whether the business owner is associated with any web app in the registry.
      *
-     * @param businessOwnerId
-     * @param registry
-     * @param tenantDomain
-     * @return whether business owner is associated with an app or not
-     * @throws AppManagementException
+     * @param businessOwnerId Business owner id
+     * @param registry        Registry object
+     * @param tenantDomain    Tenant domain
+     * @return whether the business owner is associated with an app or not
+     * @throws AppManagementException on error while trying to check whether business owner is associated with web apps
      */
     public boolean isBusinessOwnerAssociatedWithApps(int businessOwnerId, Registry registry, String tenantDomain)
             throws AppManagementException {
@@ -207,8 +204,7 @@ public class AppMDAO {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
-                                                                                AppMConstants.API_KEY);
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, AppMConstants.API_KEY);
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
                 String artifactContext = artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER);
@@ -227,23 +223,24 @@ public class AppMDAO {
         }
         return false;
     }
+
     /**
      * Update business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to update business owner
      */
     public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
         Connection connection = null;
         PreparedStatement statementToInsertRecord = null;
         PreparedStatement statementToInsertRecordTwo = null;
         PreparedStatement statementToDelete = null;
-
         try {
-
             if (log.isDebugEnabled()) {
                 log.debug("Updating a Business Owner" + businessOwner.getBusinessOwnerId());
             }
             connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
             String queryToInsertRecord = "UPDATE APM_BUSINESS_OWNER SET OWNER_NAME=?,OWNER_EMAIL=?,OWNER_DESC=?," +
                     "OWNER_SITE=? WHERE OWNER_ID=?";
 
@@ -266,10 +263,10 @@ public class AppMDAO {
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
             if (businessOwnerPropertiesList != null) {
-                for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
+                for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                     BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyKey();
-                    if(!StringUtils.isEmpty(propertyId)) {
+                    if (!StringUtils.isEmpty(propertyId)) {
                         statementToInsertRecordTwo.setInt(1, businessOwner.getBusinessOwnerId());
                         statementToInsertRecordTwo.setString(2, propertyId);
                         statementToInsertRecordTwo.setString(3, businessOwnerProperties.getPropertyValue());
@@ -296,48 +293,47 @@ public class AppMDAO {
     /**
      * Get custom properties of a given business owner.
      *
-     * @param businessOwnerId
-     * @param connection
-     * @return
-     * @throws AppManagementException
+     * @param businessOwnerId Business owner id
+     * @param connection      Database connection
+     * @return list of {@link BusinessOwnerProperty} objects
+     * @throws AppManagementException on error while trying to get business owner's custom properties
      */
     private List<BusinessOwnerProperty> getBusinessOwnerCustomPropertiesById(int businessOwnerId, Connection connection)
             throws AppManagementException, SQLException {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
-        ResultSet resultSetOfbusinessOwnerDetails = null;
+        ResultSet resultSetOfBusinessOwnerDetails = null;
         String queryToGetKeyValue = "SELECT NAME, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_PROPERTY WHERE" +
                 " OWNER_ID = ?";
         try {
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
             statementToGetBusinessOwnersDetails.setInt(1, businessOwnerId);
-            resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
-            while (resultSetOfbusinessOwnerDetails.next()) {
+            resultSetOfBusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
+            while (resultSetOfBusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyKey(resultSetOfbusinessOwnerDetails.getString("NAME"));
-                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getString("VALUE"));
-                businessOwnerProperty.setShowingInStore(resultSetOfbusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
+                businessOwnerProperty.setPropertyKey(resultSetOfBusinessOwnerDetails.getString("NAME"));
+                businessOwnerProperty.setPropertyValue(resultSetOfBusinessOwnerDetails.getString("VALUE"));
+                businessOwnerProperty.setShowingInStore(resultSetOfBusinessOwnerDetails.getBoolean("SHOW_IN_STORE"));
                 businessOwnerPropertiesList.add(businessOwnerProperty);
             }
         } catch (SQLException e) {
             /* In the code it is using a single SQL connection passed from the parent function so the error is logged
              here and throwing the SQLException so the connection will be disposed by the parent function. */
-            log.error("Error when getting the additional properties of Business Owner: " +
-                              businessOwnerId, e);
+            log.error("Error when getting the additional properties of Business Owner: " + businessOwnerId, e);
             throw e;
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, null,
-                                             resultSetOfbusinessOwnerDetails);
+                                             resultSetOfBusinessOwnerDetails);
         }
         return businessOwnerPropertiesList;
     }
 
     /**
-     * Get all business owners with their properties.
+     * Get all business owners with their custom properties.
      *
-     * @param tenantId
-     * @return list of businsess owners
-     * @throws AppManagementException
+     * @param tenantId Tenant id.
+     * @return list of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to get business owners
      */
     public List<BusinessOwner> getBusinessOwners(int tenantId) throws AppManagementException {
         Connection connection = null;
@@ -346,7 +342,6 @@ public class AppMDAO {
         ResultSet businessOwnerResultSet = null;
 
         String queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE TENANT_ID = ?";
-
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
@@ -377,10 +372,10 @@ public class AppMDAO {
     /**
      * Save a business owner.
      *
-     * @param businessOwner
-     * @param tenantId
+     * @param businessOwner {@link BusinessOwner} object
+     * @param tenantId      Tenant id
      * @return saved business owner id
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to save business owner
      */
     public int saveBusinessOwner(BusinessOwner businessOwner, int tenantId) throws AppManagementException {
         Connection connection = null;
@@ -394,6 +389,7 @@ public class AppMDAO {
                 log.debug("Adding a Business Owner" + businessOwnerName);
             }
             connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
             String queryToInsertRecord = "INSERT INTO APM_BUSINESS_OWNER(OWNER_NAME,OWNER_EMAIL,OWNER_DESC," +
                     "OWNER_SITE, TENANT_ID) VALUES (?,?,?,?,?)";
 
@@ -405,9 +401,9 @@ public class AppMDAO {
             statementToInserBusinessOwner.setInt(5, tenantId);
             int affectedRows = statementToInserBusinessOwner.executeUpdate();
 
-           if (affectedRows == 0) {
+            if (affectedRows == 0) {
                 throw new AppManagementException("Saving business owner user : " + businessOwnerName + " is failed, no "
-                                                 + "rows affected.");
+                                                         + "rows affected.");
             }
             ResultSet generatedKeys = statementToInserBusinessOwner.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -415,14 +411,11 @@ public class AppMDAO {
             }
 
             String queryToInsertRecordTwo =
-                    "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
-                            "(?,?,?,?)";
-
+                    "INSERT INTO APM_BUSINESS_OWNER_PROPERTY(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES(?,?,?,?)";
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
             if (businessOwnerPropertiesList != null) {
-                for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
-                    BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                for (BusinessOwnerProperty businessOwnerProperties : businessOwnerPropertiesList) {
                     String propertyId = businessOwnerProperties.getPropertyKey();
                     if (!StringUtils.isEmpty(propertyId)) {
                         statementToInsertBusinessOwnerDetails.setInt(1, businessOwnerId);
@@ -450,14 +443,14 @@ public class AppMDAO {
     }
 
     /**
-     * Search business owners.
+     * Search business owners with pagination.
      *
-     * @param startIndex
-     * @param pageSize
-     * @param searchValue
-     * @param tenantId
-     * @return list of business owners.
-     * @throws AppManagementException
+     * @param startIndex  Start index
+     * @param pageSize    Page size
+     * @param searchValue Search value
+     * @param tenantId    Tenant id
+     * @return list of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to search business owners
      */
     public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue, int tenantId)
             throws AppManagementException {
@@ -471,17 +464,15 @@ public class AppMDAO {
             String queryToGetBusinessOwner = null;
             if (connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                 queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
-                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM >= ? AND ROWNUM <= ?";
+                        "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? AND ROWNUM " +
+                        ">= ? AND ROWNUM <= ?";
             } else if (connection.getMetaData().getDriverName().contains("MS SQL") ||
                     connection.getMetaData().getDriverName().contains("Microsoft")) {
                 queryToGetBusinessOwner =
                         "SELECT * from " +
                                 "(SELECT ROW_NUMBER() OVER(ORDER BY OWNER_ID) AS RowNum, * from APM_BUSINESS_OWNER " +
-                                "WHERE " +
-                                "(OWNER_NAME LIKE ? OR OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) " +
-                                "AND TENANT_ID = ?) " +
-                                "as Businee_Owners " +
-                                "WHERE RowNum >= ? AND RowNum <= ?";
+                                "WHERE OWNER_NAME LIKE ? OR OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC " +
+                                "LIKE ?) AND TENANT_ID = ?) as Business_Owners WHERE RowNum >= ? AND RowNum <= ?";
 
             } else {
                 queryToGetBusinessOwner = "SELECT * FROM APM_BUSINESS_OWNER WHERE (OWNER_NAME LIKE ? OR " +
@@ -501,7 +492,6 @@ public class AppMDAO {
             while (businessOwnerResultSet.next()) {
                 BusinessOwner businessOwner = new BusinessOwner();
                 int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
-
                 businessOwner.setBusinessOwnerId(businessOwnerId);
                 businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
@@ -520,9 +510,9 @@ public class AppMDAO {
     /**
      * Get business owner count.
      *
-     * @param tenantId
+     * @param tenantId Tenant id
      * @return number of business owners.
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get business owner
      */
     public int getBusinessOwnersCount(int tenantId) throws AppManagementException {
         Connection connection = null;
@@ -552,21 +542,22 @@ public class AppMDAO {
     /**
      * Search business owners.
      *
-     * @param searchPrefix
-     * @param tenantId
-     * @return list of business owner id
-     * @throws AppManagementException
+     * @param searchPrefix Search prefix
+     * @param tenantId     Tenant id
+     * @return list of business owner ids
+     * @throws AppManagementException on error while trying to get business owner ids by a search prefix
      */
-    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws AppManagementException {
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId)
+            throws AppManagementException {
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
-        List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
         ResultSet businessOwnerResultSet = null;
 
         List<String> businessOwnerIdsList = new ArrayList<>();
         try {
             connection = APIMgtDBUtil.getConnection();
-            String queryToGetBusinessOwner = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME LIKE ? AND TENANT_ID = ? ";
+            String queryToGetBusinessOwner =
+                    "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME LIKE ? AND TENANT_ID = ? ";
 
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
             searchPrefix = "%" + searchPrefix + "%";
@@ -575,7 +566,6 @@ public class AppMDAO {
             businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
 
             while (businessOwnerResultSet.next()) {
-                BusinessOwner businessOwner = new BusinessOwner();
                 int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
                 businessOwnerIdsList.add(String.valueOf(businessOwnerId));
             }
@@ -590,14 +580,14 @@ public class AppMDAO {
     /**
      * Get business owner Id by owner name, email and tenant Id.
      *
-     * @param businessOwnerName
-     * @param businessOwnerEmail
-     * @param tenantId
+     * @param businessOwnerName  Business owner name
+     * @param businessOwnerEmail Business owner email
+     * @param tenantId           Tenant id
      * @return business owner id
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get business owner id
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId) throws
-                                                                                                AppManagementException {
+                                                                                                     AppManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet businessOwnerResultSet = null;
@@ -605,7 +595,7 @@ public class AppMDAO {
         String query = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME = ? AND OWNER_EMAIL = ? AND " +
                 "TENANT_ID = ?";
 
-        int businessOwnerId = -1; // if any business owner doesn't exit for the input parameters, return owner id as -1
+        int businessOwnerId = -1; // If a business owner doesn't exist for the input parameters, return owner id as -1
         try {
             connection = APIMgtDBUtil.getConnection();
             preparedStatement = connection.prepareStatement(query);
@@ -618,10 +608,9 @@ public class AppMDAO {
                 businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owners.", e);
+            handleException("Failed to retrieve business owner id.", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, businessOwnerResultSet);
-
         }
         return businessOwnerId;
     }
@@ -2825,12 +2814,11 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             if ("__all_providers__".equals(providerName)) {
                 if (isSubscriptionOn) {
-                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, "
-                            + "API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID "
-                            + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
-                            + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
-                            + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
-                            + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? ";
+                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, API.UUID AS UUID, " +
+                            "COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID FROM APM_SUBSCRIPTION SUB, APM_APP API, " +
+                            "APM_SUBSCRIBER SUBR, APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND " +
+                            "SUB.APPLICATION_ID=APP.APPLICATION_ID AND APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND " +
+                            "SUBR.TENANT_ID = ? ";
                     if (fromDate != null && toDate != null) {
                         sqlQuery += " AND SUB.SUBSCRIPTION_TIME BETWEEN ";
                     }
@@ -2848,8 +2836,8 @@ public class AppMDAO {
                     if (!connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                         sqlQuery += "? AND ? ";
                     } else {
-                        sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
-                                + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                        sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
+                                "HH24:MI:SS') ";
                     }
                 }
                 sqlQuery += "GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID";
@@ -2861,24 +2849,20 @@ public class AppMDAO {
                 }
             } else {
                 if (isSubscriptionOn) {
-                    sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
-                            + "AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM "
-                            + "APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? "
-                            + "AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                    sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID AS UUID, COUNT(SUB" +
+                            ".SUBSCRIPTION_ID) AS SUB_ID, FROM APM_SUBSCRIPTION SUB, APM_APP API WHERE API" +
+                            ".APP_PROVIDER = ? AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
                 } else {
-                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, " +
-                            "API.UUID AS UUID, COUNT(DISTINCT HIT.USER_ID) AS SUB_ID " +
-                            "FROM APM_APP API " +
-                            "INNER JOIN APM_APP_HITS HIT ON API.UUID=HIT.UUID " +
-                            "WHERE API.APP_PROVIDER= ? " +
-                            "AND HIT.HIT_TIME BETWEEN ";
+                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, API.UUID AS UUID, COUNT" +
+                            "(DISTINCT HIT.USER_ID) AS SUB_ID FROM APM_APP API INNER JOIN APM_APP_HITS HIT ON API" +
+                            ".UUID=HIT.UUID WHERE API.APP_PROVIDER= ? AND HIT.HIT_TIME BETWEEN ";
                 }
 
                 if (!connection.getMetaData().getDriverName().contains(oracleDriverName)) {
                     sqlQuery += "? AND ? ";
                 } else {
-                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
-                            + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP(?, 'YYYY-MM-DD " +
+                            "HH24:MI:SS') ";
                 }
                 sqlQuery += "GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER,API.UUID ";
                 ps = connection.prepareStatement(sqlQuery);

@@ -278,7 +278,6 @@ $(document).on("click", ".owner-edit-button", function () {
 });
 
 
-
 $(document).on("click", ".owner-delete-button", function () {
     var ownerId = $(this).data("ownerId");
     var ownerName = $(this).closest('tr').find("td:first").text();
@@ -292,7 +291,8 @@ $(document).on("click", ".owner-delete-button", function () {
                    success: function (response) {
                        if (response.response) {
                            updateOwners();
-                           Showalert("Business Owner : " + ownerName + " was deleted successfully ", "alert-success", "statusSuccess");
+                           Showalert("Business Owner : " + ownerName + " was deleted successfully ", "alert-success",
+                                     "statusSuccess");
                            location.reload();
                        } else {
                            Showalert('Business Owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
@@ -300,11 +300,11 @@ $(document).on("click", ".owner-delete-button", function () {
                        }
                    },
                    error: function (response) {
-                       Showalert('Error occured while deleting the business owner : ' + ownerName, "alert-error", "statusError");
+                       Showalert('Error occurred while deleting the business owner : ' + ownerName, "alert-error",
+                                 "statusError");
                    }
                });
     }
-
 });
 
 $(document).on('click', '#btn-owner-cancel', function(){

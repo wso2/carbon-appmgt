@@ -224,8 +224,8 @@ $(function() {
     	var claim  = $("#claims").val();
 	addToClaimsTable(claim,true);
     });
-    
-    function addToClaimsTable(claim,clickable){
+
+	function addToClaimsTable(claim, clickable) {
         var isAlreadyExist = addedClaimList.indexOf(claim);
         if(isAlreadyExist == -1) {
             addedClaimList.push(claim);

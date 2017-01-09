@@ -490,9 +490,9 @@ $(function() {
 		addToClaimsTable(claim,true);
 	});
 
-	function addToClaimsTable(claim,clickable){
+	function addToClaimsTable(claim,clickable) {
         var isAlreadyExist = $.inArray(claim, addedClaimList);
-        if(isAlreadyExist == -1) {
+        if (isAlreadyExist == -1) {
             addedClaimList.push(claim);
             var propertyCount = $('#claimPropertyCounter');
 
@@ -518,7 +518,7 @@ $(function() {
                     claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
                     '</td>' +
                     '<td>' +
-                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
+                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4" onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
                     '</td>' +
                     '</tr>'));
             }
