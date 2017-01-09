@@ -80,8 +80,8 @@ var render = function(theme, data, meta, require) {
 
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
-            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {
-
+            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute
+                                                                                         != "null") {
                 var businessOwner = apiProvider.getBusinessOwner(businessOwnerAttribute);
                 data.businessOwnerViewData = businessOwnerHelper.transform(businessOwner);
                 data.businessOwner = businessOwner;

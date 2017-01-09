@@ -226,9 +226,9 @@ require('/modules/store.js').exec(function (ctx) {
                 tenantId = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
             }
 
-           if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner
+                                                                                       != "null") {
                 businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
-
                 if (businessOwner != null && businessOwner.businessOwnerName != null) {
                     businessOwnerCustomData = businessOwnerHelper.transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;

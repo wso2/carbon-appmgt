@@ -15,35 +15,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-function transform(businessOwner){
-var log = new Log();
+function transform(businessOwner) {
+    var log = new Log();
     var owner = new Array();
-    
+
     owner.push({
-                      name : "Name",
-                      value : businessOwner.businessOwnerName
-                  });
+                   name: "Name",
+                   value: businessOwner.businessOwnerName
+               });
     owner.push({
-                      name : "Email",
-                      value : businessOwner.businessOwnerEmail
-                  });
+                   name: "Email",
+                   value: businessOwner.businessOwnerEmail
+               });
     owner.push({
-                      name : "Website",
-                      value : businessOwner.businessOwnerSite
-                  });
+                   name: "Website",
+                   value: businessOwner.businessOwnerSite
+               });
     owner.push({
-                      name : "Description",
-                      value : businessOwner.businessOwnerDescription
-                  });
+                   name: "Description",
+                   value: businessOwner.businessOwnerDescription
+               });
     var details = businessOwner.businessOwnerProperties;
     details = JSON.parse(details);
-    for(var key in details){
+    for (var key in details) {
         var ownerProperties = details[key];
         var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
-        if(ownerProperty["isShowingInStore"]) {
+        if (ownerProperty["isShowingInStore"]) {
             owner.push({
-                           name : key,
-                           value : ownerProperty["propertyValue"]
+                           name: key,
+                           value: ownerProperty["propertyValue"]
                        });
         }
     }
