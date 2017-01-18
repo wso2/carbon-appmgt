@@ -4,7 +4,7 @@
   <groupId>org.wso2.carbon.appmgt</groupId>
   <artifactId>carbon-appmgt</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.12-SNAPSHOT</version>
+  <version>1.2.12</version>
   <name>WSO2 Carbon - App Management Aggregator Pom</name>
   <url>http://wso2.org</url>
 
@@ -18,7 +18,7 @@
     <url>https://github.com/wso2/carbon-appmgt.git</url>
     <developerConnection>scm:git:https://github.com/wso2/carbon-appmgt.git</developerConnection>
     <connection>scm:git:https://github.com/wso2/carbon-appmgt.git</connection>
-    <tag>HEAD</tag>
+    <tag>v1.2.12</tag>
   </scm>
 
   <modules>
@@ -750,7 +750,7 @@
     <project.scm.id>github-scm</project.scm.id>
 
     <!-- AppM Component Version -->
-    <carbon.appmgt.version>1.2.12-SNAPSHOT</carbon.appmgt.version>
+    <carbon.appmgt.version>1.2.12</carbon.appmgt.version>
     <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
 
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
