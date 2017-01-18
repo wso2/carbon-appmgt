@@ -13,7 +13,8 @@
                                     {{/ifCond}}
                                     {{#if attributes.images_thumbnail}}
                                         <div class="ratio-responsive-img">
-                                            <img src="{{attributes.images_thumbnail}}" />
+                                            <img src="{{url "/api/mobileapp/getfile/"}}{{attributes
+                                            .images_thumbnail}}" />
                                         </div>
                                     {{/if}}
                                     {{> overlays/view}}
@@ -88,7 +89,8 @@
                                     {{> ribbons/inactive}}
                                     {{#if attributes.images_thumbnail}}
                                         <div class="ratio-responsive-img">
-                                            <img src="{{attributes.images_thumbnail}}" />
+                                            <img src="{{url "/api/mobileapp/getfile/"}}{{attributes
+                                            .images_thumbnail}}" />
                                         </div>
                                     {{/if}}
                                     {{> overlays/inactive}}
