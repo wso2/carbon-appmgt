@@ -3,11 +3,11 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.14-SNAPSHOT</version>
+        <version>1.2.14</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.2.14-SNAPSHOT</version>
+    <version>1.2.14</version>
     <artifactId>org.wso2.carbon.appmgt.mdm.restconnector</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - App Manager WSO2 MDM Rest Connector Component</name>
