@@ -222,18 +222,17 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Retrieve the business Owner
-     * @param cx      Rhino context
+     * Retrieve the business owner
+     *
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return List of business owners
+     * @throws AppManagementException on error while trying to get business owner
      */
-    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws
-            AppManagementException {
-
+    public static NativeObject jsFunction_getBusinessOwner(Context context, Scriptable thisObj, Object[] args,
+                                                           Function funObj) throws AppManagementException {
         if (args == null || args.length != 2) {
             throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
         }
@@ -242,12 +241,12 @@ public class APIStoreHostObject extends ScriptableObject {
         int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
         BusinessOwner businessOwner = apiConsumer.getBusinessOwnerForAppStore(businessOwnerId, tenantId);
-        NativeObject row = new NativeObject();
-        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+        NativeObject nativeObject = new NativeObject();
+        nativeObject.put("businessOwnerId", nativeObject, businessOwner.getBusinessOwnerId());
+        nativeObject.put("businessOwnerName", nativeObject, businessOwner.getBusinessOwnerName());
+        nativeObject.put("businessOwnerEmail", nativeObject, businessOwner.getBusinessOwnerEmail());
+        nativeObject.put("businessOwnerDescription", nativeObject, businessOwner.getBusinessOwnerDescription());
+        nativeObject.put("businessOwnerSite", nativeObject, businessOwner.getBusinessOwnerSite());
         List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
         if (businessOwnerPropertiesList != null) {
             JSONObject businessOwnerPropertiesObject = new JSONObject();
@@ -258,11 +257,11 @@ public class APIStoreHostObject extends ScriptableObject {
                 businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
                 businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(), businessOwnerPropertyObject);
             }
-            row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
+            nativeObject.put("businessOwnerProperties", nativeObject, businessOwnerPropertiesObject.toJSONString());
         } else {
-            row.put("businessOwnerProperties", row, null);
+            nativeObject.put("businessOwnerProperties", nativeObject, null);
         }
-        return row;
+        return nativeObject;
     }
 
     /**
@@ -2507,17 +2506,17 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Returns business owner Ids by a prefix of business owner name.
+     * Search business owner.
      *
-     * @param cx      context
-     * @param thisObj
-     * @param args
-     * @param funObj
-     * @return business owner Ids List.
-     * @throws AppManagementException
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Arguments
+     * @param funObj  Function object
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
      */
     public static List<String> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
-            Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+            Context context, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
         if (args == null || args.length != 2) {
             handleException("Invalid number of parameters.");
         }

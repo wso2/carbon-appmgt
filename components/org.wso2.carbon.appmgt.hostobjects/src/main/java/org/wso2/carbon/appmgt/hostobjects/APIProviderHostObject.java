@@ -281,20 +281,19 @@ public class APIProviderHostObject extends ScriptableObject {
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     * @return Whether business owner was deleted or not
+     * @throws AppManagementException on error while trying to delete business owner
      */
     public static boolean jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
+                                                         Object[] args, Function funObj)
+            throws AppManagementException {
         if (args == null || args.length != 1) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null) {
-            handleException("Error while deleting business owner. Owner content is null");
+            handleException("Error occurred while deleting business owner. Business owner content is null");
         }
         int ownerId = Integer.valueOf(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
@@ -302,25 +301,22 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Update the given business owner.
+     * Update business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api
-     * .AppManagementException
+     * @throws AppManagementException on error while trying to update business owner
      */
     public static void jsFunction_updateBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
+                                                      Object[] args, Function funObj)
+            throws AppManagementException {
         if (args == null || args.length != 6) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null ) {
-            handleException("Error while saving business owner. Owner content is null");
+        if (args[0] == null || args[1] == null) {
+            handleException("Error occurred while updating business owner. Business owner content is null");
         }
         BusinessOwner businessOwner = new BusinessOwner();
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
@@ -332,13 +328,13 @@ public class APIProviderHostObject extends ScriptableObject {
         businessOwner.setBusinessOwnerSite(args[4].toString());
 
         JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerDetailObject = null;
+        JSONObject businessOwnerDetailObject = null;
         try {
-            busiessOwnerDetailObject = (JSONObject) parser.parse(args[5].toString());
+            businessOwnerDetailObject = (JSONObject) parser.parse(args[5].toString());
         } catch (ParseException e) {
             handleException("Error while parsing JSON", e);
         }
-        Set<Map.Entry> entries = busiessOwnerDetailObject.entrySet();
+        Set<Map.Entry> entries = businessOwnerDetailObject.entrySet();
         for (Map.Entry entry : entries) {
             String key = (String) entry.getKey();
             JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
@@ -356,58 +352,54 @@ public class APIProviderHostObject extends ScriptableObject {
         apiProvider.updateBusinessOwner(businessOwner);
     }
 
-
     /**
-     * Retrieve business owners
-     * @param cx      Rhino context
+     * Retrieve business owners.
+     *
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return List of business owners
+     * @throws AppManagementException on error while trying to get business owners
      */
-
-
-    public static NativeArray jsFunction_getBusinessOwners(Context cx, Scriptable thisObj,
-                                                              Object[] args,
-                                                              Function funObj) throws
-                                                                               AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
+    public static NativeArray jsFunction_getBusinessOwners(Context context, Scriptable thisObj,
+                                                           Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray nativeArray = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(thisObj);
         List<BusinessOwner> BusinessOwnerList = apiProvider.getBusinessOwners();
         int count = 0;
         for (BusinessOwner businessOwner : BusinessOwnerList) {
-            NativeObject row = new NativeObject();
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+            NativeObject nativeObject = new NativeObject();
+            nativeObject.put("businessOwnerId", nativeObject, businessOwner.getBusinessOwnerId());
+            nativeObject.put("businessOwnerName", nativeObject, businessOwner.getBusinessOwnerName());
+            nativeObject.put("businessOwnerEmail", nativeObject, businessOwner.getBusinessOwnerEmail());
+            nativeObject.put("businessOwnerDescription", nativeObject, businessOwner.getBusinessOwnerDescription());
+            nativeObject.put("businessOwnerSite", nativeObject, businessOwner.getBusinessOwnerSite());
             count++;
-            myn.put(count, myn, row);
+            nativeArray.put(count, nativeArray, nativeObject);
         }
 
-        return myn;
+        return nativeArray;
     }
 
     /**
      * Retrieve business owner.
      *
-     * @param cx      Rhino context
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return native object with business owner
+     * @return Native object with business owner
      * @throws AppManagementException on error while trying to get business owner
      */
-    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args,
+    public static NativeObject jsFunction_getBusinessOwner(Context context, Scriptable thisObj, Object[] args,
                                                            Function funObj) throws AppManagementException {
         if (args == null || args.length != 1) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[0] == "null") {
-            handleException("Error while reading business owner. Owner id is null");
+            handleException("Error occurred while retrieving business owner. Business owner id is null");
         }
         NativeObject businessOwnerNativeObject = new NativeObject();
         int ownerId;
@@ -452,17 +444,17 @@ public class APIProviderHostObject extends ScriptableObject {
     /**
      * Search business owners with pagination.
      *
-     * @param cx      Rhino context
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return native object with business owners
+     * @return Native object with business owners
      * @throws AppManagementException on error while trying to search business owner
      */
-    public static NativeObject jsFunction_searchBusinessOwners(Context cx, Scriptable thisObj, Object[] args,
+    public static NativeObject jsFunction_searchBusinessOwners(Context context, Scriptable thisObj, Object[] args,
                                                                Function funObj) throws AppManagementException {
         if (args == null || args.length != 4) {
-            handleException("Invalid number of input parameters received when searching business owners.");
+            handleException("Invalid number of input parameters.");
         }
         APIProvider apiProvider = getAPIProvider(thisObj);
         int startIndex = Integer.parseInt(args[0].toString());
@@ -505,13 +497,12 @@ public class APIProviderHostObject extends ScriptableObject {
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return saved business owner id
+     * @return Saved business owner id
      * @throws AppManagementException on error while trying to save business owner
      */
-    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
-                                                   Object[] args,
+    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj, Object[] args,
                                                    Function funObj) throws AppManagementException {
         BusinessOwner businessOwner = new BusinessOwner();
         List<BusinessOwnerProperty> businessOwnerProperties = null;
@@ -520,7 +511,7 @@ public class APIProviderHostObject extends ScriptableObject {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[1] == null) {
-            handleException("Error while saving business owner. Owner content is null");
+            handleException("Error occurred while saving business owner. Business owner content is null");
         }
 
         businessOwner.setBusinessOwnerName(args[0].toString());
@@ -560,7 +551,6 @@ public class APIProviderHostObject extends ScriptableObject {
                 businessOwnerProperties.add(businessOwnerPropertiesValues);
             }
         }
-
         businessOwner.setBusinessOwnerPropertiesList(businessOwnerProperties);
         APIProvider apiProvider = getAPIProvider(thisObj);
         int businessOwnerId = apiProvider.saveBusinessOwner(businessOwner);
@@ -569,24 +559,23 @@ public class APIProviderHostObject extends ScriptableObject {
 
     /**
      * Get Business owner by owner name and email.
-     * @param ctx
-     * @param thisObj
-     * @param args
-     * @param funObj
-     * @return
-     * @throws AppManagementException
-     * @throws ScriptException
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Arguments
+     * @param funObj  Function object
+     * @return Business owner id
+     * @throws AppManagementException on error while trying to get business owner id
      */
-    public static int jsFunction_getBusinessOwnerId(Context ctx, Scriptable thisObj,Object[] args, Function funObj)
-            throws AppManagementException, ScriptException {
-
+    public static int jsFunction_getBusinessOwnerId(Context context, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
         if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         if (args[0] == null || args[1] == null) {
-            handleException("Error while checking for existence of business owner: NULL value in expected parameters ->"
-                                    + "[business owner name:" + args[0] + ",email:" + args[1] + "]");
+            handleException("Error occurred while checking for existence of business owner: NULL value in expected " +
+                                    "parameters -> [business owner name:" + args[0] + ",email:" + args[1] + "]");
 
         }
         String businessOwnerName = (String) args[0];

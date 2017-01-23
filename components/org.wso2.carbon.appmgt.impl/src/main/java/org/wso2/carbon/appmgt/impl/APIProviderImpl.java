@@ -129,10 +129,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Delete business owner.
+     * Delete a given business owner.
      *
-     * @param businessOwnerId ID of the business owner
-     * @return whether business owner was deleted or not
+     * @param businessOwnerId Id of the business owner
+     * @return Whether business owner was deleted or not
      * @throws AppManagementException on error while trying to delete business owner
      */
     @Override
@@ -149,10 +149,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Update a business owner.
+     * Update a given business owner.
      *
      * @param businessOwner {@link BusinessOwner} object
-     * @return whether business owner was updated or not
+     * @return Whether business owner was updated or not
      * @throws AppManagementException on error while trying to update business owner
      */
     @Override
@@ -167,9 +167,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 
     /**
-     * Get all business Owners.
+     * Get all business owners.
      *
-     * @return list of {@link BusinessOwner} objects
+     * @return List of {@link BusinessOwner} objects
      * @throws AppManagementException on error while trying to get business owners
      */
     @Override
@@ -178,7 +178,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get business owner by business owner Id.
+     * Retrieve business owner by given id.
      *
      * @param businessOwnerId Business owner Id.
      * @return {@link BusinessOwner} object
@@ -194,20 +194,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *
      * @param startIndex  Start index
      * @param pageSize    Page size
-     * @param searchValue Search value
-     * @return list of {@link BusinessOwner} objects
+     * @param searchKey Search key
+     * @return List of {@link BusinessOwner} objects
      * @throws AppManagementException on error while trying to search business owners
      */
     @Override
-    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                                      AppManagementException {
-        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue, tenantId);
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey)
+            throws AppManagementException {
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchKey, tenantId);
     }
 
     /**
      * Get the count of business owners.
      *
-     * @return number of business owners.
+     * @return Number of business owners.
      * @throws AppManagementException on error while trying to get business owners count
      */
     @Override
@@ -219,7 +219,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Save business owner.
      *
      * @param businessOwner {@link BusinessOwner} object
-     * @return saved business owner id
+     * @return Saved business owner id
      * @throws AppManagementException on error while trying to save business owner
      */
     @Override
@@ -228,11 +228,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get Business owner Id by business owner name and email.
+     * Get Business owner id by business owner name and email.
      *
      * @param businessOwnerName  Business owner name
      * @param businessOwnerEmail Business owner email
-     * @return business owner id
+     * @return Business owner id
      * @throws AppManagementException on error while trying to get business owner id
      */
     @Override

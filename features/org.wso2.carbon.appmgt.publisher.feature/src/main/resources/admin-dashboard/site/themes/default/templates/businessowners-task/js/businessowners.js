@@ -295,11 +295,11 @@ $(document).on("click", ".owner-delete-button", function () {
                    success: function (response) {
                        if (response.response) {
                            updateOwners();
-                           Showalert("Business Owner : " + ownerName + " was deleted successfully ", "alert-success",
+                           Showalert("Business owner : " + ownerName + " was deleted successfully ", "alert-success",
                                      "statusSuccess");
                            location.reload();
                        } else {
-                           Showalert('Business Owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
+                           Showalert('Business owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
                                      + ' it from them before deleting.', "alert-error", "statusError");
                        }
                    },

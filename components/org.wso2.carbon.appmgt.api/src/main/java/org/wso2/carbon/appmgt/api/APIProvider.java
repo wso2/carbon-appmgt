@@ -1,4 +1,5 @@
-/*
+
+                                                                                                      /*
 *  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
@@ -54,17 +55,17 @@ public interface APIProvider extends APIManager {
     /**
      * Delete a given business owner.
      *
-     * @param businessOwnerId ID of the business owner
-     * @return whether business owner was deleted or not
+     * @param businessOwnerId Id of the business owner
+     * @return Whether business owner was deleted or not
      * @throws AppManagementException on error while trying to delete business owner
      */
     public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Update a business Owner.
+     * Update business owner.
      *
      * @param businessOwner {@link BusinessOwner} object
-     * @return whether business owner was updated or not
+     * @return Whether business owner was updated or not
      * @throws AppManagementException on error while trying to update business owner
      */
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
@@ -73,55 +74,55 @@ public interface APIProvider extends APIManager {
     /**
      * Get all business owners.
      *
-     * @return list of {@link BusinessOwner} objects
+     * @return List of {@link BusinessOwner} objects
      * @throws AppManagementException on error while trying to get business owners
      */
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
 
     /**
-     * Return the owner properties of the given owner Id.
+     * Retrieve business owner by given id.
      *
-     * @param businessOwnerId Business owner Id.
+     * @param businessOwnerId Business owner id
      * @return {@link BusinessOwner} object
      * @throws AppManagementException on error while trying to get business owner
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Search the business owners with page limitation.
+     * Search business owners with pagination.
      *
      * @param startIndex  Start index
      * @param pageSize    Page size
-     * @param searchValue Search value
-     * @return list of {@link BusinessOwner} objects
+     * @param searchKey Search Key
+     * @return List of {@link BusinessOwner} objects
      * @throws AppManagementException on error while trying to search business owners
      */
-    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                                      AppManagementException;
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey)
+            throws AppManagementException;
 
     /**
      * Get the count of business owners.
      *
-     * @return number of business owners.
+     * @return Number of business owners.
      * @throws AppManagementException on error while trying to get business owners count
      */
     public int getBusinessOwnersCount() throws AppManagementException;
 
     /**
-     * Save a Business Owner.
+     * Save business owner.
      *
      * @param businessOwner {@link BusinessOwner} object
-     * @return saved business owner id
+     * @return Saved business owner id
      * @throws AppManagementException on error while trying to save business owner
      */
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
     /**
-     * Get Business owner Id by business owner name and email.
+     * Get business owner id by business owner name and email.
      *
      * @param businessOwnerName  Business owner name
      * @param businessOwnerEmail Business owner email
-     * @return business owner id
+     * @return Business owner id
      * @throws AppManagementException on error while trying to get business owner id
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException;

@@ -138,7 +138,9 @@ public class AppMDAO {
                                                                                                   connection));
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owners.", e);
+            String errorMessage = "Error occurred while retrieving business owner by id : " + businessOwnerId + " and" +
+                    " tenantId : " + tenantId;
+            handleException(errorMessage, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
         }
@@ -157,7 +159,7 @@ public class AppMDAO {
         PreparedStatement statementToDeleteRecordTwo = null;
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Deleting a Business Owner :" + businessOwnerId);
+                log.debug("Deleting business owner :" + businessOwnerId);
             }
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
@@ -176,10 +178,11 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    handleException("Failed to delete business owner " + businessOwnerId, e1);
+                    handleException("Failed to rollback transaction of deleting business owner by id :" +
+                                            businessOwnerId, e1);
                 }
             }
-            handleException("Cannot delete business owner", e);
+            handleException("Cannot occurred while deleting business owner by id : " + businessOwnerId, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
         }
@@ -215,7 +218,7 @@ public class AppMDAO {
                 }
             }
         } catch (RegistryException e) {
-            handleException("Failed to check business owner availability : " + businessOwnerId, e);
+            handleException("Error occurred while checking business owner availability : " + businessOwnerId, e);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -237,7 +240,7 @@ public class AppMDAO {
         PreparedStatement statementToDelete = null;
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Updating a Business Owner" + businessOwner.getBusinessOwnerId());
+                log.debug("Updating a business owner" + businessOwner.getBusinessOwnerId());
             }
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
@@ -281,10 +284,11 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    log.error("Failed to Update owner : ", e1);
+                    log.error("Failed to rollback transaction of updating business owner.", e1);
                 }
             }
-            handleException("Could not update business owner", e);
+            String errorMessage = "Error occurred while updating the business owner.";
+            handleException(errorMessage, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToInsertRecord, connection, null);
         }
@@ -362,7 +366,8 @@ public class AppMDAO {
                 businessOwnersList.add(businessOwner);
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owners.", e);
+            String errorMessage = "Error occurred while retrieving business owner by tenantId : " + tenantId;
+            handleException(errorMessage, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
         }
@@ -370,42 +375,42 @@ public class AppMDAO {
     }
 
     /**
-     * Save a business owner.
+     * Save business owner.
      *
      * @param businessOwner {@link BusinessOwner} object
      * @param tenantId      Tenant id
-     * @return saved business owner id
+     * @return Saved business owner id
      * @throws AppManagementException on error while trying to save business owner
      */
     public int saveBusinessOwner(BusinessOwner businessOwner, int tenantId) throws AppManagementException {
         Connection connection = null;
-        PreparedStatement statementToInserBusinessOwner = null;
+        PreparedStatement statementToInsertBusinessOwner = null;
         PreparedStatement statementToInsertBusinessOwnerDetails = null;
         String businessOwnerName = "";
         int businessOwnerId = 0;
         try {
             businessOwnerName = businessOwner.getBusinessOwnerName();
             if (log.isDebugEnabled()) {
-                log.debug("Adding a Business Owner" + businessOwnerName);
+                log.debug("Adding business owner : " + businessOwnerName);
             }
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             String queryToInsertRecord = "INSERT INTO APM_BUSINESS_OWNER(OWNER_NAME,OWNER_EMAIL,OWNER_DESC," +
                     "OWNER_SITE, TENANT_ID) VALUES (?,?,?,?,?)";
 
-            statementToInserBusinessOwner = connection.prepareStatement(queryToInsertRecord, new String[]{"OWNER_ID"});
-            statementToInserBusinessOwner.setString(1, businessOwnerName);
-            statementToInserBusinessOwner.setString(2, businessOwner.getBusinessOwnerEmail());
-            statementToInserBusinessOwner.setString(3, businessOwner.getBusinessOwnerDescription());
-            statementToInserBusinessOwner.setString(4, businessOwner.getBusinessOwnerSite());
-            statementToInserBusinessOwner.setInt(5, tenantId);
-            int affectedRows = statementToInserBusinessOwner.executeUpdate();
+            statementToInsertBusinessOwner = connection.prepareStatement(queryToInsertRecord, new String[]{"OWNER_ID"});
+            statementToInsertBusinessOwner.setString(1, businessOwnerName);
+            statementToInsertBusinessOwner.setString(2, businessOwner.getBusinessOwnerEmail());
+            statementToInsertBusinessOwner.setString(3, businessOwner.getBusinessOwnerDescription());
+            statementToInsertBusinessOwner.setString(4, businessOwner.getBusinessOwnerSite());
+            statementToInsertBusinessOwner.setInt(5, tenantId);
+            int affectedRows = statementToInsertBusinessOwner.executeUpdate();
 
             if (affectedRows == 0) {
                 throw new AppManagementException("Saving business owner user : " + businessOwnerName + " is failed, no "
                                                          + "rows affected.");
             }
-            ResultSet generatedKeys = statementToInserBusinessOwner.getGeneratedKeys();
+            ResultSet generatedKeys = statementToInsertBusinessOwner.getGeneratedKeys();
             if (generatedKeys.next()) {
                 businessOwnerId = generatedKeys.getInt(1);
             }
@@ -432,12 +437,13 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    log.error("Failed the rollback of save business owner with name : " + businessOwnerName, e1);
+                    log.error("Failed the rollback transaction of saving business owner with name : " +
+                                      businessOwnerName, e1);
                 }
             }
             handleException("Failed to save business owner with name : " + businessOwnerName, e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToInserBusinessOwner, connection, null);
+            APIMgtDBUtil.closeAllConnections(statementToInsertBusinessOwner, connection, null);
         }
         return businessOwnerId;
     }
@@ -445,14 +451,14 @@ public class AppMDAO {
     /**
      * Search business owners with pagination.
      *
-     * @param startIndex  Start index
-     * @param pageSize    Page size
-     * @param searchValue Search value
-     * @param tenantId    Tenant id
-     * @return list of {@link BusinessOwner} objects
+     * @param startIndex Start index
+     * @param pageSize   Page size
+     * @param searchKey  Search key
+     * @param tenantId   Tenant id
+     * @return List of {@link BusinessOwner} objects
      * @throws AppManagementException on error while trying to search business owners
      */
-    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue, int tenantId)
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey, int tenantId)
             throws AppManagementException {
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
@@ -479,11 +485,11 @@ public class AppMDAO {
                         "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ?) AND TENANT_ID = ? LIMIT ? , ? ";
             }
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
-            searchValue = "%" + searchValue + "%";
-            statementToGetBusinessOwners.setString(1, searchValue);
-            statementToGetBusinessOwners.setString(2, searchValue);
-            statementToGetBusinessOwners.setString(3, searchValue);
-            statementToGetBusinessOwners.setString(4, searchValue);
+            searchKey = "%" + searchKey + "%";
+            statementToGetBusinessOwners.setString(1, searchKey);
+            statementToGetBusinessOwners.setString(2, searchKey);
+            statementToGetBusinessOwners.setString(3, searchKey);
+            statementToGetBusinessOwners.setString(4, searchKey);
             statementToGetBusinessOwners.setInt(5, tenantId);
             statementToGetBusinessOwners.setInt(6, startIndex);
             statementToGetBusinessOwners.setInt(7, pageSize);
@@ -500,7 +506,7 @@ public class AppMDAO {
                 businessOwnersList.add(businessOwner);
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owner for the search value " + searchValue, e);
+            handleException("Failed to search business owner by search key : " + searchKey, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
         }
@@ -511,7 +517,7 @@ public class AppMDAO {
      * Get business owner count.
      *
      * @param tenantId Tenant id
-     * @return number of business owners.
+     * @return Number of business owners
      * @throws AppManagementException on error while trying to get business owner
      */
     public int getBusinessOwnersCount(int tenantId) throws AppManagementException {
@@ -532,7 +538,7 @@ public class AppMDAO {
                 recordCount = resultSet.getInt("RECORD_COUNT");
             }
         } catch (SQLException e) {
-            handleException("Error when getting the row count of business owners table. ", e);
+            handleException("Error occurred while getting the business owner count for the tenant id : " + tenantId , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
         }
@@ -544,8 +550,8 @@ public class AppMDAO {
      *
      * @param searchPrefix Search prefix
      * @param tenantId     Tenant id
-     * @return list of business owner ids
-     * @throws AppManagementException on error while trying to get business owner ids by a search prefix
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to get business owner ids
      */
     public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId)
             throws AppManagementException {
@@ -570,7 +576,8 @@ public class AppMDAO {
                 businessOwnerIdsList.add(String.valueOf(businessOwnerId));
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business Ids for the search value " + searchPrefix, e);
+            handleException("Error occurred while trying to retrieve business Ids for the search value " + searchPrefix,
+                            e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
         }
@@ -578,16 +585,16 @@ public class AppMDAO {
     }
 
     /**
-     * Get business owner Id by owner name, email and tenant Id.
+     * Get business owner id by owner name, email and tenant Id.
      *
      * @param businessOwnerName  Business owner name
      * @param businessOwnerEmail Business owner email
      * @param tenantId           Tenant id
-     * @return business owner id
+     * @return Business owner id
      * @throws AppManagementException on error while trying to get business owner id
      */
-    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId) throws
-                                                                                                     AppManagementException {
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail, int tenantId)
+            throws AppManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet businessOwnerResultSet = null;
@@ -608,7 +615,9 @@ public class AppMDAO {
                 businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owner id.", e);
+            String errorMessage = "Failed to retrieve business owner id by business owner name : " +
+                    businessOwnerName + " and email : " + businessOwnerEmail;
+            handleException(errorMessage, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, businessOwnerResultSet);
         }
@@ -8627,7 +8636,7 @@ public class AppMDAO {
      * @param searchValue     Search Value
      * @param registry        Registry of the current store.
      * @return List of App Identifiers
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to search apps
      */
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
@@ -8656,7 +8665,7 @@ public class AppMDAO {
                 Map<String, List<String>> appPropertiesMap = new HashMap<String, List<String>>();
                 List<String> businessOwnerIdList = getBusinessOwnerIdsBySearchPrefix(searchValue, tenantIdOfStore);
                 for (String businessOwnerId : businessOwnerIdList) {
-                    appPropertiesMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER , Arrays.asList(businessOwnerId));
+                    appPropertiesMap.put(AppMConstants.API_OVERVIEW_BUSS_OWNER, Arrays.asList(businessOwnerId));
                     appPropertiesMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, Arrays.asList(String.valueOf
                             (treatAsSite)));
                     getUserAccessibleAppsByBusinessOwner(apiIdentifiers, appPropertiesMap, registry, tenantIdOfStore,
@@ -8668,10 +8677,10 @@ public class AppMDAO {
 
             // ps is null when search by business owner.
             if (ps != null) {
-                ps.setBoolean(1,treatAsSite);
-                ps.setInt(2,tenantIdOfStore);
-                ps.setInt(3,applicationId);
-                ps.setBoolean(4,allowAnonymous);
+                ps.setBoolean(1, treatAsSite);
+                ps.setInt(2, tenantIdOfStore);
+                ps.setInt(3, applicationId);
+                ps.setBoolean(4, allowAnonymous);
                 ps.setString(5, "%" + searchValue + "%");
                 result = ps.executeQuery();
 
@@ -8697,8 +8706,8 @@ public class AppMDAO {
     }
 
     private void getUserAccessibleAppsByBusinessOwner(List<APIIdentifier> apiIdentifiers, Map<String, List<String>>
-            appPropertiesMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName) throws
-                                                                                           AppManagementException {
+            appPropertiesMap, Registry registry, int tenantIdOfStore, int tenantOfUser, String userName)
+            throws AppManagementException {
         boolean isTenantFlowStarted = false;
         try {
             UserRealmService realmService =
@@ -8714,15 +8723,14 @@ public class AppMDAO {
             }
 
             if (tenantIdOfStore != tenantOfUser) {
-                // User has to set anonnymous to get myapps.
+                // User has to set as anonymous to get my apps.
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants
-                        .REGISTRY_ANONNYMOUS_USERNAME);
+                                                                                          .REGISTRY_ANONNYMOUS_USERNAME);
             }
 
             APIInfoDTO[] subscribedApps = getSubscribedAPIsOfUser(userName);
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
-            GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
-                                                                                AppMConstants.API_KEY);
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, AppMConstants.API_KEY);
             GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(appPropertiesMap);
             for (GenericArtifact artifact : artifacts) {
                 String provider = artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);
@@ -8743,9 +8751,10 @@ public class AppMDAO {
                 }
             }
         } catch (RegistryException e) {
-            handleException("Failed to search accessible apps details from tenant store :" + tenantIdOfStore, e);
+            handleException("Error occurred while searching accessible apps details from tenant store :" +
+                                    tenantIdOfStore, e);
         } catch (UserStoreException e) {
-            handleException("Failed to get tenant domain for tenant id :" + tenantIdOfStore, e);
+            handleException("Error occurred while getting tenant domain for tenant id :" + tenantIdOfStore, e);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();

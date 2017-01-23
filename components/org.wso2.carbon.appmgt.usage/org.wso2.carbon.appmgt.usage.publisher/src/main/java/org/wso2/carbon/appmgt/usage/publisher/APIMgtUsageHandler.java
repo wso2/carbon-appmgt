@@ -374,11 +374,12 @@ public class APIMgtUsageHandler extends AbstractHandler {
     }
 
     /**
-     * Get WebApp for default version web apps.
-     * @param context
-     * @param tenantDomain
-     * @return
-     * @throws AppManagementException
+     * Get non versioned web apps.
+     *
+     * @param context Webapp context
+     * @param tenantDomain Tenant domain
+     * @return {@link WebApp} object
+     * @throws AppManagementException on error while trying to get webapp
      */
     public WebApp getNonVersionedWebApp(String context, String tenantDomain) throws AppManagementException {
         Connection connection = null;
@@ -395,21 +396,21 @@ public class APIMgtUsageHandler extends AbstractHandler {
             connection = APIMgtDBUtil.getConnection();
             preparedStatement = connection.prepareStatement(sqlQuery);
             int tenantId = UsageComponent.getRealmService().getTenantManager().getTenantId(tenantDomain);
-            preparedStatement.setString(1,context);
-            preparedStatement.setInt(2,tenantId);
+            preparedStatement.setString(1, context);
+            preparedStatement.setInt(2, tenantId);
             resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 String webAppName = resultSet.getString(AppMConstants.FIELD_API_NAME);
-                String provider = resultSet.getString(AppMConstants.FIELD_API_PUBLISHER );
+                String provider = resultSet.getString(AppMConstants.FIELD_API_PUBLISHER);
                 String trackingCode = resultSet.getString(AppMConstants.FIELD_TRACKING_CODE);
                 String version = resultSet.getString(AppMConstants.FIELD_PUBLISHED_DEFAULT_APP_VERSION);
-                APIIdentifier apiIdentifier = new APIIdentifier(provider,webAppName,version);
+                APIIdentifier apiIdentifier = new APIIdentifier(provider, webAppName, version);
                 webApp = new WebApp(apiIdentifier);
                 webApp.setTrackingCode(trackingCode);
                 webApp.setContext(context);
             }
         } catch (SQLException e) {
-            String errorMessage = "Error occurred while reading default versioned web app. Context : " + context +
+            String errorMessage = "Error occurred while reading non versioned web app. Context : " + context +
                     " tenant domain: " + tenantDomain;
             throw new AppManagementException(errorMessage, e);
         } catch (UserStoreException e) {
@@ -427,8 +428,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
     }
 
     private Cache getUsageCache() {
-        return Caching.getCacheManager(AppMConstants.USAGE_CACHE_MANAGER)
-                .getCache(AppMConstants.USAGE_CACHE);
+        return Caching.getCacheManager(AppMConstants.USAGE_CACHE_MANAGER).getCache(AppMConstants.USAGE_CACHE);
     }
 
    }

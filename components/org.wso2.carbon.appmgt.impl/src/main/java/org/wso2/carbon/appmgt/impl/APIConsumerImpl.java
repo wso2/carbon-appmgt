@@ -110,9 +110,9 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Get business owner for a given business owner id.
+     * Retrieve business owner by given id.
      *
-     * @param businessOwnerId Id of business owner.
+     * @param businessOwnerId Id of business owner
      * @return {@link BusinessOwner} object
      * @throws AppManagementException on error while trying to get business owner
      */
@@ -122,7 +122,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Get business owner for a given business owner id in public store.
+     * Retrieve business owner for a given business owner id.
      *
      * @param businessOwnerId Business owner id
      * @param appTenantId     Tenant id of the application
@@ -136,17 +136,17 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Returns business owner Ids by a prefix of business owner name.
+     * Search business owner.
      *
      * @param searchPrefix Search prefix
-     * @param appTenantId  Tenant Id of the application
-     * @return list of business owner ids
-     * @throws AppManagementException on error while trying to get business owner ids by a search prefix
+     * @param tenantId  Tenant Id of the application
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
      */
     @Override
-    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int appTenantId)
-            throws AppManagementException {
-        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, appTenantId);
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
+                                                                                             AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
     }
 
     /**
@@ -1791,14 +1791,14 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         Registry userRegistry = null;
         try {
             if (tenantIdOfStore != tenantIdOfUser) {
-                // Get registry for anonnymous users when searching is going in tenant.
+                // Get registry for anonymous users when searching is going in tenant.
                 userRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
                         .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIdOfStore);
             } else {
                 userRegistry = registry;
             }
         } catch (RegistryException e) {
-            handleException("Error while obtaining registry.", e);
+            handleException("Error occurred while obtaining apps from the registry.", e);
         }
 
         return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,

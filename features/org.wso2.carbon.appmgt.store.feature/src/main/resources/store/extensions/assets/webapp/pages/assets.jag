@@ -220,8 +220,8 @@ require('/modules/store.js').exec(function (ctx) {
         var splitQuery = query.split(":");
         searchParameter = splitQuery[0];
         // This is a registry based search. In search box, user wants to search by business owner name. But
-        // in registry, there is only business owner Id. Therefore, it is necessary to get business owner Ids
-        // related to search prefix from DB.
+        // in registry, there is only business owner id. Therefore, it is necessary to get business owner ids
+        // related to search prefix from database.
 
         if (!searchParameter.equals("Business Owner")) {
             var urlQuery = 'query=' + query + '&';
@@ -240,10 +240,10 @@ require('/modules/store.js').exec(function (ctx) {
             var initialQuery = "businessOwner:" + searchValue;
             var searchPrefix = searchValue.split("\"")[1];
             var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
-            if (resultIdsList){
+            if (resultIdsList) {
                 var resultAssets = [];
                 resultIdsList = resultIdsList.toArray();
-                for(var key in resultIdsList) {
+                for (var key in resultIdsList) {
                     var businessOwnerId = resultIdsList[key];
                     query = "businessOwner:\"" + businessOwnerId + "\"";
                     query = require('/modules/search.js').build(query);
