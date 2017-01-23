@@ -218,45 +218,27 @@ var module = function () {
 
             var artifactManager = rxtManager.getArtifactManager(shortName);
 
-            artifactManager.add(asset);
+            var artifactID = artifactManager.add(asset);
 
             log.debug('Finished saving asset (webapp): ' + name);
 
             log.debug(asset);
 
-            //The predicate object used to compare the assets
-            var predicate = {
-                attributes: {
-                    overview_name: name,
-                    overview_version: version
-                }
-            };
-            var artifact = artifactManager.find(function (adapter) {
-                //Check if the name and version are the same
-                return utility.assertEqual(adapter, predicate);
-            }, null);
-
-            log.debug('Locating saved asset: ' + artifact + ' to get the asset id.');
-
-            var id = artifact[0].id || ' ';
-
-            log.debug('Setting id of model to ' + id);
-
-            var artifact1 = artifactManager.get(id);
+            var artifact1 = artifactManager.get(artifactID);
             var attributes = artifact1.attributes;
 
 
             if (attributes.overview_advertiseOnly.toLowerCase() != "true") {
                 //adding to database
-                addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
+                addToWebApp(artifactID, provider, name, version, contextname, tracking_code, asset,
                     attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
                     saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL, isDefaultVersion, treatAsSite, businessOwner);
             }
 
             //Save the id data to the model
-            model.setField('*.id', id);
+            model.setField('*.id', artifactID);
 
-            log.debug('Finished saving asset with id: ' + id);
+            log.debug('Finished saving asset with id: ' + artifactID);
         }
     }
 };
