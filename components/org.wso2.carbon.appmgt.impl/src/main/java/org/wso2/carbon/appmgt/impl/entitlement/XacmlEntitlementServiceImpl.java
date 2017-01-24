@@ -83,6 +83,10 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     }
 
 
+    /**
+     * Initialize EntitlementPolicyAdminServiceStub
+     * @throws AppManagementException on errors while trying to initialize EntitlementPolicyAdminServiceStub
+     */
     public void init() throws AppManagementException {
         try {
             entitlementPolicyAdminServiceStub = new EntitlementPolicyAdminServiceStub(serverUrl +
@@ -180,7 +184,8 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
      *
      * @param request Request to be checked.
      * @return whether entitlement decision request is permitted or not
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to check whether entitlement decision request is
+     *                                permitted or not
      */
     @Override
     public boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException {

@@ -260,11 +260,12 @@ public interface APIProvider extends APIManager {
             throws AppManagementException;
 
     /**
-     * Get entitlement policy content from policyId
+     * Get entitlement policy content by policyId
      *
-     * @param policyId        Entitlement policy id
+     * @param policyId              Entitlement policy id
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return Entitlement policy content
+     * @throws AppManagementException on error while trying to get entitlement policy
      */
     String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException;
 

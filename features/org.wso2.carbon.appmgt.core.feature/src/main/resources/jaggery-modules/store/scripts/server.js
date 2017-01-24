@@ -118,14 +118,14 @@ var server = {};
         user = server.current(session);
         if (user) {
             var userDomain = carbon.server.tenantDomain({
-                tenantId: user.tenantId
-            });
-            //Check for anonymous tenant store access
+                                                            tenantId: user.tenantId
+                                                        });
+            //Check for anonymous tenant store access.
             if (urlDomain && (urlDomain != userDomain)) {
                 obj = {
                     tenantId: carbon.server.tenantId({
-                        domain: urlDomain
-                    }),
+                                                         domain: urlDomain
+                                                     }),
                     domain: urlDomain,
                     username: carbon.user.anonUser,
                     secured: false
@@ -150,7 +150,7 @@ var server = {};
         }
 
         if (obj.tenantId != -1) {
-            //loads the tenant if it hasn't been loaded
+            //Loads the tenant if it hasn't been loaded
             server.loadTenant(obj);
         }
         return obj;

@@ -2,19 +2,17 @@
      name="_WSO2AMStatisticsAPI_"
      transports="http"
      context="/statistics">
-   <resource methods="GET" url-mapping="/*">
-            <inSequence>
-                <log level="full"/>
-                <loopback/>
-            </inSequence>
-            <outSequence>
-                <send/>
-            </outSequence> 
-   </resource>
+    <resource methods="GET" url-mapping="/*">
+        <inSequence>
+            <log level="full" />
+            <loopback />
+        </inSequence>
+        <outSequence>
+            <send />
+        </outSequence>
+    </resource>
 
- <handlers>
-
-	<handler class="org.wso2.carbon.appmgt.usage.publisher.UsageHandler"/>
-
+    <handlers>
+        <handler class="org.wso2.carbon.appmgt.usage.publisher.UsageHandler" />
     </handlers>
 </api>

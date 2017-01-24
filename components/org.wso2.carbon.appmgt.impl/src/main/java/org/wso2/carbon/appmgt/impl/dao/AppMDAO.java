@@ -7182,11 +7182,11 @@ public class AppMDAO {
      * @param policyGroupId
      * @param conn
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
-     * @throws SQLException,AppManagementException
+     * @throws AppManagementException on error while trying to remove xacml policies from entitlement service
      */
     private static void deleteXACMLPoliciesFromEntitlementService(int policyGroupId, Connection conn,
                                                                   String authorizedAdminCookie)
-            throws SQLException, AppManagementException {
+            throws AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String query = "SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
@@ -7212,7 +7212,9 @@ public class AppMDAO {
                     policyGroupId + ". SQL Query : " + query, e);
             /* In the code im using a single SQL connection passed from the parent function so I'm logging the error
             here and throwing the SQLException so  the connection will be disposed by the parent function. */
-            throw e;
+            handleException("SQL Error while executing the query to get policy id's under policy group : " +
+                                    policyGroupId, e);
+
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, rs);
         }

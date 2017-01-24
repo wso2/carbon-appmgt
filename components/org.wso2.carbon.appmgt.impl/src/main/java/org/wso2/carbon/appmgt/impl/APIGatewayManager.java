@@ -163,15 +163,15 @@ public class APIGatewayManager {
 			if (client.getVersionedWebApp(appId,tenantDomain) != null) {
 				if (debugEnabled) {
 					log.debug("Removing WebApp " + appId.getApiName() + " From environment " +
-									  environment.getName());
+							          environment.getName());
 				}
 				String operation = "delete";
                 if (api.isDefaultVersion()) {
-                    if (client.getNonVersionedWebAppData(appId,tenantDomain) != null) {
-                        client.deleteNonVersionedWebApp(appId,tenantDomain);
-                    }
+	                if (client.getNonVersionedWebAppData(appId, tenantDomain) != null) {
+		                client.deleteNonVersionedWebApp(appId, tenantDomain);
+	                }
                 }
-                client.deleteVersionedWebApp(appId,tenantDomain);
+				client.deleteVersionedWebApp(appId, tenantDomain);
 				undeployCustomSequences(api, tenantDomain, environment);
 			}
 		}
@@ -195,7 +195,7 @@ public class APIGatewayManager {
 			AppGatewayAdminClient client = new AppGatewayAdminClient(appId, environment);
 			// If the WebApp exists in at least one environment, consider as
 			// published and return true.
-			if (client.getVersionedWebApp(appId,tenantDomain) != null) {
+			if (client.getVersionedWebApp(appId, tenantDomain) != null) {
 				return true;
 			}
 		}
@@ -255,11 +255,11 @@ public class APIGatewayManager {
         String inSequenceName = api.getInSequence();
         OMElement inSequence = AppManagerUtil.getCustomSequence(inSequenceName, tenantId, "in");
 
-        AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
+	    AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
         if (inSequence != null) {
             inSequence.getAttribute(new QName("name")).setAttributeValue(inSeqExt);
-            appGatewayAdminClient.addSequence(inSequence, tenantDomain);
+	        appGatewayAdminClient.addSequence(inSequence, tenantDomain);
         }
     }
 
@@ -270,11 +270,11 @@ public class APIGatewayManager {
         String outSequenceName = api.getOutSequence();
         OMElement outSequence = AppManagerUtil.getCustomSequence(outSequenceName, tenantId, "out");
 
-        AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
+	    AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
 
         if (outSequence != null) {
             outSequence.getAttribute(new QName("name")).setAttributeValue(outSeqExt);
-            appGatewayAdminClient.addSequence(outSequence, tenantDomain);
+	        appGatewayAdminClient.addSequence(outSequence, tenantDomain);
         }
     }
 

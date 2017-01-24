@@ -101,7 +101,7 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      * Extracts info related to the resource requests and checkes whether the request is permitted.
      * @param messageContext Synapse message context.
      * @return true if the resource is permitted, false otherwise.
-     * @throws AppManagementException 
+     * @throws AppManagementException
      */
     private boolean isResourcePermitted(MessageContext messageContext) throws AppManagementException{
     	

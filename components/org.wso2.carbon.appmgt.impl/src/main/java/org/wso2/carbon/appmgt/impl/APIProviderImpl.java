@@ -807,12 +807,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get entitlement policy content from policy id
+     * Get entitlement policy content from policy id.
      *
      * @param policyId        Entitlement policy id
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return entitlement policy content
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get entitlement policy
      */
     @Override
     public String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException {

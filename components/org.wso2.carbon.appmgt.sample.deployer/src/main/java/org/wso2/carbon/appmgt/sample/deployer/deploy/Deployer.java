@@ -74,13 +74,10 @@ public class Deployer {
         } catch (UserAdminUserAdminException e) {
 
         } catch (RemoteException e) {
-            log.error("Error while registering a User subscriber_" + username, e);
-            throw new AppManagementException("Error while registering a User subscriber_" + username, e);
+            throw new AppManagementException("Error occurred while registering a User subscriber_" + username, e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while login to UserAdminStub", e);
-            throw new AppManagementException("Error while login to UserAdminStub", e);
+            throw new AppManagementException("Error occurred while login to UserAdminStub", e);
         }
-
 
         try {
             storeSession = httpHandler.doPostHttp(httpBackEndUrl + "/store/apis/user/login",

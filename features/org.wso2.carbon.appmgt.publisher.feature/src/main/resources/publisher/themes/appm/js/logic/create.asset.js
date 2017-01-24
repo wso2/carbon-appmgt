@@ -527,54 +527,54 @@ $(function() {
 
 
 	function createServiceProvider(){
-	    var ssoConfig = {};
-	    var providerName  = $('#providers').val();
-	    var logoutUrl = $('#overview_logoutUrl').val();
-	    var idpProvider = $('#sso_idpProviderUrl').val();
-	    var appName = $('#overview_name').val();
-	    var appVersion = $('#overview_version').val();
-	    var appTransport = $('#overview_transports').val();
-	    var appTreatAsASite = $('#overview_treatAsASite').val();
-	    var appContext = $('#overview_context').val();
-	    var appProvider = $('#overview_provider').val();
-	    var appAllowAnonymous=$('#overview_allowAnonymous').val();
-	    var appAcsURL = $('#overview_acsUrl').val();
-	    var appIsDefaultVersion = $('#overview_makeAsDefaultVersion').val();
+		var ssoConfig = {};
+		var providerName = $('#providers').val();
+		var logoutUrl = $('#overview_logoutUrl').val();
+		var idpProvider = $('#sso_idpProviderUrl').val();
+		var appName = $('#overview_name').val();
+		var appVersion = $('#overview_version').val();
+		var appTransport = $('#overview_transports').val();
+		var appTreatAsASite = $('#overview_treatAsASite').val();
+		var appContext = $('#overview_context').val();
+		var appProvider = $('#overview_provider').val();
+		var appAllowAnonymous = $('#overview_allowAnonymous').val();
+		var appAcsURL = $('#overview_acsUrl').val();
+		var appIsDefaultVersion = $('#overview_makeAsDefaultVersion').val();
 
-	    var claims = [];
-	    var index=0;
-	    var propertyCount = document.getElementById("claimPropertyCounter").value;
-	    while(index < propertyCount){
-	        var claim = $("#claimPropertyName"+index).val();
-	        if(claim != null){
-	            claims[claims.length] = claim;
-	        }
-	        index++;
-	    }
-	    ssoConfig.provider = providerName;
-	    ssoConfig.logout_url = logoutUrl;
-	    ssoConfig.claims = claims;
-	    ssoConfig.idp_provider = idpProvider;
-	    ssoConfig.app_name = appName;
-	    ssoConfig.app_verison = appVersion;
-	    ssoConfig.app_transport = appTransport;
-	    ssoConfig.app_treatAsASite = appTreatAsASite;
-	    ssoConfig.app_context = appContext;
-	    ssoConfig.app_provider = appProvider;
-	    ssoConfig.app_allowAnonymous=appAllowAnonymous;
-	    ssoConfig.app_acsURL = appAcsURL;
-	    ssoConfig.app_isDefaultVersion = appIsDefaultVersion;
+		var claims = [];
+		var index = 0;
+		var propertyCount = document.getElementById("claimPropertyCounter").value;
+		while (index < propertyCount) {
+			var claim = $("#claimPropertyName" + index).val();
+			if (claim != null) {
+				claims[claims.length] = claim;
+			}
+			index++;
+		}
+		ssoConfig.provider = providerName;
+		ssoConfig.logout_url = logoutUrl;
+		ssoConfig.claims = claims;
+		ssoConfig.idp_provider = idpProvider;
+		ssoConfig.app_name = appName;
+		ssoConfig.app_verison = appVersion;
+		ssoConfig.app_transport = appTransport;
+		ssoConfig.app_treatAsASite = appTreatAsASite;
+		ssoConfig.app_context = appContext;
+		ssoConfig.app_provider = appProvider;
+		ssoConfig.app_allowAnonymous = appAllowAnonymous;
+		ssoConfig.app_acsURL = appAcsURL;
+		ssoConfig.app_isDefaultVersion = appIsDefaultVersion;
 
 
-        $.ajax({
-            url: caramel.context + '/api/sso/addConfig',
-            type: 'POST',
-            contentType: 'application/json',
-            data:JSON.stringify(ssoConfig),
-            error: function(response) {
-                showAlert('Error adding service provider.', 'error');
-            }
-        });
+		$.ajax({
+				   url: caramel.context + '/api/sso/addConfig',
+				   type: 'POST',
+				   contentType: 'application/json',
+				   data: JSON.stringify(ssoConfig),
+				   error: function (response) {
+					   showAlert('Error adding service provider.', 'error');
+				   }
+			   });
 	}
 
 
