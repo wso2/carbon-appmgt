@@ -129,7 +129,7 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
                 createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
             }
         } catch (AxisFault e) {
-            log.error("Failed to create tenant's synapse sequences for tenant " + tenantDomain);
+            log.error("Failed to create tenant's synapse sequences for tenant : " + tenantDomain);
         } catch (ConfigurationInitilizerException e) {
             log.error("Failed to initialize configuration. ");
         }
@@ -153,7 +153,7 @@ public class TenantCreateGatewayObserver extends AbstractAxis2ConfigurationConte
         File sequencesDir = new File(synapseConfigDir, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
 
         if (!sequencesDir.mkdir()) {
-            log.warn("Could not create synapse configuration for tenant " + tenantDomain);
+            log.warn("Could not create synapse configuration for tenant : " + tenantDomain);
         }
 
         SynapseConfiguration initialSynapseConfig = SynapseConfigurationBuilder.getDefaultConfiguration();
