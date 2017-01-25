@@ -46,9 +46,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Constructor.
      *
-     * @param apiId
-     * @param environment
-     * @throws AppManagementException
+     * @param apiId       {@link APIIdentifier} object
+     * @param environment {@link Environment} object
+     * @throws AppManagementException on errors while trying to initiate AppGatewayAdminStub
      */
     public AppGatewayAdminClient(APIIdentifier apiId, Environment environment) throws AppManagementException {
         String providerName = apiId.getProviderName();
@@ -68,10 +68,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Add versioned web app configuration to the gateway.
      *
-     * @param builder
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param builder      {@link APITemplateBuilder} object
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to add versioned WebApp
      */
     public void addVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -102,10 +102,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Return versioned web app configuration from the gateway.
      *
-     * @param apiId
-     * @param tenantDomain
-     * @return versioned webapp configuration
-     * @throws AppManagementException
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @return {@link WebAppData} object
+     * @throws AppManagementException on errors while trying to get versioned WebApps
      */
     public WebAppData getVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -136,10 +136,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Update versioned web app configuration in the gateway.
      *
-     * @param builder
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param builder      {@link APITemplateBuilder} object
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to update WebApp
      */
     public void updateVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -170,9 +170,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Delete versioned web app configuration from the gateway.
      *
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to delete versioned WebApp
      */
     public void deleteVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -197,10 +197,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Add non-versioned web app configuration to the gateway.
      *
-     * @param builder
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param builder      {@link APITemplateBuilder} object
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to add non versioned WebApps
      */
     public void addNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -230,10 +230,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Update non-versioned web app configuration in the gateway.
      *
-     * @param builder
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param builder      {@link APITemplateBuilder} object
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to update non versioned WebApps
      */
     public void updateNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
@@ -264,9 +264,9 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Delete non-versioned web app configuration form the gateway.
      *
-     * @param apiId
-     * @param tenantDomain
-     * @throws AppManagementException
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @throws AppManagementException on errors while trying to delete non versioned WebApp
      */
     public void deleteNonVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -293,10 +293,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Return the non-versioned web app configuration from the gateway.
      *
-     * @param apiId
-     * @param tenantDomain
-     * @return non versioned webapp configuration
-     * @throws AppManagementException
+     * @param apiId        {@link APIIdentifier} object
+     * @param tenantDomain Tenant domain
+     * @return {@link WebAppData} object
+     * @throws AppManagementException on errors while trying to get non versioned WebApp
      */
     public WebAppData getNonVersionedWebAppData(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
         String appName = apiId.getApiName();
@@ -328,7 +328,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      *
      * @param sequence     - The sequence element , which to be deployed in synapse
      * @param tenantDomain - The Tenant Domain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException on errors while occurred in deploy sequences
      */
     public void addSequence(OMElement sequence, String tenantDomain) throws AppManagementException {
         try {
@@ -358,7 +358,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      *
      * @param sequenceName -The sequence name, which need to be undeployed from synapse configuration
      * @param tenantDomain - The Tenant Domain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException on errors while trying to undeploy sequence
      */
     public void deleteSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
@@ -382,7 +382,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      *
      * @param sequenceName - The sequence name
      * @param tenantDomain - The Tenant Domain
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException on errors while trying to get sequences
      */
     public OMElement getSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
@@ -404,10 +404,10 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     /**
      * Check whether the sequence is exiting or not.
      *
-     * @param sequenceName
-     * @param tenantDomain
+     * @param sequenceName Sequence name
+     * @param tenantDomain Tenant domain
      * @return whether sequence exists or not
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException on errors while trying to check whether sequence exist or not
      */
     public boolean isExistingSequence(String sequenceName, String tenantDomain) throws AppManagementException {
         try {

@@ -182,7 +182,7 @@ public class AppMDAO {
                                             businessOwnerId, e1);
                 }
             }
-            handleException("Cannot occurred while deleting business owner by id : " + businessOwnerId, e);
+            handleException("Error occurred while deleting business owner by id : " + businessOwnerId, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
         }
@@ -602,7 +602,7 @@ public class AppMDAO {
         String query = "SELECT OWNER_ID FROM APM_BUSINESS_OWNER WHERE OWNER_NAME = ? AND OWNER_EMAIL = ? AND " +
                 "TENANT_ID = ?";
 
-        int businessOwnerId = -1; // If a business owner doesn't exist for the input parameters, return owner id as -1
+        int businessOwnerId = -1; // If a business owner doesn't exist for the input parameters, return owner id as -1.
         try {
             connection = APIMgtDBUtil.getConnection();
             preparedStatement = connection.prepareStatement(query);
