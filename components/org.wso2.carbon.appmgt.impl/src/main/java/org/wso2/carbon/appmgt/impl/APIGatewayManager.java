@@ -257,7 +257,7 @@ public class APIGatewayManager {
         AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
         if (inSequence != null) {
             inSequence.getAttribute(new QName("name")).setAttributeValue(inSeqExt);
-	        appGatewayAdminClient.addSequence(inSequence, tenantDomain);
+            appGatewayAdminClient.addSequence(inSequence, tenantDomain);
         }
     }
 
@@ -271,7 +271,7 @@ public class APIGatewayManager {
         AppGatewayAdminClient appGatewayAdminClient = new AppGatewayAdminClient(api.getId(), environment);
         if (outSequence != null) {
             outSequence.getAttribute(new QName("name")).setAttributeValue(outSeqExt);
-	        appGatewayAdminClient.addSequence(outSequence, tenantDomain);
+            appGatewayAdminClient.addSequence(outSequence, tenantDomain);
         }
     }
 
