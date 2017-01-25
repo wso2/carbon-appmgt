@@ -81,6 +81,7 @@ public class AppDataLoader {
             if("android".equals(artifact.getAttribute("overview_platform"))){
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setIdentifier(artifact.getAttribute("overview_packagename"));
+                app.setAppIdentifier(artifact.getAttribute("overview_packagename"));
             }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setAppIdentifier(artifact.getAttribute("overview_appid"));
