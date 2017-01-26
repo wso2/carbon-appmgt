@@ -17,14 +17,14 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.15-SNAPSHOT</version>
+        <version>1.2.15</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.rest.api.util</artifactId>
-    <version>1.2.15-SNAPSHOT</version>
+    <version>1.2.15</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - App Manager Rest API Utility</name>
     <description>Rest API utility and Extensions</description>
