@@ -49,7 +49,10 @@ public class APIConfigContext extends ConfigContext {
     public VelocityContext getContext() {
         VelocityContext context = new VelocityContext();
         //set the api name version and context
-        context.put("apiName", this.getAPIName(api));
+        //Ideally api object should contains apiName without @ sign. If we fix it in API object, it will change the
+        // way we write provider name into DB as well, which need a data migration. Hence replace only the apiName by
+        // removing @ sign before creating the velocity context.
+        context.put("apiName", this.getAPIName(api).replace("@","-AT-"));
         context.put("apiVersion", api.getId().getVersion());
         context.put("apiContext", api.getContext());
 
