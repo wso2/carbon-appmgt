@@ -37,11 +37,13 @@ var caramel;
     var more = false;
     var tenantDomain;
 
+    var carbonContext = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext();
     if (logged != null) {
         tenantDomain = logged.tenantDomain;
+        carbonContext.setTenantDomain(logged.tenantDomain);
+        carbonContext.setTenantId(logged.tenantId);
     }
     var urlDomain = request.getParameter('urlDomain') || tenantDomain || "carbon.super";
-
 
     if (target) {
         try {
