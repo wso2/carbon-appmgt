@@ -20,34 +20,39 @@
 response.addHeader("Content-Type", "application/json");
 
 (function () {
-	var userModule = require('/modules/user.js');
+    var userModule = require('/modules/user.js');
     var logged = userModule.current(session);
+    var log = new Log();
     var carbon = require('carbon');
+    var carbonContext = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext();
+    if (logged) {
+        carbonContext.setTenantDomain(logged.tenantDomain);
+        carbonContext.setTenantId(logged.tenantId);
+    }
     var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
     var target = request.getParameter('target');
     var sortBy = request.getParameter('sortBy') || "NEWEST";
     var limit = 10;
     var offset = request.getParameter('offset') || 0;
     var obj = JSON.parse(String(social.getSocialObjectJson(target, sortBy.toUpperCase(), offset, limit)));
-    var log = new Log();
-    reviewsJSON = obj.attachments;
-            if (reviewsJSON) {
-            for (var i = 0; i < reviewsJSON.length; i++) {
-                //Remove carbon.super tenant domain from username
-                var user = reviewsJSON[i].actor.id;
-                reviewsJSON[i].actor.id = user.replace("@carbon.super", "");
-                if (logged) {
-	                var review = reviewsJSON[i];
-	                var username = String(logged.username) + '@' + logged.tenantDomain;
-	                review.iLike = social.isUserliked(username, review.object.id, 1);
-	                review.iDislike = social.isUserliked(username, review.object.id, 0);
-		            if(user == username){
-	                    review.isMyComment = true;
-	                }
-            	}
-            }
-            }
 
+    reviewsJSON = obj.attachments;
+    if (reviewsJSON) {
+        for (var i = 0; i < reviewsJSON.length; i++) {
+            //Remove carbon.super tenant domain from username
+            var user = reviewsJSON[i].actor.id;
+            reviewsJSON[i].actor.id = user.replace("@carbon.super", "");
+            if (logged) {
+                var review = reviewsJSON[i];
+                var username = String(logged.username) + '@' + logged.tenantDomain;
+                review.iLike = social.isUserliked(username, review.object.id, 1);
+                review.iDislike = social.isUserliked(username, review.object.id, 0);
+                if(user == username){
+                    review.isMyComment = true;
+                }
+            }
+        }
+    }
     print(reviewsJSON);
 })();
 %>
