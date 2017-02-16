@@ -7,7 +7,11 @@
 
     <div class="container-fluid">
         <div class="brand pull-left float-remove-xs text-center-xs">
+        {{#if storeTenantDomain}}
+            <a href="{{url "/t/"}}{{storeTenantDomain}}">
+        {{else}}
             <a href="{{url "/"}}">
+        {{/if}}
                 <img src="{{customThemeUrl "/libs/theme-wso2_1.0/images/logo-inverse.svg"}}" alt="apps-store"
                      title="apps-store" class="logo" />
 
