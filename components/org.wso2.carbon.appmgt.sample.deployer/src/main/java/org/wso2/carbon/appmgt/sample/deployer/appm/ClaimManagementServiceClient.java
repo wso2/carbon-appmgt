@@ -77,7 +77,7 @@ public class ClaimManagementServiceClient {
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
 
-        // check whether claim already exits or not.
+        // Check whether claim already exits or not.
         ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
                 .getClaimMappings();
 

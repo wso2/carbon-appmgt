@@ -125,31 +125,31 @@ $(document).ready(function() {
     });
 
 
-    $('input[type="file"][accept="image/*"]').change(function(evt) {
-        var files = evt.target.files;
-        var isValidated = validateImages(files);
+	$('input[type="file"][accept="image/*"]').change(function (evt) {
+		var files = evt.target.files;
+		var isValidated = validateImages(files);
 
-        var btnCreate = $('#btn-create-asset');
-        var parentDiv = $(this).parents('.tbl-upload-row');
-        var iconIdValue = $('.txt-filepath', parentDiv);
-        var flagId= "validity_" + this.id;
-        var flag =  $("#" + flagId);
+		var btnCreate = $('#btn-create-asset');
+		var parentDiv = $(this).parents('.tbl-upload-row');
+		var iconIdValue = $('.txt-filepath', parentDiv);
+		var flagId = "validity_" + this.id;
+		var flag = $("#" + flagId);
 
-        if (!flag.length) {
-            iconIdValue.after('<i id = "' + flagId + '"; class="icon-check-fileType"></i>');
-            flag = $("#" + flagId);
-        }
+		if (!flag.length) {
+			iconIdValue.after('<i id = "' + flagId + '"; class="icon-check-fileType"></i>');
+			flag = $("#" + flagId);
+		}
 
-        if (isValidated == true) {
-            flag.removeClass().addClass('icon-ok icon-check-fileType').show();
-            btnCreate.removeAttr('disabled');
-            $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
-        } else {
-            flag.removeClass().addClass('icon-ban-circle icon-check-fileType').show();
-            btnCreate.attr('disabled', 'disabled');
-            showAlert("File must be in image file format.", 'error');
-        }
-	})
+		if (isValidated == true) {
+			flag.removeClass().addClass('icon-ok icon-check-fileType').show();
+			btnCreate.removeAttr('disabled');
+			$(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+		} else {
+			flag.removeClass().addClass('icon-ban-circle icon-check-fileType').show();
+			btnCreate.attr('disabled', 'disabled');
+			showAlert("File must be in image file format.", 'error');
+		}
+	});
 	/*
 	 The function is used to check if the version entered by the user exists
 	 @versionList: A list of versions
@@ -290,10 +290,11 @@ $(document).ready(function() {
         	return non_special_regex.test(value);
     }
 
-    function validateImages(files){
-        var inputType = files[0].type;
-        return inputType.toLowerCase().startsWith('image');
-    }
+	function validateImages(files) {
+		var inputType = files[0].type;
+		var validImagePattern = /^image/i;
+		return validImagePattern.test(inputType);
+	}
 
     /* expand collapse container */
     $("h2.exp_col").click(function() {

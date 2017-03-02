@@ -26,17 +26,18 @@
                     <option></option>
                     {{#if businessOwner.businessOwnerName}}
                         <option value={{businessOwner.businessOwnerId}}
-                            selected="selected">{{businessOwner.businessOwnerName}} ({{businessOwner.businessOwnerEmail}})</option>
+                                        selected="selected">{{businessOwner.businessOwnerName}}
+                            ({{businessOwner.businessOwnerEmail}})
+                        </option>
                     {{/if}}
-
                 </select>
             </div>
             <input type="hidden" required=""
-{{#if businessOwner.businessOwnerId}}
+                {{#if businessOwner.businessOwnerId}}
                    value="{{businessOwner.businessOwnerId}}"
-{{/if}}
+                {{/if}}
                    class="col-lg-6 col-sm-12 col-xs-12" name="overview_businessOwner"
-                   id="overview_businessOwner">
+                   id="overview_businessOwner"/>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2">Make As Default Version: </label>

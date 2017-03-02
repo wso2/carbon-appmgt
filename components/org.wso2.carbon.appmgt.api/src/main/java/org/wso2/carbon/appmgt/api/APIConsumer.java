@@ -30,31 +30,31 @@ import java.util.Set;
 public interface APIConsumer extends APIManager {
 
     /**
-     * Returns the details of the owner for a given owner Id.
+     * Retrieve business owner by given id.
      *
-     * @param businessOwnerId Id of business owner.
-     * @return
-     * @throws AppManagementException
+     * @param businessOwnerId Business owner id
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Returns the details of the owner for a given owner Id in public store.
+     * Retrieve business owner for a given business owner id.
      *
-     * @param businessOwnerId
-     * @param tenantId
-     * @return
-     * @throws AppManagementException
+     * @param businessOwnerId Business owner id
+     * @param appTenantId     Tenant id of the application
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
-    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int tenantId) throws AppManagementException;
+    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int appTenantId) throws AppManagementException;
 
     /**
-     * Returns business owner Ids by a prefix of business owner name.
+     * Search business owner.
      *
-     * @param searchPrefix
-     * @param tenantId
-     * @return
-     * @throws AppManagementException
+     * @param searchPrefix Search prefix
+     * @param tenantId  Tenant id
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
      */
     public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
                                                                                            AppManagementException;

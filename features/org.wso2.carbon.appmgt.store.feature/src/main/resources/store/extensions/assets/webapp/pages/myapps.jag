@@ -181,10 +181,10 @@ require('/modules/store.js').exec(function (ctx) {
                 var initialQuery = "businessOwner:" + searchValue;
                 var searchPrefix = searchValue.split("\"")[1];
                 var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
-                if (resultIdsList){
+                if (resultIdsList) {
                     var resultAssets = [];
                     resultIdsList = resultIdsList.toArray();
-                    for(var key in resultIdsList) {
+                    for (var key in resultIdsList) {
                         var businessOwnerId = resultIdsList[key];
                         query = "businessOwner:\"" + businessOwnerId + "\"";
                         query = require('/modules/search.js').build(query);

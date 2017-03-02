@@ -12,9 +12,9 @@
     "appPublishHeader": "Published Applications",
     "entitlementPoliciesHeader":"Entitlement Policies",
     "entitlementPoliciesHeaderNew":"Add New Entitlement Policy",
-    "businessOwnerNew" : "Add New Business Owner",
-    "editBusinessOwner" : "Edit Business Owner",
-    "businessOwners" : "Business Owners",
+    "businessOwnerNew": "Add New Business Owner",
+    "editBusinessOwner": "Edit Business Owner",
+    "businessOwners": "Business Owners",
 
     "username": "Username",
     "password": "Password",

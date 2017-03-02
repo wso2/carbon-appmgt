@@ -438,17 +438,16 @@ $(function() {
           }
     	});
 
+    var data = $("#owner_list").val();
+    data = jQuery.parseJSON(data);
 
-	var data =  $("#owner_list").val();
-	data = jQuery.parseJSON(data);
-
-	$(document).ready(function() {
-		$("#businessOwnerName").select2({
-		    placeholder: 'Select an option',
-			data:data,
-			allowClear: true
-		});
-	});
+    $(document).ready(function () {
+        $("#businessOwnerName").select2({
+                                            placeholder: 'Select an option',
+                                            data: data,
+                                            allowClear: true
+                                        });
+    });
 
 
 	function loadProviders(providers_data){
@@ -490,97 +489,92 @@ $(function() {
 		addToClaimsTable(claim,true);
 	});
 
-	function addToClaimsTable(claim,clickable){
-        var isAlreadyExist = $.inArray(claim, addedClaimList);
-        if(isAlreadyExist == -1) {
-            addedClaimList.push(claim);
-            var propertyCount = $('#claimPropertyCounter');
+	function addToClaimsTable(claim,clickable) {
+		var isAlreadyExist = $.inArray(claim, addedClaimList);
+		if (isAlreadyExist == -1) {
+			addedClaimList.push(claim);
+			var propertyCount = $('#claimPropertyCounter');
 
-            var i = propertyCount.val();
-            var currentCount = parseInt(i);
+			var i = propertyCount.val();
+			var currentCount = parseInt(i);
 
-            currentCount = currentCount + 1;
-            propertyCount.val(currentCount);
+			currentCount = currentCount + 1;
+			propertyCount.val(currentCount);
 
-            $('#claimTableId').hide();
-            if (clickable) {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            } else {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            }
-
-            $('#claimTableTbody').parent().show();
+			$('#claimTableId').hide();
+			if (clickable) {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+											   + 'font-style: italic;">' + claim + '<input type="hidden"'
+											   + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+											   + '"  value="' + claim + '"/></td><td><a href="#"  '
+											   + 'onclick="removeClaim(' + i + ');return false;"><i'
+											   + ' class="icon-remove-sign"></i>  Delete</a></td></tr>'));
+			} else {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+											   + 'font-style: italic;">' + claim + '<input type="hidden"'
+											   + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+											   + '"  value="' + claim + '"/></td><td><a href="#" '
+											   + 'style="pointer-events: none; cursor: default;color:#C4C4C4" '
+											   + 'onclick="removeClaim(' + i + ');return false;"><i'
+											   + ' class="icon-remove-sign"></i>  Delete</a></td></tr>'));
+			}
+			$('#claimTableTbody').parent().show();
         }
 	}
 
 
 
 	function createServiceProvider(){
-	    var sso_config = {};
-	    var provider_name  = $('#providers').val();
-	    var logout_url = $('#overview_logoutUrl').val();
-	    var idp_provider = $('#sso_idpProviderUrl').val();
-	    var app_name = $('#overview_name').val();
-	    var app_version = $('#overview_version').val();
-	    var app_transport = $('#overview_transports').val();
-	    var app_treatAsASite = $('#overview_treatAsASite').val();
-	    var app_context = $('#overview_context').val();
-	    var app_provider = $('#overview_provider').val();
-	    var app_allowAnonymous=$('#overview_allowAnonymous').val();
-	    var app_acsURL = $('#overview_acsUrl').val();
-        var app_isDefaultVersion = $('#overview_makeAsDefaultVersion').val();
+		var ssoConfig = {};
+		var providerName = $('#providers').val();
+		var logoutUrl = $('#overview_logoutUrl').val();
+		var idpProvider = $('#sso_idpProviderUrl').val();
+		var appName = $('#overview_name').val();
+		var appVersion = $('#overview_version').val();
+		var appTransport = $('#overview_transports').val();
+		var appTreatAsASite = $('#overview_treatAsASite').val();
+		var appContext = $('#overview_context').val();
+		var appProvider = $('#overview_provider').val();
+		var appAllowAnonymous = $('#overview_allowAnonymous').val();
+		var appAcsURL = $('#overview_acsUrl').val();
+		var appIsDefaultVersion = $('#overview_makeAsDefaultVersion').val();
 
-	    var claims = [];
-	    var index=0;
-	    var propertyCount = document.getElementById("claimPropertyCounter").value;
-	    while(index < propertyCount){
-	        var claim = $("#claimPropertyName"+index).val();
-	        if(claim != null){
-	            claims[claims.length] = claim;
-	        }
-	        index++;
-	    }
-	    sso_config.provider = provider_name;
-	    sso_config.logout_url = logout_url;
-	    sso_config.claims = claims;
-	    sso_config.idp_provider = idp_provider;
-	    sso_config.app_name = app_name;
-	    sso_config.app_verison = app_version;
-	    sso_config.app_transport = app_transport;
-	    sso_config.app_treatAsASite = app_treatAsASite;
-	    sso_config.app_context = app_context;
-	    sso_config.app_provider = app_provider;
-	    sso_config.app_allowAnonymous=app_allowAnonymous;
-	    sso_config.app_acsURL = app_acsURL;
-        sso_config.app_isDefaultVersion = app_isDefaultVersion;
+		var claims = [];
+		var index = 0;
+		var propertyCount = document.getElementById("claimPropertyCounter").value;
+		while (index < propertyCount) {
+			var claim = $("#claimPropertyName" + index).val();
+			if (claim != null) {
+				claims[claims.length] = claim;
+			}
+			index++;
+		}
+		ssoConfig.provider = providerName;
+		ssoConfig.logout_url = logoutUrl;
+		ssoConfig.claims = claims;
+		ssoConfig.idp_provider = idpProvider;
+		ssoConfig.app_name = appName;
+		ssoConfig.app_verison = appVersion;
+		ssoConfig.app_transport = appTransport;
+		ssoConfig.app_treatAsASite = appTreatAsASite;
+		ssoConfig.app_context = appContext;
+		ssoConfig.app_provider = appProvider;
+		ssoConfig.app_allowAnonymous = appAllowAnonymous;
+		ssoConfig.app_acsURL = appAcsURL;
+		ssoConfig.app_isDefaultVersion = appIsDefaultVersion;
 
 
-        $.ajax({
-            url: caramel.context + '/api/sso/addConfig',
-            type: 'POST',
-            contentType: 'application/json',
-            data:JSON.stringify(sso_config),
-            success: function(response) {
-                console.log("Added SSO config successfully");
-            },
-            error: function(response) {
-                showAlert('Error adding service provider.', 'error');
-            }
-        });
+		$.ajax({
+				   url: caramel.context + '/api/sso/addConfig',
+				   type: 'POST',
+				   contentType: 'application/json',
+				   data: JSON.stringify(ssoConfig),
+				   error: function (response) {
+					   showAlert('Error adding service provider.', 'error');
+				   }
+			   });
 	}
 
 

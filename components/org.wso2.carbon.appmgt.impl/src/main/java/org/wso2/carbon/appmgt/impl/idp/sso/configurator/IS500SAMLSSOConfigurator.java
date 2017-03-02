@@ -23,6 +23,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
@@ -124,7 +125,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         } else {
-            if (acsUrl != null && acsUrl.length() > 0) {
+            if (!StringUtils.isEmpty(acsUrl)) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(webApp));
@@ -215,7 +216,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         } else {
-            if (acsUrl != null && acsUrl.length() > 0) {
+            if (!StringUtils.isEmpty(acsUrl)) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(application));

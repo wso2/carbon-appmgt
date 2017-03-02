@@ -110,40 +110,43 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Get business owner for a given business owner id.
-     * @param businessOwnerId Id of business owner.
-     * @return
-     * @throws AppManagementException
+     * Retrieve business owner by given id.
+     *
+     * @param businessOwnerId Id of business owner
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     @Override
-    public BusinessOwner  getBusinessOwner(int businessOwnerId) throws AppManagementException {
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
         return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
     }
 
     /**
-     * Get business owner for a given business owner id in public store.
-     * @param businessOwnerId
-     * @param appTenantId
-     * @return
-     * @throws AppManagementException
+     * Retrieve business owner for a given business owner id.
+     *
+     * @param businessOwnerId Business owner id
+     * @param appTenantId     Tenant id of the application
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     @Override
-    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int appTenantId) throws
-                                                                                          AppManagementException {
+    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int appTenantId)
+            throws AppManagementException {
         return appMDAO.getBusinessOwner(businessOwnerId, appTenantId);
     }
 
     /**
-     * Returns business owner Ids by a prefix of business owner name.
-     * @param searchPrefix
-     * @param appTenantId
-     * @return
-     * @throws AppManagementException
+     * Search business owner.
+     *
+     * @param searchPrefix Search prefix
+     * @param tenantId  Tenant Id of the application
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
      */
     @Override
-    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int appTenantId) throws
-                                                                                          AppManagementException {
-        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, appTenantId);
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
+                                                                                             AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
     }
 
     /**
@@ -1785,21 +1788,21 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
                                                         String searchValue) throws AppManagementException {
-        Registry anonnymousUserRegistry = null;
+        Registry userRegistry = null;
         try {
             if (tenantIdOfStore != tenantIdOfUser) {
-                // Get registry for anonnymous users when searching is going in tenant.
-                anonnymousUserRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                // Get registry for anonymous users when searching is going in tenant.
+                userRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
                         .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIdOfStore);
             } else {
-                anonnymousUserRegistry = registry;
+                userRegistry = registry;
             }
         } catch (RegistryException e) {
-            handleException("Error while obtaining registry.", e);
+            handleException("Error occurred while obtaining apps from the registry.", e);
         }
 
         return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,
-                                                searchValue, anonnymousUserRegistry);
+                                                searchValue, userRegistry);
     }
 
     @Override

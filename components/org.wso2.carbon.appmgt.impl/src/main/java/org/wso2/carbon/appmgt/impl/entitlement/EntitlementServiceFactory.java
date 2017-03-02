@@ -33,8 +33,8 @@ public class EntitlementServiceFactory {
      * NOTE : Only XACML entitlement service is supported as of now.
      * @param configuration
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
-     * @return
-     * @throws AppManagementException
+     * @return entitlement service
+     * @throws AppManagementException on error while trying to get entitlement service
      */
     public static EntitlementService getEntitlementService(AppManagerConfiguration configuration,
                                                            String authorizedAdminCookie)
@@ -49,8 +49,8 @@ public class EntitlementServiceFactory {
      * NOTE : Only XACML entitlement service is supported as of now.
      *
      * @param configuration
-     * @return
-     * @throws AppManagementException
+     * @return {@link EntitlementService} object
+     * @throws AppManagementException on error while trying to get entitlement service
      */
     public static EntitlementService getEntitlementService(AppManagerConfiguration configuration)
             throws AppManagementException {

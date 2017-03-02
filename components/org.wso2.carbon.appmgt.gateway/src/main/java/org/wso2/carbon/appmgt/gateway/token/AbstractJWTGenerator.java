@@ -98,7 +98,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Reads the ClaimsRetrieverImplClass from app-manager.xml ->
      * AppConsumerAuthConfiguration -> ClaimsRetrieverImplClass.
      *
-     * @throws AppManagementException
      */
     public AbstractJWTGenerator() {
 
@@ -140,11 +139,11 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Method that generates the JWT token from SAML2 response.
      *
-     * @param saml2Assertions
-     * @param webApp
-     * @param messageContext
-     * @return jwt token
-     * @throws AppManagementException
+     * @param saml2Assertions Saml2Assertions map
+     * @param webApp {@link WebApp} object
+     * @param messageContext {@link MessageContext} object
+     * @return Jwt token
+     * @throws AppManagementException on error while trying to generate token
      */
     public String generateToken(Map<String, Object> saml2Assertions, WebApp webApp,
                                 MessageContext messageContext) throws AppManagementException {
@@ -247,10 +246,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to sign the JWT
      *
-     * @param assertion
-     * @param endUserName
+     * @param assertion Assertion
+     * @param endUserName End user name
      * @return signed assertion
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to sign JWT
      */
     private byte[] signJWT(String assertion, String endUserName) throws AppManagementException {
         int tenantId = getTenantId(endUserName);
@@ -292,10 +291,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to get private key for specific tenant.
      *
-     * @param endUserName
-     * @param tenantId
-     * @return private key
-     * @throws AppManagementException
+     * @param endUserName End user name
+     * @param tenantId Tenant id
+     * @return {@link Key} object
+     * @throws AppManagementException on error while trying to get private key
      */
     private Key getPrivateKey(String endUserName, int tenantId) throws AppManagementException {
 
@@ -346,9 +345,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to add public certificate to JWT_HEADER to signature verification.
      *
-     * @param endUserName
+     * @param endUserName End user name
      * @return jwt header as a string
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to add certificate to the header
      */
     private String addThumbPrintToHeader(String endUserName) throws AppManagementException {
         int tenantId = getTenantId(endUserName);
@@ -371,10 +370,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to get base 64 encoded thumb print for specific tenant.
      *
-     * @param endUserName
-     * @param tenantId
+     * @param endUserName End user name
+     * @param tenantId Tenant id
      * @return base 64 encoded thumb print
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get base 64 encoded thumb print
      */
     private String getBase64EncodedThumbPrint(String endUserName, int tenantId) throws AppManagementException {
         try {
@@ -409,10 +408,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to get public certificate for specific tenant.
      *
-     * @param endUserName
-     * @param tenantId
+     * @param endUserName End user name
+     * @param tenantId Tenant id
      * @return public certificate
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get public certificate
      */
     private Certificate getPublicCertificate(String endUserName, int tenantId) throws AppManagementException {
         String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
@@ -476,9 +475,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     /**
      * Helper method to get tenantId from userName
      *
-     * @param userName
-     * @return tenantId
-     * @throws AppManagementException
+     * @param userName User name
+     * @return tenantId Tenant id
+     * @throws AppManagementException on error while trying to get tenant id from user name
      */
     protected int getTenantId(String userName) throws AppManagementException {
         int tenantId;
