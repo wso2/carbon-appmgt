@@ -77,7 +77,7 @@ public class AppManagerGatewayComponent {
 
     protected void unsetAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
-            log.debug("App manager configuration service is unset to gateway bundle");
+            log.debug("App manager configuration service is unset from the gateway bundle");
         }
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
     }

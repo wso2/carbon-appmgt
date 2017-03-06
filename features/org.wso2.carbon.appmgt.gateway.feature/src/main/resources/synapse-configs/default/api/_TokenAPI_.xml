@@ -3,15 +3,15 @@
         <inSequence>
             <send>
                 <endpoint>
-                    <address uri="https://localhost:9443/appmoauth2/token"/>
+                    <address uri="https://localhost:9443/appmoauth2/token" />
                 </endpoint>
             </send>
         </inSequence>
         <outSequence>
-            <send/>
+            <send />
         </outSequence>
     </resource>
     <handlers>
-        <handler class="org.wso2.carbon.appmgt.gateway.handlers.ext.APIManagerCacheExtensionHandler"/>
+        <handler class="org.wso2.carbon.appmgt.gateway.handlers.ext.APIManagerCacheExtensionHandler" />
     </handlers>
 </api>

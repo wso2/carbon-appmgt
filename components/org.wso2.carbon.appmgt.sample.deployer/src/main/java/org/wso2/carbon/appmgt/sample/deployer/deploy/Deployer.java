@@ -74,13 +74,10 @@ public class Deployer {
         } catch (UserAdminUserAdminException e) {
 
         } catch (RemoteException e) {
-            log.error("Error while registering a User subscriber_" + username, e);
-            throw new AppManagementException("Error while registering a User subscriber_" + username, e);
+            throw new AppManagementException("Error occurred while registering a User subscriber_" + username, e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while login to UserAdminStub", e);
-            throw new AppManagementException("Error while login to UserAdminStub", e);
+            throw new AppManagementException("Error occurred while login to UserAdminStub", e);
         }
-
 
         try {
             storeSession = httpHandler.doPostHttp(httpBackEndUrl + "/store/apis/user/login",
@@ -137,10 +134,10 @@ public class Deployer {
     private boolean isSubscriptionEnabled() {
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        Boolean isSubscriptionEnabled = false;
-        Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+        boolean isSubscriptionEnabled = false;
+        boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                 AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-        Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+        boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                 AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
         if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
             isSubscriptionEnabled = true;

@@ -39,7 +39,7 @@ public class BusinessOwnerApiServiceImpl extends BusinessOwnerApiService {
                 businessOwnerPropertiesDTOList = new ArrayList<>();
                 for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
                     BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
-                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyKey());
                     businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
                     businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);

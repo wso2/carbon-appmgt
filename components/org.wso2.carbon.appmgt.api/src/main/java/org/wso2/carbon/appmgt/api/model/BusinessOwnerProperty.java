@@ -21,16 +21,16 @@ package org.wso2.carbon.appmgt.api.model;
  * Business owner property model class.
  */
 public class BusinessOwnerProperty {
-    private String propertyId;
+    private String propertyKey;
     private String propertyValue;
     private boolean isShowingInStore;
 
-    public String getPropertyId() {
-        return propertyId;
+    public String getPropertyKey() {
+        return propertyKey;
     }
 
-    public void setPropertyId(String propertyId) {
-        this.propertyId = propertyId;
+    public void setPropertyKey(String propertyKey) {
+        this.propertyKey = propertyKey;
     }
 
     public String getPropertyValue() {

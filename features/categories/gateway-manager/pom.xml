@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>feature-categories</artifactId>
-        <version>1.2.8-SNAPSHOT</version>
+        <version>1.2.17-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -149,7 +149,7 @@
 
                                 <importFeatureDef>org.wso2.carbon.identity.application.authentication.framework.server:${carbon-identity-framework.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.social:${carbon.store.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.sso.saml:${identity-inbound-auth-saml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.inbound.auth.saml2:${identity-inbound-auth-saml.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso:${identity-carbon-auth-saml2.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.hostobjects.sso.server:${carbon.commons.version}</importFeatureDef>
 

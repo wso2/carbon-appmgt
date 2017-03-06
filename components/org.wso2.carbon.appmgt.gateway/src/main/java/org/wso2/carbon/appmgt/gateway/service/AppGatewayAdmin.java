@@ -37,16 +37,23 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This service is used to proxy RESTAPIAdmin service which is exposed by carbon mediation. If Publisher needs to call
+ * RESTAPIAdmin service, it should call AppGatewayAdmin service instead. This is introduced to separate Publisher from
+ * mediation services.
+ */
 public class AppGatewayAdmin extends AbstractAdmin {
     private static Log log = LogFactory.getLog(AppGatewayAdmin.class);
+
     /**
      * Add versioned webapp configuration to the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on errors while trying to add versioned webapps for tenant users
      */
     public void addVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                             String tenantDomain)
@@ -57,11 +64,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add versioned webapp configuration to the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @throws AppManagementException on errors while trying to add versioned webapps for super tenant users
      */
     public void addVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -70,13 +78,14 @@ public class AppGatewayAdmin extends AbstractAdmin {
     }
 
     /**
-     * Return versioned webapp configuration from the gateway for tenant user.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param tenantDomain
+     * Return versioned webapp configuration from the gateway for tenant users.
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param tenantDomain    Tenant domain
      * @return versioned webapp configuration data.
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get versioned webapps for tenant users
      */
     public WebAppData getVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                   String tenantDomain) throws AppManagementException {
@@ -86,12 +95,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
     }
 
     /**
-     * Return versioned webapp configuration from the gateway for super tenant user.
-     * @param appProviderName
-     * @param appName
-     * @param version
+     * Return versioned webapp configuration from the gateway for super tenant users.
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
      * @return versioned webapp configuration data.
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get versioned webapps for super tenant users
      */
     public WebAppData getVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -103,12 +113,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update versioned webapp configuration in the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on errors while trying to update versioned webapps for tenant users
      */
     public void updateVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                                String tenantDomain) throws AppManagementException {
@@ -118,11 +129,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update versioned webapp configuration in the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @throws AppManagementException on errors while trying to update versioned webapps for super tenant users
      */
     public void updateVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -132,11 +144,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on error while deleting versioned webapp for tenant users
      */
     public void deleteVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                String tenantDomain) throws AppManagementException {
@@ -146,10 +159,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @throws AppManagementException on error while deleting versioned webapp for super tenant users
      */
     public void deleteVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -159,12 +173,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add non versioned webapp configuration to the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on error while trying to add non versioned webapp for tenant users
      */
     public void addNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                                String tenantDomain) throws AppManagementException {
@@ -174,11 +189,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add non versioned webapp configuration to the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @throws AppManagementException on error while trying to add non versioned webapp for super tenant users
      */
     public void addNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -188,12 +204,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update non versioned webapp configuration in the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on error while trying to update non versioned webapp for tenant users
      */
     public void updateNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                   String appConfig, String tenantDomain) throws AppManagementException {
@@ -203,11 +220,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update non versioned webapp configuration in the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param appConfig
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param appConfig       App configuration
+     * @throws AppManagementException on error while trying to update non versioned webapp for super tenant users
      */
     public void updateNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -217,11 +235,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete non versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param tenantDomain
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param tenantDomain    Tenant domain
+     * @throws AppManagementException on error while trying to delete non versioned webapp for tenant users
      */
     public void deleteNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                   String tenantDomain)
@@ -232,10 +251,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete non versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @throws AppManagementException on error while trying to delete non versioned webapp for super tenant users
      */
     public void deleteNonVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -245,12 +265,13 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Get non versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @param tenantDomain
-     * @return non versioned webapp configuration data.
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @param tenantDomain    Tenant domain
+     * @return Non versioned webapp configuration data.
+     * @throws AppManagementException on error while trying to get non versioned webapp for tenant users
      */
     public WebAppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version,
                                                          String tenantDomain) throws AppManagementException {
@@ -261,11 +282,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Get non versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName
-     * @param appName
-     * @param version
-     * @return non versioned webapp configuration data.
-     * @throws AppManagementException
+     *
+     * @param appProviderName App provider name
+     * @param appName         App name
+     * @param version         Version
+     * @return Non versioned webapp configuration data.
+     * @throws AppManagementException on error while trying to get non versioned webapp for super tenant users
      */
     public WebAppData getNonVersionedWebAppData(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -278,25 +300,25 @@ public class AppGatewayAdmin extends AbstractAdmin {
         if (data == null) {
             return null;
         }
-        WebAppData apiData = new WebAppData();
-        apiData.setContext(data.getContext());
-        apiData.setFileName(data.getFileName());
-        apiData.setHost(data.getHost());
-        apiData.setName(data.getName());
-        apiData.setPort(data.getPort());
+        WebAppData webAppData = new WebAppData();
+        webAppData.setContext(data.getContext());
+        webAppData.setFileName(data.getFileName());
+        webAppData.setHost(data.getHost());
+        webAppData.setName(data.getName());
+        webAppData.setPort(data.getPort());
         org.wso2.carbon.rest.api.stub.types.carbon.ResourceData[] resources = data.getResources();
-        List<ResourceData> resList = new ArrayList<ResourceData>();
+        List<ResourceData> resourceDataList = new ArrayList<ResourceData>();
         if (resources != null && resources.length > 0) {
-            for (org.wso2.carbon.rest.api.stub.types.carbon.ResourceData res : resources) {
-                if (res == null) {
+            for (org.wso2.carbon.rest.api.stub.types.carbon.ResourceData resourceData : resources) {
+                if (resourceData == null) {
                     continue;
                 }
-                ResourceData resource = convert(res);
-                resList.add(resource);
+                ResourceData resource = convert(resourceData);
+                resourceDataList.add(resource);
             }
-            apiData.setResources(resList.toArray(new ResourceData[0]));
+            webAppData.setResources(resourceDataList.toArray(new ResourceData[0]));
         }
-        return apiData;
+        return webAppData;
     }
 
     private ResourceData convert(org.wso2.carbon.rest.api.stub.types.carbon.ResourceData data) {
@@ -321,15 +343,15 @@ public class AppGatewayAdmin extends AbstractAdmin {
             return null;
         }
         String processedSequence = StringEscapeUtils.unescapeXml(sequence);
-        return  processedSequence;
+        return processedSequence;
 
     }
 
     /**
      * Deploy the sequence to the gateway for super tenant users.
      *
-     * @param sequence - The sequence element , which to be deployed in synapse.
-     * @throws AppManagementException on errors.
+     * @param sequence - The sequence element , which to be deployed in synapse
+     * @throws AppManagementException on errors while trying to add sequence
      */
     public void addSequence(String sequence) throws AppManagementException {
         if (!StringUtils.isEmpty(sequence)) {
@@ -338,10 +360,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
                 element = AXIOMUtil.stringToOM(sequence);
                 ServiceReferenceHolder.getInstance().getSequenceAdminService().addSequence(element);
             } catch (SequenceEditorException e) {
-                String errorMsg = "Error while adding the sequence : " + sequence + " for super tenant.";
+                String errorMsg = "Error occurred while adding the sequence : " + sequence + " for super tenant.";
                 throw new AppManagementException(errorMsg, e);
             } catch (XMLStreamException e) {
-                String errorMsg = "Error while streaming the sequence : " + sequence + " for super tenant.";
+                String errorMsg = "Error occurred while streaming the sequence : " + sequence + " for super tenant.";
                 throw new AppManagementException(errorMsg, e);
             }
         }
@@ -350,9 +372,9 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Deploy the sequence to the gateway for tenant users.
      *
-     * @param sequence - The sequence element , which to be deployed in synapse.
-     * @param tenantDomain the tenant domain of the user.
-     * @throws AppManagementException on errors.
+     * @param sequence     - The sequence element , which to be deployed in synapse
+     * @param tenantDomain the tenant domain of the user
+     * @throws AppManagementException on errors while trying to add sequence for tenant users
      */
     public void addSequenceForTenant(String sequence, String tenantDomain) throws AppManagementException {
         if (!StringUtils.isEmpty(sequence)) {
@@ -362,10 +384,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
                 ServiceReferenceHolder.getInstance().getSequenceAdminService().addSequenceForTenant(element,
                                                                                                     tenantDomain);
             } catch (SequenceEditorException e) {
-                String errorMsg = "Error while adding the sequence : " + sequence + " for tenant : " + tenantDomain;
+                String errorMsg = "Error occurred while adding the sequence : " + sequence + " for tenant : " +
+                        tenantDomain;
                 throw new AppManagementException(errorMsg, e);
             } catch (XMLStreamException e) {
-                String errorMsg = "Error while streaming the sequence : " + sequence + " for super tenant.";
+                String errorMsg = "Error occurred while streaming the sequence : " + sequence + " for super tenant.";
                 throw new AppManagementException(errorMsg, e);
             }
         }
@@ -374,14 +397,14 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Undeploy the sequence from gateway for super tenant users.
      *
-     * @param sequenceName -The sequence name, which need to be undeployed from synapse configuration.
-     * @throws AppManagementException on errors.
+     * @param sequenceName -The sequence name, which need to be undeployed from synapse configuration
+     * @throws AppManagementException on errors while trying to undeploy sequence for tenant users
      */
     public void deleteSequence(String sequenceName) throws AppManagementException {
         try {
             ServiceReferenceHolder.getInstance().getSequenceAdminService().deleteSequence(sequenceName);
         } catch (SequenceEditorException e) {
-            String errorMsg = "Error while deleting the sequence : " + sequenceName + " for super tenant.";
+            String errorMsg = "Error occurred while deleting the sequence : " + sequenceName + " for super tenant.";
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -389,16 +412,17 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Undeploy the sequence from gateway for tenant users.
      *
-     * @param sequenceName -The sequence name, which need to be undeployed from synapse configuration.
-     * @param tenantDomain the tenant domain of the user.
-     * @throws AppManagementException on errors.
+     * @param sequenceName -The sequence name, which need to be undeployed from synapse configuration
+     * @param tenantDomain The tenant domain of the user
+     * @throws AppManagementException on errors while trying to undeploy sequence for tenant users
      */
     public void deleteSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
             ServiceReferenceHolder.getInstance().getSequenceAdminService().deleteSequenceForTenant
                     (sequenceName, tenantDomain);
         } catch (SequenceEditorException e) {
-            String errorMsg = "Error while deleting the sequence : " + sequenceName + " for tenant : " + tenantDomain;
+            String errorMsg = "Error occurred while deleting the sequence : " + sequenceName + " for tenant : " +
+                    tenantDomain;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -406,14 +430,15 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Get the sequence from gateway for super tenant users.
      *
-     * @param sequenceName -The sequence name.
-     * @throws AppManagementException on errors.
+     * @param sequenceName The sequence name
+     * @return sequence {@link OMElement} object
+     * @throws AppManagementException on errors while trying to get sequence for super tenant users
      */
     public OMElement getSequence(String sequenceName) throws AppManagementException {
         try {
             return ServiceReferenceHolder.getInstance().getSequenceAdminService().getSequence(sequenceName);
         } catch (SequenceEditorException e) {
-            String errorMsg = "Error while retrieving the sequence : " + sequenceName + " for super tenant.";
+            String errorMsg = "Error occurred while retrieving the sequence : " + sequenceName + " for super tenant.";
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -421,24 +446,28 @@ public class AppGatewayAdmin extends AbstractAdmin {
     /**
      * Get the sequence from gateway for tenant users.
      *
-     * @param sequenceName -The sequence name
-     * @param tenantDomain the tenant domain of the user.
-     * @throws AppManagementException on errors.
+     * @param sequenceName The sequence name
+     * @param tenantDomain Tenant domain
+     * @return sequence {@link OMElement} object
+     * @throws AppManagementException on errors while trying to get sequence for tenant users
      */
     public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
-            return ServiceReferenceHolder.getInstance().getSequenceAdminService().getSequenceForTenant(sequenceName, tenantDomain);
+            return ServiceReferenceHolder.getInstance().getSequenceAdminService().getSequenceForTenant(sequenceName,
+                                                                                                       tenantDomain);
         } catch (SequenceEditorException e) {
-            String errorMsg = "Error while retrieving the sequence : " + sequenceName + " for tenant : " + tenantDomain;
+            String errorMsg = "Error occurred while retrieving the sequence : " + sequenceName + " for tenant : " +
+                    tenantDomain;
             throw new AppManagementException(errorMsg, e);
         }
     }
 
     /**
      * Check whether there is already a sequence in gateway for super tenant users.
-     * @param sequenceName the sequence name.
-     * @return true or false.
-     * @throws AppManagementException
+     *
+     * @param sequenceName Sequence name
+     * @return Whether the given sequence is exist or not
+     * @throws AppManagementException on error while trying to check whether sequence exist or not
      */
     public boolean isExistingSequence(String sequenceName) throws AppManagementException {
         try {
@@ -451,18 +480,19 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Check whether there is already a sequence in gateway for tenant users.
-     * @param sequenceName the sequence name.
-     * @param tenantDomain the tenant domain of the user.
-     * @return true or false.
-     * @throws AppManagementException
+     *
+     * @param sequenceName Sequence name
+     * @param tenantDomain The tenant domain of the user
+     * @return Whether the given sequence is exist or not
+     * @throws AppManagementException on error while trying to check whether sequence exist or not
      */
     public boolean isExistingSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
         try {
             return ServiceReferenceHolder.getInstance().getSequenceAdminService().isExistingSequenceForTenant
                     (sequenceName, tenantDomain);
         } catch (SequenceEditorException e) {
-            String errorMsg = "Error while checking for existence of sequence : " + sequenceName + "in tenant " +
-                    tenantDomain;
+            String errorMsg = "Error occurred while checking for existence of sequence : " + sequenceName + "in " +
+                    "tenant : " + tenantDomain;
             throw new AppManagementException(errorMsg, e);
         }
     }

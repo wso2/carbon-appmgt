@@ -46,8 +46,9 @@ function saveOwner(ownerName, ownerMail, description, sitelink, ownerDetails) {
      var existOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
      var response;
      if ((existOwnerId == businessOwnerId) || (existOwnerId == -1)) {
-        var partialId = apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail,
-                                                     businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
+         var partialId = apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail,
+                                                         businessOwnerDescription, businessOwnerSite,
+                                                         businessOwnerDetails);
          response = {"success": true, "response":{"message":"Business owner updated successfully."}};
      } else {
         var message = "Business owner with owner Name: " + businessOwnerName + " and email: " + businessOwnerEmail +

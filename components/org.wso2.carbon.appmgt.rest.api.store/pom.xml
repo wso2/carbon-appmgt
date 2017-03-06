@@ -19,13 +19,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.8-SNAPSHOT</version>
+        <version>1.2.17-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
-    <version>1.2.8-SNAPSHOT</version>
+    <version>1.2.17-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>WSO2 App Manager Store REST API</name>
     <description>WSO2 App Manager REST API for App Store</description>
@@ -83,7 +83,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
             <scope>provided</scope>
         </dependency>

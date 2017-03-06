@@ -22,21 +22,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
 /**
- *
- * App Manager publisher component
+ * App Manager publisher component.
  *
  * @scr.component name="org.wso2.appmgt.services.publisher" immediate="true"
- *
  * @scr.reference name="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService"
- * interface="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService" cardinality="1..1"
- * policy="dynamic" bind="setTenantConfigurationService" unbind="unsetTenantConfigurationService
- *
- *
+ * interface="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService" cardinality="1..1" policy="dynamic"
+ * bind="setTenantConfigurationService" unbind="unsetTenantConfigurationService
  **/
 public class AppManagerPublisherComponent {
 
@@ -44,31 +39,33 @@ public class AppManagerPublisherComponent {
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Publisher component activated");
+            log.debug("Publisher component activated.");
         }
         BundleContext bundleContext = componentContext.getBundleContext();
 
-        //Register Tenant service creator to deploy tenant specific common synapse configurations
+        //Register Tenant service creator to deploy tenant specific common synapse configurations.
         TenantCreatePublisherObserver listener = new TenantCreatePublisherObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
-            log.debug("Deactivating Publisher component");
+            log.debug("Deactivating Publisher component.");
         }
     }
 
     protected void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
         if (log.isDebugEnabled()) {
-            log.debug("Setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+            log.debug("Setting tenant configuration service implementation - " +
+                              tenantConfigurationService.getClass().getName());
         }
         ServiceReferenceHolder.getInstance().setTenantConfigurationService(tenantConfigurationService);
     }
 
     protected void unsetTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
         if (log.isDebugEnabled()) {
-            log.debug("Un-setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+            log.debug("Un-setting tenant configuration service implementation - " +
+                              tenantConfigurationService.getClass().getName());
         }
         ServiceReferenceHolder.getInstance().setTenantConfigurationService(null);
     }

@@ -15,6 +15,9 @@
  */
 package org.wso2.carbon.appmgt.gateway.dto;
 
+/**
+ * DTO object which maps to synapse rest APIs.
+ */
 public class WebAppData {
     private String name;
     private String host;
@@ -24,72 +27,81 @@ public class WebAppData {
     private ResourceData[] resources;
 
     /**
-     * Get App Name.
-     * @return app name as a String.
+     * Get application name.
+     *
+     * @return Application name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Set App Name.
-     * @param name application name.
+     * Set application name.
+     *
+     * @param name Application name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * Get Host Value.
-     * @return host as a String.
+     * Get host value.
+     *
+     * @return Host name
      */
     public String getHost() {
         return host;
     }
 
     /**
-     * Set Host Value.
-     * @param host host name of the app.
+     * Set host value.
+     *
+     * @param host Host name
      */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * Get Port Value.
-     * @return port in Int.
+     * Get port value.
+     *
+     * @return Port
      */
     public int getPort() {
         return port;
     }
 
     /**
-     * Set Port Value.
-     * @param port port value ot the app.
+     * Set port value.
+     *
+     * @param port Port
      */
     public void setPort(int port) {
         this.port = port;
     }
 
     /**
-     * Get App Context.
-     * @return context in String.
+     * Get app context.
+     *
+     * @return Context
      */
     public String getContext() {
         return context;
     }
 
     /**
-     * Set App Context.
-     * @param context context value of the app.
+     * Set app context.
+     *
+     * @param context Context
      */
     public void setContext(String context) {
         this.context = context;
     }
 
     /**
-     * Get Resource Data.
-     * @return array of Resource data.
+     * Get resource data.
+     *
+     * @return Array of {@link ResourceData}
      */
     public ResourceData[] getResources() {
         return resources;
@@ -97,24 +109,27 @@ public class WebAppData {
 
 
     /**
-     * Set Resource Data.
-     * @param resources app resources.
+     * Set resource data.
+     *
+     * @param resources Array of {@link ResourceData}
      */
     public void setResources(ResourceData[] resources) {
         this.resources = resources;
     }
 
     /**
-     * Get File Name.
-     * @return fileName in String.
+     * Get file name.
+     *
+     * @return File name
      */
     public String getFileName() {
         return fileName;
     }
 
     /**
-     * Set File Name.
-     * @param fileName file name of the app.
+     * Set file name.
+     *
+     * @param fileName file name
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;

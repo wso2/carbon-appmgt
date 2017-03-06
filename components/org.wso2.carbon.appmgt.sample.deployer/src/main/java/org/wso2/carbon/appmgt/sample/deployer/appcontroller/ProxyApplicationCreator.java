@@ -90,13 +90,12 @@ public class ProxyApplicationCreator {
     }
 
     /**
-     * This method is use for create,publish and subscribe given web application
+     * Create,publish and subscribe to a given web application.
      *
-     * @param webAppDetail Bean object of the web application
-     * @throws AppManagementException Throws this when failed to add an user
-     *                                Throws this when store session is failed while requesting
-     *                                Throws this when policy id is failed while requesting
-     *                                Throws this when failed to create,publish or subscribe web application
+     * @param webAppDetail           {@link WebAppDetail} object
+     * @param hasSubscriptionEnabled Whether subscription has enabled or not
+     * @throws AppManagementException on error while trying to create a web app or publish a web app or subscribe to a
+     *                                web app
      */
     public void createAndPublishWebApplication(WebAppDetail webAppDetail, Boolean hasSubscriptionEnabled) throws
                                                                                                 AppManagementException {
@@ -177,11 +176,12 @@ public class ProxyApplicationCreator {
             try {
                 applicationSubscriber.subscribeApplication(appCreateRequest, storeSession, currentUserName);
             } catch (IOException e) {
-                String subscribingErrorMessage = "Error while subscribing a web application " + webAppDetail.getDisplayName();
+                String subscribingErrorMessage = "Error occurred while trying to subscribe to a web application " +
+                        webAppDetail.getDisplayName();
                 log.error(subscribingErrorMessage, e);
                 throw new AppManagementException(subscribingErrorMessage, e);
             }
-            log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_" + currentUserName);
+            log.info(appCreateRequest.getOverview_name() + "application subscribed by subscriber_" + currentUserName);
 
         }
     }

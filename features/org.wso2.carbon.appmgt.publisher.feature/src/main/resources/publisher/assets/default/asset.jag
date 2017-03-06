@@ -56,7 +56,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var businessOwnerNameAndEmail;
         for (var i = 0; i < ownersList.length; i++) {
             ownerNameAndEmail = ownersList[i].businessOwnerName + " (" + ownersList[i].businessOwnerEmail + ")";
-            nameList.push({id:ownersList[i].businessOwnerId, text:ownerNameAndEmail});
+            nameList.push({id: ownersList[i].businessOwnerId, text: ownerNameAndEmail});
         }
         return stringify(nameList);
     }

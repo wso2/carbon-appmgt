@@ -23,7 +23,6 @@ import java.util.List;
  * Business owner model class.
  */
 public class BusinessOwner {
-
     private int businessOwnerId;
     private String businessOwnerName;
     private String businessOwnerEmail;
