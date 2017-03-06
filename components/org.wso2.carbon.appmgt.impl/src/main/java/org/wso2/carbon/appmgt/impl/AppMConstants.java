@@ -57,7 +57,7 @@ public final class AppMConstants {
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
 
-    public static final String DOCUMENTATION_KEY = "document";
+    public static final String DOCUMENTATION_KEY = "appmdocument";
     public static final String DOCUMENTATION_RESOURCE_MAP_DATA = "Data";
     public static final String DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE = "contentType";
     public static final String DOCUMENTATION_RESOURCE_MAP_NAME = "name";
