@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<artifactType type="application/vnd.wso2-document+xml" shortName="document" singularLabel="Document" pluralLabel="Documents" hasNamespace="false" iconSet="3">
+<artifactType type="application/vnd.wso2-document+xml" shortName="appmdocument" singularLabel="Document" pluralLabel="Documents" hasNamespace="false" iconSet="3">
     <storagePath>/appmgt/applicationdata/provider/@{overview_apiBasePath}/documentation/@{overview_name}</storagePath>
     <nameAttribute>overview_name</nameAttribute>
     <ui>
