@@ -9,9 +9,10 @@
  Filename:assets.js
  Created Date: 29/7/2013
  */
+
 include("/extensions/webapp/modules/jagg/jagg.jag");
 
-require('/modules/publisher.js').exec(function(ctx) {
+require('/modules/publisher.js').exec(function (ctx) {
 
     var router = require('/modules/router-g.js').router();
     var config = require('/config/publisher.json');
@@ -20,362 +21,355 @@ require('/modules/publisher.js').exec(function(ctx) {
     var publisher = require('/modules/publisher.js').publisher(request, session);
     var apiProvider = jagg.module('manager').getAPIProviderObj();
 
-var routeMnger = new router.Router();
+    var routeMnger = new router.Router();
 //var routeManager=application.get(config.app.ROUTE_MANAGER);
-var rxtManager = publisher.rxtManager;
-var modelManager = publisher.modelManager;
-var dataInjector=publisher.dataInjector;
-var DataInjectorModes=publisher.DataInjectorModes;
-var filterManager=publisher.filterManager;
-var permissions=require('/modules/permissions.js').permissions;
-var typeList = apiProvider.getEnabledAssetTypeList();
+    var rxtManager = publisher.rxtManager;
+    var modelManager = publisher.modelManager;
+    var dataInjector = publisher.dataInjector;
+    var DataInjectorModes = publisher.DataInjectorModes;
+    var filterManager = publisher.filterManager;
+    var permissions = require('/modules/permissions.js').permissions;
+    var typeList = apiProvider.getEnabledAssetTypeList();
 
-var log=new Log();
+    var log = new Log();
 
-var PAGE_SIZE = config.paginationConfig.PAGE_SIZE;
+    var PAGE_SIZE = config.paginationConfig.PAGE_SIZE;
+    var PAGE_SIZE_ON_REVIEW = config.paginationConfig.PAGE_SIZE_ON_REVIEW;
+    var PAGNINATION_SIZE = config.paginationConfig.PAGNINATION_SIZE;
+
 //var DEFAULT_PAGIN = {'start':0, 'count':20 , 'sortOrder':'desc','sortBy': 'overview_createdtime', 'paginationLimit':1000};
-var DEFAULT_PAGING = {'sortOrder':'desc','sortBy': 'overview_createdtime', 'paginationLimit':1000};
+    var DEFAULT_PAGING = {'sortOrder': 'desc', 'sortBy': 'overview_createdtime', 'paginationLimit': 1000};
 
-/*routeMnger.register('GET','publisher','/publisher/assets/list',function(context){
+    /*routeMnger.register('GET','publisher','/publisher/assets/list',function(context){
 
- //Print all of the rxt types
- for each(var template in rxtManager.rxtTemplates){
- print(template.shortName+'</br>');
- }
+     //Print all of the rxt types
+     for each(var template in rxtManager.rxtTemplates){
+     print(template.shortName+'</br>');
+     }
 
- print('root asset');
- //caramel.render({sample: {name: 'Default asset renderer'}});
+     print('root asset');
+     //caramel.render({sample: {name: 'Default asset renderer'}});
 
- });*/
-var log = new Log();
+     });*/
+    var log = new Log();
 
-/**
- * Returns all the artifacts which matchs the given criteria.
- */
-var getArtifactsWithoutPagination = function(artifactManager, query, sortby, sort){
-
-    DEFAULT_PAGING.start = 0;
-    DEFAULT_PAGING.count = artifactManager.count();
-
-    var artifacts;
-
-    if(query) {
-        var searchMap = {};
-        searchMap["overview_displayName"] = query;
-        artifacts = artifactManager.search(searchMap, DEFAULT_PAGING) || [];
-    } else if (sortby && sort){
-        DEFAULT_PAGING.sortBy = 'overview_'+sortby;
-        DEFAULT_PAGING.sortOrder = sort.toUpperCase();
-        artifacts = artifactManager.search(null,DEFAULT_PAGING) || [];
-    } else {
-        artifacts = artifactManager.search(null, DEFAULT_PAGING) || [];
-    }
-
-    return artifacts;
-}
-
-/**
- * Returns the artifacts for the requested page.
- */
-var getArtifactsInPage = function(filteredArtifacts, paginationContext){
-
-	if(!filteredArtifacts){
-		return [];
-	}
-
-    var artifactsInPage = new Array();
-
-    var i;
-    var startIndex = paginationContext.start;
-    var pageSize = paginationContext.count;
-
-    // Available elements counts in the original list, to be added to the page.
-    var nAvailableElements = filteredArtifacts.length - startIndex;
-
-    // If the available count is less than the page size, then add the available elements, else the page size.
-    var elementCountTobeAdded = (nAvailableElements < pageSize) ? nAvailableElements : pageSize;
-
-    // Add the elements to the page.
-    for(i = startIndex; i < startIndex + elementCountTobeAdded; i++){
-        artifactsInPage.push(filteredArtifacts[i]);
-    }
-
-    return artifactsInPage;
-
-}
 
     /**
      * The function will create an array of page indices upto the page count
      * @param pageCount The max page count
      */
-var pageIndexPopulator = function(pageCount,currentIndex){
+    var pageIndexPopulator = function (currentPage, isMorePagesAvailable, initialAppCount) {
 
-    var indices = [];
-    var temp={};
-    for(var index=1;index<=pageCount;index++){
-        temp={};
-        temp.index = ''+index;
-        temp.isDisabled = false;
+        // Count the maximum showable app count in the pagination.
+        var maxShowableAppCount = (PAGE_SIZE + PAGE_SIZE_ON_REVIEW) * PAGNINATION_SIZE;
+        var pageCount = 0;
 
-        var pageNumber = Math.floor(currentIndex/PAGE_SIZE);
-        var remainder = (currentIndex/PAGE_SIZE) % 1;
-        if(remainder || pageNumber===0){
-            pageNumber = pageNumber +1;
+        // If the max showable app count is lesser than the initial app count, we can directly generate indices from
+        // initial app count.
+        if (initialAppCount < maxShowableAppCount) {
+            pageCount = getAvailablePages(initialAppCount);
+        } else {
+            // Page count sould be max showable app count if the current page is less than the max showable page. Else,
+            // current page will be the max page.
+            pageCount = getAvailablePages(maxShowableAppCount) > currentPage ? getAvailablePages(maxShowableAppCount)
+                : currentPage;
         }
 
-        //The current page is offset by 1 as the loop starts at 1
-        if(index==pageNumber){
-           temp.isDisabled=true;
+        var indices = [];
+        var temp = {};
+
+        // Increase the page count if we are on the last page and there are more pages available.
+        if (currentPage == pageCount && isMorePagesAvailable) {
+            pageCount++;
         }
-            indices.push(temp);
-    }
-    return indices;
-};
 
-var getAvailablePages = function(appCount){
-    var availablePages = Math.floor(appCount/PAGE_SIZE);
-    var remainder = (appCount/PAGE_SIZE) % 1;
-    if(remainder){
-        availablePages = availablePages +1;
-    }
-    return availablePages;
-}
+        for (var index = 1; index <= pageCount; index++) {
+            temp = {};
+            temp.index = '' + index;
+            temp.isDisabled = false;
 
-var getPaginationContext = function(availablePages, page){
-
-    var startVal;
-    if(page) {
-        if(page>=0) {
-            var appliedPageValue;
-            if(page > availablePages){
-                appliedPageValue = availablePages - 1;
-                startVal = PAGE_SIZE * appliedPageValue;
-            } else if (page > 1) {
-                appliedPageValue = page - 1;
-                startVal = PAGE_SIZE * appliedPageValue;
-            }else{
-                startVal = 0;
+            if (index == currentPage) {
+                temp.isDisabled = true;
             }
-        }else {
-            startVal = 0;
+            indices.push(temp);
         }
-    }else{
-        startVal = 0;
+
+        return indices;
+    };
+
+    var getAvailablePages = function (appCount) {
+        var availablePages = Math.floor(appCount / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW));
+        var remainder = (appCount / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW)) % 1;
+        if (remainder) {
+            availablePages = availablePages + 1;
+        }
+        return availablePages;
     }
 
-    DEFAULT_PAGING.start = startVal;
-    DEFAULT_PAGING.count = PAGE_SIZE;
+    var getCurrentPage = function (currentIndex) {
+        var pageNumber = Math.floor(currentIndex / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW));
+        var remainder = (currentIndex / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW)) % 1;
 
-    return DEFAULT_PAGING;
-
-}
-
-var getCurrentPage = function(currentIndex){
-    var pageNumber = Math.floor(currentIndex/PAGE_SIZE);
-    var remainder = (currentIndex/PAGE_SIZE) % 1;
-
-    if(remainder || pageNumber===0){
-        pageNumber = pageNumber +1;
-    }
-    return pageNumber;
-}
-
-routeMnger.register('GET', 'publisher', '/publisher/assets/{type}/', function(context) {
-	var query = request.getParameter("query");
-	var sortby = request.getParameter("sortby");
-	var sort = request.getParameter("sort");
-    var page = request.getParameter("page");
-	var type = context.params.type;
-
-    var server  = require('store').server;
-    var user = server.current(session);
-	var um = server.userManager(server.current(session).tenantId);
-    var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
-    var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
-    
-    try {
-		//TODO: Check for valid asset types
-		var artifactManager = rxtManager.getArtifactManager(type);
-		
-        // Fetch all artifacts for the given criteria.
-        var artifactsWithNoPagination = getArtifactsWithoutPagination(artifactManager, query, sortby, sort);
-        var filteredArtifacts = filterManager.filter(artifactsWithNoPagination,session) || [];
-
-        // Get the artifacts in the requested page.        
-        var filteredArtifactsCount = filteredArtifacts.length;
-        var availablePages = getAvailablePages(filteredArtifactsCount);
-        var paginationContext = getPaginationContext(availablePages, page);
-        var artifactsInPage = getArtifactsInPage(filteredArtifacts, paginationContext);
-		
-		dataInjector.inject(artifactsInPage, DataInjectorModes.DISPLAY);
-        
-        var currIndex = paginationContext.start + 1;
-
-        var indices = pageIndexPopulator(availablePages,currIndex);
-        var pageIndices;
-        if(indices.length > 1){
-            pageIndices = indices;
+        if (remainder || pageNumber === 0) {
+            pageNumber = pageNumber + 1;
         }
-
-        var currentPage = getCurrentPage(currIndex);
-        
-        if(currentPage-1 >= 0){
-            var leftnav = currentPage-1;
-        }
-        if(currentPage+1 <= availablePages){
-            var rightnav = currentPage+1;
-        }
-        var sortOpposite = (sort == 'asc'? 'desc': 'asc');
-        var sortIcon = (sort == 'asc'? 'down': 'up');
-
-        if(apiProvider.isAssetTypeEnabled(type)) {
-           caramel.render({
-                op : 'list',cuser : server.current(session),
-                roles : server.current(session).getRoles(),
-		        shortName : type,
-		        artifacts : artifactsInPage,
-		        query : query,
-		        title : type,
-		        pageIndices:pageIndices,
-		        leftNav:leftnav,
-		        rightNav:rightnav,
-		        createPermission:createActionAuthorized,
-		        mobileAppCreatePermission:createMobileAppAuthorized,
-		        sortOptions:{
-		            sortBy: sortby,
-		            sort: sortOpposite,
-		            icon: sortIcon
-		            },
-		        typeList: typeList
-		    });
-        }
-        else {
-            response.sendError(404, 'Resource does not exist');
-        }
-
-	} catch (e) {
-		response.sendError(400, "Your request is malformed");
-		log.error(e.message);
-	}
-
-	/*for each(var artifact in artifacts){
-	 print(artifact.id+'<br/><br/>');
-	 }*/
-
-});
-
-routeMnger.register('GET', 'publisher', '/publisher/assets/{type}', function(context) {
-	var query = request.getParameter("query");
-	var sortby = request.getParameter("sortby");
-	var sort = request.getParameter("sort");
-    var page = request.getParameter("page");
-	var type = context.params.type;
-
-    var server  = require('store').server;
-    var user = server.current(session);
-	var um = server.userManager(server.current(session).tenantId);
-    var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
-    var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
-
-    try {
-		//TODO: Check for valid asset types
-		var artifactManager = rxtManager.getArtifactManager(type);
-
-        // Fetch all artifacts for the given criteria.
-        var artifactsWithNoPagination = getArtifactsWithoutPagination(artifactManager, query, sortby, sort);
-        var filteredArtifacts = filterManager.filter(artifactsWithNoPagination,session) || [];
-
-        // Get the artifacts in the requested page.
-        var filteredArtifactsCount = filteredArtifacts.length;
-        var availablePages = getAvailablePages(filteredArtifactsCount);
-        var paginationContext = getPaginationContext(availablePages, page);
-        var artifactsInPage = getArtifactsInPage(filteredArtifacts, paginationContext);
-
-		dataInjector.inject(artifactsInPage, DataInjectorModes.DISPLAY);
-
-        var currIndex = paginationContext.start + 1;
-
-        var indices = pageIndexPopulator(availablePages,currIndex);
-        var pageIndices;
-        if(indices.length > 1){
-            pageIndices = indices;
-        }
-
-        var currentPage = getCurrentPage(currIndex);
-
-        if(currentPage-1 >= 0){
-            var leftnav = currentPage-1;
-        }
-        if(currentPage+1 <= availablePages){
-            var rightnav = currentPage+1;
-        }
-        var sortOpposite = (sort == 'asc'? 'desc': 'asc');
-        var sortIcon = (sort == 'asc'? 'down': 'up');
-
-        if(apiProvider.isAssetTypeEnabled(type)) {
-           caramel.render({
-                op : 'list',cuser : server.current(session),
-                roles : server.current(session).getRoles(),
-		        shortName : type,
-		        artifacts : artifactsInPage,
-		        query : query,
-		        title : type,
-		        pageIndices:pageIndices,
-		        leftNav:leftnav,
-		        rightNav:rightnav,
-		        createPermission:createActionAuthorized,
-		        mobileAppCreatePermission:createMobileAppAuthorized,
-		        sortOptions:{
-		            sortBy: sortby,
-		            sort: sortOpposite,
-		            icon: sortIcon
-		            },
-		        typeList: typeList
-		    });
-        }
-        else {
-            response.sendError(404, 'Resource does not exist');
-        }
-
-	} catch (e) {
-		response.sendError(400, "Your request is malformed");
-		log.error(e.message);
-	}
-
-	/*for each(var artifact in artifacts){
-	 print(artifact.id+'<br/><br/>');
-	 }*/
-
-});
-
-
-routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/', function (context) {
-    var operation = (context.params.operation) || '';
-    var type = context.params.type;
-
-    var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
-    var disableSubscriptionStats;
-    if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
-       disableSubscriptionStats = false;
-    }else{
-       disableSubscriptionStats = true;
+        return pageNumber;
     }
 
-    if (operation == 'statistics') {
+    var getAppCountForUserWithPaging = function (searchQuery, countPaging, artifactManager) {
+        var apps = artifactManager.search(searchQuery, countPaging);
+        if (apps) {
+            return apps.length;
+        }
+        return 0;
+    }
+
+    var isRoleExistForUser = function (role, username, userManager) {
+        var roleList = userManager.getRoleListOfUser(username)
+        for (index in roleList) {
+            if (role == roleList[index]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    routeMnger.register('GET', 'publisher', '/publisher/assets/{type}/', function (context) {
+
+        var query = request.getParameter("query");
+        var sortby = request.getParameter("sortby");
+        var sort = request.getParameter("sort");
+        var page = request.getParameter("page");
+        var type = context.params.type;
+
+        var server = require('store').server;
+        var carbon = require('carbon');
+
+        var tenantId = server.current(session).tenantId;
+        var user = server.current(session);
+        var um = server.userManager(tenantId);
+        var realmService = carbon.server.osgiService('org.wso2.carbon.user.core.service.RealmService');
+        var userRealm = realmService.getTenantUserRealm(tenantId);
+
+        var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
+        var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
+        var isUserPublisher = isRoleExistForUser("Internal/publisher", user.username, um);
+        var isUserAdmin = isRoleExistForUser(userRealm.getRealmConfiguration().getAdminRoleName(), user.username, um);
+
         try {
-            caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
+            var artifactManager = rxtManager.getArtifactManager(type);
+            var artifacts = [];
+            var startVal;
+            var startValOnReview;
 
+            var countPaging = DEFAULT_PAGING;
+            countPaging.count = (PAGE_SIZE_ON_REVIEW + PAGE_SIZE) * PAGNINATION_SIZE;
+
+            var onReviewStateAppCount = 0;
+            if (isUserPublisher || isUserAdmin) {
+                onReviewStateAppCount = getAppCountForUserWithPaging({"lcState": "In-Review"}, countPaging,
+                    artifactManager);
+            }
+
+            // Get the initial page count from session. If it is not available in the the session or PAGINATION size
+            // increased, update the value in session.
+            var initialAppCount = session.get("initialAppCount");
+            if (!initialAppCount) {
+                if (isUserAdmin) {
+                    initialAppCount = getAppCountForUserWithPaging({"-lcState": "In-Review"}, countPaging,
+                        artifactManager);
+                } else {
+                    initialAppCount = getAppCountForUserWithPaging({
+                        "overview_provider": user.username,
+                        "-lcState": "In-Review"
+                    }, countPaging, artifactManager);
+                }
+                session.put("initialAppCount", initialAppCount);
+                log.debug("No page count or pagination size is changed. Updating the session cache. Initial page " +
+                    "count: " + initialPages);
+            }
+
+            var initialPages = getAvailablePages(initialAppCount + onReviewStateAppCount);
+
+            // Calculate the start application number.
+            if (page) {
+                if (page >= 0) {
+                    startVal = (page - 1) * PAGE_SIZE;
+                    startValOnReview = (page - 1) * PAGE_SIZE_ON_REVIEW;
+                } else {
+                    startVal = 0;
+                    startValOnReview = 0;
+                }
+            } else {
+                // If the page number is not specified, we have to assume that page number is 1.
+                page = 1;
+                startVal = 0;
+                startValOnReview = 0;
+            }
+
+            // We have to check only the next page is avialble to improve the performance.
+            var isMorePagesAvailable = false;
+            if (initialPages >= PAGNINATION_SIZE) {
+                countPaging.count = 1;
+                if (page >= PAGNINATION_SIZE) {
+                    countPaging.start = startVal + PAGE_SIZE;
+                    var count = 0;
+                    if (isUserAdmin) {
+                        count = getAppCountForUserWithPaging({"-lcState": "In-Review"}, countPaging,
+                            artifactManager);
+                    } else {
+                        count = getAppCountForUserWithPaging({"overview_provider": user.username}, countPaging,
+                            artifactManager);
+                    }
+
+                    if (isUserPublisher || isUserAdmin) {
+                        count += getAppCountForUserWithPaging({"lcState": "In-Review"}, countPaging,
+                            artifactManager);
+                        ;
+                    }
+                    if (count > 0) {
+                        isMorePagesAvailable = true;
+                    }
+                }
+            }
+
+            DEFAULT_PAGING.start = startVal;
+            DEFAULT_PAGING.count = PAGE_SIZE;
+
+            if (sortby && sort) {
+                DEFAULT_PAGING.sortBy = 'overview_' + sortby;
+                DEFAULT_PAGING.sortOrder = sort.toUpperCase();
+            }
+
+            if (query) {
+                // For search queries.
+                if (isUserPublisher || isUserAdmin) {
+                    var usersAssets;
+                    if (isUserAdmin) {
+                        usersAssets = artifactManager.search({
+                                "-lcState": "In-Review",
+                                "overview_name": "*" + query + "*"
+                            },
+                            DEFAULT_PAGING);
+                    } else {
+                        usersAssets = artifactManager.search({
+                                "overview_provider": user.username,
+                                "-lcState": "In-Review",
+                                "overview_name": "*" + query + "*"
+                            },
+                            DEFAULT_PAGING);
+                    }
+
+                    DEFAULT_PAGING.start = startValOnReview;
+                    DEFAULT_PAGING.count = PAGE_SIZE_ON_REVIEW;
+
+                    var inReviewApps = artifactManager.search({
+                        "lcState": "In-Review",
+                        "overview_name": "*" + query + "*"
+                    }, DEFAULT_PAGING);
+
+                    assets = usersAssets.concat(inReviewApps);
+                } else {
+                    assets = artifactManager.search({
+                        "overview_provider": user.username,
+                        "overview_name": "*" + query + "*"
+                    }, DEFAULT_PAGING);
+                }
+                artifacts = assets;
+            } else {
+                // List users from user name from registry.
+                if (isUserPublisher || isUserAdmin) {
+                    var usersAssets;
+                    if (isUserAdmin) {
+                        usersAssets = artifactManager.search({
+                            "-lcState": "In-Review"
+                        }, DEFAULT_PAGING);
+                    } else {
+                        usersAssets = artifactManager.search({
+                            "overview_provider": user.username,
+                            "-lcState": "In-Review"
+                        }, DEFAULT_PAGING);
+                    }
+
+                    DEFAULT_PAGING.start = startValOnReview;
+                    DEFAULT_PAGING.count = PAGE_SIZE_ON_REVIEW;
+
+                    var inReviewApps = artifactManager.search({"lcState": "In-Review"}, DEFAULT_PAGING);
+                    assets = usersAssets.concat(inReviewApps);
+                } else {
+                    var usersAssets = artifactManager.search({"overview_provider": user.username}, DEFAULT_PAGING);
+                    assets = artifacts;
+                }
+                artifacts = assets;
+            }
+
+            dataInjector.inject(artifacts, DataInjectorModes.DISPLAY);
+
+            // TODO: Do we need this ?
+            // Perform some filtering logic on the artifacts
+            // artifacts = filterManager.filter(artifacts, session);
+
+            // Generate pagination indices.
+            var indices = pageIndexPopulator(page, isMorePagesAvailable, initialAppCount + onReviewStateAppCount);
+            var pageIndices;
+
+            if (indices.length > 1) {
+                pageIndices = indices;
+            }
+
+            if (page - 1 >= 0) {
+                var leftnav = parseInt(page) - 1;
+            }
+            if (isMorePagesAvailable || parseInt(page)) {
+                var rightnav = parseInt(page) + 1;
+            }
+
+            var sortOpposite = (sort == 'asc' ? 'desc' : 'asc');
+            var sortIcon = (sort == 'asc' ? 'down' : 'up');
+
+            if (apiProvider.isAssetTypeEnabled(type)) {
+                caramel.render({
+                    op: 'list',
+                    cuser: server.current(session),
+                    roles: server.current(session).getRoles(),
+                    shortName: type,
+                    artifacts: artifacts,
+                    query: query,
+                    title: type,
+                    pageIndices: pageIndices,
+                    leftNav: leftnav,
+                    rightNav: rightnav,
+                    createPermission: createActionAuthorized,
+                    mobileAppCreatePermission: createMobileAppAuthorized,
+                    sortOptions: {sortBy: sortby, sort: sortOpposite, icon: sortIcon},
+                    typeList: typeList
+                });
+            }
+            else {
+                response.sendError(404, 'Resource does not exist');
+            }
         } catch (e) {
-            response.sendError(404, 'Asset type not found'); //TODO: Replace
+            response.sendError(400, "Your request is malformed.");
+            log.error(e.message);
+            log.error(e.stack);
+        }
+    });
+
+    routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/', function (context) {
+        var operation = (context.params.operation) || '';
+        var type = context.params.type;
+
+        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var disableSubscriptionStats;
+        if (!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ) {
+            disableSubscriptionStats = false;
+        } else {
+            disableSubscriptionStats = true;
         }
 
-        /*for each(var artifact in artifacts){
-         print(artifact.id+'<br/><br/>');
-         }*/
-    }
-    if (operation == 'apps') {
+        if (operation == 'statistics') {
             try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
 
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -385,40 +379,59 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
              print(artifact.id+'<br/><br/>');
              }*/
         }
-    if (operation == 'app_sub_user') {
-                try {
-                    caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
-
-                } catch (e) {
-                    response.sendError(404, 'Asset type not found'); //TODO: Replace
-                }
-
-                /*for each(var artifact in artifacts){
-                 print(artifact.id+'<br/><br/>');
-                 }*/
-    }
-    if (operation == 'app-by-endpoint') {
-        try {
-            caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type, isSubsriptionEnabled:disableSubscriptionStats});
-        } catch (e) {
-            response.sendError(404, 'Asset type not found');
-        }
-    }
-    if (operation == 'response-time') {
-                            try {
-                                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
-
-                            } catch (e) {
-                                response.sendError(404, 'Asset type not found'); //TODO: Replace
-                            }
-
-                            /*for each(var artifact in artifacts){
-                             print(artifact.id+'<br/><br/>');
-                             }*/
-                        }
-    if (operation == 'usage-page') {
+        if (operation == 'apps') {
             try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+
+            } catch (e) {
+                response.sendError(404, 'Asset type not found'); //TODO: Replace
+            }
+
+            /*for each(var artifact in artifacts){
+             print(artifact.id+'<br/><br/>');
+             }*/
+        }
+        if (operation == 'app_sub_user') {
+            try {
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+
+            } catch (e) {
+                response.sendError(404, 'Asset type not found'); //TODO: Replace
+            }
+
+            /*for each(var artifact in artifacts){
+             print(artifact.id+'<br/><br/>');
+             }*/
+        }
+        if (operation == 'app-by-popularity-over-time') {
+            try {
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+            } catch (e) {
+                response.sendError(404, 'Asset type not found');
+            }
+        }
+        if (operation == 'app-by-endpoint') {
+            try {
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+            } catch (e) {
+                response.sendError(404, 'Asset type not found'); //TODO: Replace
+            }
+        }
+        if (operation == 'response-time') {
+            try {
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+
+            } catch (e) {
+                response.sendError(404, 'Asset type not found'); //TODO: Replace
+            }
+
+            /*for each(var artifact in artifacts){
+             print(artifact.id+'<br/><br/>');
+             }*/
+        }
+        if (operation == 'usage-page') {
+            try {
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
 
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -430,22 +443,20 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
         }
         if (operation == 'cache-stat') {
             try {
-                  caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
+                caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
             }
+
+            /*for each(var artifact in artifacts){
+             print(artifact.id+'<br/><br/>');
+             }*/
         }
-        if (operation == 'app-by-popularity-over-time') {
-            try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
-            } catch (e) {
-                response.sendError(404, 'Asset type not found'); //TODO: Replace
-            }
-        }
-});
+    });
 
 
-routeMnger.handle(request, response);
+    routeMnger.handle(request, response);
 
 }, request, response, session);
 %>
