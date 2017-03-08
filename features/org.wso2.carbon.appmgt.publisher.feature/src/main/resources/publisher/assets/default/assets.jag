@@ -10,6 +10,8 @@
  Created Date: 29/7/2013
  */
 
+include("/extensions/webapp/modules/jagg/jagg.jag");
+
 require('/modules/publisher.js').exec(function (ctx) {
 
     var router = require('/modules/router-g.js').router();
