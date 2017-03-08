@@ -62,8 +62,7 @@ public class APPManagerConfigurationServiceComponent {
         String filePath = null;
         try {
             AppManagerConfiguration configuration = new AppManagerConfiguration();
-            filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+            filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
             configuration.load(filePath);
             amConfigService = new AppManagerConfigurationServiceImpl(configuration);
             apimgtConfigReaderService = new APIMGTConfigReaderService(amConfigService.getAPIManagerConfiguration());
