@@ -174,11 +174,11 @@ var auditLog = require('/modules/auditLog/logger.js');
             }
         } else {
             session.invalidate();
-            var reDirectUrl = relayState;
-            if(reversProxyEnabled) {
-                reDirectUrl = reverseProxyHost + relayState;
-            }
-            response.sendRedirect(reDirectUrl);
+            var redirectUrl = relayState;
+
+            // We don't need to handle the presence of the reverse proxy here.
+            // The relayState already contains the reverse proxy friendly URL.
+            response.sendRedirect(redirectUrl);
         }
     }
 
