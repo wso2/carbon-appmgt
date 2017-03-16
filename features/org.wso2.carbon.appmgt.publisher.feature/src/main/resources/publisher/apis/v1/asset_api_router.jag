@@ -378,6 +378,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print(msg);
                 }
 
+                session.put("updateAppCount", true);
+
             } catch (e) {
                 log.error('The asset ' + id + ' could not be deleted.The following exception was thrown: ' + e);
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');

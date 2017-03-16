@@ -58,22 +58,27 @@ require('/modules/publisher.js').exec(function (ctx) {
      * The function will create an array of page indices upto the page count
      * @param pageCount The max page count
      */
-    var pageIndexPopulator = function (currentPage, isMorePagesAvailable, initialAppCount) {
+    var pageIndexPopulator = function (currentPage, isMorePagesAvailable, initialAppCount, onReviewStateAppCount) {
 
         // Count the maximum showable app count in the pagination.
         var maxShowableAppCount = (PAGE_SIZE + PAGE_SIZE_ON_REVIEW) * PAGNINATION_SIZE;
         var pageCount = 0;
 
+        log.info("Total app count: " + (initialAppCount + onReviewStateAppCount));
+        log.info("Max showable app count: " + maxShowableAppCount);
+
         // If the max showable app count is lesser than the initial app count, we can directly generate indices from
         // initial app count.
-        if (initialAppCount < maxShowableAppCount) {
-            pageCount = getAvailablePages(initialAppCount);
+        if ((initialAppCount + onReviewStateAppCount) < maxShowableAppCount) {
+            pageCount = getAvailablePages(initialAppCount, onReviewStateAppCount);
         } else {
             // Page count sould be max showable app count if the current page is less than the max showable page. Else,
             // current page will be the max page.
-            pageCount = getAvailablePages(maxShowableAppCount) > currentPage ? getAvailablePages(maxShowableAppCount)
+            pageCount = getAvailablePages(maxShowableAppCount, 0) > currentPage ? getAvailablePages(maxShowableAppCount, 0)
                 : currentPage;
         }
+
+        log.info("Page count: " + pageCount);
 
         var indices = [];
         var temp = {};
@@ -97,14 +102,35 @@ require('/modules/publisher.js').exec(function (ctx) {
         return indices;
     };
 
-    var getAvailablePages = function (appCount) {
-        var availablePages = Math.floor(appCount / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW));
-        var remainder = (appCount / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW)) % 1;
-        if (remainder) {
-            availablePages = availablePages + 1;
+    var getAvailablePages = function (initialAppCount, onReviewAppCount) {
+
+        if (initialAppCount > 0) {
+            var pagesForInitialApps = Math.floor(initialAppCount / (PAGE_SIZE));
+        } else {
+            var pagesForInitialApps = 0;
         }
-        return availablePages;
-    }
+
+        if (onReviewAppCount) {
+            var pagesForOnReviewApps = Math.floor(onReviewAppCount / PAGE_SIZE_ON_REVIEW);
+        } else {
+            var pagesForOnReviewApps = 0;
+        }
+
+        log.info("Pages for initial: " + pagesForInitialApps);
+        log.info("Pages for review: " + pagesForOnReviewApps);
+
+        var remainderForInitialApps = (initialAppCount / PAGE_SIZE) % 1;
+        if (remainderForInitialApps) {
+            pagesForInitialApps += 1;
+        }
+
+        var remainderForOnReviewApps = (onReviewAppCount / PAGE_SIZE_ON_REVIEW) % 1;
+        if (remainderForOnReviewApps) {
+            pagesForOnReviewApps += 1;
+        }
+
+        return pagesForInitialApps > pagesForOnReviewApps ? pagesForInitialApps : pagesForOnReviewApps;
+    };
 
     var getCurrentPage = function (currentIndex) {
         var pageNumber = Math.floor(currentIndex / (PAGE_SIZE + PAGE_SIZE_ON_REVIEW));
@@ -173,8 +199,12 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             // Get the initial page count from session. If it is not available in the the session or PAGINATION size
             // increased, update the value in session.
-            var initialAppCount = session.get("initialAppCount");
-            if (!initialAppCount) {
+            var initialAppCount  = session.get("initialAppCount");
+            var updateRequired =  session.get("updateAppCount");
+
+            log.info("Update requrired: " + updateRequired);
+
+            if (!initialAppCount || updateRequired) {
                 if (isUserAdmin) {
                     initialAppCount = getAppCountForUserWithPaging({"-lcState": "In-Review"}, countPaging,
                         artifactManager);
@@ -185,11 +215,15 @@ require('/modules/publisher.js').exec(function (ctx) {
                     }, countPaging, artifactManager);
                 }
                 session.put("initialAppCount", initialAppCount);
+                session.put("updateAppCount", false);
+
                 log.debug("No page count or pagination size is changed. Updating the session cache. Initial page " +
                     "count: " + initialPages);
             }
 
-            var initialPages = getAvailablePages(initialAppCount + onReviewStateAppCount);
+            log.info("Initial app count: " + initialAppCount);
+
+            var initialPages = getAvailablePages(initialAppCount, onReviewStateAppCount);
 
             // Calculate the start application number.
             if (page) {
@@ -233,6 +267,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                 }
             }
 
+            log.info("Initial pages: " + initialPages);
+
             DEFAULT_PAGING.start = startVal;
             DEFAULT_PAGING.count = PAGE_SIZE;
 
@@ -263,10 +299,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                     DEFAULT_PAGING.start = startValOnReview;
                     DEFAULT_PAGING.count = PAGE_SIZE_ON_REVIEW;
 
-                    var inReviewApps = artifactManager.search({
-                        "lcState": "In-Review",
-                        "overview_name": "*" + query + "*"
-                    }, DEFAULT_PAGING);
+                    var inReviewApps = artifactManager.search({"lcState": "In-Review",
+                        "overview_name": "*" + query + "*"}, DEFAULT_PAGING);
 
                     assets = usersAssets.concat(inReviewApps);
                 } else {
@@ -320,7 +354,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (page - 1 >= 0) {
                 var leftnav = parseInt(page) - 1;
             }
-            if (isMorePagesAvailable || parseInt(page)) {
+
+            if (indices.length > parseInt(page)) {
                 var rightnav = parseInt(page) + 1;
             }
 
