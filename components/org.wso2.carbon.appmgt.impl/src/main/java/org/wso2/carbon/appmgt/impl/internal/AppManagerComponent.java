@@ -143,8 +143,7 @@ public class AppManagerComponent {
             addDefinedSequencesToRegistry();
 
             AppManagerConfiguration configuration = new AppManagerConfiguration();
-            String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+            String filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
             configuration.load(filePath);
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();

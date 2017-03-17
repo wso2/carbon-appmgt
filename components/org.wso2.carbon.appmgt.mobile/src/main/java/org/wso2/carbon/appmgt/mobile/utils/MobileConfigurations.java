@@ -42,7 +42,7 @@ import java.util.Iterator;
  */
 public class MobileConfigurations {
 
-    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "conf" + File.separator + "app-manager.xml";
+    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
     private static MobileConfigurations mobileConfigurations;
 
     private String mdmServerURL;
