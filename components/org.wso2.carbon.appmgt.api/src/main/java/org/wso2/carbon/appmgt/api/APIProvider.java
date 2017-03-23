@@ -575,6 +575,17 @@ public interface APIProvider extends APIManager {
      */
     public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
 
+    /**
+     *
+     * Search and return the published apps for the given search terms.
+     *
+     * @param appType App type
+     * @param searchTerms Search terms
+     * @return List of {@link App}
+     * @throws AppManagementException on errors while trying to search published apps.
+     */
+    public List<App> searchPublishedApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
+
 
     /**
      * Update the subscription status

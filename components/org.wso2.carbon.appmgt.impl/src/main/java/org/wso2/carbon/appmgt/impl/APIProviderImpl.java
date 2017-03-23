@@ -2222,6 +2222,34 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
     }
 
+    /**
+     *
+     * Search and return the published apps for the given search terms.
+     *
+     * @param appType App type
+     * @param searchTerms Search terms
+     * @return List of {@link App}
+     * @throws AppManagementException on errors while trying to search published apps.
+     */
+    @Override
+    public List<App> searchPublishedApps(String appType, Map<String, String> searchTerms) throws
+                                                                                          AppManagementException {
+        // If the app type is 'webapp' use the App Repository implementation path.
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)) {
+            return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
+        } else {
+            List<App> apps = new ArrayList<App>();
+            List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
+            searchTerms.put(AppMConstants.MOBILE_LC_STATE, AppMConstants.PUBLISHED);
+
+            for (GenericArtifact artifact : appArtifacts) {
+                if (isSearchHit(artifact, searchTerms)) {
+                    apps.add(createApp(artifact, appType));
+                }
+            }
+            return apps;
+        }
+    }
 
     /**
      * Update the Tier Permissions
