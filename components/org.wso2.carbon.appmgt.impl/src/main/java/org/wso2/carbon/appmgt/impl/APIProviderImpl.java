@@ -2239,8 +2239,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
         } else {
             List<App> apps = new ArrayList<App>();
-            List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
-            searchTerms.put(AppMConstants.MOBILE_LC_STATE, AppMConstants.PUBLISHED);
+            List<GenericArtifact> appArtifacts = getPublishedAppArtifacts(appType);
 
             for (GenericArtifact artifact : appArtifacts) {
                 if (isSearchHit(artifact, searchTerms)) {
@@ -2840,6 +2839,40 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appArtifacts;
     }
 
+    /**
+     *
+     * Return the published 'app' (e.g. webapp, mobileapp) registry artifacts.
+     *
+     * @param appType App type
+     * @return List of {@link GenericArtifact}
+     * @throws AppManagementException on errors while trying to get published app artifacts
+     */
+    private List<GenericArtifact> getPublishedAppArtifacts(String appType) throws AppManagementException {
+        List<GenericArtifact> appArtifacts = new ArrayList<GenericArtifact>();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                if (artifact.getLifecycleState().toUpperCase().equals(AppMConstants.PUBLISHED)) {
+                    appArtifacts.add(artifact);
+                }
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs from the registry", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return appArtifacts;
+    }
 
     private App createApp(GenericArtifact artifact, String appType) throws AppManagementException {
 
