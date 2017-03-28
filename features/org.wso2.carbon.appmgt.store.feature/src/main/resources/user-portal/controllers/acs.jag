@@ -6,11 +6,13 @@ var auditLog = require('/modules/auditLog/logger.js');
 
 (function () {
     var log = new Log(),
+            MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils,
+            MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants,
             configs = require('/config/store.json'),
             samlResponse = request.getParameter('SAMLResponse'),
             sessionId = session.getId(),
             samlRequest = request.getParameter('SAMLRequest'),
-            relayState = decodeURIComponent(request.getParameter('RelayState')),
+            relayStateId = decodeURIComponent(request.getParameter('RelayState')),
             sso = require('sso'),
             server = require('carbon').server,
             samlRespObj,
@@ -64,121 +66,98 @@ var auditLog = require('/modules/auditLog/logger.js');
         }
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
-            if (relayState) {
-                host = relayState.split('/')[2];
-                relayState = relayState.split(host)[1];
-            } else {
-                relayState = contextPath;
+            var relayStates = application.get("relayStates");
+            var relayState;
+
+            // Send an error if the relay state can't be found.
+            if(!relayStates || !(relayState = relayStates[relayStateId])){
+              log.error('Relay state for the id ' + relayStateId + " can't be found.");
+              response.sendError(500, 'Relay state is not present.');
+              return;
             }
 
-            var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+            // Decode the SAML response.
             var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
-            //load tenant registry for non super tenant users
-            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                jagg.module("manager").loadTenantRegistry(String(domainName));
+            if(!sessionObj.sessionIndex || sessionObj.sessionIndex === 'undefined'){
+              log.error('sessionIndex is not present in the SAML response.');
+              response.sendError(500, 'sessionIndex is not present in the SAML response.');
+              return;
             }
 
+            var username = sessionObj.loggedInUser;
+            var userTenantDomain = MultitenantUtils.getTenantDomain(username);
+
+            // Remove the tenant domain from the user name for the super tenant.
+            if (username.indexOf("@carbon.super") > -1) {
+                username = username.replace("@carbon.super", "");
+            }
+
+            // Load tenant registry for non super tenant users.
+            if (userTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(userTenantDomain)) {
+                jagg.module("manager").loadTenantRegistry(String(userTenantDomain));
+            }
+
+            // Validate the SAML response. (e.g. the signature)
             if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
                 log.error('SAML response object validation failure.');
                 response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
                 return;
             }
 
+            // Check whether the logged in user belongs to the application tenant domain.
+            var applicationTenantDomain = relayState.applicationTenantDomain;
 
-            var username = sessionObj.loggedInUser;
-            if (username.indexOf("@carbon.super") > -1) {
-                username = username.replace("@carbon.super", "");
+            if (applicationTenantDomain != userTenantDomain) {
+                log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
+                + applicationTenantDomain + '. Make sure the user is registered in the tenant domain');
+                response.sendError(403, 'You do not have permission to login to this tenant domain.Please register first.');
+                return;
             }
-            if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                var relayStateUrlMatcher = new URIMatcher(relayState);
-                var tenantedURIPattern = contextPath + '/t/{domain}/';
-                var urlTenantDomain;
 
-                //Check whether the relayState is matched with a tenanted uri pattern
-                if (relayStateUrlMatcher.match(tenantedURIPattern) ||
-                        relayStateUrlMatcher.match(tenantedURIPattern + '{+any}')) {
-                    var elements = relayStateUrlMatcher.elements();
-
-                    //Extract the tenant domain from the url
-                    urlTenantDomain = elements.domain;
-                }
-
-
-                if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                    var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
-                    var ctx = service.getServerConfigContext();
-                    var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-                    TenantAxisUtils.setTenantAccessed(domainName, ctx);
-
-                }
-                var tenantId = carbon.server.tenantId({
-                    domain: domainName
-                });
-
-                session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                session.put("Loged", "true");
-                session.put("tenantId", tenantId);
-
-                username = username + "";
-                var userDetails = {};
-                userDetails['username'] = username;
-                userDetails['action'] = "SSOLogin";
-                authResult = authenticator.login(userDetails);
-                sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
-
-                role = require('/modules/role.js').checkeRole(username, session);
-
-                if (urlTenantDomain && urlTenantDomain != domainName) {
-                    log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
-                    + urlTenantDomain + '. Make sure the user has been registered in the tenant domain');
-                    response.sendError(403, 'You do not have permission to login to this tenant domain.Please register first.');
-                    return;
-                }
-
-                    var user = require('store').user;
-                    if (log.isDebugEnabled()) {
-                        log.debug('User has been set to : ' + sessionObj.loggedInUser);
-                    }
-                    auditLog.writeLog(tenantId, username, "UserSignedIn", "Login", "", "", "");
-                    //check whether login request came by clicking the login url and do redirect
-                    // to myfavourites page if user has already selected it as homepage.
-                    //in store login url is in the format of /login?header=true
-                    var queryParam = "?header=true";
-                    if (relayState.indexOf(queryParam)) {
-                        if (!urlTenantDomain) {
-                            urlTenantDomain = "carbon.super";
-                        }
-                        var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
-                        //when only mobile app is enabled do not check for favourite home page
-                        if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
-                            var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
-                            var pathMatcher = new URIMatcher(relayState);
-                            if (isFavouritePageSelected && !(pathMatcher.match(assetOverviewPageMatcher) ||
-                                    pathMatcher.match(tenantedAssetOverviewPageMatcher))) {
-                                var favPage = configs.pages.favouritePage;
-                                relayState = contextPath + favPage;
-                            } else {
-                                //remove the query param
-                                relayState.replace(queryParam, "");
-                            }
-                        }
-                    }
-
-                    if (reversProxyEnabled) {
-                        relayState = reverseProxyHost + relayState;
-                    }
-                    response.sendRedirect(relayState);
+            if (userTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(userTenantDomain)) {
+                var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
+                var ctx = service.getServerConfigContext();
+                var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+                TenantAxisUtils.setTenantAccessed(userTenantDomain, ctx);
             }
+
+            var tenantId = carbon.server.tenantId({
+                domain: userTenantDomain
+            });
+
+            session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+            session.put("Loged", "true");
+            session.put("tenantId", tenantId);
+
+            log.info("Loged = " + session.get("Loged"));
+
+            username = username + "";
+            var userDetails = {};
+            userDetails['username'] = username;
+            userDetails['action'] = "SSOLogin";
+            authResult = authenticator.login(userDetails);
+            sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+
+            // Fire tenant load and login events.
+            require('/modules/role.js').checkeRole(username, session);
+
+            auditLog.writeLog(tenantId, username, "UserSignedIn", "Login", "", "", "");
+
+            var redirectURL = relayState.requestedURL;
+
+            if(!redirectURL){
+              redirectURL = contextPath;
+            }
+
+            response.sendRedirect(redirectURL);
         } else {
             session.invalidate();
-            var reDirectUrl = relayState;
-            if(reversProxyEnabled) {
-                reDirectUrl = reverseProxyHost + relayState;
-            }
-            response.sendRedirect(reDirectUrl);
+            var redirectUrl = relayState;
+
+            // We don't need to handle the presence of the reverse proxy here.
+            // The relayState already contains the reverse proxy friendly URL.
+            response.sendRedirect(redirectUrl);
         }
     }
 

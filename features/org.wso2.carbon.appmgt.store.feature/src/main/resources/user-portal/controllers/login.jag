@@ -5,6 +5,8 @@
     var dataConfi = require('/config/store.js').config(),
         sso = require("sso"),
         process = require("process"),
+        caramel = require('caramel'),
+        uuid = require('uuid'),
         sessionId = session.getId(),
         requestURI = request.getRequestURI(),
         requestedPage = request.getParameter("requestedPage"),
@@ -16,21 +18,48 @@
         serverHost = process.getProperty('server.host'),
         postUrl = dataConfi.ssoConfiguration.identityProviderURL;
 
-        //Set the relayState from the requestURL. If the requestURL is empty set it from the referer.
-        relayState = (requestURL ? requestURL : refererFromHeader);
-
         //Extract tenant domain from store URL
+        var requestedTenant;
         if(requestURI.indexOf("/t/") !== -1) {
             var requestContextPaths = requestURI.split("/t/");
-            var requestedTenant = requestContextPaths[1].split("/") [0];
+            requestedTenant = requestContextPaths[1].split("/") [0];
             postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
         }
 
-        //This is to track that login request came when click the login link in the store.
-        //Which is later used in acs.jag to select correct redirection page.
-        if(header && header == true) {
-            relayState = relayState +"?header=true";
+        var proxyFriendlyRequestURL = requestURL;
+        var customDomain = request.getHeader("wso2-cloud-custom-domain");
+
+        if(customDomain){
+
+          // If a custom domain is set,
+          // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
+          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/")
+        }else if(caramel.configs().reverseProxyEnabled && caramel.configs().reverseProxyHost){
+          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs().reverseProxyHost + "/")
         }
+
+        if(header && header == true) {
+            proxyFriendlyRequestURL = proxyFriendlyRequestURL +"?header=true";
+        }
+
+        // Preserve the relay state.
+        var relayStates = application.get("relayStates");
+
+        if(!relayStates){
+          relayStates = {};
+          application.put("relayStates", relayStates);
+        }
+
+        var relayStateID = uuid.generate().toString();
+
+        var relayState = {};
+        relayState.requestedURL = proxyFriendlyRequestURL;
+        relayState.applicationTenantDomain = requestedTenant;
+
+        relayStates[relayStateID] = relayState;
+
+        log.info("Loged = " + session.get("Loged"));
+
     if (!session.get("Loged")) {
         %>
             <div>
@@ -39,7 +68,7 @@
                 <form method="post" action="<%=postUrl%>">
                     <p>
                         <input type="hidden" name="SAMLRequest" value ="<%= encodedSAMLAuthRequest %>"/>
-                        <input type="hidden" name="RelayState" value ="<%= relayState %>"/>
+                        <input type="hidden" name="RelayState" value ="<%= relayStateID %>"/>
                         <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
                         <button type="submit">Redirect manually</button>
                     </p>
