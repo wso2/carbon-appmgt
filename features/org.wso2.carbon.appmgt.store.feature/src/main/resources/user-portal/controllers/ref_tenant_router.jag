@@ -39,8 +39,44 @@ var mapper = function (path) {
     };
 };
 
+var getReferer = function () {
+    var contextPath = caramel.configs().context,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost;
+    var referer = request.getHeader("referer");
+    if (!referer) {
+        if (reversProxyEnabled) {
+            referer = request.getRequestURI();
+            var context = request.getContextPath();
+            referer = contextPath + referer.substring(context.length);
+            referer = reverseProxyHost + referer;
+        } else {
+            referer = request.getRequestURL();
+        }
+    }
+    return referer;
+};
+
+var getRedirectURL = function (url) {
+    var contextPath = caramel.configs().context,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost;
+    var redirectURL = contextPath + url;
+    if (reversProxyEnabled) {
+        redirectURL = reverseProxyHost + contextPath + url;
+    }
+    return redirectURL;
+};
+
+(function(){
+
 if (!session.get("Loged")) {
-    include("/controllers/login.jag");
+    var referer = getReferer();
+    var requestURL = request.getRequestURL();
+    referer = (requestURL ? requestURL : referer);
+    var loginRelativeUrl = encodeURI("/login?referer=" + referer);
+    response.sendRedirect(getRedirectURL(loginRelativeUrl));
+    return;
 }
 
 //Check for incoming URL pattern and dispatch the request into relevant endpoint
@@ -85,6 +121,8 @@ if (matcher.match(apiEndpoint)) {
 else {
     response.sendError(404, 'Tenant Domain not found');
 }
+
+}());
 
 /*
  The function is used to validate the activeness or existence of requested tenant and resolve the router.
