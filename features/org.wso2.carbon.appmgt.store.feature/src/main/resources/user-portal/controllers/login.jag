@@ -9,7 +9,7 @@
         requestURI = request.getRequestURI(),
         requestedPage = request.getParameter("requestedPage"),
         header = request.getParameter("header"),
-        refererFromHeader = request.getParameter("referer"),
+        refererParam = request.getParameter("referer"),
         requestURL = request.getRequestURL(),
         encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
         log = new Log(),
@@ -17,7 +17,7 @@
         postUrl = dataConfi.ssoConfiguration.identityProviderURL;
 
         //Set the relayState from the requestURL. If the requestURL is empty set it from the referer.
-        relayState = refererFromHeader;
+        relayState = refererParam;
 
         //Extract tenant domain from store URL
         if(requestURI.indexOf("/t/") !== -1) {
