@@ -33,10 +33,11 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppAppmetaDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppSummaryDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppSummaryDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.CustomPropertyDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -513,10 +514,17 @@ public class APPMappingUtil {
         dto.setCreatedtime(mobileApp.getDisplayName());
         dto.setBanner(mobileApp.getBanner());
         dto.setRecentChanges(mobileApp.getRecentChanges());
+
+        AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
+        appAppmetaDTO.setPackage(mobileApp.getPackageName());
+        appAppmetaDTO.setWeburl(mobileApp.getAppUrl());
+        dto.setAppmeta(appAppmetaDTO);
+
         dto.setIcon(mobileApp.getThumbnail());
         dto.setAppType(mobileApp.getAppType());
         dto.setRecentChanges(mobileApp.getRecentChanges());
         dto.setPreviousVersionAppID(mobileApp.getPreviousVersionAppID());
+        dto.setCreatedtime(mobileApp.getCreatedTime());
 
         return dto;
     }
