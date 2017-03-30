@@ -1,17 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +22,8 @@ public class AppDTO  {
   
   
   private String type = null;
-  
+
+  private AppAppmetaDTO appmeta = null;
   
   private String marketType = null;
   
@@ -152,6 +147,15 @@ public class AppDTO  {
     this.type = type;
   }
 
+    @ApiModelProperty(value = "")
+    @JsonProperty("appmeta")
+    public AppAppmetaDTO getAppmeta() {
+        return appmeta;
+    }
+
+    public void setAppmeta(AppAppmetaDTO appmeta) {
+        this.appmeta = appmeta;
+    }
   
   /**
    **/
