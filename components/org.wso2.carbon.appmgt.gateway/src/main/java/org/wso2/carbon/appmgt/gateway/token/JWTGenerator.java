@@ -96,6 +96,15 @@ public class JWTGenerator extends AbstractJWTGenerator {
         Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
         while (it.hasNext()) {
             String assertionAttribute = it.next();
+            /*
+            When JWT is populated from saml assertions, it contains 'Subject' instead of 'sub'. sub is the correct one
+            provided in JWT spec. If we change 'subject' as 'sub' now, existing applications that use JWT will get
+            break. Therefore instead of replacing, we will keep both sub and subject in the jwt for sometime and
+            deprecate 'subject' later.
+             */
+            if (assertionAttribute.equalsIgnoreCase("Subject")) {
+                claims.put("sub", saml2Assertions.get(assertionAttribute).toString());
+            }
             claims.put(assertionAttribute, saml2Assertions.get(assertionAttribute).toString());
         }
     }
