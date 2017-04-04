@@ -24,6 +24,10 @@
             var requestContextPaths = requestURI.split("/t/");
             var requestedTenant = requestContextPaths[1].split("/") [0];
             postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
+        } else if (refererParam != null && refererParam.indexOf("/t/") !== -1) {
+            var requestContextPaths = refererParam.split("/t/");
+            var requestedTenant = requestContextPaths[1].spxlit("/") [0];
+            postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
         }
 
         //This is to track that login request came when click the login link in the store.
