@@ -14,20 +14,33 @@
         encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
         log = new Log(),
         serverHost = process.getProperty('server.host'),
-        postUrl = dataConfi.ssoConfiguration.identityProviderURL;
+        postUrl = dataConfi.ssoConfiguration.identityProviderURL,
+        forceAuth = dataConfi.ssoConfiguration.isForceAuth;
 
         //Set the relayState from the requestURL. If the requestURL is empty set it from the referer.
         relayState = refererParam;
 
         //Extract tenant domain from store URL
+        var requestedTenant;
         if(requestURI.indexOf("/t/") !== -1) {
             var requestContextPaths = requestURI.split("/t/");
-            var requestedTenant = requestContextPaths[1].split("/") [0];
+            requestedTenant = requestContextPaths[1].split("/") [0];
             postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
         } else if (refererParam != null && refererParam.indexOf("/t/") !== -1) {
             var requestContextPaths = refererParam.split("/t/");
-            var requestedTenant = requestContextPaths[1].spxlit("/") [0];
-            postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
+            requestedTenant = requestContextPaths[1].split("/") [0];
+            postUrl = postUrl + "?refererParam=" + requestedTenant;
+        }
+
+        //We need to enable forceAuth for user-portal to avoid the confusion when user logged into it with different
+        //sessions. Anyway, enabling forceAuth cause to give login page even when jaggery app session timeout while IdP
+        //session available. To minimize this situation, we enable forceAuth only when initial page access.
+        if(forceAuth && stringEndsWith(refererParam,requestedTenant)) {
+            if(postUrl.indexOf("?") == -1) {
+                postUrl = postUrl+ "?forceAuth=true";
+            } else {
+                postUrl = postUrl+ "&forceAuth=true";
+            }
         }
 
         //This is to track that login request came when click the login link in the store.
@@ -55,4 +68,8 @@
         <%
     }
 }());
+
+function stringEndsWith(str, suffix) {
+    return str.match(suffix+"$")==suffix;
+}
 %>
