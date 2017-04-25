@@ -13,7 +13,7 @@
         encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
         serverHost = process.getProperty('server.host'),
         log = new Log(),
-        postUrl = ssoIdpProvider.getIdentityProviderUrl();
+        postUrl = dataConfi.ssoConfiguration.identityProviderURL;
 
     if (!session.get("Loged")) {
         %>
