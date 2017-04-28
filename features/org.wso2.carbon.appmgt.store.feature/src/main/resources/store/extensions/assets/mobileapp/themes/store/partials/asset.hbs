@@ -147,10 +147,14 @@
                             </table>
                         </div>
                     </div>
-
-
-
                 </div>
+
+                {{#compare "webapp" asset.attributes.overview_type}}
+                    <div class="raw pull-left" id="isRemovable">
+                        <input type="checkbox" name="Removable" id="chkRemovable" value="Removable" checked> <b>Make WebClip Uninstallable.</b>
+                    </div>
+                {{/compare}}
+
                 <div class="modal-footer">
                     <button id="btn-apps-ent-install" class="btn btn-primary">Install</button>
                     <button id="btn-apps-ent-uninstall" class="btn btn-danger">Uninstall</button>

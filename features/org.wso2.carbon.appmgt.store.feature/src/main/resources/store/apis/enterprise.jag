@@ -103,6 +103,7 @@ require('/modules/store.js').exec(function (ctx) {
         var type = elements.type;
         var app = params.app;
         var data = params["data[]"];
+        var isRemovable: param.removable;
 
 
 
@@ -111,7 +112,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         if(action && type && app && data){
 
-            enterpriseInstall.performAction(action, tenantId, type, app, data);
+            enterpriseInstall.performAction(action, tenantId, type, app, data, isRemovable);
             response.contentType = "application/json";
             print('{"status" : "success"}');
             return;
