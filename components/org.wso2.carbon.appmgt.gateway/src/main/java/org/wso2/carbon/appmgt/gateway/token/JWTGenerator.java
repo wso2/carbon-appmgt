@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.appmgt.gateway.token;
 
+import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -41,10 +42,10 @@ public class JWTGenerator extends AbstractJWTGenerator {
 
     private static final Log log = LogFactory.getLog(JWTGenerator.class);
 
-    public Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
+    public Map<String, Object> populateCustomClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = new LinkedHashMap<String, String>();
+        Map<String, Object> claims = new LinkedHashMap<String, Object>();
         populateIssuerAndExpiry(claims);
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
@@ -75,16 +76,16 @@ public class JWTGenerator extends AbstractJWTGenerator {
         return null;
     }
 
-    public Map<String, String> populateStandardClaims(Map<String, Object> saml2Assertions)
+    public Map<String, Object> populateStandardClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = new LinkedHashMap<String, String>();
+        Map<String, Object> claims = new LinkedHashMap<String, Object>();
         populateIssuerAndExpiry(claims);
         populateSaml2Assertions(claims, saml2Assertions);
         return claims;
     }
 
-    private void populateIssuerAndExpiry(Map<String, String> claims) {
+    private void populateIssuerAndExpiry(Map<String, Object> claims) {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long expireIn = currentTime + 1000 * 60 * getTTL();
 
@@ -92,7 +93,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
         claims.put("exp", String.valueOf(expireIn));
     }
 
-    private void populateSaml2Assertions(Map<String, String> claims, Map<String, Object> saml2Assertions) {
+    private void populateSaml2Assertions(Map<String, Object> claims, Map<String, Object> saml2Assertions) {
         Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
         while (it.hasNext()) {
             String assertionAttribute = it.next();
@@ -105,7 +106,8 @@ public class JWTGenerator extends AbstractJWTGenerator {
             if (assertionAttribute.equalsIgnoreCase("Subject")) {
                 claims.put("sub", saml2Assertions.get(assertionAttribute).toString());
             }
-            claims.put(assertionAttribute, saml2Assertions.get(assertionAttribute).toString());
+
+            claims.put(assertionAttribute, saml2Assertions.get(assertionAttribute));
         }
     }
 }

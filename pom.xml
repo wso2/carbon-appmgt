@@ -736,6 +736,11 @@
             <artifactId>org.wso2.carbon.identity.authenticator.saml2.sso.stub</artifactId>
             <version>${carbon-identity-authenticator-saml2-stub-version}</version>
         </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -876,6 +881,7 @@
     <jsoup.version>1.8.1</jsoup.version>
     <httpmime.version>4.3.6</httpmime.version>
     <googlecode.plist.version>1.8</googlecode.plist.version>
+    <commons-codec.version>1.4</commons-codec.version>
 
     <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
     <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
