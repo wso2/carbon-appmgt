@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,6 +80,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final String SET_COOKIE_PATTERN = "%s=%s; Path=%s;";
     private static final String SESSION_ATTRIBUTE_JWTS = "jwts";
     public static final String HTTP_HEADER_SAML_RESPONSE = "AppMgtSAML2Response";
+    private static final String JWT_REGISTERED_CLAIM_AUD = "aud";
 
     // A Synapse handler is instantiated per Synapse API.
     // So the web app for the relevant Synapse API can be fetched and stored as an instance variable.
@@ -384,6 +386,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 session.addAccessedWebAppUUID(webApp.getUUID());
 
                 Map<String, Object> userAttributes = getUserAttributes((ResponseImpl) idpMessage.getSAMLResponse());
+                List<String> audiences = getAudiencesFromSAMLResponse(((ResponseImpl) idpMessage.getSAMLResponse()));
+                if(audiences != null) {
+                    userAttributes.put(JWT_REGISTERED_CLAIM_AUD, audiences);
+                }
+
                 session.getAuthenticationContext().setAttributes(userAttributes);
 
                 Object roleAttributeValues = userAttributes.get(AppMConstants.claims.CLAIM_ROLES);
@@ -586,6 +593,35 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
         return userAttributes;
+    }
+
+    /**
+     * Get Audiences of SAML2 Response.
+     *
+     * @param samlResponse SAML2 Response
+     * @return audiences
+     */
+    private List<String> getAudiencesFromSAMLResponse(ResponseImpl samlResponse) {
+
+        Assertion assertion = samlResponse.getAssertions().get(0);
+        List<String> audiences = new ArrayList<>();
+        if (assertion != null) {
+            Conditions conditions = assertion.getConditions();
+            if (conditions != null) {
+                List<AudienceRestriction> audienceRestrictions = conditions.getAudienceRestrictions();
+                if (CollectionUtils.isNotEmpty(audienceRestrictions)) {
+                    for (AudienceRestriction audienceRestriction : audienceRestrictions) {
+                        if (CollectionUtils.isNotEmpty(audienceRestriction.getAudiences())) {
+                            for (Audience audience : audienceRestriction.getAudiences()) {
+                                audiences.add(audience.getAudienceURI());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return audiences;
     }
 
     private boolean isJWTEnabled() {
