@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.appmgt.gateway.token;
 
+import com.google.gson.Gson;
 import org.apache.axiom.util.base64.Base64Utils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -50,6 +52,7 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -154,21 +157,21 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         String jwtBody = buildBody(saml2Assertions);
 
-        String base64EncodedHeader = Base64Utils.encode(jwtHeader.getBytes(StandardCharsets.UTF_8));
-        String base64EncodedBody = Base64Utils.encode(jwtBody.getBytes(StandardCharsets.UTF_8));
+        String base64UrlEncodedHeader = Base64.encodeBase64URLSafeString(jwtHeader.getBytes(StandardCharsets.UTF_8));
+        String base64UrlEncodedBody = Base64.encodeBase64URLSafeString(jwtBody.getBytes(StandardCharsets.UTF_8));
 
         if (signatureAlgorithm.equals(SHA256_WITH_RSA)) {
-            String assertion = base64EncodedHeader + "." + base64EncodedBody;
+            String assertion = base64UrlEncodedHeader + "." + base64UrlEncodedBody;
             /* Get the assertion signed */
             byte[] signedAssertion = signJWT(assertion, endUserName);
 
             if (log.isDebugEnabled()) {
                 log.debug("signed assertion value : " + new String(signedAssertion, StandardCharsets.UTF_8));
             }
-            String base64EncodedAssertion = Base64Utils.encode(signedAssertion);
-            return base64EncodedHeader + "." + base64EncodedBody + "." + base64EncodedAssertion;
+            String base64UrlEncodedAssertion = Base64.encodeBase64URLSafeString(signedAssertion);
+            return base64UrlEncodedHeader + "." + base64UrlEncodedBody + "." + base64UrlEncodedAssertion;
         } else {
-            return base64EncodedHeader + "." + base64EncodedBody + ".";
+            return base64UrlEncodedHeader + "." + base64UrlEncodedBody + ".";
         }
     }
 
@@ -196,12 +199,12 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         /* Populate claims from SAML Assertion if "AddClaimsSelectively" property is set to true,
          else add all claims values available in user profile */
         if (addClaimsSelectively) {
-            Map<String, String> standardClaims = populateStandardClaims(saml2Assertions);
+            Map<String, Object> standardClaims = populateStandardClaims(saml2Assertions);
             if (standardClaims != null) {
                 jwtBuilder.append(buildJWTBody(standardClaims));
             }
         } else {
-            Map<String, String> customClaims = populateCustomClaims(saml2Assertions);
+            Map<String, Object> customClaims = populateCustomClaims(saml2Assertions);
             if (customClaims != null) {
                 jwtBuilder.append(buildJWTBody(customClaims));
             }
@@ -209,18 +212,24 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         return jwtBuilder.toString();
     }
 
-    private String buildJWTBody(Map<String, String> claims) {
+    private String buildJWTBody(Map<String, Object> claims) {
         StringBuilder jwtBuilder = new StringBuilder();
         jwtBuilder.append("{");
         if (claims != null) {
-            for (Map.Entry<String, String> entry : claims.entrySet()) {
+            for (Map.Entry<String, Object> entry : claims.entrySet()) {
                 String key = entry.getKey();
-                String value = entry.getValue();
+                Object value = entry.getValue();
                 /* These values should be numbers. */
                 if ("exp".equals(key) || "nbf".equals(key) || "iat".equals(key)) {
                     jwtBuilder.append("\"").append(key).append("\":").append(value).append(",");
                 } else {
-                    jwtBuilder.append("\"").append(key).append("\":\"").append(value).append("\",");
+                    //value can be either String or List
+                    if (value instanceof List) {
+                        String assertionValue = new Gson().toJson(value);
+                        jwtBuilder.append("\"").append(key).append("\":").append(assertionValue).append(",");
+                    } else {
+                        jwtBuilder.append("\"").append(key).append("\":\"").append(value.toString()).append("\",");
+                    }
                 }
             }
         }
@@ -233,10 +242,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         return jwtBuilder.toString();
     }
 
-    public abstract Map<String, String> populateStandardClaims(Map<String, Object> saml2Assertions)
+    public abstract Map<String, Object> populateStandardClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException;
 
-    public abstract Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
+    public abstract Map<String, Object> populateCustomClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException;
 
 
