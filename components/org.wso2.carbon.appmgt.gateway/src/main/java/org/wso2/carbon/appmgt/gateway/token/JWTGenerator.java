@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.appmgt.gateway.token;
 
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
