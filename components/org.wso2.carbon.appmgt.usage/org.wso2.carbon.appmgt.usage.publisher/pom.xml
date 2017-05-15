@@ -18,14 +18,14 @@
     <parent>
         <artifactId>org.wso2.carbon.appmgt.usage</artifactId>
         <groupId>org.wso2.carbon.appmgt</groupId>
-        <version>1.2.25</version>
+        <version>1.2.26-SNAPSHOT</version>
 	      <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
 
     <artifactId>org.wso2.carbon.appmgt.usage.publisher</artifactId>
-   <version>1.2.25</version>
+   <version>1.2.26-SNAPSHOT</version>
     <name>WSO2 Carbon - APP Management Usage Publisher</name>
 
     <dependencies>
