@@ -344,7 +344,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             // artifacts = filterManager.filter(artifacts, session);
 
             // Generate pagination indices.
-            var indices = pageIndexPopulator(page, isMorePagesAvailable, initialAppCount + onReviewStateAppCount);
+            var indices = pageIndexPopulator(page, isMorePagesAvailable, initialAppCount, onReviewStateAppCount);
             var pageIndices;
 
             if (indices.length > 1) {
