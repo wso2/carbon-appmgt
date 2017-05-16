@@ -13,29 +13,40 @@
         header = request.getParameter("header"),
         refererFromHeader = request.getHeader("referer"),
         requestURL = request.getRequestURL(),
-        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
+        customDomain = request.getHeader("wso2-cloud-custom-domain"),
         log = new Log(),
         serverHost = process.getProperty('server.host'),
         postUrl = dataConfi.ssoConfiguration.identityProviderURL;
+
+        var acsUrl = dataConfi.ssoConfiguration.storeAcs;
+        if (customDomain != null) {
+            acsUrl = "https://" + customDomain + "/acs";
+        }
+
+        var isRequestSigningEnabled = dataConfi.ssoConfiguration.requestSigningEnabled;
+        if (isRequestSigningEnabled) {
+            encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer, acsUrl,
+                    dataConfi.ssoConfiguration.identityProviderURL, isRequestSigningEnabled);
+        } else { //keep this for backward compatibility
+            encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer);
+        }
 
         //Extract tenant domain from store URL
         var requestedTenant;
         if(requestURI.indexOf("/t/") !== -1) {
             var requestContextPaths = requestURI.split("/t/");
             requestedTenant = requestContextPaths[1].split("/") [0];
-            postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
         }
 
         var proxyFriendlyRequestURL = requestURL;
-        var customDomain = request.getHeader("wso2-cloud-custom-domain");
 
         if(customDomain){
-
           // If a custom domain is set,
           // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
-          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/")
+          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/");
         }else if(caramel.configs().reverseProxyEnabled && caramel.configs().reverseProxyHost){
-          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs().reverseProxyHost + "/")
+          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs()
+          .reverseProxyHost + "/");
         }
 
         if(header && header == true) {
@@ -58,8 +69,6 @@
 
         relayStates[relayStateID] = relayState;
 
-        log.info("Loged = " + session.get("Loged"));
-
     if (!session.get("Loged")) {
         %>
             <div>
@@ -70,6 +79,7 @@
                         <input type="hidden" name="SAMLRequest" value ="<%= encodedSAMLAuthRequest %>"/>
                         <input type="hidden" name="RelayState" value ="<%= relayStateID %>"/>
                         <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
+                        <input type="hidden" name="storeTenantDomain" value="<%= requestedTenant %>"/>
                         <button type="submit">Redirect manually</button>
                     </p>
                 </form>

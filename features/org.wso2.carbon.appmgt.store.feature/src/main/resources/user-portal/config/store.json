@@ -25,7 +25,8 @@
         "keyStoreName": "/repository/resources/security/wso2carbon.jks",
         "validateAssertionValidityPeriod": true,
         "validateAudienceRestriction": true,
-        "assertionSigningEnabled": true
+        "assertionSigningEnabled": true,
+        "requestSigningEnabled": true
     },
 
     "pagination": {
