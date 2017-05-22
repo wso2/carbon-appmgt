@@ -54,13 +54,7 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
         PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
         try  {
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
-            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String fullName;
-            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
-                fullName = loggedInUser + "@" + tenantDomain;
-            }else{
-                fullName = loggedInUser;
-            }
+            String fullName = loggedInUser;
             APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(fullName);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
             WebApp api = provider.getAPI(apiId);
