@@ -27,6 +27,7 @@
         "validateAudienceRestriction": true,
         "assertionSigningEnabled": true,
         "requestSigningEnabled": true
+        "isForceAuth" : true
     },
 
     "pagination": {
