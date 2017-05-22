@@ -8,14 +8,18 @@
         response.sendRedirect('/store');
     } else {
         var config = require('/config/store.js').config(),
-            sso = require('sso'),
-            process = require("process"),
-            sso_sessions = application.get('sso_sessions'),
-            sessionId = session.getId(),
-            encodedSAMLLogoutRequest = sso.client.getEncodedSAMLLogoutRequest(user, sso_sessions[session.getId()],
-                config.ssoConfiguration.issuer),
-            serverHost = process.getProperty('server.host'),
-            postUrl = config.ssoConfiguration.identityProviderURL;
+                sso = require('sso'),
+                process = require("process"),
+                uuid = require('uuid'),
+                sso_sessions = application.get('sso_sessions'),
+                sessionId = session.getId(),
+                encodedSAMLLogoutRequest = sso.client.getEncodedSAMLLogoutRequest(user, sso_sessions[session.getId()],
+                        config.ssoConfiguration.issuer),
+                customDomain = request.getHeader("X-WSO2-Custom-Domain"),
+                serverHost = process.getProperty('server.host'),
+                postUrl = config.ssoConfiguration.identityProviderURL;
+
+        var log = new Log();
 
         caramel = require('caramel');
         var contextPath = caramel.configs().context;
@@ -24,18 +28,57 @@
         var tenantDomain = carbon.server.tenantDomain({
                               tenantId: tenantId
                            });
-        var relayState = contextPath + "/t/" + tenantDomain;
-        
-        var reversProxyEnabled = caramel.configs().reverseProxyEnabled;
-        var reverseProxyHost = caramel.configs().reverseProxyHost;
 
-        if(reversProxyEnabled) {
-            relayState = reverseProxyHost + relayState;
+        var relayStateURL;
+        if (customDomain) {
+            relayStateURL = "https://" + customDomain;
+            if(log.isDebugEnabled()) {
+                log.debug("Custom domain : " + customDomain + " is configured. RelayStateURL constructed accordingly." +
+                        " RelayStateURL: " + relayStateURL);
+            }
+
+        } else {
+            if (tenantDomain) {
+                relayStateURL = contextPath + "/t/" + tenantDomain;
+            } else {
+                relayStateURL = contextPath;
+            }
+
+            var reversProxyEnabled = caramel.configs().reverseProxyEnabled;
+            var reverseProxyHost = caramel.configs().reverseProxyHost;
+
+            if (reversProxyEnabled && reverseProxyHost) {
+                relayStateURL = reverseProxyHost + relayStateURL;
+
+                if(log.isDebugEnabled()) {
+                    log.debug("Reverse proxy enabled with host:  " + reverseProxyHost + ". RelayStateURL" +
+                            " constructed accordingly. RelayStateURL: " + relayStateURL);
+                }
+            }
         }
 
-        var log = new Log();
-        log.debug("store session index : " + sso_sessions[session.getId()]);
-        auditLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
+        // Preserve the relay state.
+        var relayStates = application.get("relayStates");
+
+        if (!relayStates) {
+            relayStates = {};
+            application.put("relayStates", relayStates);
+        }
+
+        // Generate relay state ID.
+        var relayStateID = uuid.generate().toString();
+
+        var relayState = {};
+        relayState.requestedURL = relayStateURL;
+        relayState.applicationTenantDomain = tenantDomain;
+        relayStates[relayStateID] = relayState;
+
+        if(log.isDebugEnabled()) {
+            log.debug("User portal session index : " + sso_sessions[session.getId()]);
+        }
+
+        log.info("User: " + user + " logged out from tenant : " + tenantDomain);
+        auditLog.writeLog(tenantId, user, "UserSignedOut","Logout","", "", "");
 
         %>
             <div>
@@ -44,9 +87,9 @@
 
                 <form id="logoutForm" method="post" action="<%=postUrl%>">
                     <p>
-                        <input type="hidden" name="SAMLRequest"value="<%= encodedSAMLLogoutRequest %>"/>
-                        <input type="hidden" name="RelayState" value="<%= relayState %>"/>
-                        <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
+                        <input type="hidden" name="SAMLRequest"value="<%=encodedSAMLLogoutRequest%>"/>
+                        <input type="hidden" name="RelayState" value="<%=relayStateID%>"/>
+                        <input type="hidden" name="SSOAuthSessionID" value="<%=sessionId%>"/>
                         <button type="submit">POST</button>
                     </p>
                 </form>

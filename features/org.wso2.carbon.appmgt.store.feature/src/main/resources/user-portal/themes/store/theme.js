@@ -126,7 +126,7 @@ var engine = caramel.engine('handlebars', (function () {
                 var caramel = require('caramel');
                 var context = caramel.configs().context;
                 var pattern = context + '/storage/{+any}';
-                var customDomainHeader = request.getHeader("wso2-cloud-custom-domain");
+                var customDomainHeader = request.getHeader("X-WSO2-Custom-Domain");
                 //Resolving tenanted storage URI for webapps
                 if (storageMatcher.match(pattern)) {
                     path = "/storage/" + storageMatcher.elements().any;

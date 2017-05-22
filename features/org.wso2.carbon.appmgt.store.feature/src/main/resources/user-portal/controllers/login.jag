@@ -1,73 +1,92 @@
 <%
-(function(){
+(function () {
     include("/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
-    var dataConfi = require('/config/store.js').config(),
-        sso = require("sso"),
-        process = require("process"),
-        caramel = require('caramel'),
-        uuid = require('uuid'),
-        sessionId = session.getId(),
-        requestURI = request.getRequestURI(),
-        requestedPage = request.getParameter("requestedPage"),
-        header = request.getParameter("header"),
-        refererFromHeader = request.getHeader("referer"),
-        requestURL = request.getRequestURL(),
-        customDomain = request.getHeader("wso2-cloud-custom-domain"),
-        log = new Log(),
-        serverHost = process.getProperty('server.host'),
-        postUrl = dataConfi.ssoConfiguration.identityProviderURL;
+    var storeConfig = require('/config/store.js').config(),
+            sso = require("sso"),
+            process = require("process"),
+            caramel = require('caramel'),
+            uuid = require('uuid'),
+            sessionId = session.getId(),
+            requestedPage = request.getParameter("requestedPage"),
+            requestURI = request.getRequestURI(),
+            requestURL = request.getRequestURL(),
+            customDomain = request.getHeader("X-WSO2-Custom-Domain"),
+            postUrl = storeConfig.ssoConfiguration.identityProviderURL,
+            log = new Log();
 
-        var acsUrl = dataConfi.ssoConfiguration.storeAcs;
-        if (customDomain != null) {
-            acsUrl = "https://" + customDomain + "/acs";
+    // Extract tenant domain from store URL.
+    var requestedTenant;
+    if (requestURI.indexOf("/t/") !== -1) {
+        var requestContextPaths = requestURI.split("/t/");
+        requestedTenant = requestContextPaths[1].split("/") [0];
+
+        if (log.isDebugEnabled()) {
+            log.debug("User portal accessed from a tenant aware URL for tenant domain : " + requestedTenant);
+        }
+    }
+
+    // Set ACS URL.
+    var acsUrl = storeConfig.ssoConfiguration.storeAcs;
+    if (customDomain) {
+        acsUrl = "https://" + customDomain + "/acs";
+        if (log.isDebugEnabled()) {
+            log.debug("Custom domain : " + customDomain + " is configured. ACS URL constructed accordingly. ACS URL : "
+                    + acsUrl);
+        }
+    }
+
+    // Generate SAML request.
+    var encodedSAMLAuthRequest;
+    var isRequestSigningEnabled = storeConfig.ssoConfiguration.requestSigningEnabled;
+    if (isRequestSigningEnabled) {
+        if (log.isDebugEnabled()) {
+            log.debug("SAML request signing is enabled.");
+        }
+        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(storeConfig.ssoConfiguration.issuer, acsUrl,
+                storeConfig.ssoConfiguration.identityProviderURL, isRequestSigningEnabled);
+    } else {
+        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(storeConfig.ssoConfiguration.issuer);
+    }
+
+    if(log.isDebugEnabled()) {
+        log.debug("SAML Request : " + encodedSAMLAuthRequest);
+    }
+
+    var relayStateURL = requestURL;
+    if (customDomain) {
+        // If a custom domain is set,
+        // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
+        relayStateURL = relayStateURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain);
+        if(log.isDebugEnabled()) {
+            log.debug("Custom domain : " + customDomain + " is configured. RelayStateURL constructed accordingly." +
+                    " RelayStateURL: " + relayStateURL);
         }
 
-        var isRequestSigningEnabled = dataConfi.ssoConfiguration.requestSigningEnabled;
-        if (isRequestSigningEnabled) {
-            encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer, acsUrl,
-                    dataConfi.ssoConfiguration.identityProviderURL, isRequestSigningEnabled);
-        } else { //keep this for backward compatibility
-            encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer);
+    } else if (caramel.configs().reverseProxyEnabled && caramel.configs().reverseProxyHost) {
+        relayStateURL = relayStateURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs()
+                        .reverseProxyHost + "/");
+        if(log.isDebugEnabled()) {
+            log.debug("Reverse proxy enabled with host:  " + caramel.configs().reverseProxyHost + ". RelayStateURL" +
+                    " constructed accordingly. RelayStateURL: " + relayStateURL);
         }
+    }
 
-        //Extract tenant domain from store URL
-        var requestedTenant;
-        if(requestURI.indexOf("/t/") !== -1) {
-            var requestContextPaths = requestURI.split("/t/");
-            requestedTenant = requestContextPaths[1].split("/") [0];
-        }
+    // Preserve the relay state.
+    var relayStates = application.get("relayStates");
 
-        var proxyFriendlyRequestURL = requestURL;
+    if (!relayStates) {
+        relayStates = {};
+        application.put("relayStates", relayStates);
+    }
 
-        if(customDomain){
-          // If a custom domain is set,
-          // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
-          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/");
-        }else if(caramel.configs().reverseProxyEnabled && caramel.configs().reverseProxyHost){
-          proxyFriendlyRequestURL = proxyFriendlyRequestURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs()
-          .reverseProxyHost + "/");
-        }
+    // Generate relay state ID.
+    var relayStateID = uuid.generate().toString();
 
-        if(header && header == true) {
-            proxyFriendlyRequestURL = proxyFriendlyRequestURL +"?header=true";
-        }
-
-        // Preserve the relay state.
-        var relayStates = application.get("relayStates");
-
-        if(!relayStates){
-          relayStates = {};
-          application.put("relayStates", relayStates);
-        }
-
-        var relayStateID = uuid.generate().toString();
-
-        var relayState = {};
-        relayState.requestedURL = proxyFriendlyRequestURL;
-        relayState.applicationTenantDomain = requestedTenant;
-
-        relayStates[relayStateID] = relayState;
+    var relayState = {};
+    relayState.requestedURL = relayStateURL;
+    relayState.applicationTenantDomain = requestedTenant;
+    relayStates[relayStateID] = relayState;
 
     if (!session.get("Loged")) {
         %>
@@ -76,18 +95,18 @@
                 redirection fails, please click on the button below.</p>
                 <form method="post" action="<%=postUrl%>">
                     <p>
-                        <input type="hidden" name="SAMLRequest" value ="<%= encodedSAMLAuthRequest %>"/>
-                        <input type="hidden" name="RelayState" value ="<%= relayStateID %>"/>
-                        <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
-                        <input type="hidden" name="storeTenantDomain" value="<%= requestedTenant %>"/>
-                        <button type="submit">Redirect manually</button>
-                    </p>
-                </form>
-            </div>
-            <script type="text/javascript" >
-                document.forms[0].submit();
-            </script>
-        <%
+                        <input type="hidden" name="SAMLRequest" value ="<%=encodedSAMLAuthRequest%>"/>
+                        <input type="hidden" name="RelayState" value ="<%=relayStateID%>"/>
+                        <input type="hidden" name="SSOAuthSessionID" value="<%=sessionId%>"/>
+                        <input type="hidden" name="storeTenantDomain" value="<%=requestedTenant%>"/>
+                                <button type="submit">Redirect manually</button>
+                            </p>
+                        </form>
+                    </div>
+                    <script type="text/javascript" >
+                        document.forms[0].submit();
+                    </script>
+                <%
     }
 }());
 %>
