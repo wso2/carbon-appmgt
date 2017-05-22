@@ -103,8 +103,8 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         try {
             if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
-               appProvider = appProvider.replace("-AT-", "@");
-               appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
+                appProvider = appProvider.replace("@", "-AT-");
+                appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
                                                                          tenantDomain);
             } else {
                 appData = appGatewayAdminStub.getVersionedWebApp(appProvider, appName, appVersion);
@@ -165,6 +165,7 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
         String appVersion = apiId.getVersion();
         String appProvider = apiId.getProviderName();
         try {
+            appProvider = appProvider.replace("@", "-AT-");
             if (!StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
                                                                                   .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.deleteVersionedWebAppForTenant(appProvider, appName, appVersion, tenantDomain);
