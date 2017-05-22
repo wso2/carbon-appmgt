@@ -61,7 +61,6 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealmService;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.carbon.utils.xml.StringUtils;
@@ -148,7 +147,7 @@ public class AppMDAO {
     }
 
     /**
-     * Delete a given business owner.
+     *
      *
      * @param businessOwnerId
      */
@@ -3426,6 +3425,8 @@ public class AppMDAO {
 		}
 		return applicationId;
 	}
+
+
 
 	/**
 	 * @param application
@@ -8926,6 +8927,152 @@ public class AppMDAO {
         return query;
     }
 
+    /**
+     * Add user portal theme details for the given tenant.
+     *
+     * @param tenantDomain
+     * @param name
+     * @param description
+     * @throws AppManagementException
+     */
+    public void addUserPortalTheme(String tenantDomain, String name, String description)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        Connection connection = null;
+
+        try {
+            int tenantId;
+            try {
+                tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+            } catch (IdentityRuntimeException e) {
+                String msg = "Failed to get tenant id of tenant Domain : " + tenantDomain;
+                log.error(msg, e);
+                throw new AppManagementException(msg, e);
+            }
+
+            // This query to update the APM_USER_PORTAL_THEME table
+            final String sqlQuery = "INSERT INTO APM_USER_PORTAL_THEME (TENANT_ID, NAME, DESCRIPTION) VALUES (?,?,?)";
+
+            // Adding data to the APM_USER_PORTAL_THEME table
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            ps = connection.prepareStatement(sqlQuery);
+
+            ps.setInt(1, tenantId);
+            ps.setString(2, name);
+            ps.setString(3, description);
+
+            ps.executeUpdate();
+            ps.close();
+            // finally commit transaction
+            connection.commit();
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback the add User Portal Theme", e);
+                }
+            }
+            handleException("Failed to add user portal theme for the tenant: " + tenantDomain, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, null);
+        }
+    }
 
 
+    /**
+     * Remove user portal theme details for the given tenant.
+     *
+     * @param tenantDomain
+     * @throws AppManagementException
+     */
+    public void deleteUserPortalTheme(String tenantDomain)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        Connection connection = null;
+
+        try {
+            int tenantId;
+            try {
+                tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+            } catch (IdentityRuntimeException e) {
+                String msg = "Failed to get tenant id of tenant Domain : " + tenantDomain;
+                log.error(msg, e);
+                throw new AppManagementException(msg, e);
+            }
+
+            // This query to delete a record from the APM_USER_PORTAL_THEME table
+            final String queryToDeleteRecord = "DELETE FROM APM_USER_PORTAL_THEME WHERE TENANT_ID = ?";
+
+            // Adding data to the APM_USER_PORTAL_THEME table
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            ps = connection.prepareStatement(queryToDeleteRecord);
+
+            ps.setInt(1, tenantId);
+
+            ps.executeUpdate();
+            ps.close();
+            // finally commit transaction
+            connection.commit();
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback the delete user portal Theme", e);
+                }
+            }
+            handleException("Failed to delete user portal theme for the tenant: " + tenantDomain, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, null);
+        }
+    }
+
+    /**
+     * Returns user portal theme for the given tenant.
+     *
+     * @param tenantDomain
+     * @return
+     * @throws AppManagementException
+     */
+    public UserPortalTheme getUserPortalTheme(String tenantDomain) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        UserPortalTheme userPortalTheme = null;
+        ResultSet rs = null;
+
+        try {
+            int tenantId;
+            try {
+                tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+            } catch (IdentityRuntimeException e) {
+                String msg = "Failed to get tenant id of tenant Domain : " + tenantDomain;
+                log.error(msg, e);
+                throw new AppManagementException(msg, e);
+            }
+
+            final String queryToGetUserPortalTheme = "SELECT NAME, DESCRIPTION FROM APM_USER_PORTAL_THEME WHERE TENANT_ID = ?";
+
+            connection = APIMgtDBUtil.getConnection();
+            prepStmt = connection.prepareStatement(queryToGetUserPortalTheme);
+            prepStmt.setInt(1, tenantId);
+            rs = prepStmt.executeQuery();
+
+            if (rs.next()) {
+                userPortalTheme = new UserPortalTheme();
+                userPortalTheme.setTenantDomain(tenantId);
+                userPortalTheme.setName(rs.getString("NAME"));
+                userPortalTheme.setDescription(rs.getString("DESCRIPTION"));
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve user portal theme for the tenant: " + tenantDomain, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+
+        }
+        return userPortalTheme;
+    }
 }
