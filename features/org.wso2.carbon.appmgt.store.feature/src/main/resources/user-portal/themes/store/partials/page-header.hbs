@@ -1,7 +1,16 @@
-{{!-- page header - title --}}
-<div class="pull-left hidden-xs">
-    <h3 class="page-title">{{t title}}</h3>
+<div class="navbar-wrapper navbar-search hidden-lg hidden-md">
+    <a class="navbar-menu-toggle hidden-sm hidden-lg hidden-md" data-toggle="sidebar" data-target="#left-sidebar"
+       data-container=".page-content-wrapper" data-container-divide="true" aria-expanded="false"
+       rel="leftmenu-sidebar">
+            <span class="icon fw-stack">
+                <i class="fw fw-menu fw-stack-1x toggle-icon-left-arrow"></i>
+            </span>
+    </a>
 </div>
+{{!-- page header - title --}}
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h3 class="page-title pull-left">{{t title}}</h3>
 {{!-- add home page setting option for favouriete page--}}
 {{#if myFav}}
     <div class="page-title-setting dropdown">
@@ -24,13 +33,17 @@
 {{/if}}
 {{!-- page header - sorting options --}}
 {{#if sorting}}
-    <div class="sorting-options pull-right">
-        <div class="btn-group" role="group">
-            {{#each sorting.options}}
-                <a href="{{tenantedUrl this.url}}" class="btn btn-default" title="{{t title}}">
-                    <i class="{{class}}"></i>
-                </a>
-            {{/each}}
+    <div class="pull-right">
+        <div class="sorting-option">
+            <div class="btn-group" role="group">
+                {{#each sorting.options}}
+                    <a href="{{tenantedUrl this.url}}" class="btn btn-default" title="{{t title}}">
+                        <i class="{{class}}"></i>
+                    </a>
+                {{/each}}
+            </div>
         </div>
     </div>
 {{/if}}
+    </div>
+</div>
