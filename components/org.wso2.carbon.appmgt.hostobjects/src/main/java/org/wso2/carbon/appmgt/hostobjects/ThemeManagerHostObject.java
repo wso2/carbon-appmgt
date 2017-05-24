@@ -22,15 +22,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.UserPortalTheme;
+import org.wso2.carbon.appmgt.impl.utils.FileUtil;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,29 +44,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * This class has methods to add,remove custom themes.
  * <p/>
- * Default theme (store/themes/<themeName>) will be overriden in store/themes/<tenantDomain>/themes/custom.
- * <p/>
- * Extension level theme (store/extensions/assets/<assetType>/themes/<themeName>) will be overriden in
- * store/themes/<tenantDomain>/extensions/assets/<assetType>/themes/custom. Theme type is equal to asset type will be
- * same  extension level themes.
+ * Default theme (user-portal/themes/<themeName>) will be overriden in user-portal/themes/<tenantDomain>/themes/custom.
  * <p/>
  * Only whitelisted files will be allowed to uploaded with custom theme. Whitelisted file extension are configured in
- * admin-dasboard/site/config/site.json
+ * admin/conf/site.json
  */
 public class ThemeManagerHostObject extends ScriptableObject {
 
     private static final Log log = LogFactory.getLog(ThemeManagerHostObject.class);
-    private static final String DEFAULT = "default";
+    public final static String USER_PORTAL_THEME_FILE_EXTENSION = ".zip";
+    private static AppMDAO appMDAO = new AppMDAO();
 
     @Override
     public String getClassName() {
@@ -86,7 +86,7 @@ public class ThemeManagerHostObject extends ScriptableObject {
     }
 
     /**
-     * Add the custom theme for given tenant based on the theme type(eg. default,webapp,site).
+     * Add the custom theme for given tenant.
      *
      * @param cx
      * @param thisObj
@@ -97,17 +97,18 @@ public class ThemeManagerHostObject extends ScriptableObject {
      */
     public static boolean jsFunction_addCustomTheme(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-        if (args == null || args.length != 4) {
+        if (args == null || args.length != 5) {
             handleException("Invalid input parameters for addTenantTheme");
         }
 
         FileHostObject uploadFile = (FileHostObject) args[0];
-        String tenant = (String) args[1];
-        String themeType = (String) args[2];
-        NativeArray fileExtensions = (NativeArray) args[3];
+        String tenantDomain = (String) args[1];
+        NativeArray fileExtensions = (NativeArray) args[2];
+        String themeName = (String) args[3];
+        String description = (String) args[4];
 
         if (log.isDebugEnabled()) {
-            String msg = String.format("Add Custom theme : %1s for tenant : %2s", themeType, tenant);
+            String msg = String.format("Add Custom theme for tenant : %s", tenantDomain);
             log.debug(msg);
         }
 
@@ -115,84 +116,83 @@ public class ThemeManagerHostObject extends ScriptableObject {
         for (Object ext : fileExtensions) {
             whitelistedExt.add((String) ext);
         }
-        //extract the zip file to store directory
-        deployCustomTheme(uploadFile, tenant, themeType, whitelistedExt);
+        //extract the zip file to user-portal directory
+        deployCustomTheme(uploadFile, tenantDomain, whitelistedExt);
+        addUserPortalThemeInfo(tenantDomain, themeName, description);
 
         return true;
     }
 
     /**
-     * Get the list of custom themes(e.g default,webapp,site ) deployed to given tenant.
+     * Download the custom theme for given tenant.
      *
      * @param cx
      * @param thisObj
      * @param args
      * @param funObj
-     * @return Custom Theme Types.
+     * @return theme file location
      * @throws AppManagementException
      */
-    public static NativeObject jsFunction_getDeployedThemes(Context cx, Scriptable thisObj, Object[] args,
-                                                            Function funObj)
+    public static String jsFunction_downloadCustomTheme(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            handleException("Invalid input parameters for downloadTenantTheme");
+        }
+
+        String tenantDomain = (String) args[0];
+
+        if (log.isDebugEnabled()) {
+            String msg = String.format("Download Custom theme for tenant : %s", tenantDomain);
+            log.debug(msg);
+        }
+
+        return downloadCustomTheme(tenantDomain);
+    }
+
+    /**
+     * Get the custom themes information deployed in the given tenant.
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return theme information.
+     * @throws AppManagementException
+     */
+    public static JSONObject jsFunction_getDeployedThemeInfo(Context cx, Scriptable thisObj, Object[] args,
+                                                             Function funObj)
             throws AppManagementException {
 
         if (args == null || args.length != 1) {
             handleException(
-                    "Invalid input parameters for getDeployedThemes.Expected parameters : tenantDomain,themeTypes");
+                    "Invalid input parameters for getDeployedThemes.Expected parameters : tenantDomain");
         }
         String tenantDomain = (String) args[0];
-        NativeObject themes = new NativeObject();
+        JSONObject themeInfo = new JSONObject();
 
         if (log.isDebugEnabled()) {
-            String msg = String.format("Get deployed themes for tenant :%s", tenantDomain);
+            String msg = String.format("Check deployed themes for tenant :%s", tenantDomain);
             log.debug(msg);
         }
-        //check tenant theme dir exists
+        // check tenant theme dir exists
         Path path = getTenantThemePath(tenantDomain);
         if (!Files.exists(path)) {
-            return themes;
+            return themeInfo;
         }
 
-        //check custom default theme
-        path = getCustomThemePath(tenantDomain, DEFAULT);
-        themes.put(DEFAULT, themes, isThemeExists(path));
-
-        //check custom asset level themes
-        List<String> assetTypes = HostObjectUtils.getEnabledAssetTypes();
-        for (String type : assetTypes) {
-            path = getCustomThemePath(tenantDomain, type);
-            themes.put(type, themes, isThemeExists(path));
+        // check custom default theme
+        path = getCustomThemePath(tenantDomain);
+        UserPortalTheme userPortalTheme = getUserPortalTheme(tenantDomain);
+        if (isThemeExists(path)) {
+            themeInfo.put("themeName", userPortalTheme.getName());
+            themeInfo.put("themeDescription", userPortalTheme.getDescription());
         }
-        return themes;
+
+        return themeInfo;
     }
 
     /**
-     * Get the theme types
-     *
-     * @param cx
-     * @param thisObj
-     * @param args
-     * @param funObj
-     * @return
-     * @throws AppManagementException
-     */
-    public static NativeArray jsFunction_getCustomThemeTypes(Context cx, Scriptable thisObj, Object[] args,
-                                                             Function funObj)
-            throws AppManagementException {
-        List<String> assetTypes = HostObjectUtils.getEnabledAssetTypes();
-        NativeArray themeTypes = new NativeArray(0);
-        int i = 0;
-        themeTypes.put(i, themeTypes, DEFAULT);
-        for (String type : assetTypes) {
-            i++;
-            themeTypes.put(i, themeTypes, type);
-        }
-
-        return themeTypes;
-    }
-
-
-    /**
-     * Remove given deployed custom them for given tenant.
+     * Remove deployed custom theme for the given tenant.
      *
      * @param cx
      * @param thisObj
@@ -201,90 +201,69 @@ public class ThemeManagerHostObject extends ScriptableObject {
      * @return true if success
      * @throws AppManagementException
      */
-    public static boolean jsFunction_deleteCustomTheme(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+    public static void jsFunction_deleteCustomThemeTempDirectory(Context cx, Scriptable thisObj, Object[] args,
+                                                                 Function funObj)
             throws AppManagementException {
-        if (args == null || args.length != 2) {
+        if (args == null || args.length != 1) {
             handleException(
-                    "Invalid input parameters for getDeployedThemes.Expected parameters : tenantDomain,themeType");
+                    "Invalid input parameters for deleteCustomThemeTempDirectory. Expected parameters : tenantDomain");
+        }
+        String customThemeFilePath = (String) args[0];
+        deleteCustomThemeTempDirectory(customThemeFilePath);
+    }
+
+    /**
+     * Remove deployed custom theme for the given tenant.
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return true if success
+     * @throws AppManagementException
+     */
+    public static void jsFunction_deleteCustomTheme(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            handleException(
+                    "Invalid input parameters for deleteCustomTheme. Expected parameters : tenantDomain");
         }
         String tenantDomain = (String) args[0];
-        String themeType = (String) args[1];
-
-        return undeployTheme(tenantDomain, themeType);
+        deleteUserPortalThemeInfo(tenantDomain);
+        deleteThemeDirectory(tenantDomain);
     }
 
     /**
      * Delete the theme directory in the file system based on given theme type.
      *
      * @param tenantDomain Tenant Domain
-     * @param themeType    Theme Type (Default ,<assetType> e.g webapp)
      * @return true if success.
      * @throws AppManagementException
      */
-    private static boolean undeployTheme(String tenantDomain, String themeType) throws AppManagementException {
+    private static void deleteThemeDirectory(String tenantDomain) throws AppManagementException {
         if (log.isDebugEnabled()) {
-            String msg = String.format("Delete custom theme:%1s of tenant : %2s", themeType, tenantDomain);
+            String msg = String.format("Delete custom theme of tenant: %s", tenantDomain);
             log.debug(msg);
         }
-        // store/themes/<tenantDomain>
+        // user-portal/themes/<tenantDomain>
         Path tenantThemePath = getTenantThemePath(tenantDomain);
-        // store/themes/<tenantDomain>/extensions/assets
-        Path extAssetsPath = getExtThemePath(tenantDomain);
-        // store/themes/<tenantDomain>/themes
-        Path defaultThemePath = tenantThemePath.resolve("themes");
-        // store/themes/<tenantDomain>/extensions
-        Path extPath = tenantThemePath.resolve("extensions");
 
         if (!Files.exists(tenantThemePath)) {
             //no tenant theme directory found
-            if (log.isDebugEnabled()) {
-                String msg = String.format("Tenant theme directory does not exist : %s", tenantThemePath.toString());
-                log.debug(msg);
-            }
-            return true;
+            String msg = String.format("Tenant theme directory could not be found : %s, while un-deploying the " +
+                    "theme", tenantThemePath.toString());
+            log.warn(msg);
         }
 
-        if (DEFAULT.equals(themeType)) {
-            deleteDir(defaultThemePath);
-            //if custom extension theme path does not exist
-            //then  delete tenant theme dir
-            if (!Files.exists(extPath)) {
-                deleteDir(tenantThemePath);
-            }
-        } else {
-            // store/themes/<tenantDomain>/extensions/assets/<assetType>
-            Path path = extAssetsPath.resolve(themeType);
-            deleteDir(path);
-            //if there are no any custom asset themes
-            // then delete the extensions dir
-            File dir = extAssetsPath.toFile();
-            if (dir.list().length == 0) {
-                deleteDir(extPath);
-                //if custom default theme is not exists
-                //then delete tenand theme dir
-                if (!Files.exists(defaultThemePath)) {
-                    deleteDir(tenantThemePath);
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Delete a directory recursively in file system.
-     *
-     * @throws AppManagementException
-     */
-    private static void deleteDir(Path path) throws AppManagementException {
         if (log.isDebugEnabled()) {
-            String msg = String.format("Delete directory : %s", path.toString());
+            String msg = String.format("Deleting directory : %s", tenantThemePath.toString());
             log.debug(msg);
         }
 
         try {
-            FileUtils.deleteDirectory(path.toFile());
+            FileUtils.deleteDirectory(tenantThemePath.toFile());
         } catch (IOException e) {
-            handleException("Could not delete directory :" + path.toString());
+            handleException("Could not delete directory :" + tenantThemePath.toString(), e);
         }
     }
 
@@ -308,31 +287,29 @@ public class ThemeManagerHostObject extends ScriptableObject {
      * omitted.
      *
      * @param themeFile      Theme File in zip format
-     * @param tenant         Tenant Domain
-     * @param themeType      Theme Type (Default ,<assetType> e.g webapp)
+     * @param tenantDomain   Tenant Domain
      * @param whitelistedExt Whitelisted file extensions
      * @throws AppManagementException
      */
-    private static void deployCustomTheme(FileHostObject themeFile, String tenant, String themeType,
-                                          Set<String> whitelistedExt) throws AppManagementException {
+    private static void deployCustomTheme(FileHostObject themeFile, String tenantDomain, Set<String> whitelistedExt) throws AppManagementException {
 
         if (log.isDebugEnabled()) {
-            String msg = String.format("Deploy custom theme of type :%1s for tenant :%2s", themeType, tenant);
+            String msg = String.format("Deploy custom theme of type for tenant :%s", tenantDomain);
             log.debug(msg);
         }
 
         ZipInputStream zis = null;
         byte[] buffer = new byte[1024];
 
-        //check store theme directory exists
+        //check user-portal theme directory exists
 
-        Path themeDir = getStoreThemePath();
+        Path themeDir = getUserPortalThemePath();
         if (!Files.exists(themeDir)) {
             String msg = "Could not found directory :" + themeDir.toString();
             handleException(msg);
         }
 
-        Path themePath = getCustomThemePath(tenant, themeType);
+        Path themePath = getCustomThemePath(tenantDomain);
         InputStream zipInputStream = null;
         try {
             zipInputStream = themeFile.getInputStream();
@@ -358,7 +335,7 @@ public class ThemeManagerHostObject extends ScriptableObject {
             zis = new ZipInputStream(zipInputStream);
             //get the zipped file list entry
             ZipEntry ze = zis.getNextEntry();
-            String ext = null;
+            String ext;
 
             while (ze != null) {
                 String fileName = ze.getName();
@@ -387,7 +364,7 @@ public class ThemeManagerHostObject extends ScriptableObject {
                     } else {
                         String msg = String.format(
                                 "Unsupported file is uploaded with custom theme by tenant %1s. File : %2s ",
-                                tenant, ze.getName());
+                                tenantDomain, ze.getName());
                         log.warn(msg);
                     }
 
@@ -418,50 +395,130 @@ public class ThemeManagerHostObject extends ScriptableObject {
     }
 
     /**
-     * Construct and return the default theme path of store. [/repository/deployment/server/jaggeryapps/store/themes]
+     * Generate user portal theme temp zip file.
+     * This will be created in the default temp directory for the downloadable purpose and it will be deleted after
+     * the completion of download.
+     *
+     * @param tenantDomain
+     * @return
+     */
+    public static String downloadCustomTheme(String tenantDomain) throws AppManagementException {
+        String themeName = "";
+        Path tempDirectory = null;
+
+        try {
+            tempDirectory = Files.createTempDirectory("IS_User_Portal_Theme_");
+            tempDirectory.toFile().deleteOnExit();
+            UserPortalTheme userPortalTheme = getUserPortalTheme(tenantDomain);
+            themeName = userPortalTheme.getName();
+            FileUtil downloadUtil = new FileUtil();
+
+            downloadUtil.copyFiles(Paths.get(CarbonUtils.getCarbonHome(), getUserPortalThemePathPerTenant
+                    (tenantDomain).toString()).toString(), Paths.get(tempDirectory.toString(), themeName).toString());
+
+            downloadUtil.zipFiles(Paths.get(tempDirectory.toString(), themeName), Paths.get(tempDirectory
+                    .toString(), themeName + USER_PORTAL_THEME_FILE_EXTENSION).toString());
+
+            downloadUtil.deleteDirectory(Paths.get(tempDirectory.toString(), themeName).toString());
+        } catch (IOException e) {
+            handleException("Error occurred while creating theme zip file for the tenant: " + tenantDomain, e);
+        }
+
+        return Paths.get(tempDirectory.toString(), themeName + USER_PORTAL_THEME_FILE_EXTENSION).toString();
+    }
+
+
+    /**
+     * Delete user portal theme temp directory
+     *
+     * @param customThemeFilePath
+     * @return
+     */
+    public static void deleteCustomThemeTempDirectory(String customThemeFilePath) throws AppManagementException {
+
+        File customThemeFile = new File(customThemeFilePath);
+        String parentDir = customThemeFile.getParent();
+
+        try {
+            FileUtil downloadUtil = new FileUtil();
+            downloadUtil.deleteDirectory(parentDir);
+        } catch (IOException e) {
+            handleException("Error occurred while deleting temp theme directory: " + parentDir, e);
+        }
+    }
+
+    /**
+     * Construct and return the default theme path of user-portal. [/repository/deployment/server/jaggeryapps/user-portal/themes]
      *
      * @return path
      */
-    private static Path getStoreThemePath() {
-        return Paths.get("repository", "deployment", "server", "jaggeryapps", "store", "themes");
+    private static Path getUserPortalThemePath() {
+        return Paths.get("repository", "deployment", "server", "jaggeryapps", "user-portal", "themes");
     }
 
     /**
      * Construct and return the custom theme path of tenant.
-     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>]
+     * [/repository/deployment/server/jaggeryapps/user-portal/themes/<tenantDomain>]
      *
      * @return path
      */
-    private static Path getTenantThemePath(String tenant) {
-        return getStoreThemePath().resolve(tenant);
-    }
-
-    /**
-     * Construct and return the custom tenant theme extensions path.
-     * [/repository/deployment/server/jaggeryapps/store/themes/<tenantDomain>/extensions/assets]
-     *
-     * @return path
-     */
-    private static Path getExtThemePath(String tenantDomain) {
-        Path path = getTenantThemePath(tenantDomain);
-        Path tempPath = Paths.get("extensions", "assets");
-        return path.resolve(tempPath);
+    private static Path getTenantThemePath(String tenantDomain) {
+        return getUserPortalThemePath().resolve(tenantDomain);
     }
 
     /**
      * Construct and return the custom tenant theme path.
      *
      * @param tenantDomain Tenant Domain
-     * @param themeType    Theme Type (Default ,<assetType> e.g webapp)
      * @return path
      */
-    private static Path getCustomThemePath(String tenantDomain, String themeType) {
+    private static Path getCustomThemePath(String tenantDomain) {
         Path path = getTenantThemePath(tenantDomain);
-        if (DEFAULT.equals(themeType)) {
-            return path.resolve(Paths.get("themes", "custom"));
-        } else {
-            return path.resolve(Paths.get("extensions", "assets", themeType, "themes", "custom"));
-        }
+        return path.resolve(Paths.get("themes", "custom"));
+    }
+
+    /**
+     * Get user portal custom theme path for given tenant.
+     *
+     * @param tenantDomain
+     * @return user portal custom theme path
+     */
+    public static Path getUserPortalThemePathPerTenant(String tenantDomain) {
+        return Paths.get("repository", "deployment", "server", "jaggeryapps", "user-portal", "themes", tenantDomain,
+                "themes", "custom");
+    }
+
+    /**
+     * Add user-portal theme information for given tenant.
+     *
+     * @param tenantDomain Tenant Domain
+     * @param name         Theme name
+     * @param description  Theme description
+     * @throws AppManagementException
+     */
+    public static void addUserPortalThemeInfo(String tenantDomain, String name, String description) throws AppManagementException {
+        appMDAO.addUserPortalTheme(tenantDomain, name, description);
+    }
+
+    /**
+     * Remove user-portal theme information for given tenant.
+     *
+     * @param tenantDomain Tenant Domain
+     * @throws AppManagementException
+     */
+    public static void deleteUserPortalThemeInfo(String tenantDomain) throws AppManagementException {
+        appMDAO.deleteUserPortalTheme(tenantDomain);
+    }
+
+    /**
+     * Get user-portal theme for a given tenant.
+     *
+     * @param tenantDomain
+     * @return user-portal theme description
+     * @throws AppManagementException
+     */
+    public static UserPortalTheme getUserPortalTheme(String tenantDomain) throws AppManagementException {
+        return appMDAO.getUserPortalTheme(tenantDomain);
     }
 
 }
