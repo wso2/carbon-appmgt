@@ -1,8 +1,6 @@
 {{!-- search --}}
 {{#if searchUrl}}
-
-            <div class="form-group">
-                <div class="search-box col-xs-10 col-sm-12 col-md-12 col-lg-4">
+                <div class="search-box col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-4">
                     <div class="input-group input-wrap search-wrap">
                         <input type="hidden" value="{{tenantedUrl searchUrl}}" id="searchUrl">
                         <input type="text" id="searchTxt" value="{{searchQuery.search}}"
@@ -39,16 +37,4 @@
                     </div>
                     <!-- /input-group -->
                 </div>
-            </div>
-
-{{else}}
-    <div class="navbar-wrapper navbar-search hidden-lg hidden-md">
-        <a class="navbar-menu-toggle hidden-sm hidden-lg hidden-md" data-toggle="sidebar" data-target="#left-sidebar"
-           data-container=".page-content-wrapper" data-container-divide="true" aria-expanded="false"
-           rel="leftmenu-sidebar">
-                        <span class="icon fw-stack">
-                            <i class="fw fw-menu fw-stack-1x toggle-icon-left-arrow"></i>
-                        </span>
-        </a>
-    </div>
 {{/if}}

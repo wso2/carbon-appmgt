@@ -69,17 +69,11 @@ var render = function (theme, data, meta, require) {
                 }
             }
         ],
-        search: [
-            {
-                partial: 'search',
-                context: {searchQuery:data.search.query,searchUrl:searchUrl}
-            }
-        ],
         pageHeader: [
             {
                 partial: 'page-header',
                 context: {
-                    title: "Web App",
+                    title: "",
                     sorting: null
                 }
             }

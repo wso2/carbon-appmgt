@@ -101,7 +101,6 @@ header .header-action:active {
     background-color: #035A93;
 }
 .search-box {
-    margin-left: 400px;
     margin-top: 20px;
     padding: 0;
     margin-bottom: 20px;
@@ -239,9 +238,7 @@ header .header-action:active {
 .page-header .sorting-options > button {
     padding: 0 5px 0 5px;
 }
-.page-header .sorting-options {
-    margin-top: 25px;
-}
+
 .page-content .page-title {
     margin-left: 0px;
 }
@@ -726,7 +723,6 @@ active: background 10% lighter, border 5% darker
 
 .fav-app-title {
     width: auto;
-    padding: 0 10px;
     height: 50px;
     border-bottom: 3px solid #3a9ecf;
     float: left;
