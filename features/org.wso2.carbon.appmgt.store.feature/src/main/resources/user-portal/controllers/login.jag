@@ -13,7 +13,9 @@
             requestURL = request.getRequestURL(),
             customDomain = request.getHeader("X-WSO2-Custom-Domain"),
             postUrl = storeConfig.ssoConfiguration.identityProviderURL,
-            forceAuth = dataConfi.ssoConfiguration.isForceAuth;
+            forceAuth = storeConfig.ssoConfiguration.isForceAuth,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost,
             log = new Log();
 
     // Extract tenant domain from store URL.
@@ -26,16 +28,6 @@
             log.debug("User portal accessed from a tenant aware URL for tenant domain : " + requestedTenant);
         }
     }
-
-    // Enable forceAuth
-    if(forceAuth && stringEndsWith(refererParam,requestedTenant)) {
-        if(postUrl.indexOf("?") == -1) {
-            postUrl = postUrl+ "?forceAuth=true";
-        } else {
-            postUrl = postUrl+ "&forceAuth=true";
-        }
-    }
-
 
     // Set ACS URL.
     var acsUrl = storeConfig.ssoConfiguration.storeAcs;
@@ -68,17 +60,15 @@
     if (customDomain) {
         // If a custom domain is set,
         // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
-        relayStateURL = relayStateURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain);
+        relayStateURL = relayStateURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/");
         if(log.isDebugEnabled()) {
             log.debug("Custom domain : " + customDomain + " is configured. RelayStateURL constructed accordingly." +
                     " RelayStateURL: " + relayStateURL);
         }
-
-    } else if (caramel.configs().reverseProxyEnabled && caramel.configs().reverseProxyHost) {
-        relayStateURL = relayStateURL.replace(/http[s]?:\/\/.*?\//g, caramel.configs()
-                        .reverseProxyHost + "/");
+    } else if (reversProxyEnabled && reverseProxyHost) {
+        relayStateURL = reverseProxyHost + requestURI;
         if(log.isDebugEnabled()) {
-            log.debug("Reverse proxy enabled with host:  " + caramel.configs().reverseProxyHost + ". RelayStateURL" +
+            log.debug("Reverse proxy enabled with host:  " + reverseProxyHost + ". RelayStateURL" +
                     " constructed accordingly. RelayStateURL: " + relayStateURL);
         }
     }
@@ -110,6 +100,7 @@
                         <input type="hidden" name="RelayState" value ="<%=relayStateID%>"/>
                         <input type="hidden" name="SSOAuthSessionID" value="<%=sessionId%>"/>
                         <input type="hidden" name="storeTenantDomain" value="<%=requestedTenant%>"/>
+                        <input type="hidden" name="forceAuth" value="<%=forceAuth%>"/>
                                 <button type="submit">Redirect manually</button>
                             </p>
                         </form>
@@ -120,8 +111,4 @@
                 <%
     }
 }());
-
-function stringEndsWith(str, suffix) {
-    return str.match(suffix+"$")==suffix;
-}
 %>
