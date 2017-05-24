@@ -26,7 +26,7 @@
         "validateAssertionValidityPeriod": true,
         "validateAudienceRestriction": true,
         "assertionSigningEnabled": true,
-        "requestSigningEnabled": true
+        "requestSigningEnabled": true,
         "isForceAuth" : true
     },
 
