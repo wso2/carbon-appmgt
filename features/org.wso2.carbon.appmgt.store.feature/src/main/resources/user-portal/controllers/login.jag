@@ -1,53 +1,94 @@
 <%
-(function(){
+(function () {
     include("/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
-    var dataConfi = require('/config/store.js').config(),
-        sso = require("sso"),
-        process = require("process"),
-        sessionId = session.getId(),
-        requestURI = request.getRequestURI(),
-        requestedPage = request.getParameter("requestedPage"),
-        header = request.getParameter("header"),
-        refererParam = request.getParameter("referer"),
-        requestURL = request.getRequestURL(),
-        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(dataConfi.ssoConfiguration.issuer),
-        log = new Log(),
-        serverHost = process.getProperty('server.host'),
-        postUrl = dataConfi.ssoConfiguration.identityProviderURL,
-        forceAuth = dataConfi.ssoConfiguration.isForceAuth;
+    var storeConfig = require('/config/store.js').config(),
+            sso = require("sso"),
+            process = require("process"),
+            caramel = require('caramel'),
+            uuid = require('uuid'),
+            sessionId = session.getId(),
+            requestedPage = request.getParameter("requestedPage"),
+            requestURI = request.getRequestURI(),
+            requestURL = request.getRequestURL(),
+            customDomain = request.getHeader("X-WSO2-Custom-Domain"),
+            postUrl = storeConfig.ssoConfiguration.identityProviderURL,
+            forceAuth = storeConfig.ssoConfiguration.isForceAuth,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost,
+            log = new Log();
 
-        //Set the relayState from the requestURL. If the requestURL is empty set it from the referer.
-        relayState = refererParam;
+    // Extract tenant domain from store URL.
+    var requestedTenant;
+    if (requestURI.indexOf("/t/") !== -1) {
+        var requestContextPaths = requestURI.split("/t/");
+        requestedTenant = requestContextPaths[1].split("/") [0];
 
-        //Extract tenant domain from store URL
-        var requestedTenant;
-        if(requestURI.indexOf("/t/") !== -1) {
-            var requestContextPaths = requestURI.split("/t/");
-            requestedTenant = requestContextPaths[1].split("/") [0];
-            postUrl = postUrl + "?storeTenantDomain=" + requestedTenant;
-        } else if (refererParam != null && refererParam.indexOf("/t/") !== -1) {
-            var requestContextPaths = refererParam.split("/t/");
-            requestedTenant = requestContextPaths[1].split("/") [0];
-            postUrl = postUrl + "?refererParam=" + requestedTenant;
+        if (log.isDebugEnabled()) {
+            log.debug("User portal accessed from a tenant aware URL for tenant domain : " + requestedTenant);
         }
+    }
 
-        //We need to enable forceAuth for user-portal to avoid the confusion when user logged into it with different
-        //sessions. Anyway, enabling forceAuth cause to give login page even when jaggery app session timeout while IdP
-        //session available. To minimize this situation, we enable forceAuth only when initial page access.
-        if(forceAuth && stringEndsWith(refererParam,requestedTenant)) {
-            if(postUrl.indexOf("?") == -1) {
-                postUrl = postUrl+ "?forceAuth=true";
-            } else {
-                postUrl = postUrl+ "&forceAuth=true";
-            }
+    // Set ACS URL.
+    var acsUrl = storeConfig.ssoConfiguration.storeAcs;
+    if (customDomain) {
+        acsUrl = "https://" + customDomain + "/acs";
+        if (log.isDebugEnabled()) {
+            log.debug("Custom domain : " + customDomain + " is configured. ACS URL constructed accordingly. ACS URL : "
+                    + acsUrl);
         }
+    }
 
-        //This is to track that login request came when click the login link in the store.
-        //Which is later used in acs.jag to select correct redirection page.
-        if(header && header == true) {
-            relayState = relayState +"?header=true";
+    // Generate SAML request.
+    var encodedSAMLAuthRequest;
+    var isRequestSigningEnabled = storeConfig.ssoConfiguration.requestSigningEnabled;
+    if (isRequestSigningEnabled) {
+        if (log.isDebugEnabled()) {
+            log.debug("SAML request signing is enabled.");
         }
+        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(storeConfig.ssoConfiguration.issuer, acsUrl,
+                storeConfig.ssoConfiguration.identityProviderURL, isRequestSigningEnabled);
+    } else {
+        encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(storeConfig.ssoConfiguration.issuer);
+    }
+
+    if (log.isDebugEnabled()) {
+        log.debug("SAML Request : " + encodedSAMLAuthRequest);
+    }
+
+    var relayStateURL = requestURL;
+    if (customDomain) {
+        // If a custom domain is set,
+        // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
+        relayStateURL = relayStateURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/");
+        if (log.isDebugEnabled()) {
+            log.debug("Custom domain : " + customDomain + " is configured. RelayStateURL constructed accordingly." +
+                    " RelayStateURL: " + relayStateURL);
+        }
+    } else if (reversProxyEnabled && reverseProxyHost) {
+        relayStateURL = reverseProxyHost + requestURI;
+        if (log.isDebugEnabled()) {
+            log.debug("Reverse proxy enabled with host:  " + reverseProxyHost + ". RelayStateURL" +
+                    " constructed accordingly. RelayStateURL: " + relayStateURL);
+        }
+    }
+
+    // Preserve the relay state.
+    var relayStates = application.get("relayStates");
+
+    if (!relayStates) {
+        relayStates = {};
+        application.put("relayStates", relayStates);
+    }
+
+    // Generate relay state ID.
+    var relayStateID = uuid.generate().toString();
+
+    var relayState = {};
+    relayState.requestedURL = relayStateURL;
+    relayState.applicationTenantDomain = requestedTenant;
+    relayStates[relayStateID] = relayState;
+
     if (!session.get("Loged")) {
         %>
             <div>
@@ -55,21 +96,19 @@
                 redirection fails, please click on the button below.</p>
                 <form method="post" action="<%=postUrl%>">
                     <p>
-                        <input type="hidden" name="SAMLRequest" value ="<%= encodedSAMLAuthRequest %>"/>
-                        <input type="hidden" name="RelayState" value ="<%= relayState %>"/>
-                        <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
-                        <button type="submit">Redirect manually</button>
-                    </p>
-                </form>
-            </div>
-            <script type="text/javascript" >
-                document.forms[0].submit();
-            </script>
-        <%
+                        <input type="hidden" name="SAMLRequest" value ="<%=encodedSAMLAuthRequest%>"/>
+                        <input type="hidden" name="RelayState" value ="<%=relayStateID%>"/>
+                        <input type="hidden" name="SSOAuthSessionID" value="<%=sessionId%>"/>
+                        <input type="hidden" name="storeTenantDomain" value="<%=requestedTenant%>"/>
+                        <input type="hidden" name="forceAuth" value="<%=forceAuth%>"/>
+                                <button type="submit">Redirect manually</button>
+                            </p>
+                        </form>
+                    </div>
+                    <script type="text/javascript" >
+                        document.forms[0].submit();
+                    </script>
+                <%
     }
 }());
-
-function stringEndsWith(str, suffix) {
-    return str.match(suffix+"$")==suffix;
-}
 %>
