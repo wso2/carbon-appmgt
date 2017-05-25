@@ -52,7 +52,7 @@
         encodedSAMLAuthRequest = sso.client.getEncodedSAMLAuthRequest(storeConfig.ssoConfiguration.issuer);
     }
 
-    if(log.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
         log.debug("SAML Request : " + encodedSAMLAuthRequest);
     }
 
@@ -61,13 +61,13 @@
         // If a custom domain is set,
         // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
         relayStateURL = relayStateURL.replace(/:\/\/.*\/t\/.+?\//g, "://" + customDomain + "/");
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Custom domain : " + customDomain + " is configured. RelayStateURL constructed accordingly." +
                     " RelayStateURL: " + relayStateURL);
         }
     } else if (reversProxyEnabled && reverseProxyHost) {
         relayStateURL = reverseProxyHost + requestURI;
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Reverse proxy enabled with host:  " + reverseProxyHost + ". RelayStateURL" +
                     " constructed accordingly. RelayStateURL: " + relayStateURL);
         }

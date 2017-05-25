@@ -45,8 +45,6 @@ var auditLog = require('/modules/auditLog/logger.js');
 
     var AuthService = require('../extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
-    var assetOverviewPageMatcher = '/{context}/assets/{type}/{id}'
-    var tenantedAssetOverviewPageMatcher = '/{context}/t/{domain}/assets/{type}/{id}'
     authenticator.init(jagg, session);
 
 
@@ -155,11 +153,24 @@ var auditLog = require('/modules/auditLog/logger.js');
 
             var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, applicationTenantDomain).status;
             if (isFavouritePageSelected) {
-                var favPage = configs.pages.favouritePage;
-                redirectURL = redirectURL + favPage;
-                if(log.isDebugEnabled()) {
-                    log.debug("Favourite page selected. Constructed Redirect URL accordingly. Redirect URL : " +
-                            redirectURL);
+                var patternOrigin = new RegExp("^(http|https)(:\\/\\/)(((([\\w\\.\\-\\_])+)|(([\\w\\.\\-\\_])" +
+                        "+:[0-9]{0,5})))(\\/?)$");
+                var patternContextOrigin = new RegExp("^(http|https)(:\\/\\/)(((([\\w\\.\\-\\_])+)|(([\\w\\.\\-\\_])" +
+                        "+:[0-9]{0,5})))(\\/)(([\\w\\.\\-\\_])+(\\/?))$");
+                var patternTenantContextOrigin = new RegExp("^(http|https)(:\\/\\/)(((([\\w\\.\\-\\_])+)|(([\\w\\." +
+                        "\\-\\_])+:[0-9]{0,5})))(\\/)(([\\w\\.\\-\\_])+)(\\/t\\/)(([\\w\\.\\-\\_])+)(\\/?)$");
+
+                if (redirectURL.match(patternOrigin) || redirectURL.match(patternContextOrigin) ||
+                        redirectURL.match(patternTenantContextOrigin)) {
+                    var favPage = configs.pages.favouritePage;
+                    if (redirectURL.endsWith("/")) {
+                        redirectURL = redirectURL.substring(0, redirectURL.length - 1);
+                    }
+                    redirectURL = redirectURL + favPage;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Favourite page selected. Constructed Redirect URL accordingly. Redirect URL : " +
+                                redirectURL);
+                    }
                 }
             }
 
