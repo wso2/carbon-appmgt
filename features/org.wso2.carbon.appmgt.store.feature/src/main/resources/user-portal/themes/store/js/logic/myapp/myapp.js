@@ -91,8 +91,8 @@ $( document ).ready(function() {
                            document.getElementById("listItemAddFavorite-" + appId).style.display= "none";
                            document.getElementById("listItemRmvFavorite-" + appId).style.display= "block";
                        } else {
-                           var message = 'Error occured while adding  web app: ' + data.name +
-                                         ' to my favourite web apps';
+                           var message = 'Error occured while adding  application: ' + data.name +
+                                         ' to my favourite applications';
                            notify(message);
 
                        }
@@ -102,8 +102,8 @@ $( document ).ready(function() {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured in while adding  web app: ' + data.name +
-                                         ' to my favourite web apps';
+                           var message = 'Error occured in while adding  application: ' + data.name +
+                                         ' to my favourite applications';
                            notify(message);
                        }
                    }
@@ -121,8 +121,8 @@ $( document ).ready(function() {
                            document.getElementById("listItemAddFavorite-" + appId).style.display= "block";
                            document.getElementById("listItemRmvFavorite-" + appId).style.display= "none";
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                                         + ' from my favourite web apps';
+                           var message = 'Error occured  when remove  application: ' + data.name
+                                         + ' from my favourite applications';
                            notify(message);
                        }
                    },
@@ -131,8 +131,8 @@ $( document ).ready(function() {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                                         + ' from my favourite web apps';
+                           var message = 'Error occured  when remove  application: ' + data.name
+                                         + ' from my favourite applications';
                            notify(message);
                        }
                    }

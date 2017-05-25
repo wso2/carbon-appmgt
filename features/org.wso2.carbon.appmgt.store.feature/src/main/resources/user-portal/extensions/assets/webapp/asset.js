@@ -1,7 +1,7 @@
 var assetLinks = function (user) {
 
     return{
-        title: 'Web Applications',
+        title: 'Applications',
         links: [
             {
                 title: 'Custom',

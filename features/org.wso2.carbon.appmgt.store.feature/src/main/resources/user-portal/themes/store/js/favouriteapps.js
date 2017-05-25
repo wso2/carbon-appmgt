@@ -97,8 +97,8 @@ $(function () {
                            //To remove the app from favourite page , need to reload the page
                            notifyAndReload(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                           var message = 'Error occured  when remove  application: ' + data.name
+                               + ' from my favourite applications';
                            notify(message)
                        }
                    },
@@ -107,8 +107,8 @@ $(function () {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                           var message = 'Error occured  when remove application: ' + data.name
+                               + ' from my favourite applications';
                            notify(message);
                        }
                    }
