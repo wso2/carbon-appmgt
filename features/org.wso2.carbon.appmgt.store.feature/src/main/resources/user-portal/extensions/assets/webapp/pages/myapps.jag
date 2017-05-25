@@ -535,7 +535,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     caramel.render({
-        title: 'Web Apps | WSO2 Cloud - User Portal',
+        title: 'Applications | WSO2 Cloud - User Portal',
         user: user,
         sso: sso,
         header: headerData,

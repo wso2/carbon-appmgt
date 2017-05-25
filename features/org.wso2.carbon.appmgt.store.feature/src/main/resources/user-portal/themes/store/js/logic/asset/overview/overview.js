@@ -300,8 +300,8 @@ $(function(){
                                          '</b> to your favourite apps';
                            notifyAndReload(message);
                        } else {
-                           var message = 'Error occured in while adding  web app: ' + data.name +
-                                         "to my favourite web apps";
+                           var message = 'Error occured in while adding  application: ' + data.name +
+                                         "to my favourite applications";
                            notify(message);
                        }
                    },
@@ -310,8 +310,8 @@ $(function(){
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured in while adding  web app: ' + data.name +
-                                         ' to my favourite web apps';
+                           var message = 'Error occured in while adding  application: ' + data.name +
+                                         ' to my favourite applications';
                            notify(message);
                        }
 
@@ -333,8 +333,8 @@ $(function(){
                            $('#btnAddToFav').show();
 
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                           var message = 'Error occured  when remove application: ' + data.name
+                               + ' from my favourite applications';
                            notify(message);
                        }
 
@@ -344,8 +344,8 @@ $(function(){
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                           var message = 'Error occured  when remove application: ' + data.name
+                               + ' from my favourite applications';
                            notify(message);
                        }
                    }
