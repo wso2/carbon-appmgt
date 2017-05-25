@@ -5,15 +5,22 @@ its own partion sinceit does not support tags--}}
     <ul>
         {{#each navigation}}
             {{#ifCond partial "==" "webapp"}}
-                <li class="purple {{#if active}}active{{/if}}">
-                    <a href="{{tenantedUrl "/assets/favourite"}}">
-                        <i class="fw fw-heart icon"></i>
-                        <span class="left-menu-item"> {{t "Favourites"}}
+                <li class="blue {{#if active}}active{{/if}}">
+                    <a href="{{tenantedUrl "/extensions/assets/webapp/apps" }}">
+                        <i class="fw fw-web-app icon"></i>
+                        <span class="left-menu-item"> {{t "Web Apps"}}
                             {{#if myappsUrl}}<i class="fw fw-up"></i>{{/if}}
                         </span>
                     </a>
                 </li>
             {{/ifCond}}
+
+            <li class="pink favourite">
+                <a href="{{tenantedUrl "/assets/favourite"}}">
+                    <i class="fw fw-heart icon"></i>
+                        <span class="left-menu-item"> {{t "Favourites"}}</span>
+                </a>
+            </li>
 
             {{#ifCond partial "==" "site"}}
                 <li class="orange {{#if active}}active{{/if}}">
