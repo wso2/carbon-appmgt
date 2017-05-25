@@ -351,6 +351,22 @@ nav.navigation ul > li.purple:hover  .left-menu-item, nav.navigation ul > li.pur
 
 }
 
+nav.navigation ul > li.pink .icon {
+    background: #dd4949;
+    color: white;
+}
+
+nav.navigation ul > li.pink:hover > .icon {
+    background: #dd4949;
+    color: white;
+}
+
+nav.navigation ul > li.pink:hover  .left-menu-item, nav.navigation ul > li.pink.active  .left-menu-item, nav.navigation ul > li.pink.hover  .left-menu-item {
+    background: #dd4949;
+    color: white;
+
+}
+
 nav.navigation ul > li.grey .icon {
     background: #2c3e50;
     color: white;

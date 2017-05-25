@@ -261,4 +261,8 @@ $(function () {
         favouritesSearchTour.init(true);
         favouritesSearchTour.start(false);
     });
+    
+    if(window.location.href.indexOf("favourite") > -1) {
+        $('.favourite').addClass('active');
+    }
 });

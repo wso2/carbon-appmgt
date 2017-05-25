@@ -264,7 +264,7 @@ header .header-action:active {
     display: block;
     position: absolute;
     top: 0;
-    height: 25%;
+    height: 20%;
     color: #ffffff;
     z-index: 500;
     border: 1px solid rgb(255, 255, 255);
@@ -580,7 +580,8 @@ active: background 10% lighter, border 5% darker
 
 /* favorite  - main color: #810847 */
 .background-color-favorite {
-    background-color: #810847;
+    background-color: #e85858;
+    border-color: #dd4949;
 }
 
 .background-color-on-hover-favorite {
@@ -588,28 +589,28 @@ active: background 10% lighter, border 5% darker
 }
 
 .background-color-on-hover-favorite:hover {
-    background-color: #810847;
+    background-color: #dd4949;
 }
 
 .btn-favorite {
     color: #fff;
-    background-color: #810847;
-    border-color: #810847;
+    background-color: #e85858;
+    border-color: #e85858;
 }
 
 .btn-favorite:focus,
 .btn-favorite.focus {
     color: #fff;
-    background-color: #8E1554;
-    border-color: #75003B;
+    background-color: #e85858;
+    border-color: #dd4949;
 }
 
 .btn-favorite:hover,
 .btn-favorite:active,
 .btn-favorite.active {
     color: #fff;
-    background-color: #9B2261;
-    border-color: #75003B;
+    background-color: #e85858;
+    border-color: #dd4949;
 }
 
 /* all apps  - main color: #007A5F */
