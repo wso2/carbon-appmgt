@@ -66,7 +66,7 @@ var auditLog = require('/modules/auditLog/logger.js');
 
     delete relayStates[relayStateId];
 
-    var redirectURL = relayState.requestedURL;
+    var redirectURL = String(relayState.requestedURL);
     if(log.isDebugEnabled()){
         log.debug("Redirect URL preserved in relay state : " + redirectURL);
     }
@@ -163,7 +163,7 @@ var auditLog = require('/modules/auditLog/logger.js');
                 if (redirectURL.match(patternOrigin) || redirectURL.match(patternContextOrigin) ||
                         redirectURL.match(patternTenantContextOrigin)) {
                     var favPage = configs.pages.favouritePage;
-                    if (redirectURL.endsWith("/")) {
+                    if (redirectURL.lastIndexOf("/") === (redirectURL.length - 1)) {
                         redirectURL = redirectURL.substring(0, redirectURL.length - 1);
                     }
                     redirectURL = redirectURL + favPage;
