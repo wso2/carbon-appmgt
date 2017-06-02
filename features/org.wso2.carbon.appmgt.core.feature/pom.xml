@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.core.feature</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Core Feature</name>
     <url>http://wso2.org</url>
