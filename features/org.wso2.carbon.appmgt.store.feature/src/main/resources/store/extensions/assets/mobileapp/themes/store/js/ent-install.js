@@ -78,6 +78,11 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
     $("#btn-apps-ent-install").click(function () {
 
+            if ($('#chkRemovable').prop('checked') == true) {
+               isRemovable = true;
+            } else {
+               isRemovable = false;
+            }
 
             if(selectedTab === "roles"){
                 installToRoles();
@@ -166,7 +171,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         $.ajax({
                             type: "POST",
                             url: caramel.context + "/apis/enterprise/perform/install/role",
-                            data: { app: selectedApp, data:  rolesSelected }
+                            data: { app: selectedApp, data:  rolesSelected, removable: isRemovable }
                         })
                             .done(function( msg ) {
                                 noty({
@@ -307,7 +312,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         $.ajax({
                             type: "POST",
                             url: caramel.context + "/apis/enterprise/perform/install/user",
-                            data: { app: selectedApp, data:  usersSelected }
+                            data: { app: selectedApp, data:  usersSelected, removable: isRemovable }
                         })
                             .done(function( msg ) {
                                 noty({

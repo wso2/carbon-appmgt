@@ -164,7 +164,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             appProvider.subscribeMobileApp(username, appId);
             String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
-                                                              appId, parameters, null);
+                                                              appId, parameters, null, null);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -641,7 +641,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                 "must be installed prior to uninstall.", log);
             }
             String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
-                                                              appId, parameters, null);
+                                                              appId, parameters, null, null);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -1370,7 +1370,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantId", tenantId);
 
 
-            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime, null);
 
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
@@ -1590,7 +1590,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
 
             String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId,
-                                                              parameters, scheduleTime);
+                                                              parameters, scheduleTime, null);
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 

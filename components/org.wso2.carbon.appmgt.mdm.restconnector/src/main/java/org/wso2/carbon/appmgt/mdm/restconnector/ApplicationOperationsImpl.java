@@ -66,7 +66,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	/**
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 */
-	@Override public String performAction(ApplicationOperationAction applicationOperationAction)
+	@Override
+	public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (remoteServer.isEmpty()) {
 			setRemoteServer(this.remoteServer);
@@ -151,7 +152,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					.equals(requestApp.get(Constants.IOSConstants.TYPE))) {
 				iosProperties.put(Constants.IOSConstants.LABEL,
 				                  requestApp.get(Constants.IOSConstants.TYPE));
-				iosProperties.put(Constants.IOSConstants.IS_REMOVE_APP, true);
+				iosProperties.put(Constants.IOSConstants.IS_REMOVE_APP, applicationOperationAction.getIsRemovable());
 			}
 			requestApp.put(Constants.PROPERTIES, iosProperties);
 
@@ -160,7 +161,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			JSONObject webappProperties = new JSONObject();
 			webappProperties.put(Constants.WebAppConstants.LABEL,
 			                     requestApp.get(Constants.WebAppConstants.NAME));
-			webappProperties.put(Constants.WebAppConstants.IS_REMOVE_APP, true);
+			webappProperties.put(Constants.WebAppConstants.IS_REMOVE_APP, applicationOperationAction.getIsRemovable());
 			requestApp.put(Constants.PROPERTIES, webappProperties);
 		}
 

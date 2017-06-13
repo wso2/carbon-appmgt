@@ -64,8 +64,8 @@ require('/modules/publisher.js').exec(function (ctx) {
         var maxShowableAppCount = (PAGE_SIZE + PAGE_SIZE_ON_REVIEW) * PAGNINATION_SIZE;
         var pageCount = 0;
 
-        log.info("Total app count: " + (initialAppCount + onReviewStateAppCount));
-        log.info("Max showable app count: " + maxShowableAppCount);
+        log.debug("Total app count: " + (initialAppCount + onReviewStateAppCount));
+        log.debug("Max showable app count: " + maxShowableAppCount);
 
         // If the max showable app count is lesser than the initial app count, we can directly generate indices from
         // initial app count.
@@ -78,7 +78,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 : currentPage;
         }
 
-        log.info("Page count: " + pageCount);
+        log.debug("Page count: " + pageCount);
 
         var indices = [];
         var temp = {};
@@ -116,8 +116,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             var pagesForOnReviewApps = 0;
         }
 
-        log.info("Pages for initial: " + pagesForInitialApps);
-        log.info("Pages for review: " + pagesForOnReviewApps);
+        log.debug("Pages for initial: " + pagesForInitialApps);
+        log.debug("Pages for review: " + pagesForOnReviewApps);
 
         var remainderForInitialApps = (initialAppCount / PAGE_SIZE) % 1;
         if (remainderForInitialApps) {
@@ -202,7 +202,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             var initialAppCount  = session.get("initialAppCount");
             var updateRequired =  session.get("updateAppCount");
 
-            log.info("Update requrired: " + updateRequired);
+            log.debug("Update requrired: " + updateRequired);
 
             if (!initialAppCount || updateRequired) {
                 if (isUserAdmin) {
@@ -221,7 +221,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                     "count: " + initialPages);
             }
 
-            log.info("Initial app count: " + initialAppCount);
+            log.debug("Initial app count: " + initialAppCount);
 
             var initialPages = getAvailablePages(initialAppCount, onReviewStateAppCount);
 
@@ -267,7 +267,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 }
             }
 
-            log.info("Initial pages: " + initialPages);
+            log.debug("Initial pages: " + initialPages);
 
             DEFAULT_PAGING.start = startVal;
             DEFAULT_PAGING.count = PAGE_SIZE;
