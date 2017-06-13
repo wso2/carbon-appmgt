@@ -72,11 +72,15 @@ var modelManager = function () {
 
         var temp = new model();
 
+        /*
+        Removing this check for each call as it make unnecessary db calls
+        However, resource table has to be created in ES_STORAGE data-source as a prerequisite
         //Check if the table exists before creating
         if (!temp.checkIfTableExists()) {
             //Create the table
             temp.createTable();
         }
+        */
 
         //Add the model to the list of managed models
         this.managedModels[schema.name] = model;
