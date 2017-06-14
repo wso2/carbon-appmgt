@@ -68,7 +68,6 @@ import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.appmgt.impl.utils.APINameComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -92,9 +91,6 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import javax.cache.Cache;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,6 +107,9 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.cache.Cache;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * This class provides the core WebApp provider functionality. It is implemented in a very
@@ -1035,6 +1034,50 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public void updateApp(App app) throws AppManagementException {
         AppRepository appRepository = new DefaultAppRepository(registry);
         appRepository.updateApp(app);
+
+        if (app instanceof WebApp) {
+            WebApp api = (WebApp) app;
+            WebApp oldApi = getAPI(api.getId());
+            if (oldApi.getStatus().equals(api.getStatus())) {
+                try {
+                    if (!oldApi.getContext().equals(api.getContext())) {
+                        api.setApiHeaderChanged(true);
+                    }
+
+                    AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                            getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                    boolean gatewayExists = config.getApiGatewayEnvironments().size() > 0;
+                    boolean isAPIPublished = isAPIPublished(api);
+                    if (gatewayExists && isAPIPublished) {
+                        WebApp apiPublished = getAPI(api.getId());
+                        apiPublished.setOldInSequence(oldApi.getInSequence());
+                        apiPublished.setOldOutSequence(oldApi.getOutSequence());
+
+                        //publish to gateway if skipGateway is disabled only
+                        if (!api.getSkipGateway()) {
+                            publishToGateway(apiPublished);
+                        }
+                    } else {
+                        log.debug("Gateway is not existed for the current WebApp Provider");
+                    }
+
+                    //update apiContext cache
+                    if (AppManagerUtil.isAPIManagementEnabled()) {
+                        Cache contextCache = AppManagerUtil.getAPIContextCache();
+                        contextCache.remove(oldApi.getContext());
+                        contextCache.put(api.getContext(), true);
+                    }
+
+                } catch (AppManagementException e) {
+                    handleException("Error while updating the WebApp :" + api.getId().getApiName(), e);
+                }
+
+            } else {
+                // We don't allow WebApp status updates via this method.
+                // Use changeAPIStatus for that kind of updates.
+                throw new AppManagementException("Invalid WebApp update operation involving WebApp status changes");
+            }
+        }
     }
 
     /**
@@ -1337,10 +1380,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private boolean isAPIPublished(WebApp api) throws AppManagementException {
         try {
             String tenantDomain = null;
-			if (api.getId().getProviderName().contains("AT")) {
-				String provider = api.getId().getProviderName().replace("-AT-", "@");
-				tenantDomain = MultitenantUtils.getTenantDomain( provider);
-			}
+            String provider = api.getId().getProviderName();
+            if (api.getId().getProviderName().contains("AT")) {
+                provider = provider.replace("-AT-", "@");
+            }
+            tenantDomain = MultitenantUtils.getTenantDomain( provider);
             APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
             return gatewayManager.isAPIPublished(api, tenantDomain);
         } catch (Exception e) {
