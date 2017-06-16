@@ -257,7 +257,7 @@ var DEFAULT_ASSET_VIEW_STATE = 'published';
     };
 
     Manager.prototype.search = function (options, paging) {
-        return loadRatings(this, search(this, options,paging), paging);
+        return search(this, options,paging);
     };
 
     Manager.prototype.checkTagAssets = function (options) {
