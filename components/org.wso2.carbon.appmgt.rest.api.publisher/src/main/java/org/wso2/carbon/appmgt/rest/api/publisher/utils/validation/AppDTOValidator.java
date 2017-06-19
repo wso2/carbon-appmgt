@@ -94,7 +94,7 @@ public class AppDTOValidator {
         validateMandatoryField("description", appDTO.getDescription());
         validateMandatoryField("category", appDTO.getCategory());
         validateMandatoryField("banner", appDTO.getBanner());
-        validateMandatoryField("iconFile", appDTO.getIcon());
+        validateMandatoryField("thumbnailUrl", appDTO.getThumbnailUrl());
         List<String> screenShots = appDTO.getScreenshots();
         validateMandatoryField("screenshots", screenShots);
         if (screenShots.size() > 3) {

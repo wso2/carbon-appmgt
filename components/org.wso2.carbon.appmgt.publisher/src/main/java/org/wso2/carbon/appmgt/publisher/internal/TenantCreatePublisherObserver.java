@@ -37,47 +37,58 @@ import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
  */
 public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationContextObserver {
     private static final Log log = LogFactory.getLog(TenantCreatePublisherObserver.class);
+
+    /**
+     * Create configuration context.
+     *
+     * @param configurationContext {@link ConfigurationContext} object
+     */
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         try {
-            //load workflow-extension configuration to the registry.
+            //Load workflow-extension configuration to the registry.
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
         } catch (AppManagementException e) {
-            log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry");
+            log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry.");
         }
 
         try {
-            //load external-stores configuration to the registry
+            //Load external-stores configuration to the registry.
             AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
         } catch (AppManagementException e) {
-            log.error("Failed to load external-stores.xml to tenant " + tenantDomain + "'s registry");
+            log.error("Failed to load external-stores.xml to tenant " + tenantDomain + "'s registry.");
         }
 
         try {
             AppManagerUtil.createTenantSpecificConfigurationFilesInRegistry(tenantId);
         } catch (AppManagementException e) {
-            log.error(String.format("Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry", tenantDomain), e);
-        }
-
-        try{
-            // Write the tenant configuration file to the tenant registry.
-            AppManagerUtil.createTenantConfInRegistry(tenantId);
-
-            // Load the tenant configuration to memory
-            TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(tenantId);
-            ServiceReferenceHolder.getInstance().getTenantConfigurationService().addTenantConfiguration(tenantConfiguration);
-
-        }catch (AppManagementException e){
-            log.error(String.format("Failed to create carbon-appmgt tenant specific configuration file in the registry of the tenant '%s'", tenantDomain), e);
-        } catch (ConfigurationException e) {
-            log.error(String.format("Failed to load carbon-appmgt tenant specific configurations from the registry for the tenant '%s'", tenantDomain), e);
+            log.error(String.format(
+                    "Failed to load oauth-scope-role-mapping and custom property definitions to tenant %s's registry",
+                    tenantDomain), e);
         }
 
         try {
-            //Add the creator & publisher roles if not exists
-            //Apply permissons to appmgt collection for creator role
+            // Write the tenant configuration file to the tenant registry.
+            AppManagerUtil.createTenantConfInRegistry(tenantId);
+
+            // Load the tenant configuration to memory.
+            TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(tenantId);
+            ServiceReferenceHolder.getInstance().getTenantConfigurationService().addTenantConfiguration(
+                    tenantConfiguration);
+
+        } catch (AppManagementException e) {
+            log.error(String.format("Failed to create carbon-appmgt tenant specific configuration file in the registry " +
+                                            "of the tenant '%s'", tenantDomain), e);
+        } catch (ConfigurationException e) {
+            log.error(String.format("Failed to load carbon-appmgt tenant specific configurations from the registry " +
+                                            "for the tenant '%s'", tenantDomain), e);
+        }
+
+        try {
+            //Add the creator & publisher roles if not exists.
+            //Apply permissons to appmgt collection for creator role.
             UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
 
             Permission[] creatorPermissions = new Permission[]{
@@ -91,7 +102,8 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
                     new Permission(AppMConstants.Permissions.MOBILE_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
-                    new Permission(AppMConstants.Permissions.IDENTITY_APPLICATION_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_APPLICATION_MANAGEMENT,
+                                   UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.IDENTITY_IDP_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.XACML_POLICY_ADD, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.XACML_POLICY_DELETE, UserMgtConstants.EXECUTE_ACTION),
@@ -108,21 +120,20 @@ public class TenantCreatePublisherObserver extends AbstractAxis2ConfigurationCon
                     new Permission(AppMConstants.Permissions.VIEW_STATS, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_PUBLISH, UserMgtConstants.EXECUTE_ACTION)};
 
-            AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE,publisherPermissions, realm);
+            AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE, publisherPermissions, realm);
 
-            //Add the store-admin role
+            //Add store-admin role.
             Permission[] storeAdminPermissions = new Permission[]
                     {new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION)};
-            AppManagerUtil.addNewRole(AppMConstants.STORE_ADMIN_ROLE, storeAdminPermissions , realm);
-
-        } catch(AppManagementException e) {
-            log.error("App manager configuration service is set to publisher bundle");
+            AppManagerUtil.addNewRole(AppMConstants.STORE_ADMIN_ROLE, storeAdminPermissions, realm);
+        } catch (AppManagementException e) {
+            log.error("App manager configuration service is set to publisher bundle.");
         }
 
-        try{
+        try {
             AppManagerUtil.writeDefinedSequencesToTenantRegistry(tenantId);
-        }catch(AppManagementException e){
-            log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry");
+        } catch (AppManagementException e) {
+            log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry.");
         }
     }
 }

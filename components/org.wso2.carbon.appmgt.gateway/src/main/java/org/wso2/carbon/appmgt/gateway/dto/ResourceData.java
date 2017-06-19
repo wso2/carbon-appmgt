@@ -20,7 +20,7 @@ package org.wso2.carbon.appmgt.gateway.dto;
 import org.apache.synapse.rest.RESTConstants;
 
 /**
- * REST Resources Data.
+ * DTO object which maps to resources in synapse rest APIs.
  */
 public class ResourceData {
     private String[] httpMethods;
@@ -37,192 +37,216 @@ public class ResourceData {
     private String faultSequenceXml;
 
     /**
-     * Get Http methods.
-     * @return http methods as a string array.
+     * Get http methods.
+     *
+     * @return Http methods as a string array
      */
     public String[] getHttpMethods() {
         return httpMethods;
     }
 
     /**
-     * Set Http methods.
-     * @param httpMethods in String[].
+     * Set http methods.
+     *
+     * @param httpMethods Http methods
      */
     public void setHttpMethods(String[] httpMethods) {
         this.httpMethods = httpMethods;
     }
 
     /**
-     * Get Content Type.
-     * @return content type in String.
+     * Get content type.
+     *
+     * @return Content type
      */
     public String getContentType() {
         return contentType;
     }
 
     /**
-     * Set Content Type.
-     * @param contentType in String.
+     * Set content type.
+     *
+     * @param contentType Content type of resource
      */
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
     /**
-     * Get User Agent.
-     * @return user agent in String.
+     * Get user agent.
+     *
+     * @return User agent
      */
     public String getUserAgent() {
         return userAgent;
     }
 
     /**
-     * Set User Agent.
-     * @param userAgent in String.
+     * Set user agent.
+     *
+     * @param userAgent User agent
      */
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 
     /**
-     * Get Http Protocol.
-     * @return protocol in int.
+     * Get http protocol.
+     *
+     * @return Resource protocol
      */
     public int getProtocol() {
         return protocol;
     }
 
     /**
-     * Set Http Protocol.
-     * @param protocol int.
+     * Set http protocol.
+     *
+     * @param protocol Http protocol
      */
     public void setProtocol(int protocol) {
         this.protocol = protocol;
     }
 
     /**
-     * Get In Sequence Key.
-     * @return in sequence key in String.
+     * Get in sequence key.
+     *
+     * @return In sequence key
      */
     public String getInSequenceKey() {
         return inSequenceKey;
     }
 
     /**
-     * Set In Sequence Key.
-     * @param inSequenceKey String.
+     * Set in sequence key.
+     *
+     * @param inSequenceKey In sequence key
      */
     public void setInSequenceKey(String inSequenceKey) {
         this.inSequenceKey = inSequenceKey;
     }
 
     /**
-     * Get Out Sequence Key.
-     * @return out sequence key in String.
+     * Get out sequence key.
+     *
+     * @return Out sequence key
      */
     public String getOutSequenceKey() {
         return outSequenceKey;
     }
 
     /**
-     * Set Out Sequence Key.
-     * @param outSequenceKey String.
+     * Set out sequence key.
+     *
+     * @param outSequenceKey Out sequence key
      */
     public void setOutSequenceKey(String outSequenceKey) {
         this.outSequenceKey = outSequenceKey;
     }
 
     /**
-     * Get Fault Sequence Key.
-     * @return fault sequence key in String.
+     * Get fault sequence key.
+     *
+     * @return Fault sequence key
      */
     public String getFaultSequenceKey() {
         return faultSequenceKey;
     }
 
     /**
-     * Set Fault Sequence Key.
-     * @param faultSequenceKey String.
+     * Set fault sequence key.
+     *
+     * @param faultSequenceKey Fault sequence key
      */
     public void setFaultSequenceKey(String faultSequenceKey) {
         this.faultSequenceKey = faultSequenceKey;
     }
 
     /**
-     * Get Uri Template.
-     * @return uri template in String.
+     * Get uri template.
+     *
+     * @return Uri template
      */
     public String getUriTemplate() {
         return uriTemplate;
     }
 
     /**
-     * Set Uri Template.
-     * @param uriTemplate String.
+     * Set uri template.
+     *
+     * @param uriTemplate Uri template
      */
     public void setUriTemplate(String uriTemplate) {
         this.uriTemplate = uriTemplate;
     }
 
     /**
-     * Get Url Mapping.
-     * @return url mapping in String.
+     * Get url mapping.
+     *
+     * @return Url mapping
      */
     public String getUrlMapping() {
         return urlMapping;
     }
 
     /**
-     * Set Url Mapping.
-     * @param urlMapping String.
+     * Set url mapping.
+     *
+     * @param urlMapping Url mapping
      */
     public void setUrlMapping(String urlMapping) {
         this.urlMapping = urlMapping;
     }
 
     /**
-     * Get In Sequence Xml.
-     * @return in sequence xml in String.
+     * Get in sequence xml.
+     *
+     * @return In sequence xml
      */
     public String getInSequenceXml() {
         return inSequenceXml;
     }
 
     /**
-     * Set In Sequence Xml.
-     * @param inSequenceXml in String.
+     * Set in sequence xml.
+     *
+     * @param inSequenceXml In sequence xml
      */
     public void setInSequenceXml(String inSequenceXml) {
         this.inSequenceXml = inSequenceXml;
     }
 
     /**
-     * Get Out Sequence Xml.
-     * @return out sequence xml in String.
+     * Get out sequence xml.
+     *
+     * @return Out sequence xml
      */
     public String getOutSequenceXml() {
         return outSequenceXml;
     }
 
     /**
-     * Set Out Sequence Xml.
-     * @param outSequenceXml in String.
+     * Set out sequence xml.
+     *
+     * @param outSequenceXml Out sequence xml
      */
     public void setOutSequenceXml(String outSequenceXml) {
         this.outSequenceXml = outSequenceXml;
     }
 
     /**
-     * Get Fault Sequence Xml.
-     * @return fault sequence xml in String.
+     * Get fault sequence xml.
+     *
+     * @return Fault sequence xml
      */
     public String getFaultSequenceXml() {
         return faultSequenceXml;
     }
 
     /**
-     * Set Fault Sequence Xml.
-     * @param faultSequenceXml in String.
+     * Set fault sequence xml.
+     *
+     * @param faultSequenceXml Fault sequence xml
      */
     public void setFaultSequenceXml(String faultSequenceXml) {
         this.faultSequenceXml = faultSequenceXml;

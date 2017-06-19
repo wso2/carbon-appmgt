@@ -129,43 +129,48 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Delete business owner.
-     * @param businessOwnerId ID of the owner.
-     * @return
-     * @throws AppManagementException
+     * Delete a given business owner.
+     *
+     * @param businessOwnerId Id of the business owner
+     * @return Whether business owner was deleted or not
+     * @throws AppManagementException on error while trying to delete business owner
      */
     @Override
-    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+    public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException {
         boolean isBusinessOwnerAssociatedWithApps = appMDAO.isBusinessOwnerAssociatedWithApps(businessOwnerId,
                                                                                               registry, tenantDomain);
         if (!isBusinessOwnerAssociatedWithApps) {
             appMDAO.deleteBusinessOwner(businessOwnerId);
-            // return true if business owner is successfully deleted.
+            // Return true if business owner is successfully deleted.
             return true;
         }
-        // return false if business owner is associated with one or more web apps.
+        // Return false if business owner is associated with one or more web apps.
         return false;
     }
+
     /**
-     *Update a business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     * Update a given business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Whether business owner was updated or not
+     * @throws AppManagementException on error while trying to update business owner
      */
     @Override
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
         boolean isUpdated = false;
         if (appMDAO.getBusinessOwner(businessOwner.getBusinessOwnerId(), tenantId) != null) {
             appMDAO.updateBusinessOwner(businessOwner);
-            isUpdated =true;
+            isUpdated = true;
         }
         return isUpdated;
     }
 
 
     /**
-     * Get all business Owners.
-     * @return
-     * @throws AppManagementException
+     * Get all business owners.
+     *
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to get business owners
      */
     @Override
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
@@ -173,10 +178,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get business owners.
+     * Retrieve business owner by given id.
+     *
      * @param businessOwnerId Business owner Id.
-     * @return
-     * @throws AppManagementException
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     @Override
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
@@ -185,27 +191,36 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Search business owners with pagination.
-     * @param startIndex
-     * @param pageSize
-     * @param searchValue
-     * @return
-     * @throws AppManagementException
+     *
+     * @param startIndex  Start index
+     * @param pageSize    Page size
+     * @param searchKey Search key
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to search business owners
      */
     @Override
-    public  List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                          AppManagementException {
-        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue, tenantId);
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey)
+            throws AppManagementException {
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchKey, tenantId);
     }
 
+    /**
+     * Get the count of business owners.
+     *
+     * @return Number of business owners.
+     * @throws AppManagementException on error while trying to get business owners count
+     */
     @Override
-    public  int getBusinessOwnersCount() throws AppManagementException {
+    public int getBusinessOwnersCount() throws AppManagementException {
         return appMDAO.getBusinessOwnersCount(tenantId);
     }
 
     /**
-     *Save business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     * Save business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Saved business owner id
+     * @throws AppManagementException on error while trying to save business owner
      */
     @Override
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
@@ -213,11 +228,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get Business owner Id by owner name and email.
-     * @param businessOwnerName
-     * @param businessOwnerEmail
-     * @return
-     * @throws AppManagementException
+     * Get Business owner id by business owner name and email.
+     *
+     * @param businessOwnerName  Business owner name
+     * @param businessOwnerEmail Business owner email
+     * @return Business owner id
+     * @throws AppManagementException on error while trying to get business owner id
      */
     @Override
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException {
@@ -791,12 +807,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get entitlement policy content from policy id
+     * Get entitlement policy content from policy id.
      *
      * @param policyId        Entitlement policy id
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return entitlement policy content
-     * @throws AppManagementException
+     * @throws AppManagementException on error while trying to get entitlement policy
      */
     @Override
     public String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException {
@@ -1257,7 +1273,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
-                        } else if(status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
+                        } else if (status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
                             removeFromGateway(api);
                         }
                     }
@@ -1505,7 +1521,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             Association[] associations = registry.getAssociations(docPath,
-                                                                  AppMConstants.DOCUMENTATION_KEY);
+                                                                  AppMConstants.DOCUMENTATION_ASSOCIATION);
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
             }
@@ -1550,7 +1566,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             Association[] associations = registry.getAssociations(docPath,
-                    AppMConstants.DOCUMENTATION_KEY);
+                    AppMConstants.DOCUMENTATION_ASSOCIATION);
 
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
@@ -2206,6 +2222,33 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
     }
 
+    /**
+     *
+     * Search and return the published apps for the given search terms.
+     *
+     * @param appType App type
+     * @param searchTerms Search terms
+     * @return List of {@link App}
+     * @throws AppManagementException on errors while trying to search published apps.
+     */
+    @Override
+    public List<App> searchPublishedApps(String appType, Map<String, String> searchTerms) throws
+                                                                                          AppManagementException {
+        // If the app type is 'webapp' use the App Repository implementation path.
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)) {
+            return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
+        } else {
+            List<App> apps = new ArrayList<App>();
+            List<GenericArtifact> appArtifacts = getPublishedAppArtifacts(appType);
+
+            for (GenericArtifact artifact : appArtifacts) {
+                if (isSearchHit(artifact, searchTerms)) {
+                    apps.add(createApp(artifact, appType));
+                }
+            }
+            return apps;
+        }
+    }
 
     /**
      * Update the Tier Permissions
@@ -2796,6 +2839,40 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appArtifacts;
     }
 
+    /**
+     *
+     * Return the published 'app' (e.g. webapp, mobileapp) registry artifacts.
+     *
+     * @param appType App type
+     * @return List of {@link GenericArtifact}
+     * @throws AppManagementException on errors while trying to get published app artifacts
+     */
+    private List<GenericArtifact> getPublishedAppArtifacts(String appType) throws AppManagementException {
+        List<GenericArtifact> appArtifacts = new ArrayList<GenericArtifact>();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                if (artifact.getLifecycleState().toUpperCase().equals(AppMConstants.PUBLISHED)) {
+                    appArtifacts.add(artifact);
+                }
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs from the registry", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return appArtifacts;
+    }
 
     private App createApp(GenericArtifact artifact, String appType) throws AppManagementException {
 

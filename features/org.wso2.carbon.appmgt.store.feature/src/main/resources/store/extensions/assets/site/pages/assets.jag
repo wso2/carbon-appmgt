@@ -24,6 +24,8 @@ if(!storeHostObj.isAssetTypeEnabled("site")) {
     response.sendError(404,'Resource does not exist');
 }
 
+var searchModule = require('/modules/search.js');
+
 var AuthService;
 var authenticator;
 var caramel;
@@ -211,13 +213,14 @@ require('/modules/store.js').exec(function (ctx) {
         var searchValue;
         var splitQuery = query.split(":");
         searchParameter = splitQuery[0];
+        var businessOwnerSearchKey = "Business Owner";
         // This is a registry based search. In search box, user wants to search by business owner name. But
-        // in registry, there is only business owner Id. Therefore, it is necessary to get business owner Ids
-        // related to search prefix from DB.
+        // in registry, there is only business owner id. Therefore, it is necessary to get business owner ids
+        // related to search prefix from database.
 
-        if (!searchParameter.equals("Business Owner")) {
+        if (!businessOwnerSearchKey.equals(searchParameter)) {
             var urlQuery = 'query=' + query + '&';
-            query = require('/modules/search.js').build(query);
+            query = searchModule.build(query);
             query.overview_treatAsASite = 'TRUE';
             if (!isMultipleVersionDisplayEnabled) {
                 query.overview_makeAsDefaultVersion = 'true';
@@ -232,13 +235,13 @@ require('/modules/store.js').exec(function (ctx) {
             var initialQuery = "businessOwner:" + searchValue;
             var searchPrefix = searchValue.split("\"")[1];
             var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
-            if (resultIdsList){
+            if (resultIdsList) {
                 var resultAssets = [];
                 resultIdsList = resultIdsList.toArray();
-                for(var key in resultIdsList) {
+                for (var key in resultIdsList) {
                     var businessOwnerId = resultIdsList[key];
                     query = "businessOwner:\"" + businessOwnerId + "\"";
-                    query = require('/modules/search.js').build(query);
+                    query = searchModule.build(query);
                     query.overview_treatAsASite = 'TRUE';
                     if (!isMultipleVersionDisplayEnabled) {
                         query.overview_makeAsDefaultVersion = 'true';

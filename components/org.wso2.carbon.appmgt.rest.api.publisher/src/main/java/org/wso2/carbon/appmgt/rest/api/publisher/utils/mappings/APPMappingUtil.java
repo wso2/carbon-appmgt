@@ -594,8 +594,8 @@ public class APPMappingUtil {
         mobileAppModel.setCategory(appDTO.getCategory());
         validateMandatoryField("banner", appDTO.getBanner());
         mobileAppModel.setBanner(appDTO.getBanner());
-        validateMandatoryField("iconFile", appDTO.getIcon());
-        mobileAppModel.setThumbnail(appDTO.getIcon());
+        validateMandatoryField("thumbnailUrl", appDTO.getThumbnailUrl());
+        mobileAppModel.setThumbnail(appDTO.getThumbnailUrl());
         List<String> screenShots = appDTO.getScreenshots();
         validateMandatoryField("screenshots", screenShots);
         if (screenShots.size() > 3) {

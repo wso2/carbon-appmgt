@@ -25,7 +25,7 @@ import org.wso2.carbon.appmgt.sample.deployer.appm.ClaimManagementServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.RemoteUserStoreManagerServiceClient;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
-import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
+import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceClaimManagementException;
 import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -121,7 +121,7 @@ public class ClaimManager {
                 log.error(errorMessage, e);
                 throw  new AppManagementException(errorMessage,e);
             }
-        } catch (ClaimManagementServiceException e) {
+        } catch (ClaimManagementServiceClaimManagementException e) {
             String errorMessage = "Error while adding a ClaimMapping";
             log.error(errorMessage, e);
             throw  new AppManagementException(errorMessage,e);

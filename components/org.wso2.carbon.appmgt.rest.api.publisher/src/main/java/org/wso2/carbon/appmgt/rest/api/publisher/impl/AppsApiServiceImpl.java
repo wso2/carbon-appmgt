@@ -381,23 +381,12 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             List<App> result = apiProvider.searchApps(appType, RestApiUtil.getSearchTerms(query));
 
-
-            if (result.isEmpty()) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
-            }
-
             AppListDTO appListDTO = null;
             if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
                 appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
 
             }else{
                 appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
-            }
-
-            if (appListDTO.getCount() == 0) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
 
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());

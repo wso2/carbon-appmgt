@@ -35,6 +35,8 @@ public final class AppMConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
 
+    public static final String DRIVER_TYPE_ORACLE = "Oracle";
+
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 
@@ -55,7 +57,7 @@ public final class AppMConstants {
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
 
-    public static final String DOCUMENTATION_KEY = "document";
+    public static final String DOCUMENTATION_KEY = "appmdocument";
     public static final String DOCUMENTATION_RESOURCE_MAP_DATA = "Data";
     public static final String DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE = "contentType";
     public static final String DOCUMENTATION_RESOURCE_MAP_NAME = "name";
@@ -236,6 +238,7 @@ public final class AppMConstants {
     public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
     public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
     public static final String MOBILE_APP_TYPE_PUBLIC= "public";
+    public static final String MOBILE_LC_STATE = "lcState";
 
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";
@@ -271,6 +274,8 @@ public final class AppMConstants {
     public static final String FIELD_API_NAME = "APP_NAME";
     public static final String FIELD_CONSUMER_KEY = "CONSUMER_KEY";
     public static final String FIELD_API_PUBLISHER = "APP_PROVIDER";
+    public static final String FIELD_TRACKING_CODE = "TRACKING_CODE";
+    public static final String FIELD_PUBLISHED_DEFAULT_APP_VERSION = "PUBLISHED_DEFAULT_APP_VERSION";
 
     //table columns for APM_APPLICATION
     public static final String APPLICATION_ID = "APPLICATION_ID";
@@ -410,7 +415,7 @@ public final class AppMConstants {
     public static final String API_KEY_MANAGER_ACCESS_TOKEN_PARTITIONING_DOMAINS = API_KEY_MANAGER + "AccessTokenPartitioning." + "AccessTokenPartitioningDomains";
     public static final String API_KEY_MANAGER_ENCRYPT_TOKENS = API_KEY_MANAGER + "EncryptPersistedTokens";
 
-    public static final String API_STORE = "APIStore.";
+    public static final String API_STORE = "AppStore.";
     public static final String API_STORE_DISPLAY_ALL_APIS = API_STORE + "DisplayAllAPIs";
     public static final String API_STORE_DISPLAY_MULTIPLE_VERSIONS = API_STORE + "DisplayMultipleVersions";
 	public static final String API_STORE_DISPLAY_COMMENTS = API_STORE + "DisplayComments";
@@ -734,7 +739,7 @@ public final class AppMConstants {
 
     //Mobile application binary file extensions
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
-    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+    public static final String MOBILE_APPS_IOS_EXT = "ipa";
 
     //Mobile application platform types
     public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";

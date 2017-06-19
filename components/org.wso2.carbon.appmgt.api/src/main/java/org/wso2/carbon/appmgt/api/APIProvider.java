@@ -1,4 +1,5 @@
-/*
+
+                                                                                                      /*
 *  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
@@ -51,69 +52,78 @@ import java.util.Set;
  */
 public interface APIProvider extends APIManager {
 
-
     /**
-     * This methode is to delete a given business owner
+     * Delete a given business owner.
      *
-     * @param businessOwnerId ID of the owner.
-     * @throws AppManagementException
+     * @param businessOwnerId Id of the business owner
+     * @return Whether business owner was deleted or not
+     * @throws AppManagementException on error while trying to delete business owner
      */
-    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
+    public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * update a Business Owner.
-     * @return Integer
-     * @throws AppManagementException
+     * Update business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Whether business owner was updated or not
+     * @throws AppManagementException on error while trying to update business owner
      */
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
 
     /**
-     * @return
-     * @throws AppManagementException
+     * Get all business owners.
+     *
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to get business owners
      */
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
 
     /**
-     * Return the owner properties of the given owner Id.
+     * Retrieve business owner by given id.
      *
-     * @param businessOwnerId Business owner Id.
-     * @return
-     * @throws AppManagementException if failed to get business owner.
+     * @param businessOwnerId Business owner id
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Search the business owners with page limitation.
-     * @param startIndex
-     * @param pageSize
-     * @param searchValue
-     * @return
-     * @throws AppManagementException
+     * Search business owners with pagination.
+     *
+     * @param startIndex  Start index
+     * @param pageSize    Page size
+     * @param searchKey Search Key
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to search business owners
      */
-    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                              AppManagementException;
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey)
+            throws AppManagementException;
 
     /**
      * Get the count of business owners.
-     * @return
-     * @throws AppManagementException
+     *
+     * @return Number of business owners.
+     * @throws AppManagementException on error while trying to get business owners count
      */
-    public  int getBusinessOwnersCount() throws AppManagementException;
+    public int getBusinessOwnersCount() throws AppManagementException;
 
     /**
-     * Save a Business Owner.
-     * @return Integer
-     * @throws AppManagementException
+     * Save business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Saved business owner id
+     * @throws AppManagementException on error while trying to save business owner
      */
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
     /**
-     * Get Business owner Id by owner name and email.
-     * @param businessOwnerName
-     * @param businessOwnerEmail
-     * @return
-     * @throws AppManagementException
+     * Get business owner id by business owner name and email.
+     *
+     * @param businessOwnerName  Business owner name
+     * @param businessOwnerEmail Business owner email
+     * @return Business owner id
+     * @throws AppManagementException on error while trying to get business owner id
      */
     public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException;
 
@@ -250,11 +260,12 @@ public interface APIProvider extends APIManager {
             throws AppManagementException;
 
     /**
-     * Get entitlement policy content from policyId
+     * Get entitlement policy content by policyId
      *
-     * @param policyId        Entitlement policy id
+     * @param policyId              Entitlement policy id
      * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return Entitlement policy content
+     * @throws AppManagementException on error while trying to get entitlement policy
      */
     String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException;
 
@@ -563,6 +574,17 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
+
+    /**
+     *
+     * Search and return the published apps for the given search terms.
+     *
+     * @param appType App type
+     * @param searchTerms Search terms
+     * @return List of {@link App}
+     * @throws AppManagementException on errors while trying to search published apps.
+     */
+    public List<App> searchPublishedApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
 
 
     /**

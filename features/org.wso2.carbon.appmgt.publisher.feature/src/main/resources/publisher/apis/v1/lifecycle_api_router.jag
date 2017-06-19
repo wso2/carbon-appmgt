@@ -507,6 +507,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                                                                ", appName='" + attributes["overview_name"] + '\'' +
                                                                ", version='" + attributes["overview_version"] + '\'' +
                                                                '}' + "" + "");
+        session.put("updateAppCount", true);
+
         // everything went great
         response.status = 200;
         response.contentType = CONTENT_TYPE_JSON;

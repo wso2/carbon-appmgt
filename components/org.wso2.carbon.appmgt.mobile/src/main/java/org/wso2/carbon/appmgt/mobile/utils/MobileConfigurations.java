@@ -42,7 +42,7 @@ import java.util.Iterator;
  */
 public class MobileConfigurations {
 
-    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "conf" + File.separator + "app-manager.xml";
+    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
     private static MobileConfigurations mobileConfigurations;
 
     private String mdmServerURL;
@@ -59,7 +59,7 @@ public class MobileConfigurations {
     public final static String  ENABLED = "Enabled";
     public final static String  ENABLE_SAMPLE_DEVICES = "EnableSampleDevices";
     public final static String  APP_DOWNLOAD_URL_HOST = "AppDownloadURLHost";
-    public final static String  PUBLISHER_APP_GET_URL = "/publisher/api/mobileapp/getfile/";
+    public final static String  APP_GET_URL = "/store/api/mobileapp/getfile/";
     public final static String  ACTIVE_MDM = "ActiveMDM";
     public final static String  IOS_PLIST_PATH = "IosPlistPath";
     public final static String  ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";

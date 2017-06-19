@@ -21,7 +21,7 @@ package org.wso2.carbon.appmgt.sample.deployer.appm;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
+import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceClaimManagementException;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceStub;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimMappingDTO;
@@ -62,7 +62,7 @@ public class ClaimManagementServiceClient {
      * @throws RemoteException Throws this when failed to add a claim mapping
      */
     public void addClaim(String description, String claimURI, boolean isRequired) throws RemoteException,
-            ClaimManagementServiceException {
+            ClaimManagementServiceClaimManagementException {
         ClaimDTO claimDTO = new ClaimDTO();
         String dialectURI = "http://wso2.org/claims";
         claimDTO.setDialectURI(dialectURI);
@@ -77,7 +77,7 @@ public class ClaimManagementServiceClient {
         claimMappingDTO.setClaim(claimDTO);
         claimMappingDTO.setMappedAttribute(description);
 
-        // check whether claim already exits or not.
+        // Check whether claim already exits or not.
         ClaimMappingDTO[] claimMappingDTOList = claimManagementServiceStub.getClaimMappingByDialect(dialectURI)
                 .getClaimMappings();
 

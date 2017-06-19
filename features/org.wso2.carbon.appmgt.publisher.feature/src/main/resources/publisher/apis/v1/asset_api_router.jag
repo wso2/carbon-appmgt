@@ -378,6 +378,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print(msg);
                 }
 
+                session.put("updateAppCount", true);
+
             } catch (e) {
                 log.error('The asset ' + id + ' could not be deleted.The following exception was thrown: ' + e);
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
@@ -1753,6 +1755,7 @@ require('/modules/publisher.js').exec(function(ctx) {
  **/
 
 function addTags(tags, assetId, rxtManager, type) {
+   /*
     //Only proceed if there are any tags
     if (tags.length == 0) {
         log.debug("No tags to add to asset with id " +assetId);
@@ -1768,6 +1771,7 @@ function addTags(tags, assetId, rxtManager, type) {
 
     //Attach the tags
     rxtManager.registry.tag(path, tags);
+    */
 }
 
 /**
@@ -1778,7 +1782,7 @@ function addTags(tags, assetId, rxtManager, type) {
  @type - apptype e.g mobileapp
  **/
 function updateTags(newTags, assetId, rxtManager, type) {
-
+    /*
     //Obtain the artifact
     var artifactManager = rxtManager.getArtifactManager(type);
     var asset = artifactManager.get(assetId);
@@ -1791,6 +1795,7 @@ function updateTags(newTags, assetId, rxtManager, type) {
     //add New Tags
     addTags(newTags, assetId, rxtManager, type);
     log.debug("Tags added visibility");
+    */
 }
 
 

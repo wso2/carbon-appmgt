@@ -7,6 +7,7 @@ var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
+var businessOwnerHelper = require('../../helpers/businessowner.js');
 
 var render = function(theme, data, meta, require) {
 
@@ -79,10 +80,10 @@ var render = function(theme, data, meta, require) {
 
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
-            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {
-
+            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute
+                                                                                         != "null") {
                 var businessOwner = apiProvider.getBusinessOwner(businessOwnerAttribute);
-                data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
+                data.businessOwnerViewData = businessOwnerHelper.transform(businessOwner);
                 data.businessOwner = businessOwner;
             }
             break;

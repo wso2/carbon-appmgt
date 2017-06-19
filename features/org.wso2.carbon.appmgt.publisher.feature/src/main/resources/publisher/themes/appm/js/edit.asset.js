@@ -37,12 +37,12 @@ $(function() {
         }
     });
 
-	var data =  $("#owner_list").val();
-	data = jQuery.parseJSON(data);
+    var data = $("#owner_list").val();
+    data = jQuery.parseJSON(data);
 
-	$(document).ready(function() {
-		$(".selectOwnerName").select2({data: data,allowClear: true,placeholder: "Select a business Owner"});
-	});
+    $(document).ready(function () {
+        $(".selectOwnerName").select2({data: data, allowClear: true, placeholder: "Select a business Owner"});
+    });
 
 
 	  // let's fill all the permissions
@@ -224,41 +224,40 @@ $(function() {
     	var claim  = $("#claims").val();
 	addToClaimsTable(claim,true);
     });
-    
-    function addToClaimsTable(claim,clickable){
-        var isAlreadyExist = $.inArray(claim, addedClaimList);
-        if(isAlreadyExist == -1) {
-            addedClaimList.push(claim);
-            var propertyCount = $('#claimPropertyCounter');
 
-            var i = propertyCount.val();
-            var currentCount = parseInt(i);
+	function addToClaimsTable(claim, clickable) {
+		var isAlreadyExist = addedClaimList.indexOf(claim);
+		if (isAlreadyExist == -1) {
+			addedClaimList.push(claim);
+			var propertyCount = $('#claimPropertyCounter');
 
-            currentCount = currentCount + 1;
-            propertyCount.val(currentCount);
+			var i = propertyCount.val();
+			var currentCount = parseInt(i);
 
-            $('#claimTableId').hide();
-            if (clickable) {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            } else {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            }
-            $('#claimTableTbody').parent().show();
-        }
+			currentCount = currentCount + 1;
+			propertyCount.val(currentCount);
+
+			$('#claimTableId').hide();
+			if (clickable) {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+											   + 'font-style: italic;">' + claim + '<input type="hidden"'
+                                               + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+                                               + '"  value="' + claim + '"/></td><td><a href="#"  onclick="removeClaim('
+                                               + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
+											   '</td></tr>'));
+			} else {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+                                               + 'font-style: italic;">' + claim + '<input type="hidden"'
+                                               + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+                                               + '"  value="' + claim + '"/></td><td><a href="#" '
+                                               + 'style="pointer-events: none; cursor: default;color:#C4C4C4" '
+                                               + 'onclick="removeClaim(' + i + ');return false;">'
+                                               + '<i class="icon-remove-sign"></i>  Delete</a></td></tr>'));
+			}
+			$('#claimTableTbody').parent().show();
+		}
     }
 	
     

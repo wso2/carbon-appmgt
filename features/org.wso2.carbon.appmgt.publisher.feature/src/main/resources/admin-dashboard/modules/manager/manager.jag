@@ -41,11 +41,11 @@ var getAPIStoreObj = function() {
     var user = jagg.getUser();
     var store;
     if (user == null) {
-        store = require('apistore');
-        return new store.APIStore();
+        store = require('appstore');
+        return new store.AppStore();
     } else {
-        store = require('apistore');
-        return new store.APIStore(user.username);
+        store = require('appstore');
+        return new store.AppStore(user.username);
     }
 };
 

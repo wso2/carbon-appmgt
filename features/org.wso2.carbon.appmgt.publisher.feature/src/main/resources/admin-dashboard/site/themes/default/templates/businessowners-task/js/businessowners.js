@@ -71,30 +71,32 @@ function completeIfInTag(cm) {
     });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('#ownersTable').DataTable({
-          "processing": true,
-          "serverSide": true,
-          "paging": true,
-          "ordering": true,
-          "order": [[1, "asc"]],
-          "ajax": context + '/apis/businessowners/filtered/datatable',
-          "columnDefs": [
-              {
-                  "targets": [0],
-                  "visible": false
-              },
-             {
-                "render": function (data, type, row) {
-                    var editUrl = "tasks?task=editBusinessOwner&businessOwnerId=" + row[0];
-                    return '<a data-target="" ' +
-                           'data-toggle="modal" data-owner-id="' + row[0] + '" class="owner-edit-button" href="' + editUrl + '">' +
-                           '<i class="icon-edit"></i></a> &nbsp<a'
-                           +' class="owner-delete-button" data-owner-id="' + row[0] + '"><i class="icon-trash"></i></a>';
-                },
-                "targets": -1
-          }]
-    });
+                                    "processing": true,
+                                    "serverSide": true,
+                                    "paging": true,
+                                    "ordering": true,
+                                    "order": [[1, "asc"]],
+                                    "ajax": context + '/apis/businessowners/filtered/datatable',
+                                    "columnDefs": [
+                                        {
+                                            "targets": [0],
+                                            "visible": false
+                                        },
+                                        {
+                                            "render": function (data, type, row) {
+                                                var editUrl = "tasks?task=editBusinessOwner&businessOwnerId=" + row[0];
+                                                return '<a data-target="" ' +
+                                                       'data-toggle="modal" data-owner-id="' + row[0]
+                                                       + '" class="owner-edit-button" href="' + editUrl + '">' +
+                                                       '<i class="icon-edit"></i></a> &nbsp<a'
+                                                       + ' class="owner-delete-button" data-owner-id="' + row[0]
+                                                       + '"><i class="icon-trash"></i></a>';
+                                            },
+                                            "targets": -1
+                                        }]
+                                });
 });
 
 //save event
@@ -116,7 +118,7 @@ $(document).on("click", "#btn-owner-save", function () {
                 var key = $(key_id).val();
                 var value = [];
                 value.push($(val_id).val());
-                if(document.getElementById(showInStoreId).checked) {
+                if (document.getElementById(showInStoreId).checked) {
                     value.push(true);
                 } else {
                     value.push(false);
@@ -178,6 +180,7 @@ function updateOwners() {
     });
 
 }
+
 function GetDynamicTextBox(hasHeader, index, key, value, showInStore) {
     var id_key = "key-".concat(index);
     var id_val = "value-".concat(index);
@@ -188,17 +191,17 @@ function GetDynamicTextBox(hasHeader, index, key, value, showInStore) {
         checkBoxStatus = "checked";
     }
     if (!hasHeader) {
-        var tableHeader =  '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
-                           + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
-                           + '<div class="span2"></div></div> ';
+        var tableHeader = '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
+                          + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
+                          + '<div class="span2"></div></div> ';
         $("#editCustomProperties").append(tableHeader);
     }
 
     var fieldValue = '<div class="row-fluid"><div class="span3 div-custom">'
-                     + '<input name = "key" type="text" id="'+id_key+'" value="' + key + '"/></div>'
+                     + '<input name = "key" type="text" id="' + id_key + '" value="' + key + '"/></div>'
                      + '<div class="span3 div-custom"><input name="value" type="text" id="' + id_val
-                     +'" value="' + value +'"/></div><div class="span2 div-custom"><input type="checkbox" '
-                     + 'name="showInStore" id="'+check_val+'"' + checkBoxStatus +'/></div><div class="span2">'
+                     + '" value="' + value + '"/></div><div class="span2 div-custom"><input type="checkbox" '
+                     + 'name="showInStore" id="' + check_val + '"' + checkBoxStatus + '/></div><div class="span2">'
                      + '<button id="' + index + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove'
                      + '</button></div></div>';
     $("#editCustomProperties").append(fieldValue);
@@ -220,7 +223,7 @@ function removeFields(index) {
 $(document).on("click", "#btn-owner-add-field", function () {
     var div = $("<div />");
     var hasHeader = false;
-    if(extraFieldCount != 0) {
+    if (extraFieldCount != 0) {
         hasHeader = true;
     }
     div.html(GetDynamicTextBox(hasHeader, extraFieldCount, "", "", ""));
@@ -256,18 +259,19 @@ $(document).on("click", ".owner-edit-button", function () {
                    businessOwnerDetails = data.businessOwnerProperties;
                    var ownerDataObject = JSON.parse(businessOwnerDetails);
                    var noOfCustomProperties = Object.keys(ownerDataObject).length;
-                   if(noOfCustomProperties > 0) {
+                   if (noOfCustomProperties > 0) {
                        var i = 1;
-                       var tableHeader =  '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
-                                          + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
-                                          + '<div class="span2"></div></div> ';
+                       var tableHeader = '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
+                                         + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
+                                         + '<div class="span2"></div></div> ';
                        $("#editCustomProperties").append(tableHeader);
                        var hasHeader = true;
-                       for(var key in ownerDataObject){
+                       for (var key in ownerDataObject) {
                            var ownerProperties = ownerDataObject[key];
                            var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
-                           GetDynamicTextBox(hasHeader, i, key, ownerProperty["propertyValue"], ownerProperty["isShowingInStore"]);
-                           i ++;
+                           GetDynamicTextBox(hasHeader, i, key, ownerProperty["propertyValue"],
+                                             ownerProperty["isShowingInStore"]);
+                           i++;
                            extraFieldCount = i;
                        }
                    }
@@ -276,7 +280,6 @@ $(document).on("click", ".owner-edit-button", function () {
                }
            });
 });
-
 
 
 $(document).on("click", ".owner-delete-button", function () {
@@ -290,21 +293,22 @@ $(document).on("click", ".owner-delete-button", function () {
                    contentType: 'application/json',
                    dataType: 'json',
                    success: function (response) {
-                       if(response.response) {
+                       if (response.response) {
                            updateOwners();
-                           Showalert("Business Owner : " + ownerName + " Deleted Successfully ", "alert-success", "statusSuccess");
+                           Showalert("Business owner : " + ownerName + " was deleted successfully ", "alert-success",
+                                     "statusSuccess");
                            location.reload();
                        } else {
-                           Showalert('Business Owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
+                           Showalert('Business owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
                                      + ' it from them before deleting.', "alert-error", "statusError");
                        }
                    },
                    error: function (response) {
-                       Showalert('Error occured while deleting the business owner : ' + ownerName, "alert-error", "statusError");
+                       Showalert('Error occurred while deleting the business owner : ' + ownerName, "alert-error",
+                                 "statusError");
                    }
                });
     }
-
 });
 
 $(document).on('click', '#btn-owner-cancel', function(){

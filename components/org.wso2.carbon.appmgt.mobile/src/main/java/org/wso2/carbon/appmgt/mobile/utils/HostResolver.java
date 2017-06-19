@@ -25,13 +25,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
-
+import org.apache.axis2.util.Utils;
 /**
  * Resolved host information
  */
 public class HostResolver {
 
     private static final Log log = LogFactory.getLog(HostResolver.class);
+    public static final String LOCALHOST = "localhost";
 
     public static String getHost(String abbr){
 
@@ -40,7 +41,7 @@ public class HostResolver {
         if("%http%".equals(abbr)){
 
             try {
-                host += "http://" + NetworkUtils.getLocalHostname() + ":" +
+                host += "http://" + getServerHost() + ":" +
                         CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
             } catch (Exception e) {
                log.error("Error occurred while getting host", e);
@@ -48,8 +49,9 @@ public class HostResolver {
             }
         }else if("%https%".equals(abbr)){
             try {
-                host += "https://" + NetworkUtils.getLocalHostname() + ":" +
+                host += "https://" + getServerHost() + ":" +
                         CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
+
             } catch (Exception e) {
                 log.error("Error occurred while getting host", e);
             }
@@ -66,12 +68,21 @@ public class HostResolver {
         String host = "";
 
         try {
-            host += "http://" + NetworkUtils.getLocalHostname() + ":" +
+            host += "http://" + getServerHost() + ":" +
                     CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
         } catch (Exception e) {
             log.error("Error occurred while getting host", e);
         }
 
         return host;
+    }
+
+    private static String getServerHost() throws Exception {
+        String hostName = NetworkUtils.getLocalHostname();
+        if (hostName.equals(LOCALHOST)) {
+            hostName = Utils.getIpAddress();
+        }
+
+        return hostName;
     }
 }

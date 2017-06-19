@@ -39,8 +39,7 @@ public class RemoteUserManagerClient {
 
 			String clientRepo = CarbonUtils.getCarbonHome() + File.separator + "repository" +
                     File.separator + "deployment" + File.separator + "client";
-			String clientAxisConf = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "axis2"+ File.separator +"axis2_client.xml";
+			String clientAxisConf = CarbonUtils.getCarbonConfigDirPath() + File.separator + "axis2"+ File.separator +"axis2_client.xml";
 			
 			ConfigurationContext configContext =   ConfigurationContextFactory. createConfigurationContextFromFileSystem(clientRepo,clientAxisConf);
 			userStoreManagerStub =  new RemoteUserStoreManagerServiceStub(configContext, serviceURL +
