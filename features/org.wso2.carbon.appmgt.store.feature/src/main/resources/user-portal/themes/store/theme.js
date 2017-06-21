@@ -1,5 +1,6 @@
 var cache = false;
 var store = require('/modules/store.js');
+var customThemesExist = false;
 var engine = caramel.engine('handlebars', (function () {
     return {
         partials: function (Handlebars) {
@@ -33,8 +34,9 @@ var engine = caramel.engine('handlebars', (function () {
 
             var tenantDomain = resolveTenant();
             cacheCustomThemeInfo(tenantDomain);
+            customThemesExist = isCustomThemeExist(tenantDomain,null);
             //register partials from custom default theme
-            if(isCustomThemeExist(tenantDomain,'default')) {
+            if(customThemesExist && isCustomThemeExist(tenantDomain,'default')) {
                 var path =  getCustomDefaultThemePath(tenantDomain) + "/" + PARTIALS;
                 var dir = new File(path);
                 if (dir.isExists()) {
@@ -54,7 +56,7 @@ var engine = caramel.engine('handlebars', (function () {
                 }
 
                 //register partial from custom theme of asset extension theme
-                if(isCustomThemeExist(tenantDomain, asset)) {
+                if(customThemesExist && isCustomThemeExist(tenantDomain, asset)) {
                     var path = getCustomAssetThemePath(tenantDomain,asset)+ "/" + PARTIALS;
                     var dir = new File(path);
                     if (dir.isExists()) {
@@ -337,7 +339,7 @@ var resolve = function (path) {
 
     /*************resolve path in custom  theme*****************/
 
-    if(isCustomThemeExist(tenantDomain,null)) {
+    if(customThemesExist) {
         //if extension level theme is overridden
         if(asset && isCustomThemeExist(tenantDomain,asset)) {
             p = getCustomAssetThemePath(tenantDomain,asset) +  path;
@@ -407,7 +409,10 @@ var cacheCustomThemeInfo = function(tenantDomain) {
             }
         }
     }
-    session.put(key,customThemes);
+    //Create cutom theme list as a comma separated string. If we put object other than string value to session
+    // object, session object size become heavy. This is a workaround for that.
+    var customThemesAsString = customThemes.join(',');
+    session.put(key,customThemesAsString);
 };
 
 var isCustomThemeExist = function (tenantDomain,type){
@@ -415,15 +420,15 @@ var isCustomThemeExist = function (tenantDomain,type){
     var customThemes = session.get(key);
     var isExists = false;
 
-    if(!customThemes && customThemes.length == 0) {
+    if(customThemes == "") {
         return isExists;
     }
 
     if(type) {
-        if(customThemes.indexOf(type) >= 0) {
+        if(customThemes.indexOf(type) !== -1) {
             isExists= true;
         }
-    } else if(customThemes.length > 0) {
+    } else if(customThemes !== "") {
         isExists = true;
     }
 
