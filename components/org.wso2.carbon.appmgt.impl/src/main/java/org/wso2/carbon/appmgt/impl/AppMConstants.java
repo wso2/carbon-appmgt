@@ -434,6 +434,7 @@ public final class AppMConstants {
 
     public static final String STORE_CONFIGURATION = "APPStoreConfiguration.";
     public static final String STORE_DISPLAY_MULTIPLE_VERSIONS = STORE_CONFIGURATION + "DisplayMultipleVersions";
+    public static final String STORE_TAG_CACHE_DURATION = STORE_CONFIGURATION + "TagCacheDuration";
 
     public static final String AUTH_MANAGER = "AuthManager.";
     public static final String AUTH_MANAGER_URL = AUTH_MANAGER + "ServerURL";
