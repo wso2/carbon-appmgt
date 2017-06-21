@@ -177,12 +177,7 @@ var store = function (o, session) {
     //Check for logged-in user. If there is a logged-in user, then check whether the user is requesting to load
     //the anonymous tenant registry of an another tenant
     if (user && !isUserTenantIdDifferFromUrlTenantId(user.tenantId, tenantId)) {
-        store = session.get(TENANT_STORE);
-        if (cached && store) {
-            return store;
-        }
         store = new Store(tenantId, session);
-        session.put(TENANT_STORE, store);
         return store;
     }
     configs = server.configs(tenantId);
@@ -1028,17 +1023,10 @@ var storeManagers = function (o, session, tenantId) {
  @return: An instance of a MasterManager object either anon or store
  */
 function handleLoggedInUser(o, session) {
-    var storeMasterManager = session.get(TENANT_STORE_MANAGERS);
+    var storeMasterManager;
     var server = require('store').server;
-
     var tenantId = (o instanceof Request) ? server.tenant(o, session).tenantId : o;
-
-    if (storeMasterManager) {
-        return storeMasterManager;
-    }
-
     storeMasterManager = new StoreMasterManager(tenantId, session);
-    session.put(TENANT_STORE_MANAGERS, storeMasterManager);
 
     return storeMasterManager;
 }

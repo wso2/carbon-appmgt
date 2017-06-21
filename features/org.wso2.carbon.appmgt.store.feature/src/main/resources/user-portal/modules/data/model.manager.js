@@ -70,8 +70,6 @@ var modelManager = function () {
         //Attach the functions
         attachDefaultOperations(model, this);
 
-        var temp = new model();
-
         /*
         Removing this check for each call as it make unnecessary db calls
         However, resource table has to be created in ES_STORAGE data-source as a prerequisite
