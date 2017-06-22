@@ -774,7 +774,7 @@
     <carbon.governance.version>4.7.0</carbon.governance.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
-    <carbon.store.version>1.4.4</carbon.store.version>
+    <carbon.store.version>1.5.1</carbon.store.version>
 
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
