@@ -179,7 +179,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
         var createMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, um);
-        var isUserPublisher = isRoleExistForUser("Internal/publisher", user.username, um);
+        var publishMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_publish, um);
         var isUserAdmin = isRoleExistForUser(userRealm.getRealmConfiguration().getAdminRoleName(), user.username, um);
 
         try {
@@ -192,7 +192,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             countPaging.count = (PAGE_SIZE_ON_REVIEW + PAGE_SIZE) * PAGNINATION_SIZE;
 
             var onReviewStateAppCount = 0;
-            if (isUserPublisher || isUserAdmin) {
+            if (publishMobileAppAuthorized || isUserAdmin) {
                 onReviewStateAppCount = getAppCountForUserWithPaging({"lcState": "In-Review"}, countPaging,
                     artifactManager);
             }
@@ -256,7 +256,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                             artifactManager);
                     }
 
-                    if (isUserPublisher || isUserAdmin) {
+                    if (publishMobileAppAuthorized || isUserAdmin) {
                         count += getAppCountForUserWithPaging({"lcState": "In-Review"}, countPaging,
                             artifactManager);
                         ;
@@ -277,9 +277,11 @@ require('/modules/publisher.js').exec(function (ctx) {
                 DEFAULT_PAGING.sortOrder = sort.toUpperCase();
             }
 
+            var assets;
+
             if (query) {
                 // For search queries.
-                if (isUserPublisher || isUserAdmin) {
+                if (publishMobileAppAuthorized || isUserAdmin) {
                     var usersAssets;
                     if (isUserAdmin) {
                         usersAssets = artifactManager.search({
@@ -312,7 +314,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 artifacts = assets;
             } else {
                 // List users from user name from registry.
-                if (isUserPublisher || isUserAdmin) {
+                if (publishMobileAppAuthorized || isUserAdmin) {
                     var usersAssets;
                     if (isUserAdmin) {
                         usersAssets = artifactManager.search({
@@ -332,7 +334,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                     assets = usersAssets.concat(inReviewApps);
                 } else {
                     var usersAssets = artifactManager.search({"overview_provider": user.username}, DEFAULT_PAGING);
-                    assets = artifacts;
+                    assets = usersAssets;
                 }
                 artifacts = assets;
             }
