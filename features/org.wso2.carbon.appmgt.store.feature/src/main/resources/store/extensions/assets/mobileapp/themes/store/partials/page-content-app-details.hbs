@@ -152,14 +152,6 @@
       </div>
       <div class="modal-body">
             <br><br>
-            <label class="wr-input-control checkbox">
-            <input id="instant-update" type="checkbox" class="form-control operationDataKeys" data-key="instant-update"/>
-            <span class="helper" title="Once enabled, application update will start instantly.">
-            &nbsp;&nbsp;&nbsp;Instant Update
-            <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
-            </span>
-            </label>
-            <br><br>
             <div class='input-group date' id='dateTimePicker-update'>
                Enter the date and time to schedule application update.
                <br><br>
@@ -182,14 +174,6 @@
                            format: 'MM-DD-YYYY hh:mm a'
                        }
                    });
-               });
-               $('#instant-update').change(function() {
-                   if($(this).is(":checked")) {
-                       $('#dateTimePicker-update').addClass("hidden");
-                       $("#schedule-update").val('');
-                   } else {
-                       $('#dateTimePicker-update').removeClass("hidden");
-                   }
                });
             </script>
             <br>
@@ -217,14 +201,6 @@
       </div>
       <div class="modal-body">
             <br><br>
-            <label class="wr-input-control checkbox">
-            <input id="instant-install" type="checkbox" class="form-control operationDataKeys" data-key="instant-install"/>
-            <span class="helper" title="Once enabled, application install will start instantly.">
-            &nbsp;&nbsp;&nbsp;Instant install
-            <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
-            </span>
-            </label>
-            <br><br>
             <div class='input-group date' id='dateTimePicker-install'>
                Enter the date and time to schedule application installation.
                <br><br>
@@ -247,14 +223,6 @@
                            format: 'MM-DD-YYYY hh:mm a'
                        }
                    });
-               });
-               $('#instant-install').change(function() {
-                   if($(this).is(":checked")) {
-                       $('#dateTimePicker-install').addClass("hidden");
-                       $("#schedule-install").val('');
-                   } else {
-                       $('#dateTimePicker-install').removeClass("hidden");
-                   }
                });
             </script>
             <br>

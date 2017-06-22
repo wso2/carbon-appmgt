@@ -4,66 +4,60 @@ $('#media').carousel({
 });
 
 
-
-
-$(".device-image").each(function(index) {
+$(".device-image").each(function (index) {
     var device = getURLParameter("device");
-    if(device != "null"){
+    if (device != "null") {
         var deviceId = $(this).data("deviceId");
-        if(deviceId != device){
+        if (deviceId != device) {
             $(this).fadeTo("slow", 0.1);
-        }else{
+        } else {
             $(this).parent().css("cursor", "default");
             $(this).fadeTo("slow", 1);
         }
-    }else{
+    } else {
         $(this).css("opacity", 1);
     }
 
     var srcImage = $(this).attr("src");
     if (!urlExists(srcImage)) {
-        $(this).attr("src",  caramel.context +"/extensions/assets/mobileapp/resources/models/none.png");
+        $(this).attr("src", caramel.context + "/extensions/assets/mobileapp/resources/models/none.png");
     }
 });
 
-$(".device-image-modal").each(function(index) {
+$(".device-image-modal").each(function (index) {
     var srcImage = $(this).attr("src");
 
     if (!urlExists(srcImage)) {
-        $(this).attr("src",  caramel.context +"/extensions/assets/mobileapp/resources/models/none.png");
+        $(this).attr("src", caramel.context + "/extensions/assets/mobileapp/resources/models/none.png");
     }
 });
 
 
-
-
-
-
-function urlExists(url){
+function urlExists(url) {
 
     var http = new XMLHttpRequest();
-    try{
+    try {
         http.open('HEAD', url, false);
-    }catch(e){
+    } catch (e) {
         http.open('HEAD', url, true);
     }
 
-    try{
+    try {
         http.send();
-    }catch(e){
+    } catch (e) {
 
     }
-    return http.status!=404;
+    return http.status != 404;
 }
 
 
-$(".device-image-block").click(function(index) {
+$(".device-image-block").click(function (index) {
 
 
     var device = getURLParameter("device");
     var deviceId = $(this).data("deviceId");
     var platform = $(this).data("platform");
-    if(device != deviceId){
+    if (device != deviceId) {
         var uri = window.location.pathname + window.location.search;
         uri = updateQueryStringParameter(uri, 'device', deviceId);
         uri = updateQueryStringParameter(uri, 'platform', platform);
@@ -73,50 +67,50 @@ $(".device-image-block").click(function(index) {
 
 });
 
-$("#devicesList").on( "click", ".device-image-block-modal", function() {
+$("#devicesList").on("click", ".device-image-block-modal", function () {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    var instantInstall = $('#instant-install').is(":checked");
-    if (!instantInstall) {
-        var scheduleInstall = $('#schedule-install').val();
-        performInstalltion(deviceId, devicePlatform, appToInstall, scheduleInstall);
-    } else {
+    var scheduleInstall = $('#schedule-install').val();
+    if (scheduleInstall == "") {
         performInstalltion(deviceId, devicePlatform, appToInstall, null);
+    } else {
+        performInstalltion(deviceId, devicePlatform, appToInstall, scheduleInstall);
     }
+
 });
 
-$("#devicesList").on( "click", ".device-image-block-update-modal", function() {
+$("#devicesList").on("click", ".device-image-block-update-modal", function () {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    var instantUpdate = $('#instant-update').is(":checked");
-    if (!instantUpdate) {
-        var scheduleUpdate = $('#schedule-update').val();
-    	performUpdate(deviceId, devicePlatform, appToInstall, scheduleUpdate);
+    var scheduleUpdate = $('#schedule-update').val();
+    if (scheduleUpdate == "") {
+        performUpdate(deviceId, devicePlatform, appToInstall, null);
     } else {
-    	performUpdate(deviceId, devicePlatform, appToInstall, null);
+        performUpdate(deviceId, devicePlatform, appToInstall, scheduleUpdate);
     }
-    
+
+
 });
 
 
-function performInstalltion(deviceId, devicePlatform, app, schedule){
+function performInstalltion(deviceId, devicePlatform, app, schedule) {
     jQuery.ajax({
-        url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
-              encodeURIComponent(devicePlatform) + "/install",
+        url: caramel.context + "/apps/devices/" + encodeURIComponent(deviceId) + "/" +
+        encodeURIComponent(devicePlatform) + "/install",
         type: "POST",
         dataType: "json",
-        data : {"asset": app, "schedule": schedule}
+        data: {"asset": app, "schedule": schedule}
     });
 
-    $( document ).ajaxComplete(function() {
-       // asset.process("mobileapp",app, location.href);
+    $(document).ajaxComplete(function () {
+        // asset.process("mobileapp",app, location.href);
         noty({
-            text : 'You have been subscribed to the application successfully',
-            'layout' : 'center',
+            text: 'You have been subscribed to the application successfully',
+            'layout': 'center',
             'timeout': 1500,
             'modal': false,
-             'onClose': function() {
-                 location.reload();
+            'onClose': function () {
+                location.reload();
             }
         });
 
@@ -126,67 +120,67 @@ function performInstalltion(deviceId, devicePlatform, app, schedule){
 }
 
 
-function performUpdate(deviceId, devicePlatform, app, schedule){
+function performUpdate(deviceId, devicePlatform, app, schedule) {
     jQuery.ajax({
-        url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
-              encodeURIComponent(devicePlatform) + "/update",
+        url: caramel.context + "/apps/devices/" + encodeURIComponent(deviceId) + "/" +
+        encodeURIComponent(devicePlatform) + "/update",
         type: "POST",
         dataType: "json",
-        data : {"asset": app, "schedule": schedule}
+        data: {"asset": app, "schedule": schedule}
     });
 
-    $( document ).ajaxComplete(function() {
+    $(document).ajaxComplete(function () {
         noty({
-            text : 'You have been subscribed to the application successfully',
-            'layout' : 'center',
+            text: 'You have been subscribed to the application successfully',
+            'layout': 'center',
             'timeout': 1500,
             'modal': false,
-             'onClose': function() {
-                 location.reload();
+            'onClose': function () {
+                location.reload();
             }
         });
     });
 }
 
 
-function performInstalltionUser(app){
+function performInstalltionUser(app) {
     noty({
-        text : 'Are you sure you want to install this app?',
-        'layout' : 'center',
-        'modal' : true,
-        buttons : [{
-            addClass : 'btn',
-            text : 'Yes',
-            onClick : function($noty) {
+        text: 'Are you sure you want to install this app?',
+        'layout': 'center',
+        'modal': true,
+        buttons: [{
+            addClass: 'btn',
+            text: 'Yes',
+            onClick: function ($noty) {
 
                 $noty.close();
 
                 jQuery.ajax({
-                    url:  caramel.context +"/apps/user/install",
+                    url: caramel.context + "/apps/user/install",
                     type: "POST",
                     dataType: "json",
-                    data : {"asset": app},
+                    data: {"asset": app},
 
-                    success : function(data){
+                    success: function (data) {
 
                     }
                 });
 
-                $( document ).ajaxComplete(function(event, xhr, settings) {
+                $(document).ajaxComplete(function (event, xhr, settings) {
                     // asset.process("mobileapp",app, location.href);
                     noty({
-                        text : 'You have been subscribed to the application successfully',
-                        'layout' : 'center',
+                        text: 'You have been subscribed to the application successfully',
+                        'layout': 'center',
                         'timeout': 1500,
                         'modal': false,
-                        'onClose': function() {
-                            try{
-                                if(JSON.parse(xhr.responseText).redirect != true){
+                        'onClose': function () {
+                            try {
+                                if (JSON.parse(xhr.responseText).redirect != true) {
                                     location.reload();
-                                }else{
+                                } else {
                                     location.replace(JSON.parse(xhr.responseText).location);
                                 }
-                            }catch(e){
+                            } catch (e) {
                                 location.reload();
                             }
 
@@ -197,9 +191,9 @@ function performInstalltionUser(app){
             }
         },
             {
-                addClass : 'btn',
-                text : 'No',
-                onClick : function($noty) {
+                addClass: 'btn',
+                text: 'No',
+                onClick: function ($noty) {
                     $noty.close();
                 }
             }]
@@ -207,35 +201,35 @@ function performInstalltionUser(app){
 }
 
 
-$( document ).ready(function() {
+$(document).ready(function () {
     var id = getURLParameter("id");
 
     devicePlatform = $("#devicePlatform").val();
     //var hasdevices = false;
-    if(id != "null"){
+    if (id != "null") {
         $('#devicesList').modal('show');
     }
 
     $.ajax({
-        url:  caramel.context +"/apis/enterprise/get-devices/" + devicePlatform,
+        url: caramel.context + "/apis/enterprise/get-devices/" + devicePlatform,
         dataType: "json"
-    }).done(function(data) {
+    }).done(function (data) {
 
         var objects = [];
 
         var length = 6;
-        for(var i = 0; i <= parseInt(data.length / length); i++){
+        for (var i = 0; i <= parseInt(data.length / length); i++) {
             objects.push([]);
         }
 
-        $.each(data, function(key,value) {
-            var index = parseInt(key/ length);
+        $.each(data, function (key, value) {
+            var index = parseInt(key / length);
             objects[index].push(value);
         });
 
-        for(var j = 0; j < objects.length; j++){
+        for (var j = 0; j < objects.length; j++) {
             var isActive = j === 0 ? "active" : "";
-            var item = $("<div>", {class: "item " + isActive });
+            var item = $("<div>", {class: "item " + isActive});
             var row = $("<div>", {class: "row"});
 
             for (var k = 0; k < objects[j].length; k++) {
@@ -256,11 +250,7 @@ $( document ).ready(function() {
         }
 
 
-
     });
-
-
-
 
 
 });
@@ -278,10 +268,8 @@ function updateQueryStringParameter(uri, key, value) {
 }
 
 
-
-
 function getURLParameter(name) {
     return decodeURI(
-        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]
     );
 }
