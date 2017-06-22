@@ -83,6 +83,10 @@ var auditLog = require('/modules/auditLog/logger.js');
 
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
+            session.invalidate();
+            session = request.getSession(true);
+            sessionId = session.getId();
+
             // Decode the SAML response.
             var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
 
