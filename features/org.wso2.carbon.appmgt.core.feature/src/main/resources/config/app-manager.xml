@@ -17,6 +17,13 @@
     APP or only showing the latest version of an APP.
         -->
         <DisplayMultipleVersions>true</DisplayMultipleVersions>
+
+       <!--
+        This parameter specifies the expiration time of the TagCache. TagCache will
+        only be created when this element is uncommented. When the specified
+        time duration gets elapsed ,tag cache will get re-generated.
+       -->
+         <TagCacheDuration>120000</TagCacheDuration>
     </APPStoreConfiguration>
 
     <!-- The authorization manager configuration to be used by store / publisher components -->
