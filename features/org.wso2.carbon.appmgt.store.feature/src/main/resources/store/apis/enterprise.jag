@@ -2,9 +2,6 @@
 
 matcher = new URIMatcher(request.getRequestURI());
 
-
-
-
 require('/modules/store.js').exec(function (ctx) {
 
     var log = new Log();
@@ -94,8 +91,6 @@ require('/modules/store.js').exec(function (ctx) {
             response.sendError(401, 'Unauthorized');
         }
 
-
-
         var elements = matcher.elements();
         var params = request.getAllParameters("UTF-8");
 
@@ -103,10 +98,7 @@ require('/modules/store.js').exec(function (ctx) {
         var type = elements.type;
         var app = params.app;
         var data = params["data[]"];
-        var isRemovable: param.removable;
-
-
-
+        var isRemovable = param.removable;
 
         log.debug("Params Received " +stringify(elements) + " & " + stringify(params));
 
@@ -138,8 +130,4 @@ function removeInternalroles(roles){
 
     return filterdRoles;
 }
-
-
-
-
 %>
