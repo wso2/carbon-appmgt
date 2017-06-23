@@ -5,6 +5,10 @@ jagg.module("webapp", {
         return jagg.require(jagg.getModulesDir() + "webapp/webapp.jag").getAPIDescription.apply(this, arguments);
     },
 
+    getServerURL:function () {
+        return jagg.require(jagg.getModulesDir() + "webapp/webapp.jag").getServerURL.apply(this, arguments);
+    },
+
     getAllPublishedAPIs:function () {
         return jagg.require(jagg.getModulesDir() + "webapp/published.jag").getAllPublishedAPIs.apply(this, arguments);
     },
