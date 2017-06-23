@@ -330,12 +330,14 @@ require('/modules/store.js').exec(function (ctx) {
             var recentAsset = recentAssets[i];
             // set default thumbnail of 'recentAsset'
             setDefaultThumbnail(recentAsset);
+            /*
             var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAsset.id));
             if (appRatingRecentAssetsJson) {
                 recentAsset.rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
             } else {
                 recentAsset.rating = 0;
             }
+            */
             webAppRecentAssets.push(recentAsset);
         }
     };
@@ -371,23 +373,22 @@ require('/modules/store.js').exec(function (ctx) {
         var APIInformationService = require('../services/api-information.js').serviceModule;
         var apiInfoManager = new APIInformationService.APIInformationService();
         apiInfoManager.init(jagg, session);
+        var serverURL = apiInfoManager.getServerURL(user.username, "https");
+
+        var ratingIds = [];
+        var ratingIdCount = 0;
 
         for (var i = 0; i < assets.length; i++) {
-            //set rating
-            if (JSON.parse(social.getRating("webapp:" + assets[i].id))) {
-                assets[i].rating = Math.floor(JSON.parse(social.getRating("webapp:" + assets[i].id)).rating);
-            } else {
-                assets[i].rating = 0;
-            }
+            ratingIds[ratingIdCount] = "webapp:" + assets[i].id;
+            ratingIdCount = ratingIdCount+1;
+            assets[i].rating = 0;
 
             //Set the access URL -By one click user should access the app in myapps page.
             if (!assets[i].accessUrl) {
                 if (assets[i].attributes.overview_skipGateway.toLowerCase() == "false") {
                     //Get the gatewayurl
-                    var appData = apiInfoManager.getAPIDescription(assets[i].attributes.overview_provider,
-                                                                   assets[i].attributes.overview_name,
-                                                                   assets[i].attributes.overview_version);
-                    assets[i].accessUrl = appData.serverURL.productionURL;
+                    assets[i].accessUrl = apiInfoManager.constructGatewayURL(serverURL,
+                            assets[i].attributes).productionURL;
                 } else {
                     //Get the direct webapp url
                     assets[i].accessUrl = assets[i].attributes.overview_webAppUrl;
@@ -411,8 +412,23 @@ require('/modules/store.js').exec(function (ctx) {
             //set thumbnail
             setDefaultThumbnail(assets[i]);
         }
+
+        //populate ratings
+        if(assets.length > 0){
+            var resultRatings = social.getRatings(ratingIds);
+            populateRatingOfAssets(assets, resultRatings);
+        }
+
     };
 
+    var populateRatingOfAssets = function(assets, resultRatings){
+
+        for(var k = 0; k < assets.length; k++){
+            if(resultRatings.get("webapp:"+assets[k].id)){
+                assets[k].rating = Math.floor(JSON.parse(resultRatings.get("webapp:"+assets[k].id)).rating)
+            }
+        }
+    };
     /**
      * Get the apps from APM DB when subscription is enabled.
      * When subscription is enabled myapp page should show anonymous + user subscribed apps for logged in user.

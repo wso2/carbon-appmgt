@@ -338,7 +338,7 @@ public final class AppManagerUtil {
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
 
-            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
+            String defaultVersion = AppMDAO.getDefaultVersion(apiName, replaceEmailDomainBack(providerName),
                                                               AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
             api.setDefaultVersion(apiVersion.equals(defaultVersion));
 
