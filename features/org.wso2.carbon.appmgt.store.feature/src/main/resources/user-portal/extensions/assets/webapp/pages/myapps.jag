@@ -373,7 +373,7 @@ require('/modules/store.js').exec(function (ctx) {
         var APIInformationService = require('../services/api-information.js').serviceModule;
         var apiInfoManager = new APIInformationService.APIInformationService();
         apiInfoManager.init(jagg, session);
-        var serverURL = apiInfoManager.getServerURL(user.username, "https");
+        var serverURL = apiInfoManager.getGatewayServerUrl(user.username, "https");
 
         var ratingIds = [];
         var ratingIdCount = 0;
@@ -421,11 +421,12 @@ require('/modules/store.js').exec(function (ctx) {
 
     };
 
-    var populateRatingOfAssets = function(assets, resultRatings){
+    var populateRatingOfAssets = function (assets, resultRatings) {
 
-        for(var k = 0; k < assets.length; k++){
-            if(resultRatings.get("webapp:"+assets[k].id)){
-                assets[k].rating = Math.floor(JSON.parse(resultRatings.get("webapp:"+assets[k].id)).rating)
+        for (var k = 0; k < assets.length; k++) {
+            var appID = "webapp:" + assets[k].id;
+            if (resultRatings.get(appID)) {
+                assets[k].rating = Math.floor(JSON.parse(resultRatings.get(appID)).rating)
             }
         }
     };

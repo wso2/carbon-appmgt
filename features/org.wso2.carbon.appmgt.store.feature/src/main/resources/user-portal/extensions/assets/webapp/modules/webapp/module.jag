@@ -5,8 +5,8 @@ jagg.module("webapp", {
         return jagg.require(jagg.getModulesDir() + "webapp/webapp.jag").getAPIDescription.apply(this, arguments);
     },
 
-    getServerURL:function () {
-        return jagg.require(jagg.getModulesDir() + "webapp/webapp.jag").getServerURL.apply(this, arguments);
+    getGatewayServerUrl:function () {
+        return jagg.require(jagg.getModulesDir() + "webapp/webapp.jag").getGatewayServerUrl.apply(this, arguments);
     },
 
     getAllPublishedAPIs:function () {
