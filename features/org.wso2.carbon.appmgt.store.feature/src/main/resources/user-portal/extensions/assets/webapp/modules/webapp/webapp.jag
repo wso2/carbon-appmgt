@@ -30,28 +30,23 @@ var getAPIDescription = function (api, username) {
     }
 };
 
-var getServerURL = function (username, transport) {
-    var discoveryURL,
-            log = new Log(),
-            store = jagg.module("manager").getAPIStoreObj();
+var getGatewayServerUrl = function (username, transport) {
+    var store = jagg.module("manager").getAPIStoreObj();
 
     try {
-        // discoveryURL = store.getSwaggerDiscoveryUrl(api.name, api.version, api.provider);
-        var api2 = store.getServerURL(username, transport);
-
-        var serverURL= api2[0];
+        var api2 = store.getGatewayServerUrl(username, transport);
+        var serverURL = api2[0];
 
         return {
-            error:false,
-            serverURL:serverURL,
-            message:null
+            error: false,
+            serverURL: serverURL,
+            message: null
         };
     } catch (e) {
-        //log.error(e.message);
         return {
-            error:true,
-            serverURL:null,
-            message:e.message
+            error: true,
+            serverURL: null,
+            message: e.message
         };
     }
 };

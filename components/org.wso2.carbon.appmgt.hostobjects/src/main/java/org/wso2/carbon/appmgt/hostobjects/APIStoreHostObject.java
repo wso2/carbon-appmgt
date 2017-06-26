@@ -1291,54 +1291,49 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
-    public static NativeArray jsFunction_getServerURL(Context cx, Scriptable thisObj,
-                                                Object[] args, Function funObj) throws ScriptException,
-                                                                                       AppManagementException {
-
+    public static NativeArray jsFunction_getGatewayServerUrl(Context cx, Scriptable thisObj,
+                                                             Object[] args, Function funObj) throws ScriptException,
+            AppManagementException {
         String providerName;
         String transport;
 
         NativeArray myn = new NativeArray(0);
-        if (args!=null && args.length != 0) {
+        if (args != null && args.length == 2) {
 
-        providerName = AppManagerUtil.replaceEmailDomain((String) args[0]);
-        transport = (String) args[1];
+            providerName = AppManagerUtil.replaceEmailDomain((String) args[0]);
+            transport = (String) args[1];
 
-        boolean isTenantFlowStarted = false;
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
-            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                isTenantFlowStarted = true;
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            }
+            boolean isTenantFlowStarted = false;
+            try {
+                String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                NativeObject row = new NativeObject();
 
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                List<Environment> environments = config.getApiGatewayEnvironments();
+                String envDetails = "";
+                for (int i = 0; i < environments.size(); i++) {
+                    Environment environment = environments.get(i);
+                    envDetails += environment.getName() + ",";
+                    envDetails += filterUrls(environment.getApiGatewayEndpoint(), transport);
+                    if (i < environments.size() - 1) {
+                        envDetails += "|";
+                    }
+                }
+                row.put("serverURL", row, envDetails);
+                myn.put(0, myn, row);
 
-            NativeObject row = new NativeObject();
-
-            AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-            List<Environment> environments = config.getApiGatewayEnvironments();
-            String envDetails = "";
-            for (int i = 0; i < environments.size(); i++) {
-                Environment environment = environments.get(i);
-                envDetails += environment.getName() + ",";
-                envDetails += filterUrls(environment.getApiGatewayEndpoint(), transport);
-                if (i < environments.size() - 1) {
-                    envDetails += "|";
+            } catch (Exception e) {
+                handleException(e.getMessage(), e);
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
                 }
             }
-            //row.put("serverURL", row, config.getFirstProperty(AppMConstants.API_GATEWAY_API_ENDPOINT));
-            row.put("serverURL", row, envDetails);
-            myn.put(0, myn, row);
-
-
-        } catch (Exception e) {
-            handleException(e.getMessage(), e);
-        } finally {
-        	if (isTenantFlowStarted) {
-        		PrivilegedCarbonContext.endTenantFlow();
-        	}
-        }
         }
         return myn;
     }

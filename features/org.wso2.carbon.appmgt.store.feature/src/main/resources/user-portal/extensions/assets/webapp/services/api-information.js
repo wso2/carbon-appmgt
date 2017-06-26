@@ -111,8 +111,8 @@ var serviceModule = (function () {
         return createDescriptionObject(apiDescription, uriTemplateMap.toArray());
     };
 
-    APIInformationService.prototype.getServerURL = function (username, transport) {
-        var apiServerURLs = this.instance.getServerURL(username || this.user, transport);
+    APIInformationService.prototype.getGatewayServerUrl = function (username, transport) {
+        var apiServerURLs = this.instance.getGatewayServerUrl(username || this.user, transport);
 
         //Check if an exception has occured during the method invocation
         if (apiServerURLs.error != false) {
