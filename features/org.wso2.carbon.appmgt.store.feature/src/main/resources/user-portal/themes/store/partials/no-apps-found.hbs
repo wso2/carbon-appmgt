@@ -2,27 +2,22 @@
     {{#if searchQuery.search}}
         <div class="jumbotron" id="no-apps-search-jumbotron">
             <h2>
-                <span class="fw fw-warning add-padding-right-1x"></span>We could not find any app for your search!
+                <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for your search!
             </h2>
-            <p class="lead add-padding-top-3x text-muted">
-                Your search filter was, "{{searchQuery.search}}". What can I do now?.
-            <p>
         </div>
     {{else}}
         {{#if config.isSelfSubscriptionEnabled}}
             <div class="jumbotron" id="no-apps-default-jumbotron">
                 <h2>
-                    <span class="fw fw-warning add-padding-right-1x"></span>We could not find any apps for you!
+                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for you!
                 </h2>
 
             </div>
         {{else}}
             <div class="jumbotron" id="no-apps-noselfsub-jumbotron">
                 <h2>
-                    <span class="fw fw-warning add-padding-right-1x"></span>There are no apps rated yet!
+                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for you!
                 </h2>
-                <p class="lead add-padding-top-3x text-muted">Please contact your publisher
-                <p>
             </div>
         {{/if}}
     {{/if}}
