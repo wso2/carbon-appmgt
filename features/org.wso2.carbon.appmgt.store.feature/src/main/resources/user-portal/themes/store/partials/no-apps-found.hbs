@@ -2,21 +2,21 @@
     {{#if searchQuery.search}}
         <div class="jumbotron" id="no-apps-search-jumbotron">
             <h2>
-                <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for your search!
+                <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> Your search did not return any apps!
             </h2>
         </div>
     {{else}}
         {{#if config.isSelfSubscriptionEnabled}}
             <div class="jumbotron" id="no-apps-default-jumbotron">
                 <h2>
-                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for you!
+                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> You do not have any apps!
                 </h2>
 
             </div>
         {{else}}
             <div class="jumbotron" id="no-apps-noselfsub-jumbotron">
                 <h2>
-                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> We could not find any apps for you!
+                    <span class="add-padding-right-1x"><i class="fw fw-info"></i></span> You do not have any apps!
                 </h2>
             </div>
         {{/if}}
