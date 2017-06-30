@@ -98,7 +98,7 @@ require('/modules/store.js').exec(function (ctx) {
         var type = elements.type;
         var app = params.app;
         var data = params["data[]"];
-        var isRemovable = param.removable;
+        var isRemovable = params.removable;
 
         log.debug("Params Received " +stringify(elements) + " & " + stringify(params));
 
