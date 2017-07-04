@@ -208,7 +208,7 @@ $( document ).ready(function() {
             },
             {
                 element: "#store-link",
-                title: "Add to your favourites",
+                title: "Add to your Favorites",
                 placement: "right",
                 content: "The subscribed application will be added to the My Apps page."
             }

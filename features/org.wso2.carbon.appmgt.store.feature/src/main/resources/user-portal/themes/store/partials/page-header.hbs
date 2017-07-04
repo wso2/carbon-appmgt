@@ -18,16 +18,16 @@
             <i class="fw fw-settings fw-rotate-90">&nbsp;</i><span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-        <a href="#">
+        <li><a href="#">
             {{#if isHomePage}}
-                <i id="rmv-home">Remove from home page</i></a>
-                <i id="set-home" style="display: none">Set this page as Home</i>
+                <span id="rmv-home">Remove this page as the home page of the User Portal</span>
+                <span id="set-home" style="display: none">Set this page as the home page of the User Portal</span>
 
             {{else}}
-                <i id="set-home">Set this page as Home</i>
-                <i id="rmv-home" style="display: none">Remove from home page</i>
+                <span id="set-home">Set this page as the home page of the User Portal</span>
+                <span id="rmv-home" style="display: none">Remove this page as the home page of the User Portal</span>
             {{/if}}
-            </a>
+            </a></li>
         </ul>
     </div>
 {{/if}}
