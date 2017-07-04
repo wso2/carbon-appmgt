@@ -26,7 +26,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "Favourites",
+                    title: "Favorites",
                     sorting: createSortOptions(data),
                     myFav: true,
                     isHomePage: data.isHomePage
