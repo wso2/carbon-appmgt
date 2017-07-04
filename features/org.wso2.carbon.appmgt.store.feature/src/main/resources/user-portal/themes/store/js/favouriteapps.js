@@ -122,24 +122,24 @@ $(function () {
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           var message = 'You have successfully removed   <b> MyFavourites Page'
-                               + '</b> from home page';
+                           var message = 'You have successfully removed   <b> Favorites'
+                               + '</b> page from Home page';
                            notify(message);
                            $('#set-home').show();
                            $('#rmv-home').hide();
 
                        } else {
-                           var message = 'Error occured  when removing "MyFavourites" Page' +
+                           var message = 'Error occured  when removing "Favorites" page' +
                                          ' from Home page';
                            notify(message);
                        }
                    },
                    error: function (response) {
                        if (response.status == 401) {
-                           var message = 'Your session has time out.Please login again';
+                           var message = 'Your session has time out. Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when removing "MyFavourites" Page' +
+                           var message = 'Error occured  when removing "Favorites" page' +
                                          ' from Home page';
                            notify(message);
                        }
@@ -154,24 +154,24 @@ $(function () {
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           var message = 'You have successfully set   <b> MyFavourites Page'
-                               + '</b> as home page';
+                           var message = 'You have successfully set   <b> Favorites'
+                               + '</b> page as Home page';
                            notify(message);
                            $('#rmv-home').show();
                            $('#set-home').hide();
 
                        } else {
-                           var message = 'Error occured  when setting "MyFavourites" Page' +
+                           var message = 'Error occured  when setting "Favorites" page' +
                                          ' as Home page';
                            notify(message);
                        }
                    },
                    error: function (response) {
                        if (response.status == 401) {
-                           var message = 'Your session has time out.Please login again';
+                           var message = 'Your session has time out. Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when setting "MyFavourites" Page' +
+                           var message = 'Error occured  when setting "Favorites" page' +
                                          ' as Home page';
                            notify(message);
                        }
@@ -210,13 +210,13 @@ $(function () {
                 element: "#my-apps-link",
                 title: "Select apps as Favourite",
                 placement: "right",
-                content: "You can mark or unmark your favourite apps in My Apps page"
+                content: "You can mark or unmark your favourite apps in Applications page"
             },
             {
                 element: "#dropdown-toggle-conf",
                 title: "Set the default page",
                 placement: "left",
-                content: "My Favourites page can be set/reset as your default page with the configuration option here."
+                content: "Favorites page can be set/reset as your default page with the configuration option here."
             },
             {
                 element: "#store-link",
@@ -226,9 +226,9 @@ $(function () {
             },
             {
                 element: "#store-link",
-                title: "Add to your favourites",
+                title: "Add to your Favorites",
                 placement: "right",
-                content: "The subscribed application can be marked as your Favourites and make it your default home page."
+                content: "The subscribed application can be marked as your Favorites and make it your default home page."
             }
         ]
     });
@@ -247,7 +247,7 @@ $(function () {
                 element: ".input-group-btn",
                 title: "Change the query type",
                 placement: "bottom",
-                content: "You can change what you want to search by selecting one of \"App Name\" or \"the App Provider\""
+                content: "You can change what you want to search by selecting one of \"App Name\" or \"the App Owner\""
             }
         ]
     });
