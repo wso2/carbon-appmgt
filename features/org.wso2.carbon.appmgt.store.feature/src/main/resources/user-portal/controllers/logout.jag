@@ -57,21 +57,9 @@
             }
         }
 
-        // Preserve the relay state.
-        var relayStates = application.get("relayStates");
-
-        if (!relayStates) {
-            relayStates = {};
-            application.put("relayStates", relayStates);
-        }
-
-        // Generate relay state ID.
+        // Persist relay state in session.
         var relayStateID = uuid.generate().toString();
-
-        var relayState = {};
-        relayState.requestedURL = relayStateURL;
-        relayState.applicationTenantDomain = tenantDomain;
-        relayStates[relayStateID] = relayState;
+        session.put(relayStateID, relayStateURL);
 
         if (log.isDebugEnabled()) {
             log.debug("User portal session index : " + sso_sessions[session.getId()]);
