@@ -1,41 +1,46 @@
 <%
 (function () {
-    include("/jagg/jagg.jag");
-    var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
     var storeConfig = require('/config/store.js').config(),
             sso = require("sso"),
             process = require("process"),
             caramel = require('caramel'),
             uuid = require('uuid'),
+            util = require('/modules/util.js'),
             sessionId = session.getId(),
             requestedPage = request.getParameter("requestedPage"),
             requestURI = request.getRequestURI(),
-            requestURL = request.getRequestURL(),
             customDomain = request.getHeader("X-WSO2-Custom-Domain"),
             postUrl = storeConfig.ssoConfiguration.identityProviderURL,
             forceAuth = storeConfig.ssoConfiguration.isForceAuth,
             reversProxyEnabled = caramel.configs().reverseProxyEnabled,
             reverseProxyHost = caramel.configs().reverseProxyHost,
+            MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants,
             log = new Log();
+    include("/jagg/jagg.jag");
+    var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
 
-    // Extract tenant domain from store URL.
-    var requestedTenant;
-    if (requestURI.indexOf("/t/") !== -1) {
-        var requestContextPaths = requestURI.split("/t/");
-        requestedTenant = requestContextPaths[1].split("/") [0];
-
+    // Extract tenant domain from request URL.
+    var applicationTenantDomain = util.getTenantDomainFromUrl(requestURI);
+    if (applicationTenantDomain) {
         if (log.isDebugEnabled()) {
-            log.debug("User portal accessed from a tenant aware URL for tenant domain : " + requestedTenant);
+            log.debug("User portal is accessed from a tenant aware URL for tenant: " + applicationTenantDomain);
         }
     }
 
     // Set ACS URL.
-    var acsUrl = storeConfig.ssoConfiguration.storeAcs;
     if (customDomain) {
         acsUrl = "https://" + customDomain + "/acs";
         if (log.isDebugEnabled()) {
             log.debug("Custom domain : " + customDomain + " is configured. ACS URL constructed accordingly. ACS URL : "
                     + acsUrl);
+        }
+    } else {
+        var acsUrl = storeConfig.ssoConfiguration.storeAcs;
+        if (applicationTenantDomain && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(applicationTenantDomain)) {
+            acsUrl = util.getTenantAwareACS(applicationTenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Constructed tenant aware ACS URL: " + acsUrl + " for tenant: " + applicationTenantDomain);
+            }
         }
     }
 
@@ -56,7 +61,7 @@
         log.debug("SAML Request : " + encodedSAMLAuthRequest);
     }
 
-    var relayStateURL = requestURL;
+    var relayStateURL = request.getRequestURL();
     if (customDomain) {
         // If a custom domain is set,
         // replace the segments enclosed with [], in https://[host/user-portal/t/tenant15.com]/home.jsp
@@ -73,21 +78,9 @@
         }
     }
 
-    // Preserve the relay state.
-    var relayStates = application.get("relayStates");
-
-    if (!relayStates) {
-        relayStates = {};
-        application.put("relayStates", relayStates);
-    }
-
-    // Generate relay state ID.
+    // Persist relay state in session.
     var relayStateID = uuid.generate().toString();
-
-    var relayState = {};
-    relayState.requestedURL = relayStateURL;
-    relayState.applicationTenantDomain = requestedTenant;
-    relayStates[relayStateID] = relayState;
+    session.put(relayStateID, relayStateURL);
 
     if (!session.get("Loged")) {
         %>
@@ -99,16 +92,26 @@
                         <input type="hidden" name="SAMLRequest" value ="<%=encodedSAMLAuthRequest%>"/>
                         <input type="hidden" name="RelayState" value ="<%=relayStateID%>"/>
                         <input type="hidden" name="SSOAuthSessionID" value="<%=sessionId%>"/>
-                        <input type="hidden" name="storeTenantDomain" value="<%=requestedTenant%>"/>
-                        <input type="hidden" name="forceAuth" value="<%=forceAuth%>"/>
-                                <button type="submit">Redirect manually</button>
-                            </p>
-                        </form>
-                    </div>
-                    <script type="text/javascript" >
-                        document.forms[0].submit();
-                    </script>
                 <%
+        if (applicationTenantDomain && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(applicationTenantDomain)) {
+            %>
+                        <input type="hidden" name="storeTenantDomain" value="<%=applicationTenantDomain%>"/>
+                    <%
+        }
+        if (forceAuth && "true".equals(forceAuth)) {
+            %>
+                            <input type="hidden" name="forceAuth" value="<%=forceAuth%>"/>
+                    <%
+        }
+        %>
+                        <button type="submit">Redirect manually</button>
+                    </p>
+                </form>
+             </div>
+             <script type="text/javascript" >
+                document.forms[0].submit();
+             </script>
+    <%
     }
 }());
 %>
