@@ -714,7 +714,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
     routeManager.register('GET', 'publisher', '/publisher/api/lifecycle/information/meta/{type}/roles',
                           function (context) {
-                              var shortName = context.params.type;
+                              var shortName = "mobileapp";
                               var carbon = require('carbon');
                               var realmService = carbon.server.osgiService('org.wso2.carbon.user.core.service.RealmService');
                               var realm = realmService.getTenantUserRealm(server.current(session).tenantId);

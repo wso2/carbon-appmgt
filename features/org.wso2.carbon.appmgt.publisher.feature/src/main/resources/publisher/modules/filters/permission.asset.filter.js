@@ -44,6 +44,17 @@ var filterModule = function () {
         var item;
         var items = [];
 
+        var permissions = require('/modules/permissions.js').permissions;
+
+        // getting the user roles
+        var server = require('store').server;
+        var user = server.current(session);
+        var tenantId = server.current(session).tenantId;
+        var um = server.userManager(tenantId);
+
+        var publishMobileAppAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_publish, um);
+
+
         //Go through each data item
         for (var index in data) {
 
@@ -64,8 +75,7 @@ var filterModule = function () {
                 });
 
                 //Check if we have common roles
-                if (commonRoles.length > 0) {
-
+                if ((commonRoles.length > 0) || publishMobileAppAuthorized) {
                     items.push(item);
                 }
             }
