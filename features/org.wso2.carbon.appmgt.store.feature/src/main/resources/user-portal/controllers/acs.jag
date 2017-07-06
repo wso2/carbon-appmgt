@@ -66,16 +66,16 @@ var auditLog = require('/modules/auditLog/logger.js');
     var relayStateURL = session.get(relayStateId);
     session.remove(relayStateId);
 
-    var redirectURL = util.getDefaultRedirectUrl(request, applicationTenantDomain);
-    if(log.isDebugEnabled()){
-        log.debug("Default redirect URL : " + redirectURL);
-    }
-
+    var redirectURL;
     if (relayStateURL) {
         redirectURL = relayStateURL;
-
         if(log.isDebugEnabled()){
-            log.debug("Redirect URL preserved in relay state. Changed redirect URL to: " + redirectURL);
+            log.debug("Redirect URL preserved in relay state. Redirect URL: " + redirectURL);
+        }
+    } else {
+        redirectURL = util.getDefaultRedirectUrl(request, applicationTenantDomain);
+        if(log.isDebugEnabled()){
+            log.debug("Using default redirect URL: " + redirectURL);
         }
     }
 
