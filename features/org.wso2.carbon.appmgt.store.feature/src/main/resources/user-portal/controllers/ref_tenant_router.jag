@@ -30,6 +30,7 @@ var assetsEndpoint = store + 'assets/{type}/{+suffix}';
 var extensionsEndpoint = store + 'extensions/assets/{type}/{+suffix}';
 var storageEndpoint = store + 'storage/{+suffix}';
 var storeLogin = store + 'login';
+var acs = store + 'acs';
 var path;
 var log = new Log();
 
@@ -40,7 +41,7 @@ var mapper = function (path) {
 };
 
 (function(){
-if (!session.get("Loged")) {
+if (!session.get("Loged") && !matcher.match(acs)) {
     include("/controllers/login.jag");
     return;
 }
@@ -83,6 +84,10 @@ if (matcher.match(apiEndpoint)) {
     path = '/controllers/home.jag';
     resolveRouter(elements.domain, path, null);
 
+} else if (matcher.match(acs)) {
+    var elements = matcher.elements();
+    path = '/controllers/acs.jag';
+    resolveRouter(elements.domain, path, null);
 }
 else {
     response.sendError(404, 'Tenant Domain not found');

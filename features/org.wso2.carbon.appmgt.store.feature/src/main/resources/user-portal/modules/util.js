@@ -42,3 +42,30 @@ var resolveUserName = function(user) {
     return userName;
 };
 
+var getTenantDomainFromUrl = function (url) {
+    var tenantDomain;
+    if (url.indexOf("/t/") !== -1) {
+        var urlSegments = url.split("/t/");
+        tenantDomain = urlSegments[1].split("/") [0];
+    }
+    return tenantDomain;
+};
+
+var getTenantAwareACS = function (tenantDomain) {
+    var storeConfig = require('/config/store.js').config();
+    var acsUrl = storeConfig.ssoConfiguration.storeAcs;
+    if (tenantDomain) {
+        var urlSegments = acsUrl.split("/acs");
+        acsUrl = urlSegments[0] + "/t/" + tenantDomain + "/acs";
+    }
+    return acsUrl;
+};
+
+var getDefaultRedirectUrl = function (request, tenantDomain) {
+    var redirectUrl = request.getRequestURL().split(request.getContextPath())[0] + request.getContextPath();
+    if (tenantDomain) {
+        redirectUrl = redirectUrl + "/t/" + tenantDomain;
+    }
+    return redirectUrl;
+};
+
