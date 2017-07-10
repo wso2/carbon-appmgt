@@ -894,7 +894,6 @@
       <spring-web.version>4.1.6.RELEASE</spring-web.version>
       <hibernate-validator.version>5.0.2.Final</hibernate-validator.version>
       <swagger-jaxrs.version>1.5.2</swagger-jaxrs.version>
-      <maven.javadoc.skip>true</maven.javadoc.skip>
 
   </properties>
 
