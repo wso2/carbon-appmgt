@@ -71,10 +71,13 @@ $("#devicesList").on("click", ".device-image-block-modal", function () {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
     var scheduleInstall = $('#schedule-install').val();
-    if (scheduleInstall == "") {
-        performInstalltion(deviceId, devicePlatform, appToInstall, null);
-    } else {
+    var instantInstall = $('#instant-install').is(":checked");
+    if (!instantInstall && scheduleInstall != "") {
+        var scheduleInstall = $('#schedule-install').val();
         performInstalltion(deviceId, devicePlatform, appToInstall, scheduleInstall);
+    } else if (instantInstall) {
+        performInstalltion(deviceId, devicePlatform, appToInstall, null);
+
     }
 
 });
@@ -83,9 +86,10 @@ $("#devicesList").on("click", ".device-image-block-update-modal", function () {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
     var scheduleUpdate = $('#schedule-update').val();
-    if (scheduleUpdate == "") {
+    var instantUpdate = $('#instant-update').is(":checked");
+    if (scheduleUpdate == "" && instantUpdate) {
         performUpdate(deviceId, devicePlatform, appToInstall, null);
-    } else {
+    } else if (scheduleUpdate != "") {
         performUpdate(deviceId, devicePlatform, appToInstall, scheduleUpdate);
     }
 
