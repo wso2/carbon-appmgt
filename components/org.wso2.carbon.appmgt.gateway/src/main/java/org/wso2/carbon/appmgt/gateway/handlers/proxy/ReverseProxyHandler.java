@@ -53,8 +53,8 @@ public class ReverseProxyHandler extends AbstractHandler {
 		                  (TreeMap) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 		String webContextWithVersion = String.valueOf(messageContext.getProperty(RESTConstants.REST_API_CONTEXT))  ;
 
-        if(messageContext.getProperty(NO_VERSION) == null || !Boolean.parseBoolean(String.valueOf(messageContext
-                .getProperty(NO_VERSION)))){
+        if (messageContext.getProperty(NO_VERSION) == null || !Boolean.parseBoolean(String.valueOf(messageContext
+                .getProperty(NO_VERSION)))) {
             webContextWithVersion = webContextWithVersion + URL_SEPERATOR + String.valueOf(messageContext.getProperty
                     (RESTConstants.SYNAPSE_REST_API_VERSION));
         }
