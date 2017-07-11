@@ -38,6 +38,7 @@ public class ReverseProxyHandler extends AbstractHandler {
 	private static final String URL_SEPERATOR = "/";
 	private static final String EMPTY_STRING = "";
 	private static final long MAX_AGE_UNSPECIFIED = -1;
+	private static final String NO_VERSION = "noVersion";
 
 	public boolean handleRequest(MessageContext messageContext) {
 		return true;
@@ -50,11 +51,15 @@ public class ReverseProxyHandler extends AbstractHandler {
 		                                                  ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 		TreeMap headers =
 		                  (TreeMap) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-		String webContextWithVersion =
-		                               String.valueOf(messageContext.getProperty(RESTConstants.REST_API_CONTEXT)) +
-		                                       URL_SEPERATOR +
-		                                       String.valueOf(messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION));
-		int status = Integer.parseInt(String.valueOf(axis2MC.getProperty(NhttpConstants.HTTP_SC)));
+		String webContextWithVersion = String.valueOf(messageContext.getProperty(RESTConstants.REST_API_CONTEXT))  ;
+
+        if (messageContext.getProperty(NO_VERSION) == null || !Boolean.parseBoolean(String.valueOf(messageContext
+                .getProperty(NO_VERSION)))) {
+            webContextWithVersion = webContextWithVersion + URL_SEPERATOR + String.valueOf(messageContext.getProperty
+                    (RESTConstants.SYNAPSE_REST_API_VERSION));
+        }
+
+        int status = Integer.parseInt(String.valueOf(axis2MC.getProperty(NhttpConstants.HTTP_SC)));
 		if (status == 302 || status == 301) {
 			// Set the location to the gateway URL
 			HTTPEndpoint endpoint =
