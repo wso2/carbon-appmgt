@@ -48,7 +48,7 @@ public class TenantConfigurationLoader {
         try {
             // Read the config file from the registry
             RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
-            Registry registry = registryService.getGovernanceSystemRegistry(tenantID);
+            Registry registry = registryService.getConfigSystemRegistry(tenantID);
 
             String tenantConfRegistryPath = AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + AppMConstants.TENANT_CONF_FILENAME;
 
