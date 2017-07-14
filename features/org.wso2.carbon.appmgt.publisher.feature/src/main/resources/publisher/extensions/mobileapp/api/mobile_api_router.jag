@@ -17,6 +17,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('DELETE', 'publisher', '/publisher/api/mobile/delete/{app}', function (ctx) {
         var username=require('store').server.current(session).username;
         var um = server.userManager(server.current(session).tenantId);
+        var registry = server.systemRegistry(server.current(session).tenantId);
         var deleteAuthorized = permissions.isAuthorized(username, config.permissions.webapp_delete, um);
 
         if(deleteAuthorized){
@@ -47,7 +48,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             var appName = attributes["overview_name"];
             var appVersion = attributes["overview_version"];
             var appProvider = attributes["overview_provider"];
-            artifactManager.remove(app);
+            var appPlatform = attributes["overview_platform"];
+            path = "/_system/governance/mobileapps/" + appProvider + "/" + appPlatform + "/" + appName + "/"
+            registry.remove(path);
             apiProvider.removeBinaryFilesFromStorage(fileNames);
             auditLog.writeLog(tenantId, username, "AssetDeleted", appType, "{providerName='" + appProvider +
                                                                            "', appName='" + appName +
