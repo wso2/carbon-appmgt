@@ -4032,7 +4032,7 @@ public final class AppManagerUtil {
         final Path resolvedPath = basePath.resolve(filePath).normalize();
 
         // Make sure the resulting path is still within the required directory.
-        if (!resolvedPath.startsWith(baseDirPath)) {
+        if (!resolvedPath.startsWith(basePath.normalize())) {
             throw new IllegalArgumentException("File '" + fileName + "' is not within the required directory.");
         }
 
