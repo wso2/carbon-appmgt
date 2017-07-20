@@ -111,6 +111,19 @@ var serviceModule = (function () {
         return createDescriptionObject(apiDescription, uriTemplateMap.toArray());
     };
 
+    APIInformationService.prototype.getGatewayServerUrl = function (username, transport) {
+        var apiServerURLs = this.instance.getGatewayServerUrl(username || this.user, transport);
+
+        //Check if an exception has occured during the method invocation
+        if (apiServerURLs.error != false) {
+            throw apiServerURLs.error;
+        }
+        return filterServerURLs(apiServerURLs.serverURL);
+    };
+
+    APIInformationService.prototype.constructGatewayURL = function (serverURL, asset) {
+        return constructGatewayURL(serverURL, asset);
+    };
     /*
      The method returns an array containing tier information
      @returns: An array containing JSON objects with information on the different tiers
@@ -175,6 +188,33 @@ var serviceModule = (function () {
                 components[SERVER_URL_PRODUCTION_INDEX] :
                 MSG_UNABLE_TO_GET_API_DATA
         */
+    };
+
+    /*
+     The function parses the serverURL property of the data returned by the api module
+     */
+    var filterServerURLs = function (serverURLs) {
+        var serverURLs = serverURLs || {};
+        var components = serverURLs.serverURL.split(',');
+
+        var prodURL = components[SERVER_URL_SANDBOX_INDEX];
+        return prodURL;
+    };
+
+        /*
+     The function construct the gatewayURL for
+     */
+    var constructGatewayURL = function (serverURLs, asset) {
+        var prodURL = serverURLs + asset.overview_context + "/";
+        if (asset.overview_makeAsDefaultVersion == "false") {
+            prodURL += asset.overview_version + "/";
+        }
+
+        return{
+            productionURL: serverURLs ?
+                prodURL :
+                MSG_UNABLE_TO_GET_API_DATA
+        };
     };
 
     /*

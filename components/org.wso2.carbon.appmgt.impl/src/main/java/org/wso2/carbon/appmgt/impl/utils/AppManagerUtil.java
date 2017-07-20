@@ -338,7 +338,7 @@ public final class AppManagerUtil {
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
 
-            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
+            String defaultVersion = AppMDAO.getDefaultVersion(apiName, replaceEmailDomainBack(providerName),
                                                               AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
             api.setDefaultVersion(apiVersion.equals(defaultVersion));
 
@@ -3804,7 +3804,7 @@ public final class AppManagerUtil {
         RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
         try {
 
-            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+            UserRegistry registry = registryService.getConfigSystemRegistry(tenantID);
 
             String tenantConfRegistryPath = AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" + AppMConstants.TENANT_CONF_FILENAME;
 
@@ -4070,7 +4070,7 @@ public final class AppManagerUtil {
     private static boolean readSubscriptionConfigurations(String key) throws AppManagementException {
         Resource tenantConfResource;
         Registry registryType = null;
-        String tenantConfRegistryPath = "/_system/governance" + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" +
+        String tenantConfRegistryPath = "/_system/config" + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION + "/" +
                 AppMConstants.TENANT_CONF_FILENAME;
         try {
             registryType = ServiceReferenceHolder.getInstance().

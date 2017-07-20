@@ -818,9 +818,6 @@ Store.prototype.recentAssets = function (type, count, options) {
      }); */
     length = recent.length;
     for (i = 0; i < length; i++) {
-        recent[i].rating = this.rating(recent[i].path).average;
-        recent[i].indashboard = this.isuserasset(recent[i].id, type);
-
         if (recentReturn.length == 0) {
             recentReturn = recent;
         }

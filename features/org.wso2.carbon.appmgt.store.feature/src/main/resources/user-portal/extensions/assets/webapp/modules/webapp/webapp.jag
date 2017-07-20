@@ -30,6 +30,27 @@ var getAPIDescription = function (api, username) {
     }
 };
 
+var getGatewayServerUrl = function (username, transport) {
+    var store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        var api2 = store.getGatewayServerUrl(username, transport);
+        var serverURL = api2[0];
+
+        return {
+            error: false,
+            serverURL: serverURL,
+            message: null
+        };
+    } catch (e) {
+        return {
+            error: true,
+            serverURL: null,
+            message: e.message
+        };
+    }
+};
+
 var getTiers = function () {
     var tier,tiers,list=[],log = new Log(),
             provider = jagg.module("manager").getAPIStoreObj();

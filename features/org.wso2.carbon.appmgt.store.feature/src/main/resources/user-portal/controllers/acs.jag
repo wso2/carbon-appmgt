@@ -9,6 +9,7 @@ var auditLog = require('/modules/auditLog/logger.js');
             MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils,
             MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants,
             configs = require('/config/store.json'),
+            util = require('/modules/util.js'),
             samlResponse = request.getParameter('SAMLResponse'),
             sessionId = session.getId(),
             samlRequest = request.getParameter('SAMLRequest'),
@@ -53,22 +54,29 @@ var auditLog = require('/modules/auditLog/logger.js');
         sso_sessions = application.get('sso_sessions');
     }
 
-    // Get relay state preserved.
-    var relayState;
-    var relayStates = application.get("relayStates");
-
-    // Send an error if the relay state can't be found.
-    if(!relayStates || !(relayState = relayStates[relayStateId])){
-        log.error('Relay state for ID : ' + relayStateId + " can not be found.");
-        response.sendError(500, 'Cannnot proceed further. Relay state is not present.');
-        return;
+    // Extract tenant domain from request URL.
+    var applicationTenantDomain = util.getTenantDomainFromUrl(request.getRequestURI());
+    if (applicationTenantDomain) {
+        if (log.isDebugEnabled()) {
+            log.debug("User portal ACS accessed from a tenant aware URL for tenant: " + applicationTenantDomain);
+        }
     }
 
-    delete relayStates[relayStateId];
+    // Get relay state preserved.
+    var relayStateURL = session.get(relayStateId);
+    session.remove(relayStateId);
 
-    var redirectURL = String(relayState.requestedURL);
-    if(log.isDebugEnabled()){
-        log.debug("Redirect URL preserved in relay state : " + redirectURL);
+    var redirectURL;
+    if (relayStateURL) {
+        redirectURL = relayStateURL;
+        if(log.isDebugEnabled()){
+            log.debug("Redirect URL preserved in relay state. Redirect URL: " + redirectURL);
+        }
+    } else {
+        redirectURL = util.getDefaultRedirectUrl(request, applicationTenantDomain);
+        if(log.isDebugEnabled()){
+            log.debug("Using default redirect URL: " + redirectURL);
+        }
     }
 
     if (samlResponse != null) {
@@ -118,8 +126,7 @@ var auditLog = require('/modules/auditLog/logger.js');
             }
 
             // Check whether the logged in user belongs to the application tenant domain.
-            var applicationTenantDomain = relayState.applicationTenantDomain;
-            if (applicationTenantDomain != userTenantDomain) {
+            if (applicationTenantDomain && applicationTenantDomain != userTenantDomain) {
                 log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
                 + applicationTenantDomain + '. Make sure the user is registered in the tenant domain.');
                 response.sendError(403, 'You do not have permission to login to this tenant. Please register' +
