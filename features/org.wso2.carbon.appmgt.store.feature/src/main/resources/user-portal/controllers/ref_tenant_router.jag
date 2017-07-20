@@ -31,6 +31,7 @@ var extensionsEndpoint = store + 'extensions/assets/{type}/{+suffix}';
 var storageEndpoint = store + 'storage/{+suffix}';
 var storeLogin = store + 'login';
 var path;
+var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 var log = new Log();
 
 var mapper = function (path) {
@@ -43,7 +44,17 @@ var mapper = function (path) {
 if (!session.get("Loged")) {
     include("/controllers/login.jag");
     return;
+} else if (session.get("logged.user") != null && (matcher.match(apiEndpoint) || matcher.match(assetEndpoint) ||
+           matcher.match(assetsEndpoint) || matcher.match(storageEndpoint) || matcher.match(extensionsEndpoint) ||
+           matcher.match(storeLogin) || matcher.match(store) || matcher.match(topAssetPage))){
+    var elements = matcher.elements();
+    var userTenantDomain = MultitenantUtils.getTenantDomain(session.get("logged.user").username);
+    if (userTenantDomain != elements.domain) {
+        response.sendError(403, 'Forbidden Access');
+        return;
+    }
 }
+
 
 //Check for incoming URL pattern and dispatch the request into relevant endpoint
 if (matcher.match(apiEndpoint)) {
