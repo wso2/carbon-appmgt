@@ -13,6 +13,9 @@ var binaryFileLocation = storeObj.getBinaryFileStorage();
 
 if (binaryFileLocation.substring(0, 1) === "/") {
     var path = binaryFileLocation + fileName;
+} else if(binaryFileLocation.indexOf("\\")>-1) {
+	binaryFileLocation = storeObj.getBinaryFileStorage().replace(/\//g, '\\');
+	var path = binaryFileLocation + fileName;
 } else {
     var path = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + fileName;
 }
