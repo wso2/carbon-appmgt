@@ -47,7 +47,7 @@ if (!session.get("Loged") && !matcher.match(acs)) {
     return;
 } else if (session.get("logged.user") != null && (matcher.match(apiEndpoint) || matcher.match(assetEndpoint) ||
            matcher.match(assetsEndpoint) || matcher.match(storageEndpoint) || matcher.match(extensionsEndpoint) ||
-           matcher.match(storeLogin) || matcher.match(store) || matcher.match(topAssetPage))){
+           matcher.match(storeLogin) || matcher.match(store) || matcher.match(topAssetPage))) {
     var elements = matcher.elements();
     var userTenantDomain = MultitenantUtils.getTenantDomain(session.get("logged.user").username);
     if (userTenantDomain != elements.domain) {
