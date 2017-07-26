@@ -66,6 +66,9 @@ var serviceModule = (function () {
     var SERVER_URL_SANDBOX_INDEX = 1;
     var SERVER_URL_PRODUCTION_INDEX = 2;
 
+    //Constants
+    var TENANT_DOMAIN_SEPARATOR = '@';
+
     /*
      The class wraps the functionality of the api module and returns
      tier and api descriptions
@@ -111,8 +114,9 @@ var serviceModule = (function () {
         return createDescriptionObject(apiDescription, uriTemplateMap.toArray());
     };
 
-    APIInformationService.prototype.getGatewayServerUrl = function (username, transport) {
-        var apiServerURLs = this.instance.getGatewayServerUrl(username || this.user, transport);
+    APIInformationService.prototype.getGatewayServerUrl = function (username, tenantDomain, transport) {
+        username +=  TENANT_DOMAIN_SEPARATOR + tenantDomain;
+        var apiServerURLs = this.instance.getGatewayServerUrl(username , transport);
 
         //Check if an exception has occured during the method invocation
         if (apiServerURLs.error != false) {
