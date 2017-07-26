@@ -54,6 +54,8 @@ require('/modules/store.js').exec(function (ctx) {
         site = ctx.site,
         social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
+    var HTTPS_CONST = "https";
+
     //set tenant aware username
     var tenantUsername = user ? user.username : null;
 
@@ -373,7 +375,7 @@ require('/modules/store.js').exec(function (ctx) {
         var APIInformationService = require('../services/api-information.js').serviceModule;
         var apiInfoManager = new APIInformationService.APIInformationService();
         apiInfoManager.init(jagg, session);
-        var serverURL = apiInfoManager.getGatewayServerUrl(user.username , user.tenantDomain, "https");
+        var serverURL = apiInfoManager.getGatewayServerUrl(user.username , user.tenantDomain, HTTPS_CONST);
 
         var ratingIds = [];
         var ratingIdCount = 0;
