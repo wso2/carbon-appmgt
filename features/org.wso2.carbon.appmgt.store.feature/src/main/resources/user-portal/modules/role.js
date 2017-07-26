@@ -21,11 +21,6 @@ var checkeRole = function (username, session) {
   	usr = um.getUser(usr.username);
   	usr.tenantDomain = carbon.server.tenantDomain({tenantId: usr.tenantId});
 
-    //append domain for tenant users
-    if (usr.tenantId != -1234) {
-        usr.username += "@" + usr.tenantDomain;
-    }
-
     event.emit('login', usr.tenantId, usr, session);
   	return true;
 };

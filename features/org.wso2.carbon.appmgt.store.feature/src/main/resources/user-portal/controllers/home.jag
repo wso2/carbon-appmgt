@@ -143,7 +143,7 @@ require('/modules/store.js').exec(function (ctx) {
             var APIInformationService = require('/extensions/assets/webapp/services/api-information.js').serviceModule;
             var apiInfoManager = new APIInformationService.APIInformationService();
             apiInfoManager.init(jagg, session);
-            var serverURL = apiInfoManager.getGatewayServerUrl(user.username, "https");
+            var serverURL = apiInfoManager.getGatewayServerUrl(user.username , user.tenantDomain, "https");
 
             var ratingIds = [];
             var ratingIdCount = 0;
