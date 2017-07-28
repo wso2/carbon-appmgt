@@ -115,7 +115,6 @@ var serviceModule = (function () {
     };
 
     APIInformationService.prototype.getGatewayServerUrl = function (username, tenantDomain, transport) {
-        username +=  TENANT_DOMAIN_SEPARATOR + tenantDomain;
         var apiServerURLs = this.instance.getGatewayServerUrl(username , transport);
 
         //Check if an exception has occured during the method invocation
