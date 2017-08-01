@@ -200,7 +200,9 @@ var auditLog = require('/modules/auditLog/logger.js');
         }
         var httpSessionForSessionIndex = application.get('sso_sessions')[index];
         if (httpSessionForSessionIndex) {
-            log.info("Invalidating http session for the session index " + index);
+            if(log.isDebugEnabled()){
+                log.debug("Invalidating http session for the session index " + index);
+            }
             httpSessionForSessionIndex.invalidate();
             delete application.get('sso_sessions')[index];
         }
