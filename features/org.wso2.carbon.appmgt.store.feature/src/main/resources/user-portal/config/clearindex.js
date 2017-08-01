@@ -8,13 +8,15 @@
     // So we should proceed only if 'sso_sessions' is available.
     var sessionIndex = session.get("sessionIndex");
     if (sso_sessions) {
-        var httpSessionForSessionIndex = sso_sessions[sessionIndex];
-        if (sessionIndex && httpSessionForSessionIndex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Deleting SSO session " + sessionIndex + " for the HTTP session " +
-                          httpSessionForSessionIndex.getId());
+        if (sessionIndex) {
+            var httpSessionForSessionIndex = sso_sessions[sessionIndex];
+            if (httpSessionForSessionIndex) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Deleting SSO session " + sessionIndex + " for the HTTP session " +
+                              httpSessionForSessionIndex.getId());
+                }
+                delete sso_sessions[sessionIndex];
             }
-            delete sso_sessions[sessionIndex];
     	}
     }
 
