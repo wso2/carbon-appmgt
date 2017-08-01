@@ -14,7 +14,7 @@ var user = {};
          * "/" will be replaced.
          */
 
-        return username.replace('@', '-AT-').replace('/', ':');
+        return String(username).replace(/@/g, '-AT-').replace(/\//g, ':');
     };
 
     user.privateRole = function (username) {
@@ -52,7 +52,19 @@ var user = {};
             }));
             space = user.userSpace(usr);
             session.put(USER_SPACE, space);
-            if (!usr.isAuthorized(space, carbon.registry.actions.PUT)) {
+
+            /*
+             From the user-portal there is a scenario where it append tenant domain to the username
+             in usr object before emitting the 'login' event.
+             bur when making calls to the user store level username of the user object should be tenantaware
+             (should not contain tenant domain)
+            */
+            var usernameTemp = usr.username;
+            usr.username = tenantAwareUserName;
+            var isAuthorized = usr.isAuthorized(space, carbon.registry.actions.PUT);
+            usr.username = usernameTemp;
+
+            if (!isAuthorized) {
                 event.emit('userRegister', tenantId, usr);
             }
         });
@@ -179,7 +191,8 @@ var user = {};
      */
     user.isAuthorized = function (user, permission, action) {
         var um = server.userManager(user.tenantId);
-        return um.getUser(user.username).isAuthorized(permission, action);
+        var tenantAwareUserName = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user.username);
+        return um.getUser(tenantAwareUserName).isAuthorized(permission, action);
     };
 
     /**

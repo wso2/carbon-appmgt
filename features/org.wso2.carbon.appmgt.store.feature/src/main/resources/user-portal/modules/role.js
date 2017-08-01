@@ -1,5 +1,5 @@
 var checkeRole = function (username, session) {
-	var opts, um,role 
+	var opts, um,role
       	authorized = false,
       	carbon = require('carbon'),
       	event = require('event'),
@@ -15,17 +15,16 @@ var checkeRole = function (username, session) {
 
 	opts = user.configs(usr.tenantId);
 	role = opts.userRoles;
-  
+
 	var server=require('store').server;
   	um = server.userManager(usr.tenantId);
   	usr = um.getUser(usr.username);
   	usr.tenantDomain = carbon.server.tenantDomain({tenantId: usr.tenantId});
 
-    //append domain for tenant users
+
     if (usr.tenantId != -1234) {
         usr.username += "@" + usr.tenantDomain;
     }
-
     event.emit('login', usr.tenantId, usr, session);
-  	return true;
+    return true;
 };
