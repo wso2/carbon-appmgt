@@ -13,8 +13,9 @@
                 uuid = require('uuid'),
                 sso_sessions = application.get('sso_sessions'),
                 sessionId = session.getId(),
-                encodedSAMLLogoutRequest = sso.client.getEncodedSAMLLogoutRequest(user, sso_sessions[session.getId()],
-                        config.ssoConfiguration.issuer),
+                encodedSAMLLogoutRequest =
+                    sso.client.getEncodedSAMLLogoutRequest(user, session.get("sessionIndex"),
+                                                           config.ssoConfiguration.issuer),
                 customDomain = request.getHeader("X-WSO2-Custom-Domain"),
                 serverHost = process.getProperty('server.host'),
                 postUrl = config.ssoConfiguration.identityProviderURL;
@@ -62,7 +63,7 @@
         session.put(relayStateID, relayStateURL);
 
         if (log.isDebugEnabled()) {
-            log.debug("User portal session index : " + sso_sessions[session.getId()]);
+            log.debug("User portal session index : " + session.get("sessionIndex"));
         }
 
         log.info("User: " + user + " logged out from tenant : " + tenantDomain);

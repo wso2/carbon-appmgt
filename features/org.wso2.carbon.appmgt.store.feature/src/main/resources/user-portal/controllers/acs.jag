@@ -148,6 +148,7 @@ var auditLog = require('/modules/auditLog/logger.js');
             session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
             session.put("Loged", "true");
             session.put("tenantId", tenantId);
+            session.put("sessionIndex", sessionObj.sessionIndex);
 
             username = username + "";
             var userDetails = {};
@@ -200,7 +201,7 @@ var auditLog = require('/modules/auditLog/logger.js');
         }
         var httpSessionForSessionIndex = application.get('sso_sessions')[index];
         if (httpSessionForSessionIndex) {
-            if(log.isDebugEnabled()){
+            if (log.isDebugEnabled()) {
                 log.debug("Invalidating http session for the session index " + index);
             }
             httpSessionForSessionIndex.invalidate();
