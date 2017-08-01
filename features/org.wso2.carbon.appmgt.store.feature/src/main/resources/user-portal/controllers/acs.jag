@@ -154,7 +154,7 @@ var auditLog = require('/modules/auditLog/logger.js');
             userDetails['username'] = username;
             userDetails['action'] = "SSOLogin";
             authResult = authenticator.login(userDetails);
-            sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+            sso_sessions[sessionObj.sessionIndex] = session;
 
             // Check user permissions.
             require('/modules/role.js').checkeRole(username, session);
@@ -198,12 +198,14 @@ var auditLog = require('/modules/auditLog/logger.js');
         if(log.isDebugEnabled()) {
             log.debug("SAML logout request received for SessionIndex : " + index);
         }
-        var jSessionId = application.get('sso_sessions')[index];
-        delete application.get('sso_sessions')[index];
-        if(log.isDebugEnabled()) {
-            log.debug("User portal session Id : " + jSessionId);
+        var httpSessionForSessionIndex = application.get('sso_sessions')[index];
+        if (httpSessionForSessionIndex) {
+            if(log.isDebugEnabled()){
+                log.debug("Invalidating http session for the session index " + index);
+            }
+            httpSessionForSessionIndex.invalidate();
+            delete application.get('sso_sessions')[index];
         }
-        session.invalidate();
     }
 }());
 %>
