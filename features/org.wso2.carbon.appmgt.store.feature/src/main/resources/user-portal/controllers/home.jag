@@ -6,6 +6,7 @@ include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
 var util = require('/modules/util.js');
+var googleAnalytics = require('/config/store.json').googleAnalytics;
 require('/modules/store.js').exec(function (ctx) {
     var paging, manager, assets, length,
             log = ctx.log,
@@ -296,7 +297,11 @@ require('/modules/store.js').exec(function (ctx) {
             assets: items,
             popularAssets: popularItems
         },
-        recentAssets: recentItems
+        recentAssets: recentItems,
+        googleAnalytics : {
+            enabled: googleAnalytics.enabled,
+            trackerId: googleAnalytics.trackerId
+        }
     });
 }, request, response, session);
 
