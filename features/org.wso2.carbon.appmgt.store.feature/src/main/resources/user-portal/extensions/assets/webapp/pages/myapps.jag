@@ -38,6 +38,7 @@ if (user) {
     um = storeServer.userManager(-1234);
 }
 var WEBAPP_TYPE = 'webapp';
+var googleAnalytics = require('/config/store.json').googleAnalytics;
 
 require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, url,
@@ -578,8 +579,11 @@ require('/modules/store.js').exec(function (ctx) {
             rightNav: rightnav,
             urlQuery: urlQuery
         },
-        recentAssets: webAppRecentAssets
-
+        recentAssets: webAppRecentAssets,
+        googleAnalytics : {
+            enabled: googleAnalytics.enabled,
+            trackerId: googleAnalytics.trackerId
+        }
     });
 
 }, request, response, session);

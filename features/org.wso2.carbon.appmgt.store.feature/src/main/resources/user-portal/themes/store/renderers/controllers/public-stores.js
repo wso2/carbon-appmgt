@@ -1,6 +1,7 @@
 var render = function (theme, data, meta, require) {
     theme('1-column', {
         title: data.title,
+        googleAnalytics: data.googleAnalytics,
         header: [
             {
                 partial: 'header',
