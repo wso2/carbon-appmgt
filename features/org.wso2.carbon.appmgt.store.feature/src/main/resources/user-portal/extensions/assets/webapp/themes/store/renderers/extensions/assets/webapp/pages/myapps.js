@@ -23,6 +23,7 @@ var render = function (theme, data, meta, require) {
 
     theme('2-column-left', {
         title: data.title,
+        googleAnalytics: data.googleAnalytics,
         header: [
             {
                 partial: 'header',

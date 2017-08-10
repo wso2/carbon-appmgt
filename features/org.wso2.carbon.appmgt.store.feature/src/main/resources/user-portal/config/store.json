@@ -47,5 +47,9 @@
     },
     "pages": {
         "favouritePage": "/assets/favourite"
+    },
+    "googleAnalytics" : {
+        "enabled" : true,
+        "trackerId" : "dummy_tracker_id"
     }
 }
