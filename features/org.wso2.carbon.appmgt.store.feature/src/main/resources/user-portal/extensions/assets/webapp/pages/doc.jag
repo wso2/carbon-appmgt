@@ -1,5 +1,6 @@
 <%
 include('../modules/jagg/jagg.jag');
+var googleAnalytics = require('/config/store.json').googleAnalytics;
 require('/modules/store.js').exec(function (ctx) {
     var store = ctx.store,
         user = ctx.user;
@@ -70,6 +71,10 @@ require('/modules/store.js').exec(function (ctx) {
                        tags: {
                            tagUrl: tagUrl,
                            data: store.tags(type, isSite)
+                       },
+                       googleAnalytics : {
+                           enabled: googleAnalytics.enabled,
+                           trackerId: googleAnalytics.trackerId
                        }
 
                    });
