@@ -56,6 +56,22 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (matcher.match('/{context}/apis/enterprise/get-roles/{id}')) {
+
+        if(!isEnterpiseAdmin) {
+            response.sendError(401, 'Unauthorized');
+        }
+
+        var elements = matcher.elements();
+        var roles = removeInternalroles(um.allRoles());
+
+        var data = [];	
+	    data = filterRoles(roles, elements.id);
+        print({aaData:data});
+
+        return;
+    }
+
     if (matcher.match('/{context}/apis/enterprise/get-all-users')) {
 
         if(!isEnterpiseAdmin){
@@ -68,6 +84,23 @@ require('/modules/store.js').exec(function (ctx) {
             data.push([users[i]]);
         }
         response.contentType = "application/json";
+        print({aaData:data});
+        return;
+    }
+
+    if (matcher.match('/{context}/apis/enterprise/get-users/{id}')) {
+
+        if(!isEnterpiseAdmin){
+            response.sendError(401, 'Unauthorized');
+        }
+
+        var elements = matcher.elements();
+        var searchStr = '*' + elements.id + '*';
+        var users = um.listUsers(searchStr, -1);
+        var data = [];
+        for(var i = 0; i < users.length; i++){
+            data.push([users[i]]);
+        }
         print({aaData:data});
         return;
     }
@@ -129,5 +162,15 @@ function removeInternalroles(roles){
     }
 
     return filterdRoles;
+}
+
+function filterRoles(roles, prefix) {
+    var filteredRoles =[];
+    for (i = 0; i < roles.length; i++) {
+	    if(roles[i].indexOf(prefix) !== -1) {
+	    	filteredRoles.push(roles[i]);
+	    }
+    }
+    return filteredRoles;
 }
 %>
