@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.appmgt.impl.dto;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * List response for the JAX-RS web service

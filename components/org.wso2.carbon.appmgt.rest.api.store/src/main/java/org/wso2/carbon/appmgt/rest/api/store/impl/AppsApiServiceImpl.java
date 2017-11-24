@@ -4,9 +4,9 @@
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
- * you may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -29,9 +29,19 @@ import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.PlistTemplateContext;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Subscription;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -45,7 +55,18 @@ import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.store.dto.*;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ScheduleDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.DocumentationMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -61,8 +82,6 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.PlistTemplateBuilder;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -71,7 +90,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 public class AppsApiServiceImpl extends AppsApiService {
 

@@ -11,7 +11,7 @@
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -19,23 +19,23 @@ package org.wso2.carbon.appmgt.gateway.service;
 
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.gateway.dto.WebAppData;
-import org.wso2.carbon.appmgt.gateway.dto.ResourceData;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.gateway.dto.ResourceData;
+import org.wso2.carbon.appmgt.gateway.dto.WebAppData;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.gateway.utils.RESTAPIAdminClient;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
-import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.stream.XMLStreamException;
 
 public class AppGatewayAdmin extends AbstractAdmin {
     private static Log log = LogFactory.getLog(AppGatewayAdmin.class);

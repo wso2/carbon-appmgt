@@ -27,11 +27,11 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 
-import javax.cache.Cache;
-import javax.cache.Caching;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.cache.Cache;
+import javax.cache.Caching;
 
 /**
  * Utility class for accessing Application contexts cache.

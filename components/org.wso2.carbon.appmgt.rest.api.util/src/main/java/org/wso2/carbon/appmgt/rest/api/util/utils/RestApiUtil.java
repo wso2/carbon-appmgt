@@ -1,19 +1,19 @@
 /*
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * /
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.appmgt.rest.api.util.utils;
@@ -23,7 +23,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.api.*;
+import org.wso2.carbon.appmgt.api.APIConsumer;
+import org.wso2.carbon.appmgt.api.APIProvider;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
+import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
+import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
@@ -32,7 +37,12 @@ import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
-import org.wso2.carbon.appmgt.rest.api.util.exception.*;
+import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.ConflictException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.ForbiddenException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.PreconditionFailedException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
@@ -44,16 +54,24 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.uri.template.URITemplate;
 import org.wso2.uri.template.URITemplateException;
 
-import javax.validation.ConstraintViolation;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.validation.ConstraintViolation;
 
 public class RestApiUtil {
 

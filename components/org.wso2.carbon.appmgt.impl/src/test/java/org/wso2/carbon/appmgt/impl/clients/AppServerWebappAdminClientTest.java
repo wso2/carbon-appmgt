@@ -20,15 +20,13 @@ package org.wso2.carbon.appmgt.impl.clients;
 
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.testng.annotations.Test;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappsWrapper;
 
 import java.util.Locale;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests the webapp application client

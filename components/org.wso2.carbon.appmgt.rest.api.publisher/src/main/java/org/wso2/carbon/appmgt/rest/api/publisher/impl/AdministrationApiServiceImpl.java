@@ -4,9 +4,9 @@
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
- * you may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -37,9 +37,9 @@ import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.utils.xml.StringUtils;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
