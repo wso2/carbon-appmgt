@@ -23,7 +23,6 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.Locale;
 

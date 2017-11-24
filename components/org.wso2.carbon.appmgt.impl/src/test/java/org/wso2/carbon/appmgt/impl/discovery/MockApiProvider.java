@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.appmgt.impl.discovery;
 
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AbstractAPIManager;
 

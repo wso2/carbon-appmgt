@@ -22,7 +22,6 @@ import org.wso2.carbon.appmgt.impl.discovery.DiscoverySearchCriteria;
 import org.wso2.carbon.appmgt.impl.discovery.UserNamePasswordCredentials;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Application Discover JAX-RS request

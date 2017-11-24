@@ -23,16 +23,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.impl.discovery.*;
+import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryContext;
+import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryHandler;
+import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryServiceFactory;
+import org.wso2.carbon.appmgt.impl.discovery.DiscoverySearchCriteria;
+import org.wso2.carbon.appmgt.impl.discovery.UserNamePasswordCredentials;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
+import java.util.List;
+import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Discovery client which handles application discovery
