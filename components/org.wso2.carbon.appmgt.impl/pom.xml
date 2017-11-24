@@ -13,7 +13,7 @@
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
         <version>1.4.19-SNAPSHOT</version>
-	<relativePath>../../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -33,12 +33,12 @@
             </releases>
         </repository>
     </repositories>
-  <dependencies>
-      <dependency>
-        <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-        <artifactId>axiom</artifactId>
-      </dependency>
-    	<dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+            <artifactId>axiom</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.user.core</artifactId>
         </dependency>
@@ -59,20 +59,20 @@
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
         </dependency>
-      <dependency>
-          <groupId>org.wso2.carbon</groupId>
-          <artifactId>org.wso2.carbon.webapp.mgt.stub</artifactId>
-      </dependency>
         <dependency>
-            <groupId>com.h2database.wso2</groupId>
-            <artifactId>h2-database-engine</artifactId>
+            <groupId>org.wso2.carbon.deployment</groupId>
+            <artifactId>org.wso2.carbon.webapp.mgt.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.osgi</groupId>
@@ -85,18 +85,18 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
-             <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.user.ws</groupId>
             <artifactId>org.wso2.carbon.um.ws.api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
@@ -105,49 +105,49 @@
             <artifactId>org.wso2.carbon.event.core</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.wso2.carbon.identity</groupId>
-           <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.registry</groupId>
-          <artifactId>org.wso2.carbon.registry.indexing</artifactId>
+            <groupId>org.wso2.carbon.registry</groupId>
+            <artifactId>org.wso2.carbon.registry.indexing</artifactId>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple.wso2</groupId>
             <artifactId>json-simple</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.governance</groupId>
-          <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
+            <groupId>org.wso2.carbon.governance</groupId>
+            <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.store</groupId>
-          <artifactId>jaggery-scxml-executors</artifactId>
+            <groupId>org.wso2.carbon.store</groupId>
+            <artifactId>jaggery-scxml-executors</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
-          <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
+            <groupId>org.wso2.carbon.identity.inbound.auth.saml2</groupId>
+            <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
-          <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
-          <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon.identity</groupId>
-          <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
+            <groupId>org.wso2.carbon.identity.agent.entitlement.mediator</groupId>
+            <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
-      <dependency>
-          <groupId>org.wso2.carbon.appmgt</groupId>
-          <artifactId>org.wso2.carbon.appmgt.gateway.stub</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.wso2.carbon.store</groupId>
-          <artifactId>org.wso2.carbon.social.core</artifactId>
-      </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.gateway.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.store</groupId>
+            <artifactId>org.wso2.carbon.social.core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -189,7 +189,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
                 <configuration>
-                   <skipTests>true</skipTests>
+                    <skipTests>true</skipTests>
                     <systemProperties>
                         <property>
                             <name>APIManagerDBConfigurationPath</name>
