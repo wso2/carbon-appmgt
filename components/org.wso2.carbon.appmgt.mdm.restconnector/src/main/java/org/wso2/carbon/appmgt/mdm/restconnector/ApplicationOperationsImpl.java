@@ -48,9 +48,9 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -177,7 +177,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		try {
 			requestEntity = new StringEntity(requestObj.toJSONString(), "UTF-8");
 			requestEntity.setContentType(Constants.RestConstants.APPLICATION_JSON);
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedCharsetException e) {
 			log.error(e);
 			throw new MobileApplicationException(e);
 		}

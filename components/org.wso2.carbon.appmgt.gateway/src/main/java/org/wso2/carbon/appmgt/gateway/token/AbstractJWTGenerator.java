@@ -21,6 +21,7 @@ package org.wso2.carbon.appmgt.gateway.token;
 import com.google.gson.Gson;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -157,8 +158,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         String jwtBody = buildBody(saml2Assertions);
 
-        String base64UrlEncodedHeader = Base64.encodeBase64URLSafeString(jwtHeader.getBytes(StandardCharsets.UTF_8));
-        String base64UrlEncodedBody = Base64.encodeBase64URLSafeString(jwtBody.getBytes(StandardCharsets.UTF_8));
+        String base64UrlEncodedHeader =
+                StringUtils.newStringUsAscii(Base64.encodeBase64(jwtHeader.getBytes(StandardCharsets.UTF_8)));
+        String base64UrlEncodedBody =
+                StringUtils.newStringUsAscii(Base64.encodeBase64(jwtBody.getBytes(StandardCharsets.UTF_8)));
 
         if (signatureAlgorithm.equals(SHA256_WITH_RSA)) {
             String assertion = base64UrlEncodedHeader + "." + base64UrlEncodedBody;
@@ -168,7 +171,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             if (log.isDebugEnabled()) {
                 log.debug("signed assertion value : " + new String(signedAssertion, StandardCharsets.UTF_8));
             }
-            String base64UrlEncodedAssertion = Base64.encodeBase64URLSafeString(signedAssertion);
+            String base64UrlEncodedAssertion = StringUtils.newStringUsAscii(Base64.encodeBase64(signedAssertion));
             return base64UrlEncodedHeader + "." + base64UrlEncodedBody + "." + base64UrlEncodedAssertion;
         } else {
             return base64UrlEncodedHeader + "." + base64UrlEncodedBody + ".";

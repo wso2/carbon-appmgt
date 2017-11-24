@@ -74,7 +74,7 @@
             <artifactId>org.wso2.carbon.appmgt.sample.deployer</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
         </dependency>
         <dependency>
@@ -93,12 +93,12 @@
 
         <!-- Entitlement Dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.agent.entitlement.mediator</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
 
@@ -206,14 +206,14 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.stub:${carbon.sequences.stub.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon-identity-framework.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon-identity-framework.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:compatible:${bam.presentation.stub.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security.stub:compatible:${carbon.mediation.security.stub}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon-identity-framework.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${identity-agent-entitlement-proxy.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon-identity-framework.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.agent.entitlement.mediator:org.wso2.carbon.identity.entitlement.proxy:compatible:${identity-agent-entitlement-proxy.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.webapp.mgt.stub:${carbon.webapp.mgt.stub}</bundleDef>
+                                <bundleDef>org.wso2.carbon.deployment:org.wso2.carbon.webapp.mgt.stub:${carbon.webapp.mgt.stub}</bundleDef>
                                 <bundleDef>org.apache.velocity:velocity:${apache.velocity.version}</bundleDef>
                             </bundles>
                             <importBundles>

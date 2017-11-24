@@ -72,7 +72,9 @@ public class RestUtils {
 			nameValuePairs.add(new BasicNameValuePair(Constants.RestConstants.PASSWORD,
 			                                          remoteServer.getAuthPass()));
 			URIBuilder uriBuilder = new URIBuilder(remoteServer.getTokenApiURL());
-			uriBuilder.addParameters(nameValuePairs);
+			for (NameValuePair nameValuePair : nameValuePairs) {
+				uriBuilder.addParameter(nameValuePair.getName(), nameValuePair.getValue());
+			}
 			postMethod = new HttpPost(uriBuilder.build());
 
 			postMethod.setHeader(Constants.RestConstants.AUTHORIZATION,
