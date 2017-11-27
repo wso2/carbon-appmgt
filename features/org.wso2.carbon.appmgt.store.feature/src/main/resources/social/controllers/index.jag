@@ -57,7 +57,12 @@ var caramel;
             for (var i = 0; i < reviewsJSON.length; i++) {
                 //Remove carbon.super tenant domain from username
                 var user = reviewsJSON[i].actor.id;
-                reviewsJSON[i].actor.id = user.replace("@carbon.super", "");
+                var userObj = carbon.server.tenantUser(user);
+                var tenantAwareUser = userObj.username;
+                if (tenantAwareUser.indexOf("/") !== -1 ) {
+                    tenantAwareUser = tenantAwareUser.split("/")[1];
+                }
+                reviewsJSON[i].actor.id = tenantAwareUser;
                 var review = reviewsJSON[i];
                 review.iLike = social.isUserliked(username, review.object.id, 1);
                 review.iDislike = social.isUserliked(username, review.object.id, 0);
