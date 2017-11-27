@@ -41,7 +41,12 @@ response.addHeader("Content-Type", "application/json");
         for (var i = 0; i < reviewsJSON.length; i++) {
             //Remove carbon.super tenant domain from username
             var user = reviewsJSON[i].actor.id;
-            reviewsJSON[i].actor.id = user.replace("@carbon.super", "");
+            var userObj = carbon.server.tenantUser(user);
+            var tenantAwareUser = userObj.username;
+            if (tenantAwareUser.indexOf("/") !== -1 ) {
+                tenantAwareUser = tenantAwareUser.split("/")[1];
+            }
+            reviewsJSON[i].actor.id = tenantAwareUser;
             if (logged) {
                 var review = reviewsJSON[i];
                 var username = String(logged.username) + '@' + logged.tenantDomain;
