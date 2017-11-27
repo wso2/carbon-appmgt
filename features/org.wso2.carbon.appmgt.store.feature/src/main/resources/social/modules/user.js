@@ -147,23 +147,7 @@ var permitted = function (username, session) {
     um = server.userManager(usr.tenantId);
     user = um.getUser(usr.username);
     user.tenantDomain = carbon.server.tenantDomain({tenantId: usr.tenantId});
-    perms = opts.permissions.login;
-    L1:
-        for (perm in perms) {
-            if (perms.hasOwnProperty(perm)) {
-                actions = perms[perm];
-                length = actions.length;
-                for (i = 0; i < length; i++) {
-                    if (user.isAuthorized(perm, actions[i])) {
-                        authorized = true;
-                        break L1;
-                    }
-                }
-            }
-        }
-    if (!authorized) {
-        return false;
-    }
+
     event.emit('login', usr.tenantId, user, session);
     //TODO: ??
     if (opts.login) {
