@@ -16,24 +16,24 @@
 
 package org.wso2.mobile.utils.utilities;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.io.IOUtils;
+import com.dd.plist.BinaryPropertyListParser;
+import com.dd.plist.NSDictionary;
+import net.dongliu.apk.parser.ApkFile;
+import net.dongliu.apk.parser.bean.ApkMeta;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import com.dd.plist.BinaryPropertyListParser;
-import com.dd.plist.NSDictionary;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ZipFileReading {
 	
@@ -56,29 +56,15 @@ public class ZipFileReading {
     public String readAndroidManifestFile(String filePath) {
         String xml = "";
         try {
-            ZipInputStream stream = new ZipInputStream(new FileInputStream(
-                    filePath));
-            try {
-                ZipEntry entry;
-                while ((entry = stream.getNextEntry()) != null) {
-                    if (entry.getName().equals("AndroidManifest.xml")) {
-                        StringBuilder builder = new StringBuilder();
-                        xml = AndroidXMLParsing.decompressXML(IOUtils
-                                .toByteArray(stream));
-                    }
-                }
-            } finally {
-                stream.close();
-            }
-            Document doc = loadXMLFromString(xml);
-            doc.getDocumentElement().normalize();
+            ApkFile apkFile = new ApkFile(new File(filePath));
+            ApkMeta apkMeta = apkFile.getApkMeta();
+            ;
             JSONObject obj = new JSONObject();
-            obj.put("version",
-                    doc.getDocumentElement().getAttribute(APK_VERSION_KEY));
-            obj.put("package", doc.getDocumentElement().getAttribute(APK_PACKAGE_KEY));
+            obj.put("version", apkMeta.getVersionName());
+            obj.put("package", apkMeta.getPackageName());
             xml = obj.toJSONString();
-        } catch (Exception e) {
-            xml = "Exception occured " + e;
+        } catch (IOException e) {
+            xml = "Exception occurred " + e;
         }
         return xml;
     }
