@@ -62,7 +62,7 @@ public class ZipFileReading {
         try {
             ApkFile apkFile = new ApkFile(new File(filePath));
             ApkMeta apkMeta = apkFile.getApkMeta();
-            ;
+
             JSONObject obj = new JSONObject();
             obj.put("version", apkMeta.getVersionName());
             obj.put("package", apkMeta.getPackageName());
