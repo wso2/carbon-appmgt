@@ -57,13 +57,18 @@
         "identityAlias": "wso2carbon",
         "responseSigningEnabled": "true",
         "publisherAcs": "%https.host%/publisher/sso",
-        "keyStoreName": "/repository/resources/security/wso2carbon.jks"
+        "keyStoreName": "/repository/resources/security/wso2carbon.jks",
+        "validateAssertionValidityPeriod": true,
+        "validateAudienceRestriction": true,
+        "assertionSigningEnabled": true
     },
     "constants" :{
     "assetCreatedDateLength" : 20
     },
     "paginationConfig" :{
-    	"PAGE_SIZE" : 20
+        "PAGE_SIZE" : 5,
+        "PAGE_SIZE_ON_REVIEW" : 5,
+        "PAGNINATION_SIZE": 10
     },
     "excludedRolesList":["admin","Internal/subscriber","Internal/publisher", "Internal/everyone", "system/wso2.anonymous.role"],
     "permissions": {

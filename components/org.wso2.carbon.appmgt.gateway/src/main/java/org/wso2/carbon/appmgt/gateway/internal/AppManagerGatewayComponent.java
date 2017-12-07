@@ -22,32 +22,33 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
-import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-import org.wso2.carbon.appmgt.impl.observers.TenantServiceCreator;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
+import org.wso2.carbon.sequences.services.SequenceAdminService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
-
-import javax.cache.Cache;
-import java.util.List;
 
 /**
  *
  * Application manager gateway component
  *
- * @scr.component name="org.wso2.apimgt.impl.services.gateway" immediate="true"
- * @scr.reference name="api.manager.config.service"
+ * @scr.component name="org.wso2.carbon.appmgt.gateway.services" immediate="true"
+ *
+ * @scr.reference name="arg.wso2.appmgt.impl.services.appm"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
- * policy="dynamic" bind="setAPIManagerConfigurationService" unbind="unsetAPIManagerConfigurationService"
+ * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
+ *
+ * @scr.reference name="org.wso2.carbon.sequences" immediate="true"
+ * interface="org.wso2.carbon.sequences.services.SequenceAdminService" cardinality="1..1"
+ * policy="dynamic" bind="setSequenceAdminService" unbind="unsetSequenceAdminService"
+ *
+ * @scr.reference name="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService"
+ * interface="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService" cardinality="1..1"
+ * policy="dynamic" bind="setTenantConfigurationService" unbind="unsetTenantConfigurationService"
+ *
  */
 public class AppManagerGatewayComponent {
 
     private static final Log log = LogFactory.getLog(AppManagerGatewayComponent.class);
-
-    private static AppManagerConfiguration configuration = null;
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
@@ -56,25 +57,8 @@ public class AppManagerGatewayComponent {
         BundleContext bundleContext = componentContext.getBundleContext();
 
         //Register Tenant service creator to deploy tenant specific common synapse configurations
-        TenantServiceCreator listener = new TenantServiceCreator();
+        TenantCreateGatewayObserver listener = new TenantCreateGatewayObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
-
-        //Load initially available api contexts at the server startup. This Cache is only use by the products other than the app-manager
-        /* TODO: Load Config values from apimgt.core*/
-        boolean apiManagementEnabled = AppManagerUtil.isAPIManagementEnabled();
-        boolean loadAPIContextsAtStartup = AppManagerUtil.isLoadAPIContextsAtStartup();
-        try {
-            if (apiManagementEnabled && loadAPIContextsAtStartup) {
-                List<String> contextList = AppMDAO.getAllAvailableContexts();
-                Cache contextCache = AppManagerUtil.getAPIContextCache();
-                for (String context : contextList) {
-                    contextCache.put(context, true);
-                }
-            }
-        } catch (Exception e) {
-            //TODO: This is another quick hack. Need to move the code to better startup on gateway.
-            log.debug("Error occurred loading Existing API contexts:" + e.getMessage());
-        }
 
     }
 
@@ -84,20 +68,46 @@ public class AppManagerGatewayComponent {
         }
     }
 
-    protected void setAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
+    protected void setAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
-            log.debug("Gateway manager configuration service bound to the WebApp host objects");
+            log.debug("App manager configuration service is set to gateway bundle");
         }
-        configuration = amcService.getAPIManagerConfiguration();
-        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
+        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
     }
 
-    protected void unsetAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
+    protected void unsetAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
-            log.debug("Gateway manager configuration service unbound from the WebApp host objects");
+            log.debug("App manager configuration service is unset from the gateway bundle");
         }
-        configuration = null;
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+    }
+
+    protected void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(tenantConfigurationService);
+    }
+
+    protected void unsetTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Un-setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(null);
+    }
+
+    protected void setSequenceAdminService(SequenceAdminService sequenceAdminService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Sequence service is set to gateway bundle");
+        }
+        ServiceReferenceHolder.getInstance().setSequenceAdminService(sequenceAdminService);
+    }
+
+    protected void unsetSequenceAdminService(SequenceAdminService sequenceAdminService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Sequence service is unset to gateway bundle");
+        }
+        ServiceReferenceHolder.getInstance().setSequenceAdminService(null);
     }
 
 }

@@ -206,6 +206,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             }
         }
 
+
+
         // check whether current user has enough permission to change the life cycle
         var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
         if (!hasPermission) {
@@ -245,6 +247,14 @@ require('/modules/publisher.js').exec(function (ctx) {
             content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
             response.content = stringify(content);
             return;
+        }
+
+        if(appType == 'mobileapp'){
+            if(action == 'Publish' || action == 'Re-Publish' ){
+                userManager.authorizeRole('system/wso2.anonymous.role', currentArtifact.path,carbon.registry.actions.GET);
+            }else  if(action == 'Unpublish'){
+                userManager.denyRole('system/wso2.anonymous.role', currentArtifact.path,carbon.registry.actions.GET);
+            }
         }
 
         // grant permissions
@@ -363,6 +373,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // promote lifecycle of this app (current artifact)
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
                                                    appType, action);
+
+        // Workaround for APPM-1263
+        var registryCacheCleanerClass = Packages.org.wso2.carbon.appmgt.impl.utils.RegistryCacheHelper;
+        var registryCacheCleaner = new registryCacheCleanerClass();
+        registryCacheCleaner.cleanRegistryResourceCache(currentArtifact.path);
+
         if (operationResult.isSuccess) {
             content.messages.push(operationResult.message);
         } else {
@@ -379,6 +395,9 @@ require('/modules/publisher.js').exec(function (ctx) {
             // ignore errors when reverting changes
             promoteArtifactLifeCycle(artifactManager, currentArtifact, appType,
                                      "Re-Publish");
+
+            // Workaround for APPM-1263
+            registryCacheCleaner.cleanRegistryResourceCache(currentArtifact.path);
 
             response.status = 500;
             response.contentType = CONTENT_TYPE_JSON;
@@ -482,12 +501,14 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
         var originalArtifact = artifactManager.get(uuid);
         var attributes = originalArtifact.attributes;
-        auditLog.writeLog(tenantId, username, action, appType, "{" +
+        auditLog.writeLog(tenantId, username, "LifecycleActionPerformed-"+action, appType, "{" +
                                                                "providerName='" + attributes["overview_provider"] + '\''
                                                                +
-                                                               ", apiName='" + attributes["overview_name"] + '\'' +
+                                                               ", appName='" + attributes["overview_name"] + '\'' +
                                                                ", version='" + attributes["overview_version"] + '\'' +
                                                                '}' + "" + "");
+        session.put("updateAppCount", true);
+
         // everything went great
         response.status = 200;
         response.contentType = CONTENT_TYPE_JSON;
@@ -693,7 +714,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
     routeManager.register('GET', 'publisher', '/publisher/api/lifecycle/information/meta/{type}/roles',
                           function (context) {
-                              var shortName = context.params.type;
+                              var shortName = "mobileapp";
                               var carbon = require('carbon');
                               var realmService = carbon.server.osgiService('org.wso2.carbon.user.core.service.RealmService');
                               var realm = realmService.getTenantUserRealm(server.current(session).tenantId);

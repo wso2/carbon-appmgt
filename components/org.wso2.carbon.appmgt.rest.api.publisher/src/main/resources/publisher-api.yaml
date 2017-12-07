@@ -85,15 +85,15 @@ paths:
 
 
 
-            Supported attribute modifiers are [**provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id, business_owner_id**]
 
 
 
 
 
-            If no advanced attribute modifier has been specified, the search will
-            match the
+            If no advanced attribute modifier has been specified, the search
+            will match the
 
             given query string against the App name.
           type: string
@@ -180,8 +180,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -237,7 +237,7 @@ paths:
             OK.
             Qualifying App is returned.
           schema:
-            $ref: '#/definitions/AppInfo'
+            $ref: '#/definitions/App'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -398,7 +398,10 @@ paths:
       x-wso2-curl: >-
         curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags"
-      x-wso2-response: '{"tags":["w1","webapptag1","webapptag2"]}'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+         {"tags":["tagA","tagB","tagC"]}
       summary: Get all Tags of an App
       description: |
         Get a list of available Tags relevant to the given App Internal ID.
@@ -445,15 +448,15 @@ paths:
             $ref: '#/definitions/Error'
     put:
       x-scope: 'appm:create'
-      x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
-        -H "Content-Type: application/json" -d '{"tags":["tag1"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+      x-wso2-curl: |-
+        curl -X PUT -H "Authorization: Bearer 4be7890951f36d5c44a68d5a35227ceb" 
+         -H "Content-Type: application/json" 
+         -d '{"tags":["tagA","tagB","tagC"]}' "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/00fafc68-d8bb-498f-9ef3-afbb6db06826/tags"
       x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"tags":["tag1"]}'
+      x-wso2-request: '{"tags":["tagA","tagB","tagC"]}'
       summary: Add a new tag
       description: |
-        Add a new tag to the tag collection of a given application type.
+        Add a new tag/tags to the tag collection of a given application type.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -503,8 +506,9 @@ paths:
       x-scope: 'appm:create'
       x-wso2-curl: >-
         curl -X DELETE -H "Authorization: Bearer
-        e099014668a524870c2895fe0595f125"  -d '{"tags":["w2"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+        4be7890951f36d5c44a68d5a35227ceb" -H "Content-Type: application/json" -d
+        '{"tags":["tag1","tag2"]}'
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/95e497dd-ebb0-414f-9718-88857a153780/tags"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Tags relevant to an App
       description: |
@@ -764,44 +768,12 @@ paths:
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/discover':
-    post:
-      x-scope: 'appm:create'
-      x-wso2-curl: ''
-      x-wso2-response: ''
-      x-wso2-request: ''
-      summary: Discover Apps
-      description: |
-        Discover Apps.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: |
-            OK.
-        '400':
-          description: |
-            Bad Request.
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: |
-            Unsupported Media Type.
-            The entity of the request was in an unsupported format.
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/throttlingtiers':
+  '/apps/{appType}/throttlingtiers':
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers"
+        curl -X GET -H "Authorization: Bearer 0b236aa97005945bd9796149e54cd0b7"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/throttlingtiers"
       x-wso2-response: >-
         {"tierList":[{"tierSortKey":1,"tierName":"Bronze","tierDisplayName":"Bronze","tierDescription":"Allows
         1 request(s) per
@@ -816,7 +788,6 @@ paths:
         Get a list of tiers.
       parameters:
         - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
       tags:
@@ -856,17 +827,100 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/docs/{documentId}/content':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 637084f12e5f93b8c4e7a8d7307635ab"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/927068ec-300a-4503-89fc-ef5ebc41a7db/docs/6777080d-99eb-402b-aadc-a00a17e178c3/content"
+        > sample.pdf
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Disposition: attachment; filename="sample.pdf"
+        Content-Type: application/octet-stream
+        Content-Length: 7802
+
+        %PDF-1.4
+        %äüöß
+        2 0 obj
+        <</Length 3 0 R/Filter/FlateDecode>>
+        stream
+        ..
+        >>
+        startxref
+        7279
+        %%EOF
+      summary: Get document content
+      description: >
+        Downloads a FILE type document/get the inline content or source url of a
+        certain document.
+      parameters:
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/documentId'
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - App Document
+      responses:
+        '200':
+          description: |
+            OK.
+            File or inline content returned.
+          headers:
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: |
+                Entity Tag of the response resource.
+                Used by caches, or in conditional requests.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modified the last time.
+                Used by caches, or in conditional reuquests.
+              type: string
+        '303':
+          description: >
+            See Other.
+
+            Source can be retrived from the URL specified at the Location
+            header.
+          headers:
+            Location:
+              description: |
+                The Source URL of the document.
+              type: string
+        '304':
+          description: >
+            Not Modified.
+
+            Empty body because the client has already the latest version of the
+            requested resource.
+        '404':
+          description: |
+            Not Found.
+            Requested Document does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '406':
+          description: |
+            Not Acceptable.
+            The requested media type is not supported
+          schema:
+            $ref: '#/definitions/Error'
     post:
       consumes:
         - multipart/form-data
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -k -H "Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -H
-        "Content-Type: application/json"
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content"
-        > sample.pdf
+        curl -X POST -H "Authorization: Bearer 0c28ea242609cdbaef56c80452e0c843"
+        -H "Content-Type: multipart/form-data" -F "file=@@sample.pdf"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e/content"
       x-wso2-response: HTTP/1.1 200 OK
-      summary: Uploading document
+      summary: Uploading document Content
       description: |
         Uploading document files against an App.
       parameters:
@@ -922,7 +976,7 @@ paths:
       x-scope: 'appm:read'
       x-wso2-curl: >-
         curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a"
-        "http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs"
       x-wso2-response: |-
         HTTP/1.1 200 OK
         Content-Type: application/json
@@ -930,8 +984,7 @@ paths:
         {
            "previous": "",
            "list":    [
-                    {
-                 "visibility": "API_LEVEL",
+              {
                  "sourceType": "INLINE",
                  "sourceUrl": null,
                  "otherTypeName": null,
@@ -940,8 +993,7 @@ paths:
                  "name": "PhoneVerification App Documentation",
                  "type": "HOWTO"
               },
-                    {
-                 "visibility": "API_LEVEL",
+              {
                  "sourceType": "URL",
                  "sourceUrl": "http://wiki.cdyne.com/index.php/Phone_Verification",
                  "otherTypeName": null,
@@ -1004,12 +1056,11 @@ paths:
     post:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b" -H
-        "Content-Type: application/json" -X POST -d @data.json
-        "http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents"
+        curl -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3" -H
+        "Content-Type:application/json" -X POST -d @data.json
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs"
       x-wso2-request: |-
         {
-            "visibility": "API_LEVEL",
             "sourceType": "INLINE",
             "sourceUrl": null,
             "otherTypeName": null,
@@ -1019,15 +1070,9 @@ paths:
         }
       x-wso2-response: >-
         HTTP/1.1 201 Created
-
-        Location:
-        http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
-
         Content-Type: application/json
 
-
         {
-           "visibility": "API_LEVEL",
            "sourceType": "INLINE",
            "sourceUrl": null,
            "otherTypeName": null,
@@ -1057,8 +1102,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created document object as the entity
-            in the body.
+            Successful response with the newly created document object as the
+            entity in the body.
 
             Location header contains the URL of the newly added document.
           schema:
@@ -1091,8 +1136,8 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a"
-        "http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5"
+        curl -X GET -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e"
       x-wso2-response: |-
         HTTP/1.1 200 OK
         Content-Type: application/json
@@ -1158,9 +1203,9 @@ paths:
     delete:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -H "Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -X
+        curl -H "Authorization: Bearer 4fc0a364a336a37c663790364da307a3" -X
         DELETE
-        http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/8150c757-ba7f-4751-8020-71d7ee3e5d76"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Document
       description: |
@@ -1190,6 +1235,101 @@ paths:
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
+    put:
+      x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -k -H "Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a" -H
+        "Content-Type: application/json" -X PUT -d data.json
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/4cbbafc6-2327-49fc-9c3f-34ea36599091"
+      x-wso2-request: |-
+        {
+           "sourceType": "INLINE",
+           "sourceUrl": null,
+           "otherTypeName": null,
+           "documentId": "0bcb7f05-599d-4e1a-adce-5cb89bfe58d5",
+           "summary": "This is a sample documentation for v1.0.0",
+           "name": "PhoneVerification Documentation",
+           "type": "HOWTO"
+        }
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+
+        {
+           "visibility": "API_LEVEL",
+           "sourceType": "INLINE",
+           "sourceUrl": null,
+           "otherTypeName": null,
+           "documentId": "0bcb7f05-599d-4e1a-adce-5cb89bfe58d5",
+           "summary": "This is a sample documentation for v1.0.0",
+           "name": "PhoneVerification Documentation",
+           "type": "HOWTO"
+        }
+      summary: Update an Webapp Document
+      description: |
+        Update document details.
+      parameters:
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/documentId'
+        - $ref: '#/parameters/appType'
+        - in: body
+          name: body
+          description: |
+            Document object that needs to be added
+          required: true
+          schema:
+            $ref: '#/definitions/Document'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - App Document
+      responses:
+        '200':
+          description: |
+            OK.
+            Document updated
+          schema:
+            $ref: '#/definitions/Document'
+          headers:
+            Location:
+              description: |
+                The URL of the updated document.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: |
+                Entity Tag of the response resource.
+                Used by caches, or in conditional request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modifed the last time.
+                Used by caches, or in conditional reuquests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
   '/apps/{appType}/change-lifecycle':
     post:
       summary: Change App Status
@@ -1198,20 +1338,25 @@ paths:
         curl -X POST -H "Authorization: Bearer 31b72e5a9158a413187532b052953f68"
         -H "Content-Type: application/json"
         "http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish"
-      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-response: |-
+        HTTP/1.1 202 OK
+        Content-Type: application/json
+         {"message": "Lifecycle action : Recycle has been accepted for processing "}
       description: |
         Change the lifecycle of an App.
       parameters:
         - $ref: '#/parameters/appType'
         - name: action
           description: >
-            The action determining whether to demote or promote the state of the App.
+            The action determining whether to demote or promote the state of the
+            App.
 
 
 
 
 
-            Supported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]
+            Supported actions are [**Publish, Approve, Reject, Unpublish,
+            Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]
           in: query
           type: string
           required: true
@@ -1244,9 +1389,8 @@ paths:
                 requests.
               type: string
             Last-Modified:
-              description: >
+              description: |
                 Date and time at which the App lifecycle was last modified.
-
                 Used by caches or in conditional requests.
               type: string
         '400':
@@ -1273,11 +1417,12 @@ paths:
     post:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 31b72e5a9158a413187532b052953f68"
-        -H "Content-Type: application/json" -d '{"tags":["aa","bb","cc"]}'
-        "http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/validate-context"
-      x-wso2-response: HTTP/1.1 200 OK
-      x-wso2-request: '{"tags":["aa","bb","cc"]}'
+        curl -X POST -H "Authorization: Bearer f61b3bea0fdc1d31d464a40f7aec8282"
+        "http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/validate-context?appContext=travelApp"
+      x-wso2-response: |-
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        {"IsContextExists":true}
       summary: Validate App Context
       description: |
         Validate App context.
@@ -1327,12 +1472,16 @@ paths:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/statType'
         - name: startTimeStamp
-          description: 'The start date and time of the stat analysis in the following format: 2016-04-19 10:32:00'
+          description: >-
+            The start date and time of the stat analysis in the following
+            format: 2016-04-19 10:32:00
           in: query
           type: string
           required: false
         - name: endTimeStamp
-          description: 'The end date and time of the stat analysis in the following format: 2016-04-19 10:32:00'
+          description: >-
+            The end date and time of the stat analysis in the following format:
+            2016-04-19 10:32:00
           in: query
           type: string
           required: false
@@ -1784,8 +1933,9 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b"
-        "http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp"
+        curl -X GET -H "Authorization: Bearer 04b1607a56c2d51adb35912943335322"
+        -H "Content-Type: application/json"
+        "http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/2/apps/webapp"
       x-wso2-response: >-
         {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get all Apps mapped to a policy partial
@@ -1838,15 +1988,18 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition></Rule>"}'
+        curl -X POST -H "Authorization: Bearer 04b1607a56c2d51adb35912943335322"
+        -H "Content-Type: application/json"  -d '{ "policyPartial":
+        "<Condition>\n      <Apply
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n        
+        <Function
+        FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n        
+        <AttributeValue
+        DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n        
+        <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\"
+        Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\"
+        DataType=\"http://www.w3.org/2001/XMLSchema#string\"
+        MustBePresent=\"true\"/>\n      </Apply>\n</Condition>"}'
         "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: |-
@@ -1891,20 +2044,7 @@ paths:
   /administration/xacmlpolicies/:
     post:
       x-scope: 'appm:administration'
-      x-wso2-curl: >-
-        curl -X POST -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>","policyPartialName": "ddd",  "isSharedPartial": true,
-        "policyPartialDesc": null}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies"
+      x-wso2-curl: "curl -X POST -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"/>\\n         <AttributeValue DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\">admin</AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http://wso2.org/claims/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\" MustBePresent=\\\"true\\\"/>\\n      </Apply>\\n</Condition>\\n</Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/\"\r\n"
       x-wso2-response: >-
         {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
               <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
@@ -1947,8 +2087,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -1982,20 +2122,7 @@ paths:
   '/administration/xacmlpolicies/{policyPartialId}':
     put:
       x-scope: 'appm:administration'
-      x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
-        -H "Content-Type: application/json" -d '{"policyPartial": "<Rule
-        Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>", "policyPartialName": "ddd", "isSharedPartial":
-        true,"policyPartialDesc": null}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40"
+      x-wso2-curl: "curl -X PUT -H \"Authorization: Bearer 28bc70efa75175336e177d88e148c46d\" -H \"Content-Type: application/json\" -H \"Cache-Control: no-cache\" -H \"Postman-Token: 02ec508b-85ef-c4fa-5cb3-e5b4ab440948\" -d '{\"isSharedPartial\":true,\"policyPartialDesc\":\"asdasdasdadsad\",\"policyPartial\":\"<Rule Effect=\\\"Permit\\\" RuleId=\\\"Rule001\\\"><Condition>\\n      <Apply FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:any-of\\\">\\n         <Function FunctionId=\\\"urn:oasis:names:tc:xacml:1.0:function:string-equal\\\"/>\\n         <AttributeValue DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\">admin</AttributeValue>\\n         <AttributeDesignator AttributeId=\\\"http://wso2.org/claims/role\\\" Category=\\\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\\\" DataType=\\\"http://www.w3.org/2001/XMLSchema#string\\\" MustBePresent=\\\"true\\\"/>\\n      </Apply>\\n</Condition>\\n</Rule>\",\"policyPartialName\":\"asdasd\",\"policyPartialId\":1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/1\"\r\n"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
         {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
@@ -2036,9 +2163,8 @@ paths:
                 requests.
               type: string
             Last-Modified:
-              description: >
+              description: |
                 Date and time at which the App lifecycle was last modified.
-
                 Used by caches or in conditional requests.
               type: string
         '400':
@@ -2224,10 +2350,11 @@ paths:
     post:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X POST -H "Content-Type: application/json" -d '{"site":
-        "testUser.lk","email": "testUser@gmail.com","description": "this is a
-        test description","name":"testUser","properties": [{"isVisible":
-        true,"value": "0112345678","key": "telephone"}]}'
+        curl -X POST -H "Authorization: Bearer 56bbab397e7baa757e6e5847e789727d"
+        -H "Host: 127.0.0.1:9763" -H "Content-Type:application/json" -d
+        '{"site": "testUser.lk","email": "testUser@gmail.com","description":
+        "this is a test description","name":"testUser","properties":
+        [{"isVisible": true,"value": "0112345678","key": "telephone"}]}'
         "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner"
       x-wso2-response: '{"id": 4}'
       x-wso2-request: >-
@@ -2254,8 +2381,8 @@ paths:
           description: >
             Created.
 
-            Successful response with the newly created object as the entity in the
-            body.
+            Successful response with the newly created object as the entity in
+            the body.
 
             Location header contains the URL of the newly created entity.
           schema:
@@ -2346,7 +2473,7 @@ paths:
         "sysUser@gmail.com","description": "this is a test description","name":
         "sysUser","properties": [{"isVisible": true,"value": "0112345678","key":
         "telephone"}],"id": 1}'
-        "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner"
+        "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: >-
         {"site": "newSysUser.lk","email":
@@ -2403,7 +2530,8 @@ paths:
     delete:
       x-scope: 'appm:administration'
       x-wso2-curl: >-
-        curl -X PUT -H "Authorization: Bearer 68f8872882b2dca493328564942251b6"
+        curl -X DELETE -H "Authorization: Bearer
+        68f8872882b2dca493328564942251b6"
         "http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3"
       x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Business Owner
@@ -2551,8 +2679,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the
-      version.
+      The following combination is also accepted as a valid APP ID: the provider
+      of the app, name of the app and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -2577,8 +2705,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The following combination is also accepted as a valid App ID: the provider of the app, name of the app and the
-      version.
+      The following combination is also accepted as a valid App ID: the provider
+      of the app, name of the app and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -2592,7 +2720,9 @@ parameters:
   isGlobal:
     name: isGlobal
     in: query
-    description: Determines whether or not the policy is global. The default value is 'true'.
+    description: >-
+      Determines whether or not the policy is global. The default value is
+      'true'.
     required: false
     default: true
     type: boolean
@@ -2657,8 +2787,9 @@ parameters:
 
 
 
-      Supported stat types are
-      [**getAppUsagePerPage, getSubscriptionCountsPerApp, getSubscriptionsPerApp, getAppUsagePerUser, getAppResponseTime, getCacheHit**]
+      Supported stat types are [**getAppUsagePerPage,
+      getSubscriptionCountsPerApp, getSubscriptionsPerApp, getAppUsagePerUser,
+      getAppResponseTime, getCacheHit**]
     required: true
     type: string
     enum:
@@ -2702,8 +2833,10 @@ parameters:
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: |
-      Validator for conditional requests; based on the Last Modified header of the
+    description: >
+      Validator for conditional requests; based on the Last Modified header of
+      the
+
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -2739,12 +2872,16 @@ definitions:
           Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /app?limit=1&offset=0&query=
-      list:
+      appList:
         type: array
         items:
-          $ref: '#/definitions/AppInfo'
-  AppInfo:
-    title: App Info object with basic App details.
+          $ref: '#/definitions/App'
+      appSummaryList:
+        type: array
+        items:
+          $ref: '#/definitions/AppSummary'
+  AppSummary:
+    title: App summary object with basic App details.
     properties:
       id:
         type: string
@@ -3011,6 +3148,10 @@ definitions:
         description: asset created timestamp
         type: string
         example: 00000001459919490157
+      customProperties:
+        type: array
+        items:
+          $ref: '#/definitions/CustomProperty'
   DocumentList:
     title: Document List
     properties:
@@ -3072,6 +3213,9 @@ definitions:
       sourceUrl:
         type: string
         example: ''
+      fileName:
+        type: string
+        example: SampleDoc.pdf
       otherTypeName:
         type: string
         example: ''
@@ -3477,4 +3621,13 @@ definitions:
         type: string
         description: |
           Description about individual errors occurred
-
+  CustomProperty:
+    title: The DTO for a custom app property
+    required:
+      - name
+      - value
+    properties:
+      name:
+        type: string
+      value:
+        type: string

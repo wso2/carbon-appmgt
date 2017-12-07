@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="brand pull-left float-remove-xs text-center-xs">
             <a href="{{url "/"}}">
-                <img src="{{url "/themes/store/libs/theme-wso2_1.0/images/logo-inverse.svg"}}" alt="apps-store"
+                <img src="{{customThemeUrl "/libs/theme-wso2_1.0/images/logo-inverse.svg"}}" alt="apps-store"
                      title="apps-store" class="logo" />
 
                 <h1 class="display-block-xs">APP Store</h1>
@@ -68,7 +68,7 @@
                     {{/if}}
 
                     <li class="{{#ifCond active "==" "store" }}active{{/ifCond}}">
-                        <a href="{{tenantedUrl "/"}}">
+                        <a id="store-link" href="{{tenantedUrl "/"}}">
                             <span class="icon add-margin-right-1x"><i class="fw fw-organization fw-lg"></i></span>Store
                         </a>
                     </li>

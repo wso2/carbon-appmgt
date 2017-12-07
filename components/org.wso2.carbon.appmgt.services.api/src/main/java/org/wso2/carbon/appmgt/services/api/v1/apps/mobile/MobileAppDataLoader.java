@@ -31,10 +31,10 @@ public class MobileAppDataLoader {
                         mobileApp.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
                                 .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
-                        String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         mobileApp.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
                                 .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance()
-                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
+                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  +
+                                artifact.getAttribute("overview_url"));
                     }
                 }
             }else if ("public".equals(artifact.getAttribute("overview_type"))){

@@ -31,7 +31,7 @@ $( document ).ready(function() {
     var appStatus = "APP_IS_ANY_LIFECYCLE_STATE";
 
     $.ajax({
-               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + encodeURIComponent(providerName) + '/' + appStatus,
                type: 'GET',
                async: false,
                success: function (data) {
@@ -106,7 +106,7 @@ $( document ).ready(function() {
         }
     });
 
-    $(".selectOwnerName").change(function() {
+    $(".selectOwnerName").change(function () {
         var data = $('.selectOwnerName').select2('data')[0]['id'].trim();
         $('#overview_businessOwner').val(data);
     });

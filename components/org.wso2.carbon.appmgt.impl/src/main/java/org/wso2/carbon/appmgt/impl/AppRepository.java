@@ -1,11 +1,8 @@
 package org.wso2.carbon.appmgt.impl;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +50,28 @@ public interface AppRepository {
     App getApp(String type, String uuid) throws AppManagementException;
 
     /**
+     * Returns the web app for the given name and version.
+     *
+     * @param name
+     * @param version
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
+    WebApp getWebAppByNameAndVersion(String name, String version, int tenantId) throws AppManagementException;
+
+    /**
+     *
+     * Returns the web app for the give context and the version.
+     *
+     * @param context
+     * @param version
+     * @return
+     * @throws AppManagementException
+     */
+    WebApp getWebAppByContextAndVersion(String context, String version, int tenantId) throws AppManagementException;
+
+    /**
      * Searches and returns the apps for the given search terms.
      *
      * @param appType
@@ -77,6 +96,39 @@ public interface AppRepository {
      */
     public FileContent getStaticContent(String contentId) throws AppManagementException;
 
+    /**
+     * Add user subscription for a webapp/site
+     * @param subscriberName Subscriber username
+     * @param webApp WebApp object
+     * @param applicationName Application Name
+     * @return subscription id
+     * @throws AppManagementException
+     */
     public int addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException;
 
+    /**
+     * Persist one-time download link reference in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void persistOneTimeDownloadLink(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
+
+    /**
+     * Retrieve one-time download link details from database
+     * @param UUID UUID of the one-time download link
+     * @return
+     * @throws AppManagementException
+     */
+    public OneTimeDownloadLink getOneTimeDownloadLinkDetails(String UUID) throws AppManagementException;
+
+    /**
+     * Update one-time download link details in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException;
+
+    Subscription getEnterpriseSubscription(String webAppContext, String webAppVersion) throws AppManagementException;
+
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException;
 }

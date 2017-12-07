@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.configuration.services" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.usage.publisher.services" immediate="true"
  * @scr.reference name="tomcat.service.provider"
  * interface="org.wso2.carbon.tomcat.api.CarbonTomcatService"
  * cardinality="1..1" policy="dynamic" bind="setCarbonTomcatService"
@@ -62,8 +62,7 @@ public class APPManagerConfigurationServiceComponent {
         String filePath = null;
         try {
             AppManagerConfiguration configuration = new AppManagerConfiguration();
-            filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+            filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
             configuration.load(filePath);
             amConfigService = new AppManagerConfigurationServiceImpl(configuration);
             apimgtConfigReaderService = new APIMGTConfigReaderService(amConfigService.getAPIManagerConfiguration());

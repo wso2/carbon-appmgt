@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="AppDocumentsApi"></a>AppDocumentsApi</h1>
 
-    
-        
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdContentPost"></a>Uploading document</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdContentPost"></a>Uploading document Content</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Uploading document files against an App.\n</p>
+            <p class="marked">Uploading document files against an App. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs/{documentId}/content</code>
@@ -17,31 +15,19 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -k -H &quot;Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content&quot; &gt; sample.pdf</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 0c28ea242609cdbaef56c80452e0c843&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file&#x3D;@@sample.pdf&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e/content&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsDocumentIdContentPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdDocsDocumentIdContentPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document UUID.\n</p>
-                            
+                            <p class="param-description marked">Document UUID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -168,19 +144,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">Document to be uploaded.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
-                                file
-                                
+                                File
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -198,19 +171,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">Inline content of the document.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -227,20 +197,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -257,20 +224,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -289,55 +253,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nDocument uploaded successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Document uploaded successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#StaticContent">StaticContent</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested entity does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdGet"></a>Retrieving document</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Retrieving the document.\n</p>
+            <p class="marked">Retrieving the document. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs/{documentId}</code>
@@ -346,28 +296,18 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 4fc0a364a336a37c663790364da307a3&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsDocumentIdGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdDocsDocumentIdGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -380,8 +320,6 @@ Content-Type: application/json
    &quot;name&quot;: &quot;PhoneVerification API Documentation&quot;,
    &quot;type&quot;: &quot;HOWTO&quot;
 }</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -400,7 +338,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -417,20 +354,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -447,20 +381,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -477,20 +408,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document UUID.\n</p>
-                            
+                            <p class="param-description marked">Document UUID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -507,20 +435,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -537,20 +462,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -569,68 +491,50 @@ Content-Type: application/json
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nDocument retrieved successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Document retrieved successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#file">file</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested entity does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsPost"></a>Add a new document</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Add a new document to an API\n</p>
+            <p class="marked">Add a new document to an API </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs</code>
@@ -639,18 +543,11 @@ Content-Type: application/json
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b&quot; -H &quot;Content-Type: application/json&quot; -X POST -d @data.json &quot;http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer 4fc0a364a336a37c663790364da307a3&quot; -H &quot;Content-Type:application/json&quot; -X POST -d @data.json &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs&quot;</code></div>
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-appsAppTypeIdAppIdDocsPost">
                     <h4 class="section-heading">
                         Sample Request
@@ -658,7 +555,6 @@ Content-Type: application/json
                     </h4>
                 </div>
                 <div id="request-appsAppTypeIdAppIdDocsPost"class="pre collapse"><code class="json">{
-    &quot;visibility&quot;: &quot;API_LEVEL&quot;,
     &quot;sourceType&quot;: &quot;INLINE&quot;,
     &quot;sourceUrl&quot;: null,
     &quot;otherTypeName&quot;: null,
@@ -666,23 +562,15 @@ Content-Type: application/json
     &quot;name&quot;: &quot;Introduction to PhoneVerification API&quot;,
     &quot;type&quot;: &quot;HOWTO&quot;
 }</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-appsAppTypeIdAppIdDocsPost" class="pre collapse"><code class="json">HTTP/1.1 201 Created
-Location: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058
-Content-Type: application/json
-
+                <div id="response-appsAppTypeIdAppIdDocsPost" class="pre collapse"><code class="json">HTTP/1.1 201 Created Content-Type: application/json
 {
-   &quot;visibility&quot;: &quot;API_LEVEL&quot;,
    &quot;sourceType&quot;: &quot;INLINE&quot;,
    &quot;sourceUrl&quot;: null,
    &quot;otherTypeName&quot;: null,
@@ -691,8 +579,6 @@ Content-Type: application/json
    &quot;name&quot;: &quot;Introduction to PhoneVerification API&quot;,
    &quot;type&quot;: &quot;HOWTO&quot;
 }</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -711,7 +597,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -728,20 +613,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -758,20 +640,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -788,22 +667,18 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">Document object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Document
-                                
                                     (<a href="#!/models#Document">Document</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -820,20 +695,17 @@ Content-Type: application/json
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -852,48 +724,33 @@ Content-Type: application/json
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created document object as the entity in the body.\nLocation header contains the URL of the newly added document.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created document object as the entity in the body. Location header contains the URL of the newly added document. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Document">Document</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported media type.\nThe entity of the request was in an unsupported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported media type. The entity of the request was in an unsupported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

@@ -106,11 +106,22 @@ require('/modules/publisher.js').exec(function(ctx) {
         webApp.setContext(params.app_context);
         webApp.setTransports(params.app_transport);
 
+        // Pass the HTTP cookie for the logged in user, to the SSOConfigUtil.
+        // This ensures that the SPs are created in the tenant of the logged in user (creator)
+
+        var serviceConfig = new Packages.java.util.HashMap();
+        serviceConfig.put("adminServiceCookie", session.get("idp-authenticated-cookie"));
+
         var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-        if(type == 'editConfig'){
-            ssoConfigUtil.createSSOProvider(webApp, true);
-        }else {
-            ssoConfigUtil.createSSOProvider(webApp, false);
+        if (type == 'editConfig') {
+            var currentServiceProvider = ssoConfigUtil.getSSOProvider(ssoProvider.getProviderName(), ssoProvider.getProviderVersion(), ssoProvider.getIssuerName());
+            if(currentServiceProvider) {
+                ssoConfigUtil.createSSOProvider(webApp, true, serviceConfig);
+            }else{
+                ssoConfigUtil.createSSOProvider(webApp, false, serviceConfig);
+            }
+        } else {
+            ssoConfigUtil.createSSOProvider(webApp, false, serviceConfig);
         }
     }
     

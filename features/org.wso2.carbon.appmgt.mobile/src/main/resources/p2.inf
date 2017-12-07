@@ -1,0 +1,3 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.mobile_${feature.version}/plist-templates/,target:${installFolder}/../../resources/plist-templates/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/resources/entitlement-templates/,target:${installFolder}/../../resources/entitlement-templates/,overwrite:true);\

@@ -26,16 +26,14 @@ import java.util.Map;
 
 public class APIMGTConfigReaderService {
 
-    private String bamServerThriftPort;
-    private String bamServerURL;
-    private String bamServerUser;
-    private String bamServerPassword;
+    private String dasServerThriftPort;
+    private String dasServerURL;
+    private String dasServerUser;
+    private String dasServerPassword;
     private boolean enabled;
     private String publisherClass;
     private boolean googleAnalyticsTrackingEnabled;
     private String googleAnalyticsTrackingID;
-   	private boolean cacheStatsEnabled;   
-    
 
 	private String apiManagerRequestStreamName;
     private String apiManagerRequestStreamVersion;
@@ -43,9 +41,9 @@ public class APIMGTConfigReaderService {
     private String apiManagerResponseStreamVersion;
     private String apiManagerFaultStreamName;
     private String apiManagerFaultStreamVersion;
-    private String apiManagerBamUiActivityStreamName;
-    private String apiManagerBamUiActivityStreamVersion; 
-	private boolean uiActivityBamPublishEnabled;
+    private String apiManagerDasUiActivityStreamName;
+    private String apiManagerDasUiActivityStreamVersion;
+	private boolean uiActivityDASPublishEnabled;
     private String apiManagerCacheStatStreamName;
    	private String apiManagerCacheStatStreamVersion;
    	
@@ -56,10 +54,10 @@ public class APIMGTConfigReaderService {
     public APIMGTConfigReaderService(AppManagerConfiguration config) {
         String enabledStr = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_ENABLED);
         enabled = enabledStr != null && JavaUtils.isTrueExplicitly(enabledStr);
-        bamServerThriftPort = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_THRIFT_PORT);
-        bamServerURL = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_SERVER_URL);
-        bamServerUser = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_SERVER_USER);
-        bamServerPassword = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_SERVER_PASSWORD);
+        dasServerThriftPort = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_THRIFT_PORT);
+        dasServerURL = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_DAS_SERVER_URL);
+        dasServerUser = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_DAS_SERVER_USER);
+        dasServerPassword = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_DAS_SERVER_PASSWORD);
         publisherClass = config.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_PUBLISHER_CLASS);
         String googleAnalyticsEnabledStr = config.getFirstProperty(APIMgtUsagePublisherConstants.API_GOOGLE_ANALYTICS_TRACKING_ENABLED);
         googleAnalyticsTrackingEnabled = googleAnalyticsEnabledStr != null && JavaUtils.isTrueExplicitly(googleAnalyticsEnabledStr);
@@ -81,23 +79,20 @@ public class APIMGTConfigReaderService {
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_CACHE_STAT_STREAM_NAME);
 		apiManagerCacheStatStreamVersion = config
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_CACHE_STAT_VERSION);
-		apiManagerBamUiActivityStreamName = config
-				.getFirstProperty(APIMgtUsagePublisherConstants.API_BAM_UI_ACTIVITY_STREAM);
-		apiManagerBamUiActivityStreamVersion = config
-				.getFirstProperty(APIMgtUsagePublisherConstants.API_BAM_UI_ACTIVITY_STREAM_VERSION);   
-		String uiActivityBAMPublishEnabledStr = config
-				.getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
-		uiActivityBamPublishEnabled = uiActivityBAMPublishEnabledStr != null
-				&& JavaUtils.isTrueExplicitly(uiActivityBAMPublishEnabledStr);
-		String cacheStatsEnabledString = config.
-				getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_CACHE_STATS_ENABLED);
-		cacheStatsEnabled = cacheStatsEnabledString != null && JavaUtils.isTrueExplicitly(cacheStatsEnabledString);
+		apiManagerDasUiActivityStreamName = config
+				.getFirstProperty(APIMgtUsagePublisherConstants.API_DAS_UI_ACTIVITY_STREAM);
+		apiManagerDasUiActivityStreamVersion = config
+				.getFirstProperty(APIMgtUsagePublisherConstants.API_DAS_UI_ACTIVITY_STREAM_VERSION);
+		String uiActivityDASPublishEnabledStr = config
+				.getFirstProperty(AppMConstants.APP_USAGE_DAS_UI_ACTIVITY_ENABLED);
+		uiActivityDASPublishEnabled = uiActivityDASPublishEnabledStr != null
+				&& JavaUtils.isTrueExplicitly(uiActivityDASPublishEnabledStr);
 		
 		
         if(enabled) {
-            enabledAnalyticsEngines.put(APIMgtUsagePublisherConstants.ANALYTIC_ENGINE_BAM, true);
+            enabledAnalyticsEngines.put(APIMgtUsagePublisherConstants.ANALYTIC_ENGINE_DAS, true);
         } else {
-            enabledAnalyticsEngines.put(APIMgtUsagePublisherConstants.ANALYTIC_ENGINE_BAM, false);
+            enabledAnalyticsEngines.put(APIMgtUsagePublisherConstants.ANALYTIC_ENGINE_DAS, false);
         }
 
         if(googleAnalyticsTrackingEnabled) {
@@ -107,20 +102,20 @@ public class APIMGTConfigReaderService {
         }
     }
 
-    public String getBamServerThriftPort() {
-        return bamServerThriftPort;
+    public String getDasServerThriftPort() {
+        return dasServerThriftPort;
     }
 
-    public String getBamServerPassword() {
-        return bamServerPassword;
+    public String getDasServerPassword() {
+        return dasServerPassword;
     }
 
-    public String getBamServerUser() {
-        return bamServerUser;
+    public String getDasServerUser() {
+        return dasServerUser;
     }
 
-    public String getBamServerURL() {
-        return bamServerURL;
+    public String getDasServerURL() {
+        return dasServerURL;
     }
 
     public boolean isEnabled() {
@@ -167,16 +162,16 @@ public class APIMGTConfigReaderService {
 		return apiManagerFaultStreamVersion;
 	}
 
-	public String getApiManagerBamUiActivityStreamName() {
-		return apiManagerBamUiActivityStreamName;
+	public String getApiManagerDasUiActivityStreamName() {
+		return apiManagerDasUiActivityStreamName;
 	}
 
-	public String getApiManagerBamUiActivityStreamVersion() {
-		return apiManagerBamUiActivityStreamVersion;
+	public String getApiManagerDasUiActivityStreamVersion() {
+		return apiManagerDasUiActivityStreamVersion;
 	}
 
-	public boolean isUiActivityBamPublishEnabled() {
-		return uiActivityBamPublishEnabled;
+	public boolean isUiActivityDASPublishEnabled() {
+		return uiActivityDASPublishEnabled;
 	}
 	
 	public String getApiManagerCacheStatStreamName() {
@@ -185,10 +180,6 @@ public class APIMGTConfigReaderService {
 
 	public String getApiManagerCacheStatStreamVersion() {
 		return apiManagerCacheStatStreamVersion;
-	}
-	
-	public boolean isCacheStatsEnabled() {
-		return cacheStatsEnabled;
 	}
 
 }

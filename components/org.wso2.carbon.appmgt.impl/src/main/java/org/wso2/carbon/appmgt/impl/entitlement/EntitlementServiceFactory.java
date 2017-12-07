@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.impl.entitlement;
 
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 
@@ -27,25 +28,38 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 public class EntitlementServiceFactory {
 
     private static final String SERVER_URL = "EntitlementServiceConfiguration.Parameters.ServerUrl";
-    private static final String USERNAME = "EntitlementServiceConfiguration.Parameters.Username";
-    private static final String PASSWORD = "EntitlementServiceConfiguration.Parameters.Password";
 
     /**
      * NOTE : Only XACML entitlement service is supported as of now.
      * @param configuration
-     * @return
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
+     * @return entitlement service
+     * @throws AppManagementException on error while trying to get entitlement service
      */
-    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration){
-
+    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration,
+                                                           String authorizedAdminCookie)
+            throws AppManagementException {
         String serverUrl = configuration.getFirstProperty(SERVER_URL);
-        String username = configuration.getFirstProperty(USERNAME);
-        String password = configuration.getFirstProperty(PASSWORD);
-
-        EntitlementService entitlementService =  new XacmlEntitlementServiceImpl(serverUrl, username, password);
+        EntitlementService entitlementService = new XacmlEntitlementServiceImpl(serverUrl, authorizedAdminCookie);
         entitlementService.init();
-
         return entitlementService;
     }
+
+    /**
+     * NOTE : Only XACML entitlement service is supported as of now.
+     *
+     * @param configuration
+     * @return {@link EntitlementService} object
+     * @throws AppManagementException on error while trying to get entitlement service
+     */
+    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration)
+            throws AppManagementException {
+        String serverUrl = configuration.getFirstProperty(SERVER_URL);
+        EntitlementService entitlementService = new XacmlEntitlementServiceImpl(serverUrl);
+        entitlementService.init();
+        return entitlementService;
+    }
+
 
 
 }

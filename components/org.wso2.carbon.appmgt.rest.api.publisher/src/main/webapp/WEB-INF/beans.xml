@@ -35,7 +35,6 @@
     </cxf:bus>
 
     <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor" />
-
     <bean id="jacksonObjectMapper" class="org.wso2.carbon.appmgt.rest.api.util.spring.ObjectMapperFactoryBean" />
     <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
         <property name="mapper" ref="jacksonObjectMapper" />

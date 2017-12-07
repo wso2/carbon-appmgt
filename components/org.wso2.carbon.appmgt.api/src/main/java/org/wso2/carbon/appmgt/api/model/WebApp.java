@@ -17,12 +17,7 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provider's & system's view of WebApp
@@ -30,6 +25,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class WebApp extends App{
 
+    private int databaseId;
     private APIIdentifier id;
 
     private String description;
@@ -128,7 +124,17 @@ public class WebApp extends App{
     public String createdTime;
     private String originVersion;
 
+    private boolean serviceProviderCreationEnabled;
+
     public WebApp() {
+    }
+
+    public int getDatabaseId() {
+        return databaseId;
+    }
+
+    public void setDatabaseId(int databaseId) {
+        this.databaseId = databaseId;
     }
 
     public WebApp(APIIdentifier id) {
@@ -136,7 +142,11 @@ public class WebApp extends App{
     }
 
     public String getLogoutURL() {
-        return logoutURL;
+        if(logoutURL != null && logoutURL.startsWith("/")){
+            return logoutURL.substring(1);
+        }else {
+            return logoutURL;
+        }
     }
 
     public void setLogoutURL(String logoutURL) {
@@ -755,5 +765,48 @@ public class WebApp extends App{
 
     public String getOriginVersion() {
         return originVersion;
+    }
+
+    public void addURITemplate(URITemplate uriTemplate) {
+
+        if(uriTemplates == null){
+            uriTemplates = new HashSet<URITemplate>();
+        }
+
+        uriTemplates.add(uriTemplate);
+    }
+
+    public URITemplate getURITemplate(int urlTemplateId) {
+
+        if(uriTemplates != null){
+
+            for(URITemplate template : uriTemplates){
+                if(template.getId() == urlTemplateId){
+                    return template;
+                }
+            }
+
+        }
+
+        return null;
+    }
+    public List<String> getVisibleRoleList(){
+        List<String> visibleRoleList = new ArrayList<String>();
+
+        if(visibleRoles != null && visibleRoles != ""){
+            String allowedRolesString = visibleRoles;
+            if(allowedRolesString != null && !allowedRolesString.trim().isEmpty()){
+                visibleRoleList = Arrays.asList(allowedRolesString.split(","));
+            }
+        }
+        return visibleRoleList;
+    }
+
+    public void setServiceProviderCreationEnabled(boolean serviceProviderCreationEnabled) {
+        this.serviceProviderCreationEnabled = serviceProviderCreationEnabled;
+    }
+
+    public boolean isServiceProviderCreationEnabled() {
+        return serviceProviderCreationEnabled;
     }
 }

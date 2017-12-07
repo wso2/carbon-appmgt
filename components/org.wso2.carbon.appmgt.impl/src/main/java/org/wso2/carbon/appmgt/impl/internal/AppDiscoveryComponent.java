@@ -66,8 +66,7 @@ public class AppDiscoveryComponent {
      * @return
      */
     private AppDiscoveryConfiguration loadConfig() {
-        String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                File.separator + "conf" + File.separator + "app-manager.xml";
+        String filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
         AppDiscoveryConfiguration discoveryConfiguration = new AppDiscoveryConfiguration();
         try {
             discoveryConfiguration.load(filePath);

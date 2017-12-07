@@ -61,26 +61,29 @@ function updateJavaPolicyPartial(action) {
     $.each(javaPolicyArray, function (index, obj) {
         if (obj != null) {
 
-            //if policy is saved, tick the java policy checkbox
-            if (obj.applicationId != null) {
-                checkedStatus = "checked";
-                //push the id's of saved policies to array
-                javaPolicyIndexArray.push(obj.javaPolicyId);
-            }
+            if (javaPolicyIndexArray.indexOf(obj.javaPolicyId) == -1) {
+                //if policy is saved, tick the java policy checkbox
+                if (obj.applicationId != null) {
+                    checkedStatus = "checked";
+                    //push the id's of saved policies to array
+                    javaPolicyIndexArray.push(obj.javaPolicyId);
+                } else {
+                    if (action == "add" && obj.displayName == "Publish Statistics:") {
+                        checkedStatus = "checked";
+                        javaPolicyIndexArray.push(obj.javaPolicyId);
+                    }
+                }
 
-            if(action == "add" && obj.displayName == "Publish Statistics:"){
-                checkedStatus = "checked";
+                //draw div's to each policy
+                $('#divJavaPolicies').empty().append(
+                    "<div class='form-group'> " +
+                    "<label class='control-label col-sm-4'> " + obj.displayName + "</label> " +
+                    "<div class='col-md-1'>" +
+                    "<input  class='javaPolicy-opt-val' data-javaPolicy-id='" + obj.javaPolicyId + "'  type='checkbox' "
+                    + checkedStatus + ">" +
+                    "</div>" +
+                    "</div>");
             }
-
-            //draw div's to each policy
-            $('#divJavaPolicies').empty().append(
-                "<div class='form-group'> " +
-                "<label class='control-label col-sm-4'> " + obj.displayName + "</label> " +
-                "<div class='col-md-1'>" +
-                "<input  class='javaPolicy-opt-val' data-javaPolicy-id='" + obj.javaPolicyId + "'  type='checkbox' "
-                + checkedStatus + ">" +
-                "</div>" +
-                "</div>");
         }
     });
 

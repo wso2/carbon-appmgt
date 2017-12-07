@@ -37,6 +37,7 @@ import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
@@ -60,6 +61,7 @@ public abstract class AbstractAPIManager implements APIManager {
     protected int tenantId;
     protected String tenantDomain;
     protected String username;
+    protected AppRepository appRepository;
 
     public AbstractAPIManager() throws AppManagementException {
     }
@@ -93,6 +95,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 AppManagerUtil.loadTenantAPIPolicy( tenantUserName, tenantId);
                 AppManagerUtil.writeDefinedSequencesToTenantRegistry(tenantId);
             }
+            appRepository = new DefaultAppRepository(this.registry);
             ServiceReferenceHolder.setUserRealm(ServiceReferenceHolder.getInstance().
                     getRegistryService().getConfigSystemRegistry().getUserRealm());
             registerCustomQueries(configRegistry, username);
@@ -112,7 +115,7 @@ public abstract class AbstractAPIManager implements APIManager {
      */
     private void registerCustomQueries(UserRegistry registry, String username)
             throws RegistryException, AppManagementException {
-        String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+        String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
         String latestAPIsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/latest-apis";
         String resourcesByTag = RegistryConstants.QUERIES_COLLECTION_PATH + "/resource-by-tag";
         String path = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
@@ -318,7 +321,14 @@ public abstract class AbstractAPIManager implements APIManager {
             }
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
                                                                                 AppMConstants.API_KEY);
-            Resource apiResource = registry.get(apiPath);
+            Resource apiResource = null;
+            try {
+                apiResource = registry.get(apiPath);
+            } catch (AuthorizationFailedException ex) {
+                log.warn("Retrieving app details for the app : " + identifier.getApiName() + " of user : " + username + ". But user do not have " +
+                        "permission to the app.");
+                return null;
+            }
             String artifactId = apiResource.getUUID();
             if (artifactId == null) {
                 throw new AppManagementException("artifact id is null for : " + apiPath);
@@ -417,10 +427,10 @@ public abstract class AbstractAPIManager implements APIManager {
         return null;
     }
 
-    public List<Documentation> getAllDocumentation(APIIdentifier apiId) throws
+    public List<Documentation> getAllDocumentation(APIIdentifier appId) throws
                                                                         AppManagementException {
         List<Documentation> documentationList = new ArrayList<Documentation>();
-        String apiResourcePath = AppManagerUtil.getAPIPath(apiId);
+        String apiResourcePath = AppManagerUtil.getAPIPath(appId);
         try {
         	Association[] docAssociations = registry.getAssociations(apiResourcePath,
                                                                      AppMConstants.DOCUMENTATION_ASSOCIATION);
@@ -436,7 +446,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 Date contentLastModifiedDate;
                 Date docLastModifiedDate = docResource.getLastModified();
                 if (Documentation.DocumentSourceType.INLINE.equals(doc.getSourceType())) {
-                    String contentPath = AppManagerUtil.getAPIDocContentPath(apiId, doc.getName());
+                    String contentPath = AppManagerUtil.getAPIDocContentPath(appId, doc.getName());
                     contentLastModifiedDate = registry.get(contentPath).getLastModified();
                     doc.setLastUpdated((contentLastModifiedDate.after(docLastModifiedDate) ?
                                         contentLastModifiedDate : docLastModifiedDate));
@@ -447,21 +457,9 @@ public abstract class AbstractAPIManager implements APIManager {
 
                 documentationList.add(doc);
             }
-            /* Document for loading WebApp definition Content - Swagger*/
-            Documentation documentation = new Documentation(DocumentationType.SWAGGER_DOC, AppMConstants.API_DEFINITION_DOC_NAME);
-            Documentation.DocumentSourceType docSourceType = Documentation.DocumentSourceType.INLINE;
-            documentation.setSourceType(docSourceType);
-            
-            String swaggerDocPath = AppMConstants.API_DOC_LOCATION + RegistryConstants.PATH_SEPARATOR +
-            		apiId.getApiName() +"-"  + apiId.getVersion() + RegistryConstants.PATH_SEPARATOR + AppMConstants.API_DOC_RESOURCE_NAME;
-            if (registry.resourceExists(swaggerDocPath)) {
-            	Resource docResource = registry.get(swaggerDocPath);
-            	documentation.setLastUpdated(docResource.getLastModified());
-            	documentationList.add(documentation);
-            }
                         
         } catch (RegistryException e) {
-            handleException("Failed to get documentations for api " + apiId.getApiName(), e);
+            handleException("Failed to get documentations for api " + appId.getApiName(), e);
         } 
         return documentationList;
     }
@@ -654,13 +652,15 @@ public abstract class AbstractAPIManager implements APIManager {
     public boolean isContextExist(String context) throws AppManagementException {
     	boolean isTenantFlowStarted = false;
         try {
-            GovernanceUtils.loadGovernanceArtifacts((UserRegistry)registry);
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GovernanceUtils.loadGovernanceArtifacts((UserRegistry) systemRegistry);
             if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
         		isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
         	}
-            GenericArtifactManager artifactManager = new GenericArtifactManager(registry,
+            GenericArtifactManager artifactManager = new GenericArtifactManager(systemRegistry,
                                                                                 AppMConstants.API_KEY);
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {

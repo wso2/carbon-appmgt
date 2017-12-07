@@ -26,6 +26,16 @@ import java.io.Serializable;
 public class EnterpriseApplication extends AndroidApplication implements Serializable {
 
 	private String url;
+	private String schedule;
+	private String packageName;
+	
+	public String getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(String schedule) {
+		this.schedule = schedule;
+	}
 
 	public String getUrl() {
 		return url;
@@ -35,4 +45,11 @@ public class EnterpriseApplication extends AndroidApplication implements Seriali
 		this.url = url;
 	}
 
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
 }

@@ -117,18 +117,10 @@
             </div>
 
             <div id="control-packagename"	class="form-group">
-                <label class="control-label col-sm-2" for="txtVisibility">Visibility</label>
+                <label class="control-label col-sm-2" for="txtVisibility">Restrict Visibility</label>
                 <div class="col-sm-10">
                     <input type="text" id="txtVisibility" name="visibility" data-roles="{{artifact.attributes.overview_visibility}}" class='col-lg-6 col-sm-8 col-xs-6'
                            placeholder="type user role to search"/>
-                </div>
-            </div>
-
-            <div id="control-packagename"	class="form-group">
-                <label class="control-label col-sm-2">Tags</label>
-                <div class="col-sm-10">
-                    <input type="text" id="txtTags" name="tags"  class='col-lg-6 col-sm-8 col-xs-6'
-                           placeholder="type tag to search"/>
                 </div>
             </div>
 
@@ -142,7 +134,7 @@
                                     class="fileupload-new"><i class="icon-plus-sign"></i></span><span
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
-                                        type="file" name="bannerFile" id="txtBanner" />
+                                        type="file" name="bannerFile" accept="image/*" id="txtBanner" />
 							</span><a
                                 href="#" class="btn fileupload-exists"
                                 data-dismiss="fileupload"><i class="icon-remove"></i></a>
@@ -164,7 +156,7 @@
                                     class="fileupload-new"><i class="icon-plus-sign"></i></span><span
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
-                                        type="file" class="uploadAction" name="screenshot1File"
+                                        type="file" class="uploadAction" name="screenshot1File" accept="image/*"
                                         id="txtScreenShot1" data-url="{{url "/api/apps/upload"}}" />
 							</span><a href="#" class="btn fileupload-exists"
                                       data-dismiss="fileupload"><i class="icon-remove"></i></a>
@@ -179,7 +171,7 @@
                                     class="fileupload-new"><i class="icon-plus-sign"></i></span><span
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
-                                        type="file" class="uploadAction" name="screenshot2File"
+                                        type="file" class="uploadAction" name="screenshot2File" accept="image/*"
                                         id="txtScreenShot2" data-url="{{url "/api/apps/upload"}}" />
 							</span><a href="#" class="btn fileupload-exists"
                                       data-dismiss="fileupload"><i class="icon-remove"></i></a>
@@ -194,7 +186,7 @@
                                     class="fileupload-new"><i class="icon-plus-sign"></i></span><span
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
-                                        type="file" class="uploadAction" name="screenshot3File"
+                                        type="file" class="uploadAction" name="screenshot3File" accept="image/*"
                                         id="txtScreenShot3" data-url="{{url "/api/apps/upload"}}" />
 							</span><a href="#" class="btn fileupload-exists"
                                       data-dismiss="fileupload"><i class="icon-remove"></i></a>
@@ -216,7 +208,7 @@
                                     class="fileupload-new"><i class="icon-plus-sign"></i></span><span
                                     class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input
-                                        name="iconFile" type="file" />
+                                        name="iconFile" accept="image/*" type="file" />
 							</span><a href="#"
                                       class="btn fileupload-exists" data-dismiss="fileupload"><i
                                 class="icon-remove"></i></a>

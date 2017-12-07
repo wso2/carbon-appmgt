@@ -54,15 +54,15 @@ require('/modules/store.js').exec(function (ctx) {
         social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     //set tenant aware username
-    var tenantUsername = null;
-    if (user != null) {
-        if (tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
-    }
+    var tenantUsername = user ? user.username : null;
 
+    //Get the store public visibility. Read the registry file store.json(tenanted) and get the value of publicVisibility
+    var storePublicVisibility = store.getPublicVisibility();
+    if (storePublicVisibility == null) {
+        storePublicVisibility = false;
+        log.warn('\'publicVisibility\' property has not been configured in the store.json config file. Use the default value as \'false\'');
+    }
+    var tagInfo = {};
 
     caramel = require('caramel');
     //Check whether to show register link in myapps page
@@ -157,17 +157,53 @@ require('/modules/store.js').exec(function (ctx) {
             options.lifecycleState = ["published"];
             assets = store.taggeds(type, options, paging);
         } else if (query) { // if search from search box
-            urlQuery = 'query=' + query + '&';
-            query = require('/modules/search.js').build(query);
-            query.overview_treatAsASite = 'FALSE';
-            if (!isMultipleVersionDisplayEnabled) {
-                query.overview_makeAsDefaultVersion = 'true';
+            var searchParameter;
+            var searchValue;
+            var splitQuery = query.split(":");
+            searchParameter = splitQuery[0];
+            // This is a registry based search. In search box, user wants to search by business owner name. But
+            // in registry, there is only business owner Id. Therefore, it is necessary to get business owner Ids
+            // related to search prefix from DB.
+            if (!searchParameter.equals("Business Owner")) {
+                urlQuery = 'query=' + query + '&';
+                query = require('/modules/search.js').build(query);
+                query.overview_treatAsASite = 'FALSE';
+                if (!isMultipleVersionDisplayEnabled) {
+                    query.overview_makeAsDefaultVersion = 'true';
+                }
+                options = {
+                    type: type,
+                    attributes: query
+                };
+                assets = store.search(options, paging);
+            } else {
+                searchValue = splitQuery[1];
+                var initialQuery = "businessOwner:" + searchValue;
+                var searchPrefix = searchValue.split("\"")[1];
+                var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
+                if (resultIdsList) {
+                    var resultAssets = [];
+                    resultIdsList = resultIdsList.toArray();
+                    for (var key in resultIdsList) {
+                        var businessOwnerId = resultIdsList[key];
+                        query = "businessOwner:\"" + businessOwnerId + "\"";
+                        query = require('/modules/search.js').build(query);
+                        query.overview_treatAsASite = 'FALSE';
+                        if (!isMultipleVersionDisplayEnabled) {
+                            query.overview_makeAsDefaultVersion = 'true';
+                        }
+                        options = {
+                            type: type,
+                            attributes: query
+                        };
+                        resultAssets = resultAssets.concat(store.search(options, paging));
+                    }
+                    assets = resultAssets;
+                }
+                query = initialQuery;
+                urlQuery = 'query=' + initialQuery + '&';
+                query = require('/modules/search.js').build(query);
             }
-            options = {
-                type: type,
-                attributes: query
-            };
-            assets = store.search(options, paging);
         } else { // sort by popularity in myapps page
             if (paging.sort == 'popular') {
                 urlQuery = 'sort=' + paging.sort + '&';
@@ -386,6 +422,9 @@ require('/modules/store.js').exec(function (ctx) {
 
             if (searchOption.toLowerCase() == "provider") {
                 searchOption = "SEARCH_BY_APP_PROVIDER";
+            } else if (searchOption.toLowerCase() == "business owner") {
+                query = "businessOwner:" + searchValue;
+                searchOption = "SEARCH_BY_BUSINESS_OWNER";
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
             }
@@ -450,60 +489,73 @@ require('/modules/store.js').exec(function (ctx) {
         asset.lifecycleState = lifeCycleState;
         return active
     };
-    /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        //In this case all the apps in the store are accessible by user without any subscriptions
-        //So myapps page should display all the apps.Searching,Sorting,pagination,tag search,recently added apps should
-        //available in myapps page since assets are retrieved from registry.
 
-        //get the apps from registry based on the
-        //requested method(sort,search or normal)
-        getAssetsFromRegistry();
-        //check for pagination
-        setPagination();
+    //Retrieve asset form the registry/DB only for the given condition to increase the store performances.
+    if(storePublicVisibility == true || (storePublicVisibility == false && user)) {
+        /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
+        if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            //In this case all the apps in the store are accessible by user without any subscriptions
+            //So myapps page should display all the apps.Searching,Sorting,pagination,tag search,recently added apps should
+            //available in myapps page since assets are retrieved from registry.
 
-        // hide all apps link in header
-        navigationData.showAllAppsLink = false;
+            //get the apps from registry based on the
+            //requested method(sort,search or normal)
+            getAssetsFromRegistry();
+            //check for pagination
+            setPagination();
+
+            // hide all apps link in header
+            navigationData.showAllAppsLink = false;
+        } else {
+            //show anonymous + subscribed apps for logged in user.
+            //show anonymous apps for anoymous user.
+            getAssetsFromDB();
+        }
+
+        // add rating,access url etc to retrieved webapps
+        addMoreInformationToWebApps();
+        //get recently added apps from registry
+        getRecentAssetsFromRegistry();
+
+        tagInfo.allTags = store.tags(type, isSite);
+        tagInfo.searchedTag = tag;
     } else {
-        //show anonymous + subscribed apps for logged in user.
-        //show anonymous apps for anoymous user.
-        getAssetsFromDB();
+        assets = null;
+        webAppRecentAssets = null;
+        tagInfo.allTags = null;
+        tagInfo.searchedTag = null;
     }
-
-    // add rating,access url etc to retrieved webapps
-    addMoreInformationToWebApps();
-    //get recently added apps from registry
-    getRecentAssetsFromRegistry();
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       navigation: navigationData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-                           enabledTypeList: enabledTypeList
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
+        title: 'Web Apps | Store',
+        user: user,
+        sso: sso,
+        header: headerData,
+        navigation: navigationData,
+        search: {
+            query: query
+        },
+        type: type,
+        tags: {
+            data: tagInfo
+        },
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        },
+        assets: assets,
+        assetType: 'webapp',
+        pagination: {
+            leftNav: leftnav,
+            rightNav: rightnav,
+            urlQuery: urlQuery
+        },
+        recentAssets: webAppRecentAssets
 
-                   });
+    });
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {

@@ -284,9 +284,21 @@ public class AppManagerConfiguration {
         Map<String, String> paramMap = new HashMap<String, String>();
         OMElement params = element.getFirstChildWithName(new QName(SSOConfiguratorConstants.PARAMETERS));
         Iterator i = params.getChildElements();
+
         while(i.hasNext()) {
             OMElement param = (OMElement) i.next();
-            paramMap.put(param.getLocalName(), param.getText());
+            String paramKey = param.getLocalName();
+            String key = SSOConfiguratorConstants.SSO_CONFIGURATION + "." + SSOConfiguratorConstants.CONFIGURATORS +
+                    "."+ SSOConfiguratorConstants.CONFIGURATOR + "." + SSOConfiguratorConstants.PARAMETERS + "." +
+                    SSOConfiguratorConstants.DEFAUL_PARAMETERS_PASSWORD;
+            String paramValue = param.getText();
+
+            if (SSOConfiguratorConstants.DEFAUL_PARAMETERS_PASSWORD.equalsIgnoreCase(paramKey)) {
+                if (secretResolver.isInitialized() && secretResolver.isTokenProtected(key)) {
+                    paramValue = secretResolver.resolve(key);
+                }
+            }
+            paramMap.put(paramKey, paramValue);
         }
 
         return paramMap;

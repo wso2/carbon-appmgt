@@ -31,8 +31,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 
     @Override
-    public void performAction(ApplicationOperationAction applicationOperationAction) {
-
+    public String performAction(ApplicationOperationAction applicationOperationAction) {
+        return null;
     }
 
     @Override

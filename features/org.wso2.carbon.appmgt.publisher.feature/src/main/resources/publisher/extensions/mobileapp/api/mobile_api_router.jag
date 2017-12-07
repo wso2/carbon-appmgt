@@ -1,5 +1,5 @@
 <%
-
+include("/extensions/webapp/modules/jagg/jagg.jag");
 require('/modules/publisher.js').exec(function(ctx) {
 
     var config = require('/config/publisher.json');
@@ -11,17 +11,51 @@ require('/modules/publisher.js').exec(function(ctx) {
     var rxtManager = publisher.rxtManager;
     var server = require('store').server;
     var permissions=require('/modules/permissions.js').permissions;
-
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var auditLog = require('/modules/auditLog/logger.js');
 
     routeManager.register('DELETE', 'publisher', '/publisher/api/mobile/delete/{app}', function (ctx) {
         var username=require('store').server.current(session).username;
         var um = server.userManager(server.current(session).tenantId);
+        var registry = server.systemRegistry(server.current(session).tenantId);
         var deleteAuthorized = permissions.isAuthorized(username, config.permissions.webapp_delete, um);
 
         if(deleteAuthorized){
             var app = ctx.params.app;
             var artifactManager = rxtManager.getArtifactManager("mobileapp");
-            artifactManager.remove(app);
+            var fileNames = [];
+
+            var artifact = artifactManager.get(app);
+            fileNames.push(artifact.attributes.images_thumbnail);
+            fileNames.push(artifact.attributes.images_banner);
+            var screenShots = artifact.attributes.images_screenshots.split(",");
+
+            for each(var screenshot in screenShots){
+                if(screenshot){
+                    fileNames.push(screenshot);
+                }
+            }
+            if(artifact.attributes.overview_type != "webapp" && artifact.attributes.overview_type != "public"){
+               var mobileBinaryUrl = artifact.attributes.overview_url;
+                if(mobileBinaryUrl){
+                   var binaryFileName = mobileBinaryUrl.substring(mobileBinaryUrl.lastIndexOf("/") + 1, mobileBinaryUrl.length);
+                   fileNames.push(binaryFileName);
+                }
+            }
+            var attributes = artifact.attributes;
+            var appType = "mobileApp";
+            var tenantId = server.current(session).tenantId;
+            var appName = attributes["overview_name"];
+            var appVersion = attributes["overview_version"];
+            var appProvider = attributes["overview_provider"];
+            var appPlatform = attributes["overview_platform"];
+            path = "/_system/governance/mobileapps/" + appProvider + "/" + appPlatform + "/" + appName + "/"
+            registry.remove(path);
+            apiProvider.removeBinaryFilesFromStorage(fileNames);
+            auditLog.writeLog(tenantId, username, "AssetDeleted", appType, "{providerName='" + appProvider +
+                                                                           "', appName='" + appName +
+                                                                           "', version='" + appVersion + "'}",
+                              artifact);
         }
     });
 

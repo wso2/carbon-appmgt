@@ -102,7 +102,9 @@ var build = function (query) {
             var key;
             if(token.key.equals("Name")){
                 key = "displayName";
-            }else{
+            } else if (token.key.equals("businessOwner")) {
+                key = token.key;
+            } else{
                 key = token.key.toLowerCase();
             }
             obj['overview_' + key] = token.value;

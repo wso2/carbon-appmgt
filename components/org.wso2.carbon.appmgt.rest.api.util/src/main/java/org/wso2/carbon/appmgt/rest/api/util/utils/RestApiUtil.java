@@ -23,12 +23,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.appmgt.api.*;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
@@ -41,7 +41,8 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.uri.template.URITemplate;
+import org.wso2.uri.template.URITemplateException;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
@@ -50,18 +51,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RestApiUtil {
 
     private static final Log log = LogFactory.getLog(RestApiUtil.class);
+    private static Dictionary<org.wso2.uri.template.URITemplate, List<String>> uriToHttpMethodsMap;
 
     public static <T> ErrorDTO getConstraintViolationErrorDTO(Set<ConstraintViolation<T>> violations) {
         ErrorDTO errorDTO = new ErrorDTO();
@@ -157,6 +154,19 @@ public class RestApiUtil {
      * @param log Log instance
      * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
      */
+    public static void handleForbiddenRequest(String msg, Log log) throws ForbiddenException {
+        ForbiddenException forbiddenException = buildForbiddenException(msg);
+        log.error(msg);
+        throw forbiddenException;
+    }
+
+    /**
+     * Logs the error, builds a BadRequestException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
+     */
     public static void handlePreconditionFailedRequest(String msg, Log log) throws BadRequestException {
         PreconditionFailedException preconditionFailedRequest = buildPreconditionFailedRequestException(msg);
         log.error(msg);
@@ -183,6 +193,17 @@ public class RestApiUtil {
     public static ConflictException buildConflictException(String description) {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_CONFLCIT_MESSAGE_DEFAULT, 409l, description);
         return new ConflictException(errorDTO);
+    }
+
+    /**
+     * Returns a new ConflictException
+     *
+     * @param description description of the exception
+     * @return a new ConflictException with the specified details as a response DTO
+     */
+    public static ForbiddenException buildForbiddenException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT, 403l, description);
+        return new ForbiddenException(errorDTO);
     }
 
 
@@ -446,9 +467,9 @@ public class RestApiUtil {
     public static NotFoundException buildNotFoundException(String resource, String id) {
         String description;
         if (!StringUtils.isEmpty(id)) {
-            description = "Requested " + resource + " with Id '" + id + "' not found";
+            description = "Requested " + resource + " with Id '" + id + "' was not found.";
         } else {
-            description = "Requested " + resource + " not found";
+            description = "Requested " + resource + " was not found.";
         }
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT, 404l, description);
         return new NotFoundException(errorDTO);
@@ -498,7 +519,7 @@ public class RestApiUtil {
         FileOutputStream outFileStream = null;
 
         try {
-            outFileStream = new FileOutputStream(new File(storageLocation, newFileName));
+            outFileStream = new FileOutputStream(new File(AppManagerUtil.resolvePath(storageLocation, newFileName)));
             int read;
             byte[] bytes = new byte[1024];
             while ((read = uploadedInputStream.read(bytes)) != -1) {
@@ -518,10 +539,17 @@ public class RestApiUtil {
         File storageFile = null;
         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String filePath = CarbonUtils.getCarbonHome() + File.separator +
-                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
-        storageFile = new File(filePath);
+        storageFile = new File(AppManagerUtil.resolvePath(
+                appManagerConfiguration.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION), fileName));
         return storageFile;
+    }
+
+    public static boolean isValidFileName(String fileName){
+        boolean isValid = true;
+        if(fileName == null || StringUtils.isEmpty(fileName) || (fileName.indexOf('\u0000') > 0)){
+            isValid = false;
+        }
+        return isValid;
     }
 
     public static String readFileContentType(String filePath) throws AppManagementException{
@@ -601,5 +629,74 @@ public class RestApiUtil {
         }
 
         return searchTerms;
+    }
+
+    /**
+     * Returns the white-listed URIs and associated HTTP methods for REST API. If not already read before, reads
+     * app-manager.xml configuration, store the results in a static reference and returns the results.
+     * Otherwise returns previously stored the static reference object.
+     *
+     * @return A Dictionary with the white-listed URIs and the associated HTTP methods
+     * @throws AppManagementException
+     */
+    public static Dictionary<URITemplate, List<String>> getWhiteListedURIsToMethodsMap()
+            throws AppManagementException {
+
+        if (uriToHttpMethodsMap == null) {
+            uriToHttpMethodsMap = getWhiteListedURIsToMethodsMapFromConfig();
+        }
+        return uriToHttpMethodsMap;
+    }
+
+    /**
+     * Returns the white-listed URIs and associated HTTP methods for REST API by reading api-manager.xml configuration
+     *
+     * @return A Dictionary with the white-listed URIs and the associated HTTP methods
+     * @throws AppManagementException
+     */
+    private static Dictionary<org.wso2.uri.template.URITemplate, List<String>> getWhiteListedURIsToMethodsMapFromConfig()
+            throws AppManagementException {
+        Hashtable<org.wso2.uri.template.URITemplate, List<String>> uriToMethodsMap = new Hashtable<>();
+        AppManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        List<String> uriList = apiManagerConfiguration
+                .getProperty(AppMConstants.APPM_RESTAPI_WHITELISTED_URI_URI);
+        List<String> methodsList = apiManagerConfiguration
+                .getProperty(AppMConstants.APPM_RESTAPI_WHITELISTED_URI_HTTPMethods);
+
+        if (uriList != null && methodsList != null) {
+            if (uriList.size() != methodsList.size()) {
+                String errorMsg = "Provided White-listed URIs for REST API are invalid."
+                        + " Every 'WhiteListedURI' should include 'URI' and 'HTTPMethods' elements";
+                log.error(errorMsg);
+                return new Hashtable<>();
+            }
+
+            for (int i = 0; i < uriList.size(); i++) {
+                String uri = uriList.get(i);
+                try {
+                    org.wso2.uri.template.URITemplate uriTemplate = new org.wso2.uri.template.URITemplate(uri);
+                    String methodsForUri = methodsList.get(i);
+                    List<String> methodListForUri = Arrays.asList(methodsForUri.split(","));
+                    uriToMethodsMap.put(uriTemplate, methodListForUri);
+                } catch (URITemplateException e) {
+                    String msg = "Error in parsing uri " + uri + " when retrieving white-listed URIs for REST API";
+                    log.error(msg, e);
+                    throw new AppManagementException(msg, e);
+                }
+            }
+        }
+        return uriToMethodsMap;
+    }
+
+    /**
+     * Get Store REST API context path
+     * @return context path of store REST APIs
+     */
+    public static String getStoreRESTAPIContextPath(){
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return appManagerConfiguration.getFirstProperty(
+                AppMConstants.APPM_RESTAPI_STORE_API_CONTEXT_PATH);
     }
 }

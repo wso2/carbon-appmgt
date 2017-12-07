@@ -15,18 +15,17 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.2.43-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.43-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>WSO2 App Manager Store REST API</name>
     <description>WSO2 App Manager REST API for App Store</description>
@@ -84,23 +83,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.databridge.agent</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.databridge.commons</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.deployment</groupId>
-            <artifactId>org.wso2.carbon.bam.service.data.publisher</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -215,6 +199,49 @@
                                 ${basedir}/../org.wso2.carbon.appmgt.rest.api.util/src/main/resources/doc-templates
                             </templateDirectory>
                             <output>src/main/resources/api-docs</output>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-doc-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources/api-docs/docs/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../org.wso2.carbon.appmgt.rest.api.util/src/main/resources/doc-templates</directory>
+                                    <includes>
+                                        <include>assets/</include>
+                                        <include>fonts/</include>
+                                        <include>js/</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-doc-guide</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources/api-docs/docs/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../org.wso2.carbon.appmgt.rest.api.store/src/main/resources/</directory>
+                                    <includes>
+                                        <include>guide.html</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>

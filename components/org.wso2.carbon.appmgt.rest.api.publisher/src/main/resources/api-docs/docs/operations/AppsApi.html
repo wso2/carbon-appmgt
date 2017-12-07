@@ -1,14 +1,12 @@
 <div class="main-content">
     <h1><a name="AppsApi"></a>AppsApi</h1>
 
-    
-        
             <hr/>
             <h3 class="operation-heading"><a name="administrationXacmlpoliciesPolicyPartialIdDelete"></a>Delete policy partial</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Delete an existing policy partial\n</p>
+            <p class="marked">Delete an existing policy partial </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
@@ -17,31 +15,19 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:administration</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot;   -d &#39;&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationXacmlpoliciesPolicyPartialIdDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-administrationXacmlpoliciesPolicyPartialIdDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,20 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy partial ID\n</p>
-                            
+                            <p class="param-description marked">Policy partial ID </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -107,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -169,68 +145,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Resource successfully deleted. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeChangeLifecyclePost"></a>Change App Status</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Change the lifecycle of an App.\n</p>
+            <p class="marked">Change the lifecycle of an App. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/change-lifecycle</code>
@@ -239,31 +197,21 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:publish</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&amp;action=Unpublish&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId&#x3D;d88b826c-e560-499e-900d-eb24679b2fbf&amp;action&#x3D;Unpublish&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeChangeLifecyclePost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
+                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json">HTTP/1.1 202 OK
+Content-Type: application/json
+ {&quot;message&quot;: &quot;Lifecycle action : Recycle has been accepted for processing &quot;}</code></div>
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -282,7 +230,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -299,20 +246,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -329,8 +273,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The action determining whether to demote or promote the state of the App.\n\n\n\n\nSupported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]\n</p>
-                            
+                            <p class="param-description marked">The action determining whether to demote or promote the state of the App.     Supported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**] </p>
                                 <p><b>Accepted values: </b></p>
 
 <code>Publish</code>
@@ -351,19 +294,16 @@
 
 <code>Submit#for#Review</code>
 
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -380,20 +320,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid App ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid App ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -410,20 +347,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -440,20 +374,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -472,68 +403,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">202</p></td>
-                        <td class="parameter"><p class="marked">OK.\nLifecycle changed successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Lifecycle changed successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#ResponseMessage">ResponseMessage</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested App does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested App does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeGet"></a>Get all Apps</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of available Apps qualifying under a given search condition.\n</p>
+            <p class="marked">Get a list of available Apps qualifying under a given search condition. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}</code>
@@ -542,31 +455,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeGet" class="pre collapse"><code class="json">{&quot;previous&quot;:&quot;&quot;,&quot;next&quot;:&quot;&quot;,&quot;count&quot;:2,&quot;appList&quot;:[{&quot;name&quot;:&quot;app1&quot;,&quot;context&quot;:null,&quot;id&quot;:&quot;af929140-1257-46ed-97c0-d26098e140e9&quot;,&quot;rating&quot;:0.0,&quot;lifecycleState&quot;:&quot;IN-REVIEW&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;description&quot;:&quot;asdasd&quot;,&quot;version&quot;:&quot;1&quot;},{&quot;name&quot;:&quot;app2&quot;,&quot;context&quot;:null,&quot;id&quot;:&quot;5c9c8551-d696-4c44-85a6-dcd86f1a1e25&quot;,&quot;rating&quot;:0.0,&quot;lifecycleState&quot;:&quot;CREATED&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;description&quot;:&quot;phone&quot;,&quot;version&quot;:&quot;1.0&quot;}]}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -585,7 +486,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -602,20 +502,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -632,20 +529,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">A search condition.\n\n\n\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\n\n\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\n\n\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n</p>
-                            
+                            <p class="param-description marked">A search condition.     You can search attributes by using an **\&quot;attribute:\&quot;** modifier.     Eg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.     Supported attribute modifiers are [**provider, app_name, app_version, app_id, business_owner_id**]     If no advanced attribute modifier has been specified, the search will match the given query string against the App name. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -662,27 +556,23 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Used to limit the fields in the response.\n\n\n\n\nSupported filters are [ **basic, all**]\n</p>
-                            
+                            <p class="param-description marked">Used to limit the fields in the response.     Supported filters are [ **basic, all**] </p>
                                 <p><b>Accepted values: </b></p>
 
 <code>basic</code>
 
 <code>all</code>
 
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">basic</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -699,20 +589,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
-                            
+                            <p class="param-description marked">Maximum size of resource array to return. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">25</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -729,20 +616,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
-                            
+                            <p class="param-description marked">Starting point within the complete list of items qualified. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">0</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -759,20 +643,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -789,20 +670,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -821,68 +699,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Apps is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of qualifying Apps is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#AppList">AppList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdCreateNewVersionPost"></a>Create a new version of an App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Create a new version of an App\n</p>
+            <p class="marked">Create a new version of an App </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/create-new-version</code>
@@ -891,29 +751,18 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-            
                 <p>Not Available</p>
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdCreateNewVersionPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
             </h4>
             </div>
-            
-            
                 <p>Not Available</p>
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -932,7 +781,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -949,20 +797,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -979,20 +824,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1009,22 +851,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">App object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 App
-                                
                                     (<a href="#!/models#App">App</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1041,20 +879,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1071,20 +906,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1103,55 +935,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created object as entity in the body. Location header contains the URL of the newly created entity. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#App">App</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in an unsupported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDelete"></a>Delete App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Delete an existing App\n</p>
+            <p class="marked">Delete an existing App </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
@@ -1160,31 +978,19 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -1203,7 +1009,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1220,20 +1025,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1250,20 +1052,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1280,20 +1079,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1310,20 +1106,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1342,315 +1135,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Resource successfully deleted. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-            <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDiscoverPost"></a>Discover Apps</h3>
-
-            <p class="marked"></p>
-
-            <p class="marked">Discover Apps.\n</p>
-
-            <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/discover</code>
-
-            <h4 class="section-heading">HTTP Method</h4>
-            <code>POST</code>
-
-            <h4 class="section-heading">Scope</h4>
-            
-                <code>appm:create</code>
-            
-            
-
-            <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash"></code></div>
-            
-            
-
-            
-                <div class="pointer" data-toggle="collapse" data-target="#request-appsAppTypeIdAppIdDiscoverPost">
-                    <h4 class="section-heading">
-                        Sample Request
-                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    </h4>
-                </div>
-                <div id="request-appsAppTypeIdAppIdDiscoverPost"class="pre collapse"><code class="json"></code></div>
-            
-
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDiscoverPost">
-                <h4 class="section-heading">
-                    Sample Response
-                    
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
-            </h4>
-            </div>
-            
-                <div id="response-appsAppTypeIdAppIdDiscoverPost" class="pre collapse"><code class="json"></code></div>
-            
-            
-            <h4 class="section-heading">Parameters</h4>
-            <table class="table table-hover">
-                <colgroup>
-                    <col style="width: 10%;"/>
-                    <col style="width: 20%;"/>
-                    <col style="width: 40%;"/>
-                    <col style="width: 10%;"/>
-                    <col style="width: 20%;"/>
-                </colgroup>
-                <thead>
-                <tr class="active">
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Schema</th>
-                    <th>Default</th>
-                </tr>
-                </thead>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appType</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appId</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            
-                            <span class="param-in">Header </span>
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>Content-Type</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked">JSON</p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            
-                            <span class="param-in">Header </span>
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>If-Modified-Since</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-            </table>
-
-            <h4 class="section-heading">Responses</h4>
-
-            <table class="table table-hover">
-                <colgroup>
-                    <col style="width: 15%;"/>
-                    <col style="width: 70%;"/>
-                    <col style="width: 15%;"/>
-                </colgroup>
-                <thead>
-                <tr class="active">
-                    <th>HTTP Code</th>
-                    <th>Description</th>
-                    <th>Schema</th>
-                </tr>
-                </thead>
-                <tbody>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                
-                                    
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#Error">Error</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
-                        <td class="parameter">
-                            <span class="parameter">
-                                
-                                    <a href="#!/models#Error">Error</a>
-                                
-                                
-                            </span>
-                        </td>
-                    </tr>
-                
-                </tbody>
-            </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdDocsDocumentIdDelete"></a>Delete Document</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Delete an existing document.\n</p>
+            <p class="marked">Delete an existing document. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs/{documentId}</code>
@@ -1659,31 +1187,19 @@
             <code>DELETE</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; -X DELETE http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer 4fc0a364a336a37c663790364da307a3&quot; -X DELETE &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs/8150c757-ba7f-4751-8020-71d7ee3e5d76&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdDocsDocumentIdDelete">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdDocsDocumentIdDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -1702,7 +1218,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1719,20 +1234,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1749,20 +1261,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1779,20 +1288,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document UUID.\n</p>
-                            
+                            <p class="param-description marked">Document UUID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1809,20 +1315,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1839,20 +1342,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1871,55 +1371,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Resource successfully deleted. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdGet"></a>Get app details</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get details of an app.\n</p>
+            <p class="marked">Get details of an app. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
@@ -1928,31 +1414,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdGet" class="pre collapse"><code class="json">{&quot;displayName&quot;:null,&quot;createdTime&quot;:&quot;00000001461645676735&quot;,&quot;bundleVersion&quot;:&quot;1&quot;,&quot;packageName&quot;:&quot;undefined&quot;,&quot;description&quot;:&quot;asdasd&quot;,&quot;version&quot;:&quot;1&quot;,&quot;category&quot;:&quot;Business&quot;,&quot;tags&quot;:[],&quot;appType&quot;:&quot;webapp&quot;,&quot;appName&quot;:&quot;asd&quot;,&quot;appUrl&quot;:&quot;http://wso2.com&quot;,&quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/pduoTTAgbWAuFxm.JPG&quot;,&quot;marketType&quot;:null,&quot;recentChanges&quot;:&quot;-&quot;,&quot;appProvider&quot;:&quot;admin&quot;,&quot;thumbnail&quot;:&quot;/publisher/api/mobileapp/getfile/J3TM0iKb6OiapuG.JPG&quot;,&quot;screenShots&quot;:[&quot;/publisher/api/mobileapp/getfile/zq7kNCpZkfLsxic.JPG&quot;],&quot;appId&quot;:null,&quot;platform&quot;:&quot;webapp&quot;,&quot;appVisibility&quot;:null,&quot;availableLifecycleActions&quot;:null,&quot;lifecycleStatus&quot;:&quot;INREVIEW&quot;,&quot;type&quot;:&quot;mobileapp&quot;,&quot;uuid&quot;:&quot;af929140-1257-46ed-97c0-d26098e140e9&quot;,&quot;rating&quot;:0.0}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -1971,7 +1445,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1988,20 +1461,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2018,20 +1488,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2048,20 +1515,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2078,20 +1542,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2108,20 +1569,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2140,68 +1598,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying App is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Qualifying App is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                    <a href="#!/models#AppInfo">AppInfo</a>
-                                
-                                
+                                    <a href="#!/models#App">App</a>
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdPut"></a>Update an existing App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Update an existing App\n</p>
+            <p class="marked">Update an existing App </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
@@ -2210,18 +1650,11 @@
             <code>PUT</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:update</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -v -X PUT -H &quot;Content-Type: application/json&quot; &#39;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0&#39; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;,&quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;fdyefyeufuegfyugefyue&quot;,&quot;description&quot;:&quot;description&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;public&quot;}&#39;</code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-appsAppTypeIdAppIdPut">
                     <h4 class="section-heading">
                         Sample Request
@@ -2229,20 +1662,14 @@
                     </h4>
                 </div>
                 <div id="request-appsAppTypeIdAppIdPut"class="pre collapse"><code class="json">{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;,&quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;fdyefyeufuegfyugefyue&quot;,&quot;description&quot;:&quot;description&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;public&quot;}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdPut">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdPut" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -2261,7 +1688,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2278,20 +1704,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2308,20 +1731,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2338,22 +1758,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">App object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 App
-                                
                                     (<a href="#!/models#App">App</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2370,20 +1786,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2400,20 +1813,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2430,20 +1840,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2462,81 +1869,59 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated App object.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Successful response with updated App object. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#App">App</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypeIdAppIdSubscriptionsGet"></a>Get subscribed user list for an App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get subscribed user list for an App.\n</p>
+            <p class="marked">Get subscribed user list for an App. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/subscriptions</code>
@@ -2545,31 +1930,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e099014668a524870c2895fe0595f125&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions&quot;</code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdSubscriptionsGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypeIdAppIdSubscriptionsGet" class="pre collapse"><code class="json">{&quot;userIds&quot;:[&quot;admin&quot;,&quot;user1&quot;,&quot;user2&quot;]}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -2588,7 +1961,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2605,20 +1977,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2635,20 +2004,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. The following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version. Should be formatted as **provider-name-version**. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2665,20 +2031,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2695,20 +2058,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2725,20 +2085,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2757,68 +2114,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying user list is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Qualifying user list is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#UserIdList">UserIdList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsAppTypePost"></a>Create a new App</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Create a new App\n</p>
+            <p class="marked">Create a new App </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}</code>
@@ -2827,18 +2166,11 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash">curl -v -X POST &#39;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp&#39; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;, &quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;SampleDisplay&quot;,&quot;description&quot;:&quot;sample calculator application&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;Business&quot;,”marketType”:”enterprise”}&#39;</code></div>
-            
-            
 
-            
                 <div class="pointer" data-toggle="collapse" data-target="#request-appsAppTypePost">
                     <h4 class="section-heading">
                         Sample Request
@@ -2846,20 +2178,14 @@
                     </h4>
                 </div>
                 <div id="request-appsAppTypePost"class="pre collapse"><code class="json">{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;, &quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;SampleDisplay&quot;,&quot;description&quot;:&quot;sample calculator application&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;Business&quot;,”marketType”:”enterprise”}</code></div>
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypePost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsAppTypePost" class="pre collapse"><code class="json">{&quot;id&quot; : &quot;aff9fb92-7e17-4ce8-8024-a747ff5aea41&quot;}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -2878,7 +2204,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2895,20 +2220,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2925,22 +2247,18 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added.\n</p>
-                            
+                            <p class="param-description marked">App object that needs to be added. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 App
-                                
                                     (<a href="#!/models#App">App</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2957,20 +2275,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media type of the entity in the body. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media type of the entity in the body. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2987,20 +2302,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -3019,55 +2331,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created object as the entity in the body. Location header contains the URL of the newly created entity. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#App">App</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in an unsupported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsMobileGetplistTenantTenantIdFileFileNameGet"></a>Get Plist</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get the plist file of the specified iOS (Apple) mobile app.\n</p>
+            <p class="marked">Get the plist file of the specified iOS (Apple) mobile app. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}</code>
@@ -3076,31 +2374,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
                 <div class="pre"><code class="bash"></code></div>
-            
-            
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsMobileGetplistTenantTenantIdFileFileNameGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsMobileGetplistTenantTenantIdFileFileNameGet" class="pre collapse"><code class="json"></code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -3119,7 +2405,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3136,20 +2421,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Tenant ID.\n</p>
-                            
+                            <p class="param-description marked">Tenant ID. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3166,20 +2448,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The file name.\n</p>
-                            
+                            <p class="param-description marked">The file name. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3196,20 +2475,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3226,20 +2502,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -3258,68 +2531,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#PList">PList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf and documents files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Retrieving images for banners, screenshots, etc.\n</p>
+            <p class="marked">Retrieving images for banners, screenshots, etc. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/static-contents/{fileName}</code>
@@ -3328,31 +2583,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c7fff7b0307472345c8652d6595b1b1c&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/ZQCIsEEkYM2LJ9C.jpg?appType=mobileapp&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c7fff7b0307472345c8652d6595b1b1c&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/ZQCIsEEkYM2LJ9C.jpg?appType&#x3D;mobileapp&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsStaticContentsFileNameGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -3371,7 +2614,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3389,19 +2631,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">The application type.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3418,20 +2657,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The file name.\n</p>
-                            
+                            <p class="param-description marked">The file name. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3448,20 +2684,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3478,20 +2711,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -3510,68 +2740,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nStatic content retrieved successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Static content retrieved successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#file">file</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested entity does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="appsStaticContentsPost"></a>Uploading images, pdf and document files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Uploading images for banners, screenshots etc.\n</p>
+            <p class="marked">Uploading images for banners, screenshots etc. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/static-contents</code>
@@ -3580,31 +2792,19 @@
             <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:create</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 0763d28a85f20d6fd8954f955859055c&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file=@/home/user/sample.jpg&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents?appType=webapp&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 0763d28a85f20d6fd8954f955859055c&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file&#x3D;@/home/user/sample.jpg&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents?appType&#x3D;webapp&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-appsStaticContentsPost">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-appsStaticContentsPost" class="pre collapse"><code class="json">{&quot;id&quot;: &quot;ZQCIsEEkYM2LJ9C.jpg&quot;}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -3623,7 +2823,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3641,19 +2840,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">The application type.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -3671,19 +2867,16 @@
                         </td>
                         <td>
                             <p class="param-description marked">Document to be uploaded.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
-                                file
-                                
+                                File
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3700,20 +2893,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3730,20 +2920,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -3762,68 +2949,50 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nStatic content uploaded successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Static content uploaded successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#StaticContent">StaticContent</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested entity does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h3 class="operation-heading"><a name="xacmlpoliciesPolicyPartialIdAppsAppTypeGet"></a>Get all Apps mapped to a policy partial</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of available Apps mapped to a policy partial.\n</p>
+            <p class="marked">Get a list of available Apps mapped to a policy partial. </p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/xacmlpolicies/{policyPartialId}/apps/{appType}</code>
@@ -3832,31 +3001,19 @@
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 04b1607a56c2d51adb35912943335322&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/2/apps/webapp&quot;</code></div>
 
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-xacmlpoliciesPolicyPartialIdAppsAppTypeGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
                 <div id="response-xacmlpoliciesPolicyPartialIdAppsAppTypeGet" class="pre collapse"><code class="json">{&quot;previous&quot;:&quot;&quot;,&quot;next&quot;:&quot;&quot;,&quot;count&quot;:2,&quot;appList&quot;:[{&quot;name&quot;:&quot;app1&quot;,&quot;context&quot;:null,&quot;id&quot;:&quot;af929140-1257-46ed-97c0-d26098e140e9&quot;,&quot;rating&quot;:0.0,&quot;lifecycleState&quot;:&quot;IN-REVIEW&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;description&quot;:&quot;asdasd&quot;,&quot;version&quot;:&quot;1&quot;},{&quot;name&quot;:&quot;app2&quot;,&quot;context&quot;:null,&quot;id&quot;:&quot;5c9c8551-d696-4c44-85a6-dcd86f1a1e25&quot;,&quot;rating&quot;:0.0,&quot;lifecycleState&quot;:&quot;CREATED&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;description&quot;:&quot;phone&quot;,&quot;version&quot;:&quot;1.0&quot;}]}</code></div>
-            
-            
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -3875,7 +3032,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3892,20 +3048,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Policy partial ID\n</p>
-                            
+                            <p class="param-description marked">Policy partial ID </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3922,20 +3075,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3952,20 +3102,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
-                            
+                            <p class="param-description marked">Maximum size of resource array to return. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">25</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3982,20 +3129,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
-                            
+                            <p class="param-description marked">Starting point within the complete list of items qualified. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 Integer
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">0</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -4012,20 +3156,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -4042,20 +3183,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -4074,61 +3212,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Apps is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of qualifying Apps is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#AppList">AppList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

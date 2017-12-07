@@ -110,16 +110,44 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Get business owner for a given business owner id.
-     * @param businessOwnerId Id of business owner.
-     * @return
-     * @throws AppManagementException
+     * Retrieve business owner by given id.
+     *
+     * @param businessOwnerId Id of business owner
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     @Override
-    public BusinessOwner  getBusinessOwner(int businessOwnerId) throws AppManagementException {
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
         return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
     }
 
+    /**
+     * Retrieve business owner for a given business owner id.
+     *
+     * @param businessOwnerId Business owner id
+     * @param appTenantId     Tenant id of the application
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
+     */
+    @Override
+    public BusinessOwner getBusinessOwnerForAppStore(int businessOwnerId, int appTenantId)
+            throws AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId, appTenantId);
+    }
+
+    /**
+     * Search business owner.
+     *
+     * @param searchPrefix Search prefix
+     * @param tenantId  Tenant Id of the application
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
+     */
+    @Override
+    public List<String> getBusinessOwnerIdsBySearchPrefix(String searchPrefix, int tenantId) throws
+                                                                                             AppManagementException {
+        return appMDAO.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+    }
 
     /**
      * Returns the set of APIs with the given tag from the taggedAPIs Map
@@ -668,6 +696,18 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return apiSortedSet;
     }
 
+    public float getAverageRating(String uuid, String assetType) throws AppManagementException {
+        float rating = 0;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, assetType);
+            GenericArtifact genericArtifact = artifactManager.getGenericArtifact(uuid);
+            rating = registry.getAverageRating(genericArtifact.getPath());
+        } catch (RegistryException e) {
+            handleException("Failed to retrieve rating", e);
+        }
+        return rating;
+    }
+
     /**
      * Get the recently added APIs set
      *
@@ -779,7 +819,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         Registry userRegistry = null;
         String tagsQueryPath = null;
         try {
-            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
             Map<String, String> params = new HashMap<String, String>();
             params.put(RegistryConstants.RESULT_TYPE_PROPERTY_NAME, RegistryConstants.TAG_SUMMARY_RESULT_TYPE);
 
@@ -852,21 +892,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleException("Failed to get all the tags", e);
         }
         return tagSet;
-    }
-
-    public void rateAPI(APIIdentifier apiId, APIRating rating,
-                        String user) throws AppManagementException {
-        appMDAO.addRating(apiId, rating.getRating(), user);
-
-    }
-
-    public void removeAPIRating(APIIdentifier apiId, String user) throws AppManagementException {
-        appMDAO.removeAPIRating(apiId, user);
-
-    }
-
-    public int getUserRating(APIIdentifier apiId, String user) throws AppManagementException {
-        return appMDAO.getUserRating(apiId, user);
     }
 
     public Set<WebApp> getPublishedAPIsByProvider(String providerId, int limit)
@@ -1438,16 +1463,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         appMDAO.updateSubscriptions(identifier, api.getContext(), applicationId);
     }
 
-    public void addComment(APIIdentifier identifier, String commentText, String user) throws
-                                                                                      AppManagementException {
-        appMDAO.addComment(identifier, commentText, user);
-    }
-
-    public org.wso2.carbon.appmgt.api.model.Comment[] getComments(APIIdentifier identifier)
-            throws AppManagementException {
-        return appMDAO.getComments(identifier);
-    }
-
     /**
      * Retrieve webapp from the UUID
      * @param uuid uuid of the application
@@ -1523,7 +1538,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
-            log.warn("The configurations related to show deprecated APIs in APIStore " +
+            log.warn("The configurations related to show deprecated Apps in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }
@@ -1536,7 +1551,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         String displayMultiVersions = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
         if (displayMultiVersions == null) {
-            log.warn("The configurations related to show multiple versions of WebApp in APIStore " +
+            log.warn("The configurations related to show multiple versions of WebApp in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }
@@ -1711,7 +1726,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
-            log.warn("The configurations related to show deprecated APIs in APIStore " +
+            log.warn("The configurations related to show deprecated Apps in AppStore " +
                     "are missing in app-manager.xml.");
             return false;
         }
@@ -1773,8 +1788,21 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                         boolean treatAsSite, WebAppSearchOption searchOption,
                                                         String searchValue) throws AppManagementException {
+        Registry userRegistry = null;
+        try {
+            if (tenantIdOfStore != tenantIdOfUser) {
+                // Get registry for anonymous users when searching is going in tenant.
+                userRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                        .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIdOfStore);
+            } else {
+                userRegistry = registry;
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while obtaining apps from the registry.", e);
+        }
+
         return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,
-                                                searchValue);
+                                                searchValue, userRegistry);
     }
 
     @Override

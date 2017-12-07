@@ -1,11 +1,13 @@
 {{!-- page content - app details page --}}
 <div class="page-content">
     {{!--banner content--}}
+    <input type="hidden" id="devicePlatform" value="{{asset.attributes.overview_platform}}">
     <div class="app-details row remove-margin-left remove-margin-right">
         <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
             <div class="ratio-responsive-16by9 hover-overlay-container">
                 <div class="ratio-responsive-img">
-                    <img src="{{#if asset.attributes.images_banner}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_banner}}{{/if}}">
+                    <img src="{{#if asset.attributes.images_banner}}{{url "/api/mobileapp/getfile/"}}{{ asset
+                    .attributes.images_banner}}{{/if}}">
                 </div>
             </div>
         </div>
@@ -15,26 +17,12 @@
                 <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
                     <div class="ratio-responsive-4by3">
                         <div class="ratio-responsive-img">
-                            <img src="{{#if asset.attributes.images_thumbnail}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_thumbnail}}{{/if}}" />
+                            <img src="{{#if asset.attributes.images_thumbnail}}{{url "/api/mobileapp/getfile/"}}{{
+                            asset.attributes.images_thumbnail}}{{/if}}"/>
                         </div>
-                        {{#ifCond asset.attributes.overview_platform "==" "android"}}
-                            <div class="app-thumbnail-type background-color-android
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-android"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond asset.attributes.overview_platform "==" "ios"}}
-                            <div class="app-thumbnail-type background-color-apple
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-apple"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond asset.attributes.overview_platform "==" "webapp"}}
-                            <div class="app-thumbnail-type background-color-webapps
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw  fw-cloud"></i></span>
-                            </div>
-                        {{/ifCond}}
+                        <div class="app-thumbnail-type background-color-android col-xs-2 col-sm-3 col-md-3 col-lg-3">
+                            <span><i class="fw {{iconImage asset.attributes.overview_platform}}"></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,9 +37,9 @@
                         Type : {{asset.attributes.overview_type}}
                     </p>
 
-                                    <span class="rating">
-                                        {{assetRating asset.rating}}
-                                    </span>
+                    <span class="rating">
+                        {{assetRating asset.rating}}
+                    </span>
                     {{!--buttons --}}
                     <div class="actions">
                         {{#if user}}
@@ -59,27 +47,39 @@
                                 {{#if isDeviceSubscriptionEnabled}}
                                     <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-                                       data-target="#modalDevices"
+                                       data-target="#modalInstallApp"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
                                 {{else}}
                                     <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                                {{/if}}
+                            {{!--Check if already subscribed to previous version of the app--}}
+                            {{else}} {{#if isUpdatedApp}}
+                                {{#if isDeviceSubscriptionEnabled}}
+                                    <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                       data-target="#modalUpdateApp"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                {{else}}
+                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
                                 {{/if}}
                             {{else}}
                                 {{#if isDeviceSubscriptionEnabled}}
                                     <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-                                       data-target="#modalDevices"
+                                       data-target="#modalInstallApp"
                                        class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
                                 {{else}}
                                     <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
                                 {{/if}}
-                            {{/if}}
+                            {{/if}}{{/if}}
                         {{else}}
-                            <a id="btn-add-gadget-install"href="{{tenantedUrl "/login"}}"
+                            <a id="btn-add-gadget-install" href="{{tenantedUrl "/login"}}"
                                class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
                         {{/if}}
 
@@ -121,7 +121,7 @@
                         {{#if this}}
                             <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                 <div class="thumbnail">
-                                    <img class="img-responsive" src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{this}}" />
+                                    <img class="img-responsive" src="{{url "/api/mobileapp/getfile/"}}{{this}}"/>
                                 </div>
                             </div>
                         {{/if}}
@@ -143,6 +143,144 @@
 
 
 {{!-- modal section--}}
+<div class="modal fade" id="modalUpdateApp">
+    <div class="modal-dialog">
+        <div class="modal-content ep-install-modal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Schedule Update</h4>
+            </div>
+            <div class="modal-body">
+                <br><br>
+                <label class="wr-input-control checkbox">
+                    <input id="instant-update" type="checkbox" class="form-control operationDataKeys"
+                           data-key="instant-update"/>
+                    <span class="helper" title="Once enabled, application update will start instantly.">
+              &nbsp;&nbsp;&nbsp;Instant Update
+              <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+          </span>
+                </label>
+                <br><br>
+                <div class='input-group date' id='dateTimePicker-update'>
+                    Enter the date and time to schedule application update.
+                    <br><br>
+                    <div id="firmware-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+                    <input type='text' class="form-control modal-input operationDataKeys" style="z-index : 900;"
+                           name="daterange-update" id="schedule-update" data-key="schedule-update"/>
+                    Date and time in the format of 04-30-2016 12:00 am
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('.modalpopup-bg').css('z-index', '1000');
+                        $('.modalpopup-container').css('z-index', '1200');
+                        $('input[name="daterange-update"]').daterangepicker({
+                            singleDatePicker: true,
+                            timePicker: true,
+                            showDropdowns: true,
+                            timePickerIncrement: 1,
+                            locale: {
+                                format: 'MM-DD-YYYY hh:mm a'
+                            }
+                        });
+                    });
+                    $('#instant-update').change(function () {
+                        if ($(this).is(":checked")) {
+                            $('#dateTimePicker-update').addClass("hidden");
+                            $("#schedule-update").val('');
+                        } else {
+                            $('#dateTimePicker-update').removeClass("hidden");
+                        }
+                    });
+                </script>
+                <br>
+                <br><br>
+                Do you want to perform this operation?
+                <br>
+                <div class="modal-footer">
+                    <a id="btn-schduled-update" href="#" data-app="{{asset.id}}"
+                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                       class="btn btn-primary">Yes</a>
+                    <a class="btn btn-danger" data-dismiss="modal">No</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.modal -->
+
+
+<div class="modal fade" id="modalInstallApp">
+    <div class="modal-dialog">
+        <div class="modal-content ep-install-modal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Schedule Install</h4>
+            </div>
+            <div class="modal-body">
+                <br><br>
+                <label class="wr-input-control checkbox">
+                    <input id="instant-install" type="checkbox" class="form-control operationDataKeys"
+                           data-key="instant-install"/>
+                    <span class="helper" title="Once enabled, application install will start instantly.">
+           &nbsp;&nbsp;&nbsp;Instant install
+             <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+            </span>
+                </label>
+                <br><br>
+                <div class='input-group date' id='dateTimePicker-install'>
+                    Enter the date and time to schedule application installation.
+                    <br><br>
+                    <div id="firmware-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+                    <input type='text' class="form-control modal-input operationDataKeys" style="z-index : 900;"
+                           name="daterange-install" id="schedule-install" data-key="schedule-install"/>
+                    Date and time in the format of 04-30-2016 12:00 am
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('.modalpopup-bg').css('z-index', '1000');
+                        $('.modalpopup-container').css('z-index', '1200');
+                        $('input[name="daterange-install"]').daterangepicker({
+                            singleDatePicker: true,
+                            timePicker: true,
+                            showDropdowns: true,
+                            timePickerIncrement: 1,
+                            locale: {
+                                format: 'MM-DD-YYYY hh:mm a'
+                            }
+                        });
+                    });
+                    $('#instant-install').change(function () {
+                        if ($(this).is(":checked")) {
+                            $('#dateTimePicker-install').addClass("hidden");
+                            $("#schedule-install").val('');
+                        } else {
+                            $('#dateTimePicker-install').removeClass("hidden");
+                        }
+                    });
+                </script>
+                <br>
+                <br><br>
+                Do you want to perform this operation?
+                <br>
+                <div class="modal-footer">
+                    <a id="btn-schduled-install" href="#" data-app="{{asset.id}}"
+                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                       class="btn btn-primary">Yes</a>
+                    <a class="btn btn-danger" data-dismiss="modal">No</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.modal -->
+
+
 <div class="modal fade" id="modalDevices">
     <div class="modal-dialog-devices">
         <div class="modal-content">
@@ -180,7 +318,8 @@
     <div class="modal-dialog">
         <div class="modal-content ep-install-modal">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Enterprise Install</h4>
             </div>
             <div class="modal-body">
@@ -191,7 +330,9 @@
                 </ul>
                 <div class="tab-content">
                     <div id="ent-roles" class="tab-pane fade in active ">
-                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered " id="roles-table">
+                        <div class="form-inline pull-left" style="padding:2px"><label>Search: &nbsp;</label><input id="roleId" type="text" style="margin-right:5px"></div>
+                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered "
+                               id="roles-table">
                             <thead>
                             <tr>
                                 <th>Role name</th>
@@ -202,7 +343,9 @@
                         </table>
                     </div>
                     <div id="ent-users" class="tab-pane fade">
-                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="users-table">
+                        <div class="form-inline pull-left" style="padding:2px"><label>Search: &nbsp;</label><input id="userId" type="text" style="margin-right:5px"></div>
+                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered"
+                               id="users-table">
                             <thead>
                             <tr>
                                 <th>User name</th>
@@ -213,7 +356,6 @@
                         </table>
                     </div>
                 </div>
-
 
 
             </div>

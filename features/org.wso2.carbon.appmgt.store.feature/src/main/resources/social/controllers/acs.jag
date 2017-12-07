@@ -26,16 +26,33 @@
             samlRequest = request.getParameter('SAMLRequest'),
             relayState = request.getParameter('RelayState'),
             sso = require('sso'),
-            samlRespObj,
-            keyStoreProps = {
-                KEY_STORE_NAME: process.getProperty('carbon.home') + configs.ssoConfiguration.keyStoreName,
-                KEY_STORE_PASSWORD: configs.ssoConfiguration.keyStorePassword,
-                IDP_ALIAS: configs.ssoConfiguration.identityAlias
-            },
+            samlRespObj;
+
+    var keyStoreName = configs.ssoConfiguration.keyStoreName;
+    var keyStorePassword = configs.ssoConfiguration.keyStorePassword;
+    var identityAlias = configs.ssoConfiguration.identityAlias;
+    var CarbonUtils = Packages.org.wso2.carbon.utils.CarbonUtils;
+    if (keyStorePassword == null || keyStorePassword == "") {
+        keyStorePassword = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.Password");
+    }
+    if (identityAlias == null || identityAlias == "") {
+        identityAlias = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.KeyAlias");
+    }
+    if (keyStoreName == null || keyStoreName == "") {
+        keyStoreName = CarbonUtils.getServerConfiguration().getFirstProperty("Security.KeyStore.Location");
+    } else {
+        keyStoreName = process.getProperty('carbon.home') + keyStoreName;
+    }
+    var keyStoreProps = {
+        KEY_STORE_NAME: keyStoreName,
+        KEY_STORE_PASSWORD: keyStorePassword,
+        IDP_ALIAS: identityAlias
+        },
             sso_sessions = application.get('sso_sessions');
             contextPath = caramel.configs().context,
             reversProxyEnabled = caramel.configs().reverseProxyEnabled,
-            reverseProxyHost = caramel.configs().reverseProxyHost;
+            reverseProxyHost = caramel.configs().reverseProxyHost,
+                    attr = configs.ssoConfiguration;
 
     if(reversProxyEnabled) {
         relayState = reverseProxyHost+relayState;
@@ -48,31 +65,38 @@
 
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
+
+        if (!samlRespObj) {
+            log.error('SAML response object validation failure.');
+            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+            return;
+        }
+
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
-            // validating the signature
-            if (configs.ssoConfiguration.responseSigningEnabled) {
+            if (!sso.client.validateSamlResponse(samlRespObj, attr, keyStoreProps)) {
+                log.error('SAML response object validation failure.');
+                response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                return;
+            }
 
-                if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-                    var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
 
-                    if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-                        session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        session.put("Loged", "true");
+            if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                session.put("Loged", "true");
 
-                        sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
 
-                        var user = require('/modules/user.js');
+                var user = require('/modules/user.js');
 
-                        if (user.loginWithSAML(sessionObj.loggedInUser)) {
-			    if(log.isDebugEnabled()){
-                            	log.debug('user is set :::' + sessionObj.loggedInUser);
-                            }
-			    response.sendRedirect(relayState);
-                        }
-
+                if (user.loginWithSAML(sessionObj.loggedInUser)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug('user is set :::' + sessionObj.loggedInUser);
                     }
+                    response.sendRedirect(relayState);
                 }
+
             }
 
         } else {

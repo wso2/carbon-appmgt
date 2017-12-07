@@ -196,12 +196,8 @@ require('/modules/store.js').exec(function (ctx) {
     var isFavouriteApp = function (appName, version, provider) {
         var status = false;
         if (user) {
-            var tenantUsername;
-            if (tenantId == -1234) {
-                tenantUsername = user.username;
-            } else {
-                tenantUsername = user.username + "@" + user.tenantDomain;
-            }
+            var tenantUsername=user.username;
+
             // check whether this is favourite app of user.
             status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                             tenantDomain).status;
@@ -219,23 +215,60 @@ require('/modules/store.js').exec(function (ctx) {
         options.lifecycleState = ["published"];
         assets = store.taggeds(type, options, paging);
     } else if (query) {
-        var urlQuery = 'query=' + query + '&';
-        query = require('/modules/search.js').build(query);
-        query.overview_treatAsASite = 'FALSE';
-        if (!isMultipleVersionDisplayEnabled) {
-            query.overview_makeAsDefaultVersion = 'true';
+        var searchParameter;
+        var searchValue;
+        var splitQuery = query.split(":");
+        searchParameter = splitQuery[0];
+        // This is a registry based search. In search box, user wants to search by business owner name. But
+        // in registry, there is only business owner id. Therefore, it is necessary to get business owner ids
+        // related to search prefix from database.
+
+        if (!searchParameter.equals("Business Owner")) {
+            var urlQuery = 'query=' + query + '&';
+            query = require('/modules/search.js').build(query);
+            query.overview_treatAsASite = 'FALSE';
+            if (!isMultipleVersionDisplayEnabled) {
+                query.overview_makeAsDefaultVersion = 'true';
+            }
+            options = {
+                type: type,
+                attributes: query
+            };
+            assets = store.search(options, paging);
+        } else {
+            searchValue = splitQuery[1];
+            var initialQuery = "businessOwner:" + searchValue;
+            var searchPrefix = searchValue.split("\"")[1];
+            var resultIdsList = storeHostObj.getBusinessOwnerIdsByBusinessOwnerNameField(searchPrefix, tenantId);
+            if (resultIdsList) {
+                var resultAssets = [];
+                resultIdsList = resultIdsList.toArray();
+                for (var key in resultIdsList) {
+                    var businessOwnerId = resultIdsList[key];
+                    query = "businessOwner:\"" + businessOwnerId + "\"";
+                    query = require('/modules/search.js').build(query);
+                    query.overview_treatAsASite = 'FALSE';
+                    if (!isMultipleVersionDisplayEnabled) {
+                        query.overview_makeAsDefaultVersion = 'true';
+                    }
+                    options = {
+                        type: type,
+                        attributes: query
+                    };
+                    resultAssets = resultAssets.concat(store.search(options, paging));
+                }
+                assets = resultAssets;
+            }
+            query = initialQuery;
+            urlQuery = 'query=' + initialQuery + '&';
+            query = require('/modules/search.js').build(query);
         }
-        options = {
-            type: type,
-            attributes: query
-        };
         for (key in query) {
             if (query.hasOwnProperty(key) && key === 'overview_category') {
                 selectedCategory = query[key];
             }
         }
         subPage = '/ Search: "' + query + '"';
-        assets = store.search(options, paging);
     } else {
         if (paging.sort == 'popular') {
             var urlQuery = 'sort=' + paging.sort + '&';

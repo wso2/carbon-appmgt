@@ -71,7 +71,10 @@ public class AppDTO  {
   
   
   private String skipGateway = null;
-  
+
+
+  private Boolean serviceProviderCreationEnabled = null;
+
   
   private String allowAnonymousAccess = null;
   
@@ -149,6 +152,12 @@ public class AppDTO  {
   
   
   private String createdTime = null;
+  
+  
+  private String previousVersionAppID = null;
+
+
+  private List<CustomPropertyDTO> customProperties = new ArrayList<CustomPropertyDTO>();
 
   
   /**
@@ -383,7 +392,18 @@ public class AppDTO  {
     this.skipGateway = skipGateway;
   }
 
-  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("serviceProviderCreationEnabled")
+  public Boolean isServiceProviderCreationEnabled() {
+    return serviceProviderCreationEnabled;
+  }
+  public void setServiceProviderCreationEnabled(Boolean serviceProviderCreationEnabled) {
+    this.serviceProviderCreationEnabled = serviceProviderCreationEnabled;
+  }
+
+
   /**
    **/
   @ApiModelProperty(value = "")
@@ -715,7 +735,19 @@ public class AppDTO  {
     this.createdTime = createdTime;
   }
 
-  
+
+  /**
+   * custom properties
+   **/
+  @ApiModelProperty(value = "custom properties")
+  @JsonProperty("customProperties")
+  public List<CustomPropertyDTO> getCustomProperties() {
+    return customProperties;
+  }
+  public void setCustomProperties(List<CustomPropertyDTO> customProperties) {
+    this.customProperties = customProperties;
+  }
+
 
   @Override
   public String toString()  {
@@ -767,6 +799,8 @@ public class AppDTO  {
     sb.append("  mediaType: ").append(mediaType).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
     sb.append("  createdTime: ").append(createdTime).append("\n");
+    sb.append("  customProperties: ").append(customProperties).append("\n");
+    //sb.append("  previousVersionAppID: ").append(previousVersionAppID).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

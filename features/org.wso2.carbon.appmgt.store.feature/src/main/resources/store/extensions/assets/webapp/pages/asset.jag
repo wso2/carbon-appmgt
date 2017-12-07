@@ -38,6 +38,8 @@ var subscriptionConfig = require('../../../../themes/store/js/subscription-confi
 var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
 var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
+var businessOwnerHelper = require('../themes/store/js/logic/businessOwners/businessOwners.js')
+
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title, currentTenant, userTenant, tenantIdVal,
         log = ctx.log,
@@ -215,12 +217,20 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
             var overviewBusinessOwner = asset.attributes.overview_businessOwner;
-            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
-                businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner);
+            
+            var appDomainName = asset.attributes.overview_appTenant;
+            var tenantId;
+            if (!(!appDomainName || appDomainName == null || appDomainName == 'undefined')) {
+                tenantId = carbon.server.tenantId({ domain: appDomainName });
+            } else {
+                tenantId = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            }
 
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner
+                                                                                       != "null") {
+                businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
                 if (businessOwner != null && businessOwner.businessOwnerName != null) {
-                    businessOwnerCustomData =
-                    require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+                    businessOwnerCustomData = businessOwnerHelper.transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;
                     ownerEmail = businessOwnerCustomData[1].value;
                 }
@@ -356,12 +366,7 @@ require('/modules/store.js').exec(function (ctx) {
             var version = asset.attributes.overview_version;
             var provider = asset.attributes.overview_provider;
 
-            var tenantUsername;
-            if (tenantId == -1234) {
-                tenantUsername = user.username;
-            } else {
-                tenantUsername = user.username + "@" + user.tenantDomain;
-            }
+            var tenantUsername = user.username;
 
             var status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                                 tenantDomain).status;
@@ -527,7 +532,7 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
-        var searchQuery = {search: "", searchTerm: ""};
+        var searchQuery = {search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
                            title: 'WebApp | Store',

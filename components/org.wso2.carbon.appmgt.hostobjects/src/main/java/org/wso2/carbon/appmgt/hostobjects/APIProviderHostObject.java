@@ -23,6 +23,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.woden.WSDLFactory;
@@ -42,7 +43,19 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.dto.AppHitsStatsDTO;
+import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResourcePathUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseFaultCountDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseTimeDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageByUserDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppVersionLastAccessTimeDTO;
+import org.wso2.carbon.appmgt.api.dto.AppVersionUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.PerUserAPIUsageDTO;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
+import org.wso2.carbon.appmgt.api.dto.UserHitsPerAppDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
@@ -69,22 +82,10 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
+import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
+import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResourcePathUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseFaultCountDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionLastAccessTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.AppHitsStatsDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.PerUserAPIUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.UserHitsPerAppDTO;
-import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -94,7 +95,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.net.ssl.SSLHandshakeException;
-import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
@@ -102,7 +102,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -282,46 +281,42 @@ public class APIProviderHostObject extends ScriptableObject {
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     * @return Whether business owner was deleted or not
+     * @throws AppManagementException on error while trying to delete business owner
      */
     public static boolean jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
+                                                         Object[] args, Function funObj)
+            throws AppManagementException {
         if (args == null || args.length != 1) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null) {
-            handleException("Error while deleting business owner. Owner content is null");
+            handleException("Error occurred while deleting business owner. Business owner content is null");
         }
-        String ownerId = args[0].toString();
+        int ownerId = Integer.valueOf(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.deleteBusinessOwner(ownerId);
     }
 
     /**
-     * Update the given business owner.
+     * Update business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api
-     * .AppManagementException
+     * @throws AppManagementException on error while trying to update business owner
      */
     public static void jsFunction_updateBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
+                                                      Object[] args, Function funObj)
+            throws AppManagementException {
         if (args == null || args.length != 6) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null ) {
-            handleException("Error while saving business owner. Owner content is null");
+        if (args[0] == null || args[1] == null) {
+            handleException("Error occurred while updating business owner. Business owner content is null");
         }
         BusinessOwner businessOwner = new BusinessOwner();
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
@@ -333,20 +328,20 @@ public class APIProviderHostObject extends ScriptableObject {
         businessOwner.setBusinessOwnerSite(args[4].toString());
 
         JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerDetailObject = null;
+        JSONObject businessOwnerDetailObject = null;
         try {
-            busiessOwnerDetailObject = (JSONObject) parser.parse(args[5].toString());
+            businessOwnerDetailObject = (JSONObject) parser.parse(args[5].toString());
         } catch (ParseException e) {
             handleException("Error while parsing JSON", e);
         }
-        Set<Map.Entry> entries = busiessOwnerDetailObject.entrySet();
+        Set<Map.Entry> entries = businessOwnerDetailObject.entrySet();
         for (Map.Entry entry : entries) {
             String key = (String) entry.getKey();
             JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
             String propertyValue = businessOwnerValuesObject.get(0).toString();
             String showInStore = businessOwnerValuesObject.get(1).toString();
             BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-            businessOwnerProperty.setPropertyId(key);
+            businessOwnerProperty.setPropertyKey(key);
             businessOwnerProperty.setPropertyValue(propertyValue);
             businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(showInStore));
 
@@ -357,103 +352,109 @@ public class APIProviderHostObject extends ScriptableObject {
         apiProvider.updateBusinessOwner(businessOwner);
     }
 
-
     /**
-     * Retrieve business owners
-     * @param cx      Rhino context
+     * Retrieve business owners.
+     *
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return List of business owners
+     * @throws AppManagementException on error while trying to get business owners
      */
-
-
-    public static NativeArray jsFunction_getBusinessOwners(Context cx, Scriptable thisObj,
-                                                              Object[] args,
-                                                              Function funObj) throws
-                                                                               AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
+    public static NativeArray jsFunction_getBusinessOwners(Context context, Scriptable thisObj,
+                                                           Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray nativeArray = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(thisObj);
         List<BusinessOwner> BusinessOwnerList = apiProvider.getBusinessOwners();
         int count = 0;
         for (BusinessOwner businessOwner : BusinessOwnerList) {
-            NativeObject row = new NativeObject();
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+            NativeObject nativeObject = new NativeObject();
+            nativeObject.put("businessOwnerId", nativeObject, businessOwner.getBusinessOwnerId());
+            nativeObject.put("businessOwnerName", nativeObject, businessOwner.getBusinessOwnerName());
+            nativeObject.put("businessOwnerEmail", nativeObject, businessOwner.getBusinessOwnerEmail());
+            nativeObject.put("businessOwnerDescription", nativeObject, businessOwner.getBusinessOwnerDescription());
+            nativeObject.put("businessOwnerSite", nativeObject, businessOwner.getBusinessOwnerSite());
             count++;
-            myn.put(count, myn, row);
+            nativeArray.put(count, nativeArray, nativeObject);
         }
 
-        return myn;
+        return nativeArray;
     }
 
     /**
      * Retrieve business owner.
-     * @param cx      Rhino context
+     *
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return Native object with business owner
+     * @throws AppManagementException on error while trying to get business owner
      */
-    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args,
+    public static NativeObject jsFunction_getBusinessOwner(Context context, Scriptable thisObj, Object[] args,
                                                            Function funObj) throws AppManagementException {
         if (args == null || args.length != 1) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[0] == "null") {
-            handleException("Error while reading business owner. Owner id is null");
+            handleException("Error occurred while retrieving business owner. Business owner id is null");
         }
-        NativeObject row = new NativeObject();
+        NativeObject businessOwnerNativeObject = new NativeObject();
         int ownerId;
         try {
             ownerId = Integer.valueOf(args[0].toString());
             APIProvider apiProvider = getAPIProvider(thisObj);
             BusinessOwner businessOwner = apiProvider.getBusinessOwner(ownerId);
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+            businessOwnerNativeObject.put("businessOwnerId", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerId());
+            businessOwnerNativeObject.put("businessOwnerId", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerId());
+            businessOwnerNativeObject.put("businessOwnerName", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerName());
+            businessOwnerNativeObject.put("businessOwnerEmail", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerEmail());
+            businessOwnerNativeObject.put("businessOwnerDescription", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerDescription());
+            businessOwnerNativeObject.put("businessOwnerSite", businessOwnerNativeObject, businessOwner
+                    .getBusinessOwnerSite());
             List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
-            if(businessOwnerPropertiesList != null) {
+            if (businessOwnerPropertiesList != null) {
                 JSONObject businessOwnerPropertiesObject = new JSONObject();
                 for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                     JSONObject businessOwnerPropertyObject = new JSONObject();
                     BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
                     businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
                     businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
-                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyId(),businessOwnerPropertyObject);
+                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(),
+                                                      businessOwnerPropertyObject);
                 }
-                row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
+                businessOwnerNativeObject.put("businessOwnerProperties", businessOwnerNativeObject,
+                                              businessOwnerPropertiesObject.toJSONString());
             } else {
-                row.put("businessOwnerProperties", row, null);
+                businessOwnerNativeObject.put("businessOwnerProperties", businessOwnerNativeObject, null);
             }
         } catch (NumberFormatException e) {
             log.warn("Business owner id : " + args[0] + " is not an integer.", e);
         }
-        return row;
+        return businessOwnerNativeObject;
     }
 
     /**
-     * Search business owners with pagination
-     * @param cx
-     * @param thisObj
-     * @param args
-     * @param funObj
-     * @return
-     * @throws AppManagementException
+     * Search business owners with pagination.
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Arguments
+     * @param funObj  Function object
+     * @return Native object with business owners
+     * @throws AppManagementException on error while trying to search business owner
      */
-    public static NativeObject jsFunction_searchBusinessOwners(Context cx, Scriptable thisObj, Object[] args,
-                                                           Function funObj) throws AppManagementException {
-        if (args==null||args.length != 4) {
-            handleException("Invalid number of input parameters received when searching business owners.");
+    public static NativeObject jsFunction_searchBusinessOwners(Context context, Scriptable thisObj, Object[] args,
+                                                               Function funObj) throws AppManagementException {
+        if (args == null || args.length != 4) {
+            handleException("Invalid number of input parameters.");
         }
         APIProvider apiProvider = getAPIProvider(thisObj);
         int startIndex = Integer.parseInt(args[0].toString());
@@ -462,83 +463,126 @@ public class APIProviderHostObject extends ScriptableObject {
         String searchValue = args[3].toString();
         List<BusinessOwner> businessOwnerList = apiProvider.searchBusinessOwners(startIndex, pageSize, searchValue);
         int totalBusinessOwners = apiProvider.getBusinessOwnersCount();
-        NativeObject nativeObject = new NativeObject();
-        nativeObject.put("draw", nativeObject, currentPage);
-        nativeObject.put("recordsTotal", nativeObject, totalBusinessOwners);
-        if(searchValue.trim() == "") {
-            nativeObject.put("recordsFiltered", nativeObject, totalBusinessOwners);
+        NativeObject businessOwnersNativeObject = new NativeObject();
+        businessOwnersNativeObject.put("draw", businessOwnersNativeObject, currentPage);
+        businessOwnersNativeObject.put("recordsTotal", businessOwnersNativeObject, totalBusinessOwners);
+        if (searchValue.trim() == "") {
+            businessOwnersNativeObject.put("recordsFiltered", businessOwnersNativeObject, totalBusinessOwners);
         } else {
             int filteredNoOfRecords = businessOwnerList.size();
-            nativeObject.put("recordsFiltered", nativeObject, filteredNoOfRecords);
+            businessOwnersNativeObject.put("recordsFiltered", businessOwnersNativeObject, filteredNoOfRecords);
         }
 
         NativeArray businessOwnersNativeArray = new NativeArray(0);
         int businessOwnersArrayCount = 0;
 
         for (BusinessOwner businessOwner : businessOwnerList) {
-            NativeArray businessOwnerArray = new NativeArray(0);
+            NativeObject businessOwnerObject = new NativeObject();
             int count = 0;
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerId());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerName());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerEmail());
-            businessOwnerArray.put(count++, businessOwnerArray, businessOwner.getBusinessOwnerSite());
-            businessOwnerArray.put(count, businessOwnerArray, businessOwner.getBusinessOwnerDescription());
-            businessOwnersNativeArray.put(businessOwnersArrayCount, businessOwnersNativeArray, businessOwnerArray);
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerId());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerName());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerEmail());
+            businessOwnerObject.put(count++, businessOwnerObject, businessOwner.getBusinessOwnerSite());
+            businessOwnerObject.put(count, businessOwnerObject, businessOwner.getBusinessOwnerDescription());
+            businessOwnersNativeArray.put(businessOwnersArrayCount, businessOwnersNativeArray, businessOwnerObject);
             businessOwnersArrayCount++;
         }
 
-        nativeObject.put("data", nativeObject, businessOwnersNativeArray);
-        return nativeObject;
+        businessOwnersNativeObject.put("data", businessOwnersNativeObject, businessOwnersNativeArray);
+        return businessOwnersNativeObject;
     }
 
     /**
-     * Saves business owner.
+     * Save business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     * @return Saved business owner id
+     * @throws AppManagementException on error while trying to save business owner
      */
-    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
-                                                   Object[] args,
-                                                   Function funObj) throws
-                                                                    AppManagementException, ParseException {
+    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj, Object[] args,
+                                                   Function funObj) throws AppManagementException {
         BusinessOwner businessOwner = new BusinessOwner();
-        List<BusinessOwnerProperty> businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
+        List<BusinessOwnerProperty> businessOwnerProperties = null;
 
         if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null ) {
-            handleException("Error while saving business owner. Owner content is null");
+        if (args[0] == null || args[1] == null) {
+            handleException("Error occurred while saving business owner. Business owner content is null");
         }
 
         businessOwner.setBusinessOwnerName(args[0].toString());
         businessOwner.setBusinessOwnerEmail(args[1].toString());
-        businessOwner.setBusinessOwnerDescription(args[2].toString());
-        businessOwner.setBusinessOwnerSite(args[3].toString());
+        String businessOwnerDescription = args[2].toString();
+        if (StringUtils.isEmpty(businessOwnerDescription)) {
+            businessOwnerDescription = null;
+        }
+        String businessOwnerSite = args[3].toString();
+        if (StringUtils.isEmpty(businessOwnerSite)) {
+            businessOwnerSite = null;
+        }
+        businessOwner.setBusinessOwnerDescription(businessOwnerDescription);
+        businessOwner.setBusinessOwnerSite(businessOwnerSite);
 
         JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
+        JSONObject businessOwnerPropertyObject = null;
+        try {
+            businessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
+        } catch (ParseException e) {
+            handleException("Error occurred while parsing JSON", e);
+        }
 
-        Set<Map.Entry> entries = busiessOwnerPropertyObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
-            String propertyValue = businessOwnerValuesObject.get(0).toString();
-            Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
-            BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
-            businessOwnerPropertiesValues.setPropertyId(key);
-            businessOwnerPropertiesValues.setPropertyValue(propertyValue);
-            businessOwnerPropertiesValues.setShowingInStore(showInStore);
+        Set<Map.Entry> entries = businessOwnerPropertyObject.entrySet();
+        if (entries.size() > 0) {
+            businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
+            for (Map.Entry entry : entries) {
+                String key = (String) entry.getKey();
+                JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
+                String propertyValue = businessOwnerValuesObject.get(0).toString();
+                Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
+                BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
+                businessOwnerPropertiesValues.setPropertyKey(key);
+                businessOwnerPropertiesValues.setPropertyValue(propertyValue);
+                businessOwnerPropertiesValues.setShowingInStore(showInStore);
 
-            businessOwnerProperties.add(businessOwnerPropertiesValues);
+                businessOwnerProperties.add(businessOwnerPropertiesValues);
+            }
         }
         businessOwner.setBusinessOwnerPropertiesList(businessOwnerProperties);
         APIProvider apiProvider = getAPIProvider(thisObj);
         int businessOwnerId = apiProvider.saveBusinessOwner(businessOwner);
+        return businessOwnerId;
+    }
+
+    /**
+     * Get Business owner by owner name and email.
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Arguments
+     * @param funObj  Function object
+     * @return Business owner id
+     * @throws AppManagementException on error while trying to get business owner id
+     */
+    public static int jsFunction_getBusinessOwnerId(Context context, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 2) {
+            handleException("Invalid number of input parameters.");
+        }
+
+        if (args[0] == null || args[1] == null) {
+            handleException("Error occurred while checking for existence of business owner: NULL value in expected " +
+                                    "parameters -> [business owner name:" + args[0] + ",email:" + args[1] + "]");
+
+        }
+        String businessOwnerName = (String) args[0];
+        String businessOwnerEmail = (String) args[1];
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        int businessOwnerId = apiProvider.getBusinessOwnerId(businessOwnerName, businessOwnerEmail);
         return businessOwnerId;
     }
 
@@ -591,12 +635,13 @@ public class APIProviderHostObject extends ScriptableObject {
                                             Object[] args,
                                             Function funObj)
             throws AppManagementException, ScriptException {
-        if (args==null||args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         boolean success;
         NativeObject apiData = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
         String provider = String.valueOf(apiData.get("provider", apiData));
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
@@ -837,7 +882,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
                 /*Set permissions to anonymous role for thumbPath*/
                 AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), null, null, thumbPath);
-                apiProvider.updateAPI(api);
+                apiProvider.updateAPI(api, authorizedAdminCookie);
             }
 
             success = true;
@@ -878,7 +923,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                               Object[] args,
                                                               Function funObj) throws
             AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null) {
@@ -886,12 +931,13 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         NativeObject appIdentifierNativeObject = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
         APIIdentifier apiIdentifier = new APIIdentifier(
                 (String) (appIdentifierNativeObject.get("provider", appIdentifierNativeObject)),
                 (String) (appIdentifierNativeObject.get("name", appIdentifierNativeObject)),
                 (String) (appIdentifierNativeObject.get("version", appIdentifierNativeObject)));
         APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.generateEntitlementPolicies(apiIdentifier);
+        apiProvider.generateEntitlementPolicies(apiIdentifier, authorizedAdminCookie);
     }
 
     /**
@@ -908,16 +954,18 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                 Object[] args,
                                                                 Function funObj) throws
                                                                                  AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null) {
+        if (args[0] == null || args[1] == null) {
             handleException("Error while retrieving entitlement policy content. Entitlement policy id is null");
         }
 
         String policyId = args[0].toString();
+        String authorizedAdminCookie = args[1].toString();
+
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.getEntitlementPolicy(policyId);
+        return apiProvider.getEntitlementPolicy(policyId, authorizedAdminCookie);
     }
 
     /**
@@ -992,10 +1040,10 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                     Object[] args,
                                                                     Function funObj) throws
                                                                                      AppManagementException {
-        if (args == null || args.length != 4) {
+        if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
         }
-        if (args[0] == null || args[1] == null || args[2] == null) {
+        if (args[0] == null || args[1] == null || args[2] == null || args[4] == null) {
             handleException("Error in updating policy parital :NULL value in expected parameters ->"
                     + "[policyPartialId:" + args[0] + ",policyPartial:" + args[1] + ",isShared:" + args[0] + "]");
         }
@@ -1005,9 +1053,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
+        String authorizedAdminCookie = args[4].toString();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial, policyPartialDesc);
+        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial,
+                                                          policyPartialDesc, authorizedAdminCookie);
     }
 
     /**
@@ -1221,13 +1271,14 @@ public class APIProviderHostObject extends ScriptableObject {
     public static void jsFunction_updateEntitlementPolicies(Context cx, Scriptable thisObj, Object[] args,
                                                             Function funObj) throws
                                                                                  AppManagementException {
-        if (args == null || args.length == 0) {
+        if (args == null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         NativeArray policies = (NativeArray) args[0];
+        String authorizedAdminCookie = (String) args[1];
         APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.updateEntitlementPolicies(policies);
+        apiProvider.updateEntitlementPolicies(policies, authorizedAdminCookie);
     }
 
 
@@ -1235,11 +1286,13 @@ public class APIProviderHostObject extends ScriptableObject {
                                                Object[] args,
                                                Function funObj) throws AppManagementException {
 
-        if (args==null || args.length == 0) {
+        if (args==null || args.length != 2) {
             handleException("Invalid number of input parameters.");
         }
 
         NativeObject apiData = (NativeObject) args[0];
+        String authorizedAdminCookie = (String) args[1];
+
         String uuid = (String) apiData.get("id");
         apiData = (NativeObject)apiData.get("attributes",apiData) ;
         boolean success;
@@ -1259,9 +1312,10 @@ public class APIProviderHostObject extends ScriptableObject {
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
                                                                                  apiData));
         String treatAsSite = (String) apiData.get("overview_treatAsASite", apiData);
+        String visibleRoles = (String) apiData.get(AppMConstants.API_OVERVIEW_VISIBLE_ROLES);
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
-        String visibleRoles = "";
+
 
         if (endpoint != null && endpoint.trim().length() == 0) {
             endpoint = null;
@@ -1351,9 +1405,10 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setAllowAnonymous(allowAnonymous);
         api.setDefaultVersion(makeAsDefaultVersion);
         api.setTreatAsASite(treatAsSite);
+        api.setVisibleRoles(visibleRoles);
 
         try {
-            apiProvider.updateAPI(api);
+            apiProvider.updateAPI(api, authorizedAdminCookie);
             boolean hasAPIUpdated=false;
             if(!oldApi.equals(api)){
                 hasAPIUpdated=true;
@@ -2567,7 +2622,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getProviderAPIVersionUsage(Context cx, Scriptable thisObj,
                                                                     Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIVersionUsageDTO> list = null;
+        List<AppVersionUsageDTO> list = null;
         if (args == null || args.length==0) {
             handleException("Invalid input parameters.");
         }
@@ -2578,10 +2633,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String providerName = (String) args[0];
         String apiName = (String) args[1];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getUsageByAPIVersions(providerName, apiName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIVersionUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getUsageByAppVersions(providerName, apiName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIVersionUsage", e);
         }
         Iterator it = null;
         if (list != null) {
@@ -2592,7 +2648,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIVersionUsageDTO usage = (APIVersionUsageDTO) usageObject;
+                AppVersionUsageDTO usage = (AppVersionUsageDTO) usageObject;
                 row.put("version", row, usage.getVersion());
                 row.put("count", row, usage.getCount());
                 myn.put(i, myn, row);
@@ -2611,7 +2667,7 @@ public class APIProviderHostObject extends ScriptableObject {
             return myn;
         }
 
-        List<APIUsageDTO> list = null;
+        List<AppUsageDTO> list = null;
         if (args == null ||  args.length==0) {
             handleException("Invalid number of parameters.");
         }
@@ -2621,11 +2677,11 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-
-            list = client.getUsageByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            list = appUsageStatisticsService.getUsageByApps(providerName, fromDate, toDate, 10, tenantDomainName);
+        } catch (AppUsageQueryServiceClientException e) {
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
         NativeArray myn = new NativeArray(0);
         Iterator it = null;
@@ -2637,7 +2693,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIUsageDTO usage = (APIUsageDTO) usageObject;
+                AppUsageDTO usage = (AppUsageDTO) usageObject;
                 row.put("apiName", row, usage.getApiName());
                 row.put("count", row, usage.getCount());
                 myn.put(i, myn, row);
@@ -2662,10 +2718,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String providerName = (String) args[0];
         String apiName = (String) args[1];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getUsageBySubscribers(providerName, apiName, 10);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUserUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getUsageBySubscribers(providerName, apiName, 10);
+        } catch (AppUsageQueryServiceClientException e) {
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUserUsage", e);
         }
         Iterator it = null;
         if (list != null) {
@@ -2689,7 +2746,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIUsageByResourcePath(Context cx, Scriptable thisObj,
                                                                    Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIResourcePathUsageDTO> list = null;
+        List<AppResourcePathUsageDTO> list = null;
         NativeArray myn = new NativeArray(0);
         if (!HostObjectUtils.checkDataPublishingEnabled()) {
             return myn;
@@ -2705,11 +2762,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAPIUsageByResourcePath(providerName, fromDate, toDate);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getAppUsageByResourcePath(providerName, fromDate, toDate);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2721,7 +2778,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIResourcePathUsageDTO usage = (APIResourcePathUsageDTO) usageObject;
+                AppResourcePathUsageDTO usage = (AppResourcePathUsageDTO) usageObject;
                 row.put("apiName", row, usage.getApiName());
                 row.put("version", row, usage.getVersion());
                 row.put("method", row, usage.getMethod());
@@ -2738,7 +2795,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIUsageByPage(Context cx, Scriptable thisObj,
                                                            Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIPageUsageDTO> list = null;
+        List<AppPageUsageDTO> list = null;
         NativeArray myn = new NativeArray(0);
         if (!HostObjectUtils.checkDataPublishingEnabled()) {
             return myn;
@@ -2756,10 +2813,11 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            list = client.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            list = appUsageStatisticsService.getAppUsageByPage(providerName, fromDate, toDate, tenantDomainName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2771,7 +2829,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIPageUsageDTO usage = (APIPageUsageDTO) usageObject;
+                AppPageUsageDTO usage = (AppPageUsageDTO) usageObject;
                 row.put("apiName", row, usage.getApiName());
                 row.put("version", row, usage.getVersion());
                 row.put("userid", row, usage.getUserId());
@@ -2788,7 +2846,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIUsageByUser(Context cx, Scriptable thisObj,
                                                            Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIUsageByUserDTO> list = null;
+        List<AppUsageByUserDTO> list = null;
         NativeArray myn = new NativeArray(0);
         if(!HostObjectUtils.checkDataPublishingEnabled()){
             return myn;
@@ -2805,12 +2863,13 @@ public class APIProviderHostObject extends ScriptableObject {
 
         try {
             String userName = ((APIProviderHostObject) thisObj).getUsername();
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
 
-            list = client.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            list = appUsageStatisticsService.getAppUsageByUser(providerName, fromDate, toDate, tenantDomainName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2822,7 +2881,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIUsageByUserDTO usage = (APIUsageByUserDTO) usageObject;
+                AppUsageByUserDTO usage = (AppUsageByUserDTO) usageObject;
                 row.put("apiName", row, usage.getApiName());
                 row.put("version", row, usage.getVersion());
                 row.put("userId", row, usage.getUserID());
@@ -2831,64 +2890,6 @@ public class APIProviderHostObject extends ScriptableObject {
                 row.put("userId", row, usage.getUserID());
                 row.put("time", row, usage.getRequestDate());
 
-
-                myn.put(i, myn, row);
-                i++;
-            }
-        }
-        return myn;
-    }
-
-    //cache hit
-
-    public static NativeArray jsFunction_getcashHitMiss(Context cx, Scriptable thisObj,
-                                                           Object[] args, Function funObj)
-            throws AppManagementException {
-        List<APPMCacheCountDTO> list = null;
-        NativeArray myn = new NativeArray(0);
-        if(!HostObjectUtils.checkDataPublishingEnabled()){
-            return myn;
-        }
-        if (args.length == 0) {
-            handleException("Invalid number of parameters.");
-        }
-        if (!HostObjectUtils.checkDataPublishingEnabled()) {
-            return myn;
-        }
-        String providerName = (String) args[0];
-        String fromDate = (String) args[1];
-        String toDate = (String) args[2];
-
-        try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getCacheHitCount(providerName,fromDate,toDate);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
-        } catch (SQLException e) {
-            log.error("Error while executing the SQL", e);
-        } catch (XMLStreamException e) {
-            log.error("Error while reading the xml-stream", e);
-        }
-
-        Iterator it = null;
-        if (list != null) {
-            it = list.iterator();
-        }
-        int i = 0;
-        if (it != null) {
-            while (it.hasNext()) {
-                NativeObject row = new NativeObject();
-                Object usageObject = it.next();
-                APPMCacheCountDTO usage = (APPMCacheCountDTO) usageObject;
-                String userName[]=usage.getApiName().split("--");
-                String name[]=userName[1].split(":");
-                row.put("apiName", row,  name[0]);
-                row.put("version", row, usage.getVersion());
-                row.put("fullRequestPath", row, usage.getFullRequestPath());
-                row.put("cachetHit",row,usage.getCacheHit());
-                row.put("totalRequestCount", row, usage.getTotalRequestCount());
-                row.put("time", row, usage.getRequestDate());
 
                 myn.put(i, myn, row);
                 i++;
@@ -2914,11 +2915,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String apiName = (String) args[1];
         String version = (String) args[2];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getUsageBySubscribers(providerName, apiName, version, 10);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUserUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getUsageBySubscribers(providerName, apiName, version, 10);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUserUsage", e);
         }
         Iterator it = null;
         if (list != null) {
@@ -2944,7 +2945,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                              Object[] args,
                                                                              Function funObj)
             throws AppManagementException {
-        List<APIVersionLastAccessTimeDTO> list = null;
+        List<AppVersionLastAccessTimeDTO> list = null;
         if (args == null ||  args.length==0) {
             handleException("Invalid number of parameters.");
         }
@@ -2959,11 +2960,13 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
 
-            list = client.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10, tenantDomainName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIVersionLastAccess", e);
+            list = appUsageStatisticsService.getLastAccessTimesByApps(providerName, fromDate, toDate, 10,
+                                                                      tenantDomainName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIVersionLastAccess", e);
         }
         Iterator it = null;
         if (list != null) {
@@ -2974,7 +2977,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIVersionLastAccessTimeDTO usage = (APIVersionLastAccessTimeDTO) usageObject;
+                AppVersionLastAccessTimeDTO usage = (AppVersionLastAccessTimeDTO) usageObject;
                 row.put("api_name", row, usage.getApiName());
                 row.put("api_version", row, usage.getApiVersion());
                 row.put("user", row, usage.getUser());
@@ -2990,7 +2993,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getProviderAPIServiceTime(Context cx, Scriptable thisObj,
                                                                    Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIResponseTimeDTO> list = null;
+        List<AppResponseTimeDTO> list = null;
         if (args == null ||  args.length==0) {
             handleException("Invalid number of parameters.");
         }
@@ -3006,10 +3009,12 @@ public class APIProviderHostObject extends ScriptableObject {
         try {
             String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIServiceTime", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            list = appUsageStatisticsService.getResponseTimesByApps(providerName,
+                                                                    fromDate, toDate, 10, tenantDomainName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIServiceTime", e);
         }
         Iterator it = null;
         if (list != null) {
@@ -3020,7 +3025,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIResponseTimeDTO usage = (APIResponseTimeDTO) usageObject;
+                AppResponseTimeDTO usage = (AppResponseTimeDTO) usageObject;
                 row.put("apiName", row, usage.getApiName());
                 row.put("context", row, usage.getContext());
                 row.put("version", row, usage.getVersion());
@@ -3225,7 +3230,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static boolean jsFunction_deleteApp(Context context, Scriptable thisObj,
                                                Object[] args,
                                                Function funObj) throws AppManagementException {
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[2] == null) {
@@ -3241,6 +3246,7 @@ public class APIProviderHostObject extends ScriptableObject {
         SSOProvider ssoProvider = (SSOProvider) ssoProviderNativeJavaObject.unwrap();
 
         boolean isTenantFlowStarted = false;
+        String authorizedAdminCookie = (String) args[3];
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3249,7 +3255,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
             APIProvider appProvider = getAPIProvider(thisObj);
-            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider);
+            isAppDeleted = appProvider.deleteApp(apiIdentifier, ssoProvider, authorizedAdminCookie);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3521,7 +3527,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIResponseFaultCount(Context cx, Scriptable thisObj,
                                                                   Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIResponseFaultCountDTO> list = null;
+        List<AppResponseFaultCountDTO> list = null;
         NativeArray myn = new NativeArray(0);
         if (!HostObjectUtils.checkDataPublishingEnabled()) {
             return myn;
@@ -3533,11 +3539,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAPIResponseFaultCount(providerName,fromDate,toDate);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getAppResponseFaultCount(providerName, fromDate, toDate);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -3549,7 +3555,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object faultObject = it.next();
-                APIResponseFaultCountDTO fault = (APIResponseFaultCountDTO) faultObject;
+                AppResponseFaultCountDTO fault = (AppResponseFaultCountDTO) faultObject;
                 row.put("apiName", row, fault.getApiName());
                 row.put("version", row, fault.getVersion());
                 row.put("context", row, fault.getContext());
@@ -3565,7 +3571,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIFaultyAnalyzeByTime(Context cx, Scriptable thisObj,
                                                                    Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIResponseFaultCountDTO> list = null;
+        List<AppResponseFaultCountDTO> list = null;
         NativeArray myn = new NativeArray(0);
         if (!HostObjectUtils.checkDataPublishingEnabled()) {
             return myn;
@@ -3575,11 +3581,11 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         String providerName = (String) args[0];
         try {
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAPIFaultyAnalyzeByTime(providerName);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getAppFaultyAnalyzeByTime(providerName);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -3591,7 +3597,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object faultObject = it.next();
-                APIResponseFaultCountDTO fault = (APIResponseFaultCountDTO) faultObject;
+                AppResponseFaultCountDTO fault = (AppResponseFaultCountDTO) faultObject;
                 long faultTime = Long.parseLong(fault.getRequestTime());
                 row.put("apiName", row, fault.getApiName());
                 row.put("version", row, fault.getVersion());
@@ -3619,11 +3625,11 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         String providerName = (String) args[0];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getFirstAccessTime(providerName,1);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.getFirstAccessTime(providerName, 1);
+        } catch (AppUsageQueryServiceClientException e) {
+            log.error("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
         NativeArray myn = new NativeArray(0);
         NativeObject row = new NativeObject();
@@ -3825,7 +3831,7 @@ public class APIProviderHostObject extends ScriptableObject {
         List<AppHitsStatsDTO> appStatsList = null;
         NativeArray popularApps = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(hostObj);
-        if (!AppManagerUtil.isUIActivityBAMPublishEnabled()) {
+        if (!AppManagerUtil.isUIActivityDASPublishEnabled()) {
             return popularApps;
         }
         if (args.length != 3) {
@@ -3848,10 +3854,10 @@ public class APIProviderHostObject extends ScriptableObject {
                         tenantDomain, true);
             }
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
-            appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) hostObj).getUsername());
+            appStatsList = appUsageStatisticsService.getAppHitsOverTime(fromDate, toDate, tenantId);
+        } catch (AppUsageQueryServiceClientException e) {
             handleException("Error occurred while invoking APPUsageStatisticsClient " +
                         "for ProviderAPPUsage", e);
         }
@@ -4164,7 +4170,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                  Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray availableAssetTypes = new NativeArray(0);
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
         for (int i = 0; i < typeList.size(); i++) {
             availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
         }
@@ -4192,7 +4198,7 @@ public class APIProviderHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid argument type. App name should be a String.");
         }
         String assetType = (String) args[0];
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
 
         for (String type : typeList) {
             if (assetType.equals(type)) {
@@ -4218,6 +4224,110 @@ public class APIProviderHostObject extends ScriptableObject {
         return HostObjectUtils.getBinaryStorageConfiguration();
     }
 
+    /**
+     * Is Service Provider Create is enabled for skip gateway apps
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isSPCreateEnabledForSkipGatewayApps(Context cx, Scriptable thisObj, Object[] args,
+                                                                         Function funObj) throws AppManagementException{
+        return HostObjectUtils.isServiceProviderCreateEnabledForSkipGatewayApp();
+    }
+
+    /**
+     * Remove mobile application binary files
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeBinaryFilesFromStorage(Context cx, Scriptable thisObj, Object[] args,
+                                                         Function funObj) throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof NativeArray)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        NativeArray fileNames = (NativeArray) args[0];
+        for (int i = 0; i < fileNames.getLength(); i++) {
+            apiProvider.removeBinaryFromStorage(AppManagerUtil.resolvePath(HostObjectUtils.getBinaryStorageConfiguration(),
+                    fileNames.get(i).toString()));
+        }
+    }
+
+
+    /**
+     * Get Gateway endpoint url
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return Gateway endpoint url
+     * @throws AppManagementException
+     */
+    public static String jsFunction_getGatewayEndpoint(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        APIProvider provider = getAPIProvider(thisObj);
+        return provider.getGatewayEndpoint();
+    }
+
+    /**
+     * Returns the generated Issuer name
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static String jsFunction_populateIssuerName(Context cx, Scriptable thisObj, Object[] args,
+                                                       Function funObj) throws AppManagementException {
+        if (args == null || args.length != 2) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String appName = (String) args[0];
+        String version = (String) args[1];
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+
+        String saml2SsoIssuer;
+        if (!"carbon.super".equalsIgnoreCase(tenantDomain)) {
+            saml2SsoIssuer = appName + "-" + tenantDomain + "-" + version;
+        } else {
+            saml2SsoIssuer = appName + "-" + version;
+        }
+        return saml2SsoIssuer;
+    }
+
+    public static String jsFunction_getAscUrl(Context cx, Scriptable thisObj, Object[] args,
+                                                   Function funObj) throws AppManagementException {
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String version = (String) args[0];
+        String context = (String) args[1];
+        String transport = (String) args[2];
+
+        APIIdentifier appIdentifier = new APIIdentifier(null, null, version);
+        WebApp webApp = new WebApp(appIdentifier);
+        webApp.setTransports(transport);
+        webApp.setContext(context);
+        String acsUrl = SSOConfiguratorUtil.getACSURL(webApp);
+        return acsUrl;
+    }
 }
 
 

@@ -37,12 +37,12 @@ $(function() {
         }
     });
 
-	var data =  $("#owner_list").val();
-	data = jQuery.parseJSON(data);
+    var data = $("#owner_list").val();
+    data = jQuery.parseJSON(data);
 
-	$(document).ready(function() {
-		$(".selectOwnerName").select2({data: data,allowClear: true,placeholder: "Select a business Owner"});
-	});
+    $(document).ready(function () {
+        $(".selectOwnerName").select2({data: data, allowClear: true, placeholder: "Select a business Owner"});
+    });
 
 
 	  // let's fill all the permissions
@@ -68,7 +68,15 @@ $(function() {
 	        success: function(response) {
 			var providers_data = response;
                   	if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
- 				loadSelectedProviders(providers_data.response);
+						var isSPAwaiable = true;
+						if($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false"){
+							isSPAwaiable = false;
+						}
+						if(isSPAwaiable) {
+							loadSelectedProviders(providers_data.response);
+						}else{
+							$("#ssoTable").remove();
+						}
                   	} else {
 				$("#ssoTable").remove();
                   	}
@@ -131,23 +139,25 @@ $(function() {
     	var appVersion = $("#overview_version").val();
 
     	$.ajax({
-	          url: caramel.context + '/api/sso/'+ y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion ,
+	          url: caramel.context + '/api/sso/'+ y[0] + '/' + y[1] + '/' + encodeURIComponent(appProvider) + '/' + appName + '/' + appVersion ,
 	          type: 'GET',
 	          contentType: 'application/json',
 	          success: function(response) {
 	        	 
 	        	  var provider_data = response.response;
-	        	  var selected_claims = provider_data.claims;
-	        	  for(n=0;n<selected_claims.length;n++){
-	        		  var claim = selected_claims[n];
-	        		  if(claim == "http://wso2.org/claims/role"){
-	        			  addToClaimsTable(claim,false);  
-	        		  }else{
-	        			  addToClaimsTable(claim,true);  
-	        		  }
-	        		  
-	        		  
-	        	  }
+				  if(provider_data != null) {
+					  var selected_claims = provider_data.claims;
+					  for (n = 0; n < selected_claims.length; n++) {
+						  var claim = selected_claims[n];
+						  if (claim == "http://wso2.org/claims/role") {
+							  addToClaimsTable(claim, false);
+						  } else {
+							  addToClaimsTable(claim, true);
+						  }
+
+
+					  }
+				  }
 	  			
 	          },
 	          error: function(response) {
@@ -214,41 +224,40 @@ $(function() {
     	var claim  = $("#claims").val();
 	addToClaimsTable(claim,true);
     });
-    
-    function addToClaimsTable(claim,clickable){
-        var isAlreadyExist = $.inArray(claim, addedClaimList);
-        if(isAlreadyExist == -1) {
-            addedClaimList.push(claim);
-            var propertyCount = $('#claimPropertyCounter');
 
-            var i = propertyCount.val();
-            var currentCount = parseInt(i);
+	function addToClaimsTable(claim, clickable) {
+		var isAlreadyExist = addedClaimList.indexOf(claim);
+		if (isAlreadyExist == -1) {
+			addedClaimList.push(claim);
+			var propertyCount = $('#claimPropertyCounter');
 
-            currentCount = currentCount + 1;
-            propertyCount.val(currentCount);
+			var i = propertyCount.val();
+			var currentCount = parseInt(i);
 
-            $('#claimTableId').hide();
-            if (clickable) {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            } else {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            }
-            $('#claimTableTbody').parent().show();
-        }
+			currentCount = currentCount + 1;
+			propertyCount.val(currentCount);
+
+			$('#claimTableId').hide();
+			if (clickable) {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+											   + 'font-style: italic;">' + claim + '<input type="hidden"'
+                                               + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+                                               + '"  value="' + claim + '"/></td><td><a href="#"  onclick="removeClaim('
+                                               + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
+											   '</td></tr>'));
+			} else {
+				$('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
+											   '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); '
+                                               + 'font-style: italic;">' + claim + '<input type="hidden"'
+                                               + ' name="claimPropertyName' + i + '" id="claimPropertyName' + i
+                                               + '"  value="' + claim + '"/></td><td><a href="#" '
+                                               + 'style="pointer-events: none; cursor: default;color:#C4C4C4" '
+                                               + 'onclick="removeClaim(' + i + ');return false;">'
+                                               + '<i class="icon-remove-sign"></i>  Delete</a></td></tr>'));
+			}
+			$('#claimTableTbody').parent().show();
+		}
     }
 	
     
@@ -294,7 +303,35 @@ $(function() {
 
 		//Extract the fields
 		var fields = $('#form-asset-edit :input');
-		
+
+		var subscribeAvailability = $('#sub-availability').val();
+		if (subscribeAvailability == 'specific_tenants') {
+			var tenantList = $('#tenant-list');
+			var tenantListValue = tenantList.val();
+			if(tenantListValue == null || tenantListValue.trim() == '') {
+				showAlert('Please enter the specific tenant list.', 'error');
+				tenantList.focus();
+				this.disabled = false;
+				$("html, body").animate({ scrollTop: 0 }, "slow");
+				return;
+			}
+		}
+
+		//Check illegal characters in tags
+		var tags = $('#tag-test').tokenInput('get');
+		if(tags.length > 0) {
+			for (var index in tags) {
+				if(checkIllegalCharacters(tags[index].name)){
+					showAlert("Tags contains one or more illegal characters (~!@#;%^*()+={}|\\<>\"',)", 'error');
+					this.disabled = false;
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					return;
+				}
+
+			}
+		}
+
+
 		if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
 			$('#sso_ssoProvider').val(selectedProvider);
@@ -345,28 +382,31 @@ $(function() {
                 			});
             			}
 
-                        	if (rolePermissions.length > 0) {
-                            		$.ajax({
-                                		url: caramel.context + '/asset/' + type + '/id/' + id + '/permissions',
-                                		type: 'POST',
-                                		processData: false,
-                                		contentType: 'application/json',
-                                		data: JSON.stringify(rolePermissions),
-                                		success: function (response) {
-                                   			 showModel(type, id);
-                               			 },
-                               			error: function (response) {
-                                   			 showAlert('Error adding permissions.', 'error');
-                                		}
-                            		});
-                        	}
+                        $.ajax({
+                                   url: caramel.context + '/asset/' + type + '/id/' + id + '/permissions',
+                                   type: 'POST',
+                                   processData: false,
+                                   contentType: 'application/json',
+                                   data: JSON.stringify(rolePermissions),
+                                   success: function (response) {
+                                       showModel(type, id);
+                                   },
+                                   error: function (response) {
+                                       showAlert('Error adding permissions.', 'error');
+                                   }
+                               });
 	            			
         			})();
 
-			    	if($('#autoConfig').is(':checked')){
-						createServiceProvider();
+					var isCreateSP = true;
+					if ($('#overview_skipGateway').val() == "true" && $('#isCreateSPForSkipGatewayAppsEnabled').val() == "false") {
+						isCreateSP = false;
 					}
-
+					if (isCreateSP) {
+						createServiceProvider();
+					} else {
+						window.location = caramel.context + "/assets/webapp/";
+					}
 
 				} else {
                     alert(result.message);
@@ -505,6 +545,15 @@ $(function() {
 		return formData;
 	}
 
+	var checkIllegalCharacters = function (value) {
+		// registry doesn't allow following illegal charecters
+		var match = value.match(/[~!@#;%^*()+={}|\\<>"',]/);
+		if (match) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 
     function createServiceProvider() {
         var sso_config = {};

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.appmgt.api.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Parent class for apps.
  */
@@ -26,12 +29,30 @@ public class App {
     private String type;
     private String uuid;
     private String displayName;
+    private String name;
+    private String version;
     private float rating;
     private String[] appVisibility;
     private String banner;
     private String lifeCycleName;
     private APIStatus lifeCycleStatus;
+    private List<CustomProperty> customProperties;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public String[] getAppVisibility() {
         return appVisibility;
@@ -97,4 +118,25 @@ public class App {
         return lifeCycleStatus;
     }
 
+    public List<CustomProperty> getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(List<CustomProperty> customProperties) {
+        this.customProperties = customProperties;
+    }
+
+    public void addCustomProperty(CustomProperty customProperty){
+
+        if(customProperties == null){
+            customProperties = new ArrayList<>();
+        }
+
+        customProperties.add(customProperty);
+    }
+
+    public void addCustomProperty(String name, String value){
+        CustomProperty customProperty = new CustomProperty(name, value);
+        addCustomProperty(customProperty);
+    }
 }

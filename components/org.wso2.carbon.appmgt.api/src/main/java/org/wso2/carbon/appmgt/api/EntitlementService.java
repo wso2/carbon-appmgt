@@ -31,9 +31,11 @@ import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 public interface EntitlementService {
 
     /**
-     * Initializes the service.
+     * Initializes entitlement service.
+     *
+     * @throws AppManagementException on error while trying to initialize entitlement service
      */
-    void init();
+    void init() throws AppManagementException;
 
     /**
      * Saves the given policy.
@@ -42,11 +44,13 @@ public interface EntitlementService {
     void savePolicy(EntitlementPolicy policy);
 
     /**
-     * Checks whether the request is permitted.
+     * Check whether the request is permitted ot not.
+     *
      * @param request Request to be checked.
      * @return true if the request is permitted, false otherwise.
+     * @throws AppManagementException on error while trying to check whether the request is permitted or not.
      */
-    boolean isPermitted(EntitlementDecisionRequest request);
+    boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException;
 
     /**
      * Get the policy content from the policy id

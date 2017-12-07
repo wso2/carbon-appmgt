@@ -8,7 +8,7 @@ $(document).ready( function () {
 
 if($('#isEnterpriseInstallEnabled').val() === 'true'){
     oTable = $('#roles-table').dataTable({
-        "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+        "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'>r>t<'row-fluid'<'span6'i><'span6'p>>",
         "aaSorting": [
             [ 0, "desc" ]
         ],
@@ -42,7 +42,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
 
     oTableUsers = $('#users-table').dataTable({
-        "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+        "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'>r>t<'row-fluid'<'span6'i><'span6'p>>",
         "aaSorting": [
             [ 0, "desc" ]
         ],
@@ -78,6 +78,11 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
     $("#btn-apps-ent-install").click(function () {
 
+            if ($('#chkRemovable').prop('checked') == true) {
+               isRemovable = true;
+            } else {
+               isRemovable = false;
+            }
 
             if(selectedTab === "roles"){
                 installToRoles();
@@ -109,6 +114,51 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
     $("#btn-ent-install-close").click(function () {
         clearSelected();
     });
+
+    $("#roleId").keyup(function(e){
+        searchRoleByName();
+    });
+
+    $("#userId").keyup(function(e){
+        searchUserByName();
+    });
+
+    function searchRoleByName() {
+        var roleId = $('#roleId').val();
+        var url = '/store/apis/enterprise/get-roles/' + $('#roleId').val();
+        if(roleId === ""){
+            url = '/store/apis/enterprise/get-all-roles/';
+        }
+        
+        $.getJSON(url, null, function(json) {
+            table = $('#roles-table').dataTable();
+            oSettings = table.fnSettings();
+            table.fnClearTable(this);
+            table.fnAddData(json.aaData);
+
+            oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+            table.fnDraw();
+        });
+    }
+
+    function searchUserByName() {
+        var userId = $('#userId').val();
+        var url = '/store/apis/enterprise/get-users/' + $('#userId').val();
+        if(userId === ""){
+            url = '/store/apis/enterprise/get-all-users/';
+        }
+
+        $.getJSON(url, null, function(json) {
+            table = $('#users-table').dataTable();
+            oSettings = table.fnSettings();
+            table.fnClearTable(this);
+            table.fnAddData(json.aaData);
+
+            oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+            table.fnDraw();
+        });
+    }
+
 
 
     function clearSelected(){
@@ -166,7 +216,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         $.ajax({
                             type: "POST",
                             url: caramel.context + "/apis/enterprise/perform/install/role",
-                            data: { app: selectedApp, data:  rolesSelected }
+                            data: { app: selectedApp, data:  rolesSelected, removable: isRemovable }
                         })
                             .done(function( msg ) {
                                 noty({
@@ -307,7 +357,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         $.ajax({
                             type: "POST",
                             url: caramel.context + "/apis/enterprise/perform/install/user",
-                            data: { app: selectedApp, data:  usersSelected }
+                            data: { app: selectedApp, data:  usersSelected, removable: isRemovable }
                         })
                             .done(function( msg ) {
                                 noty({

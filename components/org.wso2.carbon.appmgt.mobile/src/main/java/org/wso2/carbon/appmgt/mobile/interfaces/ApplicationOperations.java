@@ -33,13 +33,15 @@ import java.util.List;
  */
 public interface ApplicationOperations {
 
-	/**
+    /**
+     *
      * This used to perform an action ex: install, uninstall, update apps on devices
      *
      * @param applicationOperationAction holds the information needs to perform an action on mdm
+     * @return An ID which is a reference to the operation being performed.
      * @throws MobileApplicationException
      */
-    void performAction(ApplicationOperationAction applicationOperationAction) throws MobileApplicationException;
+    String performAction(ApplicationOperationAction applicationOperationAction) throws MobileApplicationException;
 
 	/**
      *  This used to get the device list from mdm

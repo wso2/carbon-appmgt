@@ -2,9 +2,6 @@
 
 matcher = new URIMatcher(request.getRequestURI());
 
-
-
-
 require('/modules/store.js').exec(function (ctx) {
 
     var log = new Log();
@@ -34,7 +31,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     var isEnterpiseAdmin = false;
-
+    user.username = org.wso2.carbon.utils.multitenancy.MultitenantUtils.getTenantAwareUsername(user.username);
     if(user.hasRoles([mdmConfig.EnterpriseOperations_AuthorizedRole])){
         isEnterpiseAdmin = true;
     }
@@ -59,6 +56,22 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (matcher.match('/{context}/apis/enterprise/get-roles/{id}')) {
+
+        if(!isEnterpiseAdmin) {
+            response.sendError(401, 'Unauthorized');
+        }
+
+        var elements = matcher.elements();
+        var roles = removeInternalroles(um.allRoles());
+
+        var data = [];	
+	    data = filterRoles(roles, elements.id);
+        print({aaData:data});
+
+        return;
+    }
+
     if (matcher.match('/{context}/apis/enterprise/get-all-users')) {
 
         if(!isEnterpiseAdmin){
@@ -75,12 +88,29 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (matcher.match('/{context}/apis/enterprise/get-users/{id}')) {
 
-    if (matcher.match('/{context}/apis/enterprise/get-devices')) {
+        if(!isEnterpiseAdmin){
+            response.sendError(401, 'Unauthorized');
+        }
+
+        var elements = matcher.elements();
+        var searchStr = '*' + elements.id + '*';
+        var users = um.listUsers(searchStr, -1);
+        var data = [];
+        for(var i = 0; i < users.length; i++){
+            data.push([users[i]]);
+        }
+        print({aaData:data});
+        return;
+    }
+
+
+    if (matcher.match('/{context}/apis/enterprise/get-devices/{type}')) {
 
         var devices = [];
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-            devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
+            devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], matcher.elements().type)));
         }
         response.contentType = "application/json";
         print(devices);
@@ -94,8 +124,6 @@ require('/modules/store.js').exec(function (ctx) {
             response.sendError(401, 'Unauthorized');
         }
 
-
-
         var elements = matcher.elements();
         var params = request.getAllParameters("UTF-8");
 
@@ -103,15 +131,13 @@ require('/modules/store.js').exec(function (ctx) {
         var type = elements.type;
         var app = params.app;
         var data = params["data[]"];
-
-
-
+        var isRemovable = params.removable;
 
         log.debug("Params Received " +stringify(elements) + " & " + stringify(params));
 
         if(action && type && app && data){
 
-            enterpriseInstall.performAction(action, tenantId, type, app, data);
+            enterpriseInstall.performAction(action, tenantId, type, app, data, isRemovable);
             response.contentType = "application/json";
             print('{"status" : "success"}');
             return;
@@ -138,7 +164,13 @@ function removeInternalroles(roles){
     return filterdRoles;
 }
 
-
-
-
+function filterRoles(roles, prefix) {
+    var filteredRoles =[];
+    for (i = 0; i < roles.length; i++) {
+	    if(roles[i].indexOf(prefix) !== -1) {
+	    	filteredRoles.push(roles[i]);
+	    }
+    }
+    return filteredRoles;
+}
 %>

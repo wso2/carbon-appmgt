@@ -7,7 +7,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.sample.deployer.appcontroller.BackEndApplicationCreator;
 import org.wso2.carbon.appmgt.sample.deployer.appcontroller.ProxyApplicationCreator;
 import org.wso2.carbon.appmgt.sample.deployer.appcontroller.WebpageAccessor;
@@ -63,6 +66,7 @@ public class Deployer {
             log.error("Error while parsing JSON object", e);
             throw new AppManagementException("Error while parsing JSON object", e);
         }
+
         UserAdminServiceClient userAdminServiceClient;
         try {
             userAdminServiceClient = new UserAdminServiceClient();
@@ -70,11 +74,9 @@ public class Deployer {
         } catch (UserAdminUserAdminException e) {
 
         } catch (RemoteException e) {
-            log.error("Error while registering a User subscriber_" + username, e);
-            throw new AppManagementException("Error while registering a User subscriber_" + username, e);
+            throw new AppManagementException("Error occurred while registering a User subscriber_" + username, e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while login to UserAdminStub", e);
-            throw new AppManagementException("Error while login to UserAdminStub", e);
+            throw new AppManagementException("Error occurred while login to UserAdminStub", e);
         }
 
         try {
@@ -119,7 +121,7 @@ public class Deployer {
                 backEndApplicationCreator.copyFileUsingFileStreams(webAppDetail.getWarFileName());
                 claimManager.addClaimMapping(claimsMap);
                 claimManager.setClaimValues(claimsMap, "subscriber_" + username);
-                proxyApplicationCreator.createAndPublishWebApplication(webAppDetail);
+                proxyApplicationCreator.createAndPublishWebApplication(webAppDetail, isSubscriptionEnabled());
                 if (Configuration.isStactsEnabled().equals("true")) {
                     WebpageAccessor.accsesWebPages(webAppDetail, ipAddress);
                 }
@@ -127,5 +129,19 @@ public class Deployer {
             }
         }
         return response;
+    }
+
+    private boolean isSubscriptionEnabled() {
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        boolean isSubscriptionEnabled = false;
+        boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+        boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+        if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            isSubscriptionEnabled = true;
+        }
+        return isSubscriptionEnabled;
     }
 }

@@ -78,7 +78,8 @@ $(".btn-reject-proceed").click(function () {
 	jQuery.ajax({
 		url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
 		type: "PUT",
-		data: JSON.stringify({comment: comment}),
+		contentType: 'application/json',
+		data: (comment) ? JSON.stringify({comment: comment}) : "",
 		success: function (msg) {
 			location.reload();
 		}
@@ -195,7 +196,7 @@ function isPublishedToExternalStore(action, provider, name, version) {
 
         $.ajax({
             async: false,
-            url: caramel.context + '/api/asset/get/external/stores/webapp/' + provider + '/' + name + '/' + version,
+            url: caramel.context + '/api/asset/get/external/stores/webapp/' + encodeURIComponent(provider) + '/' + name + '/' + version,
             type: 'GET',
             processData: true,
             success: function (response) {

@@ -1,13 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @ApiModel(description = "")
@@ -22,7 +22,8 @@ public class AppDTO  {
   
   
   private String type = null;
-  
+
+  private AppAppmetaDTO appmeta = null;
   
   private String marketType = null;
   
@@ -101,8 +102,14 @@ public class AppDTO  {
   
   
   private String lifecycleAvailableActions = null;
-
   
+  
+  private String previousVersionAppID = null;
+
+
+  private List<CustomPropertyDTO> customProperties = new ArrayList<CustomPropertyDTO>();
+
+
   /**
    * UUID of the app registry artifact
    **/
@@ -140,6 +147,15 @@ public class AppDTO  {
     this.type = type;
   }
 
+    @ApiModelProperty(value = "")
+    @JsonProperty("appmeta")
+    public AppAppmetaDTO getAppmeta() {
+        return appmeta;
+    }
+
+    public void setAppmeta(AppAppmetaDTO appmeta) {
+        this.appmeta = appmeta;
+    }
   
   /**
    **/
@@ -328,6 +344,19 @@ public class AppDTO  {
 
   
   /**
+   * previous version app ID if this is an updated app
+   **/
+  @ApiModelProperty(value = "previous version app ID if this is an updated app")
+  @JsonProperty("previousVersionAppID")
+  public String getPreviousVersionAppID() {
+    return previousVersionAppID;
+  }
+  public void setPreviousVersionAppID(String previousVersionAppID) {
+    this.previousVersionAppID = previousVersionAppID;
+  }
+
+  
+  /**
    * lifecycle state of the asset
    **/
   @ApiModelProperty(value = "lifecycle state of the asset")
@@ -469,7 +498,19 @@ public class AppDTO  {
     this.lifecycleAvailableActions = lifecycleAvailableActions;
   }
 
-  
+
+  /**
+   * custom properties
+   **/
+  @ApiModelProperty(value = "custom properties")
+  @JsonProperty("customProperties")
+  public List<CustomPropertyDTO> getCustomProperties() {
+    return customProperties;
+  }
+  public void setCustomProperties(List<CustomPropertyDTO> customProperties) {
+    this.customProperties = customProperties;
+  }
+
 
   @Override
   public String toString()  {
@@ -505,6 +546,8 @@ public class AppDTO  {
     sb.append("  createdtime: ").append(createdtime).append("\n");
     sb.append("  platform: ").append(platform).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
+    sb.append("  customProperties: ").append(customProperties).append("\n");
+    sb.append("  previousVersionAppID: ").append(previousVersionAppID).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

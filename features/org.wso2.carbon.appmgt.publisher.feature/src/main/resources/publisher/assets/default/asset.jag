@@ -34,8 +34,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var publisher = require('/modules/publisher.js').publisher(request, session);
     var storageModule = require('/modules/data/storage.js').storageModule();
     var storageConfig = require('/config/storage.json');
-
-
+    var isCreateSPForSkipGatewayAppsEnabled = apiProvider.isSPCreateEnabledForSkipGatewayApps();
     var router = require('/modules/router-g.js').router();
     var routeManager = new router.Router();
 
@@ -57,7 +56,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var businessOwnerNameAndEmail;
         for (var i = 0; i < ownersList.length; i++) {
             ownerNameAndEmail = ownersList[i].businessOwnerName + " (" + ownersList[i].businessOwnerEmail + ")";
-            nameList.push({id:ownersList[i].businessOwnerId, text:ownerNameAndEmail});
+            nameList.push({id: ownersList[i].businessOwnerId, text: ownerNameAndEmail});
         }
         return stringify(nameList);
     }
@@ -109,6 +108,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         output.sso_provider = getIdentityProviderUrl();
         caramel.render({
             isSubscriptionEnabled:isSubscriptionEnabled,
+            isCreateSPForSkipGatewayAppsEnabled:isCreateSPForSkipGatewayAppsEnabled,
             op: operation,
             cuser: server.current(session),
             shortName: shortName,
@@ -178,11 +178,14 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         apiData.version = model.get('overview.version').value;
         var result = mod.getAllDocumentation(apiData);
 
-        //get external store details
-        var externalAppStores = getExternalAppStores(apiData);
         var appStoresDetail = {};
-        appStoresDetail.app = apiData;
-        appStoresDetail.externalStores = externalAppStores;
+        //For webapps, get external store details
+        if(shortName == "webapp"){
+            var externalAppStores = getExternalAppStores(apiData);
+            appStoresDetail.app = apiData;
+            appStoresDetail.externalStores = externalAppStores;
+        }
+
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);
@@ -350,6 +353,7 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             } else {
                 caramel.render({
                     isSubscriptionEnabled: isSubscriptionEnabled,
+                    isCreateSPForSkipGatewayAppsEnabled:isCreateSPForSkipGatewayAppsEnabled,
                     op: operation,
                     cuser: user,
                     shortName: shortName,
@@ -434,8 +438,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             //If exists, return an error message
             if (isexists == true) {
                 response.contentType = CONTENT_TYPE_JSON;
-                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
-                                                       name + "' and version - '" + version +"'"});
+                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name '" +
+                                                       name + "' and version '" + version +"'"});
                 return;
             }
 
@@ -476,28 +480,30 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             username = username + "@" + tenantDomain;
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
-            appMgtProviderObj.generateEntitlementPolicies(webappId);
-
+            var authorizedAdminCookie = session.get("idp-authenticated-cookie");
+            appMgtProviderObj.generateEntitlementPolicies(webappId, authorizedAdminCookie);
+            var tenantAwareUserName =  jagg.getUser().username;
             if (oldVersion == null || oldVersion == '') {
-                auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewAssetAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
-                                                                                   ", apiName='" + webappId.name + '\''
+                                                                                   ", appName='" + webappId.name + '\''
                                                                                    +
                                                                                    ", version='" + webappId.version
                                                                                    + '\'' +
                                                                                    '}', "", "");
             }
             else {
-                auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, tenantAwareUserName, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
-                                                                                    ", apiName='" + webappId.name + '\''
+                                                                                    ", appName='" + webappId.name + '\''
                                                                                     +
                                                                                     ", version='" + webappId.version
                                                                                     + '\'' +
                                                                                     '}', "", "");
             }
+            session.put("updateAppCount", true);
             response.contentType = CONTENT_TYPE_JSON;
             print({ok: true, message: 'asset added', id: assetId});
         }
@@ -884,29 +890,32 @@ function overridePermissions(assetId, artifactManager, permissions) {
 
     });
 
-    //Remove public visibility for role restricted apps
-    if(denyEveryone){
-        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
-        um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
-    }
-
-
     var registry = new carbon.registry.Registry(server, {
         username: server.current(session).username,
         tenantId: server.current(session).tenantId
     });
-
-    artifact.name = artifact.attributes.overview_name;
     var permPath = artifact.path + "role_restrictions";
 
-    var resource ={
-        content: JSON.stringify(permissions),
-        mediaType: 'text/plain'
-    };
+    //Remove public visibility for role restricted apps
+    if(denyEveryone){
+        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
+        um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
 
-    registry.put(permPath,resource);
+        //create role restriction resource when restricted roles are available
+        var resource = {
+            content: JSON.stringify(permissions),
+            mediaType: 'text/plain'
+        };
+        registry.put(permPath, resource);
+        artifact.attributes.overview_permissions = permPath;
+    } else {
+        //remove role restrict resource if the role restriction is no longer applicable
+        if (registry.get(permPath) != null) {
+            registry.remove(permPath);
+        }
+    }
 
-    artifact.attributes.overview_permissions = permPath;
+    artifact.name = artifact.attributes.overview_name;
     delete artifact.content;
     artifactManager.update(artifact);
 }

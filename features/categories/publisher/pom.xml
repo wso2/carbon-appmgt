@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.appmgt</groupId>
+        <artifactId>feature-categories</artifactId>
+        <version>1.2.43-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.appmgt.publisher.category.feature</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Publisher</name>
+    <url>http://wso2.org</url>
+    <description>Includes features for Publisher component.</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>1-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.appmgt.publisher.category</id>
+                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.eclipse.equinox.p2.type.category:true</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:composite</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.property:true</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <importFeatures>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.logging.mgt:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.system.statistics:${carbon.commons.version}</importFeatureDef>
+
+
+                                <importFeatureDef>org.wso2.carbon.soaptracer:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.security.mgt:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.directory.service.mgr.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.security.mgt.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.service.mgt.server:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.service.mgt:${carbon.deployment.version}</importFeatureDef>
+
+                                <!--Registry-->
+                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.ui.menu:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.resource.properties:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.handler.configuration:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.associations.dependencies:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.community.features:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.community.features.server:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.contentsearch.server:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.deployment.synchronizer:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.ws:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.ui.menu.governance:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.task:${carbon.registry.version}</importFeatureDef>
+
+                                <importFeatureDef>org.apache.axis2.transport.mail:${axis2.transport.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.task.server:${carbon.mediation.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.appmanager.styles:${carbon.appmgt.server.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.application.mgt:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.mgt:${carbon-identity-framework.version}</importFeatureDef>
+
+                                <importFeatureDef>org.jaggeryjs:${jaggery.js.version}</importFeatureDef>
+
+                                <!--Governance Feature-->
+                                <importFeatureDef>org.wso2.carbon.registry.extensions:${carbon.governance.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.extensions.server:${carbon.governance.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.governance.metadata:${carbon.governance.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.governance.metadata.server:${carbon.governance.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.governance.lifecycle.management:${carbon.governance.version}</importFeatureDef>
+
+                                <!--8 Carbon-MultiTenancy-->
+                                <importFeatureDef>org.wso2.carbon.tenant.common:${carbon.multitenancy.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.usage.agent:${carbon.multitenancy.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.throttling.agent:${carbon.multitenancy.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.deployment:${carbon.multitenancy.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.mgt.common:${carbon.commons.version}</importFeatureDef>
+
+                                <!--Identity Features-->
+                                <importFeatureDef>org.wso2.carbon.user.mgt:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.core:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.provider.server:${identity-inbound-auth-openid.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.user.registration.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth:${identity-inbound-auth-oauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.idp.mgt:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.user.profile.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.idp.mgt.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth.common:${identity-inbound-auth-oauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.basicauth.server:${identity-local-auth-basicauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.samlsso.server:${identity-outbound-auth-samlsso.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.claim.mgt:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.thrift.authentication:${identity-carbon-auth-thrift.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.mgt.common.server:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ntask.core:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ntask:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.module.mgt.server:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.webapp.mgt:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.webapp.mgt.server:${carbon.deployment.version}</importFeatureDef>
+
+                                <importFeatureDef>org.jaggeryjs.modules.handlebars:${handlebars.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules.login:${es.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.markdown:${jaggeryjs.markdown.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules.event:${es.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules.registration:${es.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.caramel:${jaggeryjs.caramel.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.carbon:${jaggeryjs.carbon.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.email:${jaggeryjs.email.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.i18n:${jaggeryjs.i18n.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.process:${jaggeryjs.process.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.uuid:${jaggeryjs.uuid.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.ws:${jaggeryjs.ws.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules.permission:${es.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules:sso:${es.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store.modules.claims:${es.feature.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.identity.application.authentication.framework.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.store:${carbon.store.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.social:${carbon.store.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.inbound.auth.saml2:${identity-inbound-auth-saml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso:${identity-carbon-auth-saml2.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.hostobjects.sso.server:${carbon.commons.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.identity.user.profile:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.um.ws.service:${identity-user-ws.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:${identity-user-ws.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.mgt:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.xacml:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.provisioning.server:${carbon-identity-framework.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.openid.server:${identity-outbound-auth-openid.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.oidc.server:${identity-outbound-auth-oidc.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.passive.sts.server:${identity-outbound-auth-passive-sts.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.iwa.server:${identity-local-auth-iwa.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.requestpath.basicauth.server:${identity-outbound-auth-requestpath-basicauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.requestpath.oauth.server:${identity-outbound-auth-requestpath-oauth.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.yahoo.server:${identity-outbound-auth-yahoo.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.google.server:${identity-outbound-provisioning-google.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.live.server:${identity-outbound-auth-windows-live.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.application.authenticator.facebook.server:${identity-outbound-auth-facebook.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.identity.provisioning.connector.google.server:${identity-outbound-provisioning-google.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.provisioning.connector.salesforce.server:${identity-outbound-provisioning-salesforce.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.provisioning.connector.spml.server:${identity-outbound-provisioning-spml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.authenticator.iwa:${identity-carbon-auth-iwa.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.notification.mgt:${carbon-identity-framework.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.databridge.commons.server:${carbon.analytics-common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.user.account.association:${identity-user-account-association.version}</importFeatureDef>
+
+                                <importFeatureDef>org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.stratos.appmgt.dashboard.ui:${carbon.appmgt.server.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.osgiconnector:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.restconnector:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.publisher:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.rest.api.publisher:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.oauth:${carbon.appmgt.version}</importFeatureDef>
+                            </importFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

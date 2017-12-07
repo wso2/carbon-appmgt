@@ -15,8 +15,6 @@ import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AdministrationApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AdminInstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorListItemDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.RoleIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
@@ -36,11 +34,12 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
@@ -92,97 +91,86 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry) registry, "mobileapp");
 
             Iterator<String> typeIdIterator = typeIds.iterator();
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setCode(Long.valueOf(Response.Status.OK.getStatusCode()));
-            errorDTO.setDescription("App(s) download status details.");
-            errorDTO.setMoreInfo("user: " + tenantUserName + ", type of operation (user/role wise)" + ": " + type);
-            List<ErrorListItemDTO> errorListItemDTOs = new ArrayList<>();
+            Operations mobileOperation = new Operations();
+
+            String action = "install";
+            String[] parameters = null;
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+            Set<String> userList = new HashSet<>();
 
             while (typeIdIterator.hasNext()) {
                 String typeId = typeIdIterator.next();
-
-                ErrorListItemDTO errorListItemDTO = new ErrorListItemDTO();
                 GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
-                String parameterContext =
-                        "[appId: " + appId + "]";
 
 
                 if (artifact != null) {
-                    try {
-                        Operations mobileOperation = new Operations();
-                        String action = "install";
-                        String[] parameters = null;
-
-                        JSONObject user = new JSONObject();
-                        user.put("username", tenantUserName);
-                        user.put("tenantDomain", tenantDomainName);
-                        user.put("tenantId", tenantId);
-                        appProvider.subscribeMobileApp(loggedUserName, appId);
-
-                        if ("role".equalsIgnoreCase(type)) {
-                            PrivilegedCarbonContext carbonContext =
-                                    PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                            RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
-                                                                                                    null);
-                            UserRealm realm = realmService.getTenantUserRealm(tenantId);
-                            UserStoreManager manager = realm.getUserStoreManager();
-                            String[] userNames;
-                            userNames = manager.getUserListOfRole(typeId);
-                            if (userNames == null) {
-                                return RestApiUtil.buildNotFoundException("Users not found", null).getResponse();
-                            }
-
-                            for (int i = 0; i < userNames.length; i++) {
-                                parameters = new String[1];
-                                parameters[0] = userNames[i];
-                                mobileOperation.performAction(user.toString(), action, tenantId, appId,
-                                                              install.getType(),
-                                                              parameters);
-                            }
-                        } else if ("user".equalsIgnoreCase(type)) {
-                            parameters = new String[1];
-                            parameters[0] = typeId;
-                            mobileOperation.performAction(user.toString(), action, tenantId, appId,
-                                                          install.getType(),
-                                                          parameters);
-
-                        } else {
-                            RestApiUtil.handleBadRequest("Invalid installation type.", log);
+                    if ("role".equalsIgnoreCase(type)) {
+                        if (RestApiUtil.isExistingRole(typeId) == false) {
+                            throw new NotFoundException();
                         }
-                    } catch (NotFoundException e) {
-                        errorListItemDTO.setCode(String.valueOf(Response.Status.NOT_FOUND.getStatusCode()));
-                        errorListItemDTO.setMessage(type + ": " + typeId + " Not Found");
-                    } catch (MobileApplicationException e) {
-                        errorListItemDTO.setCode(String.valueOf(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
-                        errorListItemDTO.setMessage("Error while installing App on Mobile device.");
-                    }
-                } else {
-                    errorListItemDTO.setCode(String.valueOf(Response.Status.NOT_FOUND.getStatusCode()));
-                    errorListItemDTO.setMessage("App Not Found. " + parameterContext);
-                }
+                        PrivilegedCarbonContext carbonContext =
+                                PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
+                                                                                                null);
+                        UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                        UserStoreManager manager = realm.getUserStoreManager();
+                        String[] userNames;
+                        userNames = manager.getUserListOfRole(typeId);
+                        if (userNames == null) {
+                            return RestApiUtil.buildNotFoundException("Users not found", null).getResponse();
+                        }
 
-                if (errorListItemDTO.getCode() == null) {
-                    errorListItemDTO.setCode(String.valueOf(Response.Status.ACCEPTED.getStatusCode()));
-                    errorListItemDTO.setMessage(Response.Status.ACCEPTED + " " + parameterContext);
+                        for (int i = 0; i < userNames.length; i++) {
+                            userList.add(userNames[i]);
+                            appProvider.subscribeMobileApp(userNames[i], appId);
+
+                        }
+                    } else if ("user".equalsIgnoreCase(type)) {
+                        if (RestApiUtil.isExistingUser(typeId) == false) {
+                            throw new NotFoundException();
+                        }
+                        userList.add(typeId);
+                        appProvider.subscribeMobileApp(typeId, appId);
+                    } else {
+                        RestApiUtil.handleBadRequest("Invalid installation type.", log);
+                    }
+
+                } else {
+                    return RestApiUtil.buildNotFoundException("Apps", null).getResponse();
                 }
-                errorListItemDTOs.add(errorListItemDTO);
             }
-            errorDTO.setError(errorListItemDTOs);
-            return Response.status(Response.Status.ACCEPTED).entity(errorDTO).build();
+
+            if (!userList.isEmpty()) {
+                parameters = userList.toArray(new String[0]);
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, "user",
+                                                                  appId, parameters, null, null);
+                JSONObject response = new JSONObject();
+                response.put("activityId", activityId);
+
+                return Response.ok().entity(response.toString()).build();
+            } else {
+                return RestApiUtil.buildNotFoundException("Users", null).getResponse();
+            }
+
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             log.error("Error while initializing UserStore.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
         } catch (RegistryException e) {
             log.error("Error while initializing Registry.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         } catch (AppManagementException e) {
             log.error("Error while Downloading the App.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleInternalServerError("MobileApplication Error occurred while installing", e, log);
         }
-
-        return null;
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
 
@@ -232,98 +220,86 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry) registry, "mobileapp");
 
             Iterator<String> typeIdIterator = typeIds.iterator();
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setCode(Long.valueOf(Response.Status.OK.getStatusCode()));
-            errorDTO.setDescription("App(s) download status details.");
-            errorDTO.setMoreInfo("user: " + tenantUserName + ", type of operation (user/role wise)" + ": " + type);
-            List<ErrorListItemDTO> errorListItemDTOs = new ArrayList<>();
+            Operations mobileOperation = new Operations();
+
+            String action = "uninstall";
+            String[] parameters = null;
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+            Set<String> userList = new HashSet<>();
 
             while (typeIdIterator.hasNext()) {
                 String typeId = typeIdIterator.next();
-
-                ErrorListItemDTO errorListItemDTO = new ErrorListItemDTO();
                 GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
-                String parameterContext =
-                        "[appId: " + appId + "]";
 
 
                 if (artifact != null) {
-                    try {
-                        Operations mobileOperation = new Operations();
-                        String action = "uninstall";
-                        String[] parameters = null;
-
-                        JSONObject user = new JSONObject();
-                        user.put("username", tenantUserName);
-                        user.put("tenantDomain", tenantDomainName);
-                        user.put("tenantId", tenantId);
-                        appProvider.subscribeMobileApp(loggedUserName, appId);
-
-                        if ("role".equalsIgnoreCase(type)) {
-                            PrivilegedCarbonContext carbonContext =
-                                    PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                            RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
-                                                                                                    null);
-                            UserRealm realm = realmService.getTenantUserRealm(tenantId);
-                            UserStoreManager manager = realm.getUserStoreManager();
-                            String[] userNames;
-                            userNames = manager.getUserListOfRole(typeId);
-                            if (userNames == null) {
-                                return RestApiUtil.buildNotFoundException("Users not found", null).getResponse();
-                            }
-
-                            for (int i = 0; i < userNames.length; i++) {
-                                parameters = new String[1];
-                                parameters[0] = userNames[i];
-                                mobileOperation.performAction(user.toString(), action, tenantId, appId,
-                                                              install.getType(),
-                                                              parameters);
-                            }
-                        } else if ("user".equalsIgnoreCase(type)) {
-                            parameters = new String[1];
-                            parameters[0] = typeId;
-                            mobileOperation.performAction(user.toString(), action, tenantId, appId,
-                                                          install.getType(),
-                                                          parameters);
-
-                        } else {
-                            RestApiUtil.handleBadRequest("Invalid installation type.", log);
+                    if ("role".equalsIgnoreCase(type)) {
+                        if (RestApiUtil.isExistingRole(typeId) == false) {
+                            throw new NotFoundException();
                         }
-                    } catch (NotFoundException e) {
-                        errorListItemDTO.setCode(String.valueOf(Response.Status.NOT_FOUND.getStatusCode()));
-                        errorListItemDTO.setMessage(type + ": " + typeId + " Not Found");
-                    } catch (MobileApplicationException e) {
-                        errorListItemDTO.setCode(String.valueOf(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
-                        errorListItemDTO.setMessage("Error while installing App on Mobile device.");
-                    }
-                } else {
-                    errorListItemDTO.setCode(String.valueOf(Response.Status.NOT_FOUND.getStatusCode()));
-                    errorListItemDTO.setMessage("App Not Found. " + parameterContext);
-                }
+                        PrivilegedCarbonContext carbonContext =
+                                PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
+                                                                                                null);
+                        UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                        UserStoreManager manager = realm.getUserStoreManager();
+                        String[] userNames;
+                        userNames = manager.getUserListOfRole(typeId);
+                        if (userNames == null) {
+                            return RestApiUtil.buildNotFoundException("Users not found", null).getResponse();
+                        }
 
-                if (errorListItemDTO.getCode() == null) {
-                    errorListItemDTO.setCode(String.valueOf(Response.Status.ACCEPTED.getStatusCode()));
-                    errorListItemDTO.setMessage(Response.Status.ACCEPTED + " " + parameterContext);
+                        for (int i = 0; i < userNames.length; i++) {
+                            userList.add(userNames[i]);
+                            appProvider.subscribeMobileApp(userNames[i], appId);
+
+                        }
+                    } else if ("user".equalsIgnoreCase(type)) {
+                        if (RestApiUtil.isExistingUser(typeId) == false) {
+                            throw new NotFoundException();
+                        }
+                        userList.add(typeId);
+                        appProvider.subscribeMobileApp(typeId, appId);
+                    } else {
+                        RestApiUtil.handleBadRequest("Invalid installation type.", log);
+                    }
+
+                } else {
+                    return RestApiUtil.buildNotFoundException("Apps", null).getResponse();
                 }
-                errorListItemDTOs.add(errorListItemDTO);
             }
-            errorDTO.setError(errorListItemDTOs);
-            return Response.status(Response.Status.ACCEPTED).entity(errorDTO).build();
+
+            if (!userList.isEmpty()) {
+                parameters = userList.toArray(new String[0]);
+                String activityId = mobileOperation.performAction(user.toString(), action, tenantId, "user",
+                                                                  appId, parameters, null, null);
+                JSONObject response = new JSONObject();
+                response.put("activityId", activityId);
+            } else {
+                return RestApiUtil.buildNotFoundException("Users", null).getResponse();
+            }
+
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             log.error("Error while initializing UserStore.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
         } catch (RegistryException e) {
             log.error("Error while initializing Registry.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         } catch (AppManagementException e) {
             log.error("Error while Downloading the App.");
-            RestApiUtil.buildInternalServerErrorException();
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleInternalServerError("MobileApplication Error occurred while installing", e, log);
         }
-
-        return null;
+        return Response.status(Response.Status.ACCEPTED).build();
     }
+
 
     @Override
     public Response administrationRolesGet(Integer limit, Integer offset, String accept, String ifNoneMatch) {

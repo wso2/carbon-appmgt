@@ -12,7 +12,7 @@
     var isDirectDownloadEnabled = mdmConfig.EnableDirectDownload == "true" ? true : false;
 
 
-    var performAction = function performAction (action, tenantId, type, app, params) {
+    var performAction = function performAction (action, tenantId, type, app, params, schedule, isRemovable) {
 
 
         //check security;
@@ -26,7 +26,7 @@
         asset = store.asset('mobileapp', app);
 
 
-        if( asset.attributes.overview_visibility != "null"){
+        if(asset.attributes.overview_visibility){
 
                 var assetRoles = asset.attributes.overview_visibility.split(",");
                 var um = server.userManager(tenantId);
@@ -55,7 +55,7 @@
 
                 var path = user.userSpace(currentUser) + SUBSCRIPTIONS_PATH +  app;
 
-                if(action == 'install') {
+                if(action == 'install' || action == 'update') {
                     subscribe(path, app, currentUser.username);
                 }else if(action === 'uninstall') {
                     unsubscribe(path, app, currentUser.username);
@@ -114,7 +114,7 @@
         if(isMDMOperationsEnabled){
             var operationsClass = Packages.org.wso2.carbon.appmgt.mobile.store.Operations;
             var operations = new operationsClass();
-            operations.performAction(stringify(currentUser), action, tenantId, type, app, params);
+            operations.performAction(stringify(currentUser), action, tenantId, type, app, params, schedule, isRemovable);
         }
 
 

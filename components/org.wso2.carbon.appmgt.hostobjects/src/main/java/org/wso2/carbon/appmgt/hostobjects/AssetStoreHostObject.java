@@ -79,7 +79,7 @@ public class AssetStoreHostObject extends ScriptableObject {
 
     private static final long serialVersionUID = -3169012616750937045L;
     private static final Log log = LogFactory.getLog(AssetStoreHostObject.class);
-    private static final String hostObjectName = "APIStore";
+    private static final String hostObjectName = "AppStore";
     private static final String httpPort = "mgt.transport.http.port";
     private static final String httpsPort = "mgt.transport.https.port";
     private static final String hostName = "carbon.local.ip";
@@ -1545,7 +1545,7 @@ public class AssetStoreHostObject extends ScriptableObject {
                             (k > 0 ? k : ""));
                     if (type != null && url != null && comment != null) {
                         NativeObject row = new NativeObject();
-                        row.put("name", row, DigestUtils.md5Hex(comment + url + type));
+                        row.put("name", row, DigestUtils.shaHex(comment + url + type));
                         row.put("sourceType", row, "URL");
                         row.put("summary", row, comment);
                         row.put("sourceUrl", row, url);

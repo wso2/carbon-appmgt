@@ -5,6 +5,9 @@ var AppService;
 var appInfoApi;
 var authenticator;
 var log = new Log();
+var businessOwnerData;
+var ownerName;
+var ownerEmail;
 include('../modules/jagg/jagg.jag');
 
 var DocumentService = require('../services/documentation.js').serviceModule;
@@ -210,6 +213,22 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['overview_provider'] = provider;
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+            var overviewBusinessOwner = asset.attributes.overview_businessOwner;
+
+            var appDomainName = asset.attributes.overview_appTenant;
+            var tenantId = carbon.server.tenantId({
+                                                      domain: appDomainName
+                                                  });
+
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
+                var businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner, tenantId);
+                if (businessOwner != null && businessOwner.businessOwnerName != null) {
+                    businessOwnerData =
+                            require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+                    ownerName = businessOwnerData[0].value;
+                    ownerEmail = businessOwnerData[1].value;
+                }
+            }
 
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
@@ -340,12 +359,7 @@ require('/modules/store.js').exec(function (ctx) {
             var version = asset.attributes.overview_version;
             var provider = asset.attributes.overview_provider;
 
-            var tenantUsername;
-            if (tenantId == -1234) {
-                tenantUsername = user.username;
-            } else {
-                tenantUsername = user.username + "@" + user.tenantDomain;
-            }
+            var tenantUsername = user.username;
 
             var status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                                 tenantDomain).status;
@@ -528,7 +542,7 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
-        var searchQuery = { search: "", searchTerm: ""};
+        var searchQuery = { search: "", searchTerm: "overview_displayName"};
 
         caramel.render({
                            title: 'Site | Store',
@@ -568,7 +582,10 @@ require('/modules/store.js').exec(function (ctx) {
                                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
                                enabledTypeList: enabledTypeList
                            },
-                           assetType : 'site'
+                           assetType : 'site',
+                           businessOwnerData: businessOwnerData,
+                           businessOwnerName: ownerName,
+                           businessOwnerEmail: ownerEmail
                        });
     }
 

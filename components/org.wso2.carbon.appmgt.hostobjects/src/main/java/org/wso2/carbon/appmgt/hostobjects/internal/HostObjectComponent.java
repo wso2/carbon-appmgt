@@ -22,6 +22,7 @@ import org.wso2.carbon.appmgt.hostobjects.HostObjectUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -30,21 +31,30 @@ import java.util.List;
 
 /**
  * @scr.component name="org.wso2.appmgt.hostobjects" immediate="true"
+ *
  * @scr.reference name="api.manager.config.service"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
  * policy="dynamic" bind="setAPIManagerConfigurationService" unbind="unsetAPIManagerConfigurationService"
+ *
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService"
  * cardinality="1..1"
  * policy="dynamic"
  * bind="setConfigurationContextService"
  * unbind="unsetConfigurationContextService"
+ *
  * @scr.reference name="user.realm.service"
  * interface="org.wso2.carbon.user.core.service.RealmService"
  * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
+ *
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
+ *
+ * @scr.reference name="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService"
+ * interface="org.wso2.carbon.appmgt.impl.service.TenantConfigurationService" cardinality="1..1"
+ * policy="dynamic" bind="setTenantConfigurationService" unbind="unsetTenantConfigurationService
+ *
  */
 public class HostObjectComponent {
 
@@ -90,6 +100,20 @@ public class HostObjectComponent {
 
     protected void unsetConfigurationContextService(ConfigurationContextService configCtx) {
         HostObjectUtils.setConfigContextService(null);
+    }
+
+    protected void setTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(tenantConfigurationService);
+    }
+
+    protected void unsetTenantConfigurationService(TenantConfigurationService tenantConfigurationService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Un-setting tenant configuration service implementation - " + tenantConfigurationService.getClass().getName());
+        }
+        ServiceReferenceHolder.getInstance().setTenantConfigurationService(null);
     }
 
     protected void setRealmService(RealmService realmService) {

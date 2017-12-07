@@ -25,6 +25,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.idp.sso.configurator.SSOConfigurator;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -36,10 +37,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.util.List;
+import java.util.Map;
 
 public class SSOConfiguratorUtil {
 
     private static Log log = LogFactory.getLog(SSOConfiguratorUtil.class);
+
+    public static final String SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY = "adminServiceCookie";
 
     /**
      * Create or update SSO Provider for a given application
@@ -47,7 +51,7 @@ public class SSOConfiguratorUtil {
      * @param app application object
      * @param update isToUpdate
      */
-    public static void createSSOProvider(WebApp app, boolean update) {
+    public static void createSSOProvider(WebApp app, boolean update, Map<String, String> serviceConfigs) {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -60,7 +64,15 @@ public class SSOConfiguratorUtil {
 
         try {
             SSOConfigurator configurator = (SSOConfigurator) Class.forName(ssoEnvironment.getProviderClass()).newInstance();
-            configurator.init(ssoEnvironment.getParameters());
+
+            Map<String, String> configuratorConfig = ssoEnvironment.getParameters();
+
+            // If there is a an http cookie given in the service configs, add it as a configuration to the configurator.
+            if(serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY) != null){
+                configuratorConfig.put(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY));
+            }
+
+            configurator.init(configuratorConfig);
 
             if (update) {
                 if(configurator.updateProvider(app)) {
@@ -211,7 +223,7 @@ public class SSOConfiguratorUtil {
      *
      * @param ssoProvider SSOProvider Object
      */
-    public void deleteSSOProvider(SSOProvider ssoProvider) throws AppManagementException {
+    public void deleteSSOProvider(SSOProvider ssoProvider, Map<String, String> serviceConfigs) throws AppManagementException {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -228,7 +240,15 @@ public class SSOConfiguratorUtil {
         try {
             //Initialize SSOConfigurator
             configurator = (SSOConfigurator) Class.forName(ssoEnvironment.getProviderClass()).newInstance();
-            configurator.init(ssoEnvironment.getParameters());
+
+            Map<String, String> configuratorConfig = ssoEnvironment.getParameters();
+
+            // If there is a an http cookie given in the service configs, add it as a configuration to the configurator.
+            if(serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY) != null){
+                configuratorConfig.put(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, serviceConfigs.get(SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY));
+            }
+
+            configurator.init(configuratorConfig);
 
             //Remove SSOProvider if available
             if(configurator.getProvider(ssoProvider.getIssuerName())!=null) {
@@ -296,6 +316,39 @@ public class SSOConfiguratorUtil {
             url = url + app.getContext() + "/" + identifier.getVersion() + "/";
         }
          return url;
+    }
+
+    public static String getACSURL(WebApp webApp){
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String acsURLPostfix = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_ACS_URL_POSTFIX);
+        return getGatewayUrl(webApp) + acsURLPostfix;
+    }
+
+    public static boolean isResponseSigningEnabled() {
+
+        String responseSigningEnabled = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_ENABLE_RESPONSE_SIGNING);
+
+        /*responseSigningEnabled can be null, when element is not present in the app-manager.xml.
+         For backward compatibility reason, we need to handle null scenario.(AppManager-1.2.0 released with
+         response signing true without having a config option)
+         */
+        if (responseSigningEnabled == null) {
+            responseSigningEnabled = "true";
+        }
+
+        return Boolean.parseBoolean(responseSigningEnabled);
+    }
+
+    public static boolean isAssertionSigningEnabled() {
+
+        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_ENABLE_ASSERTION_SIGNING));
+    }
+
+    public static boolean isValidateAssertionValidityPeriod() {
+        return Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.SSO_CONFIGURATION_VALIDATE_ASSERTION_EXPIRY));
     }
 
     private static void handleException(String msg, Throwable t) throws AppManagementException {

@@ -30,14 +30,18 @@ import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.PlistTemplateContext;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -47,36 +51,49 @@ import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
+import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DocumentListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ScheduleDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.DocumentationMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
-import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
+import org.wso2.carbon.appmgt.usage.publisher.AppMUIActivitiesDASDataPublisher;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.social.core.SocialActivityException;
 import org.wso2.carbon.social.core.service.SocialActivityService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.mobile.utils.utilities.PlistTemplateBuilder;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -87,8 +104,18 @@ import java.util.Set;
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
+
     BeanValidator beanValidator;
 
+    /**
+     * Download/Install mobile application
+     *
+     * @param contentType
+     * @param install     InstallDTO
+     * @return
+     */
+    
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
         String username = RestApiUtil.getLoggedInUsername();
@@ -99,16 +126,15 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
-
-            //check app validity
-            Map<String, String> searchTerms = new HashMap<String, String>();
-            searchTerms.put("id", appId);
-            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
-            if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
             }
-
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
+            }
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -117,10 +143,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length,
+                                           String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -132,18 +159,85 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
+            //Check for app existance and app state
+
 
             appProvider.subscribeMobileApp(username, appId);
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                              appId, parameters, null, null);
 
-        } catch (AppManagementException | MobileApplicationException e) {
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+            //mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         }
-        return Response.ok().build();
+        return Response.serverError().build();
+
+    }
+
+    /**
+     *
+     * @param appId
+     * @param contentType
+     * @return
+     */
+    @Override
+    public Response appsMobileIdAppIdDownloadPost(String appId, String contentType) {
+        String username = RestApiUtil.getLoggedInUsername();
+        Map<String, String> appURLResponse = new HashMap<>();
+        String appURL = null;
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
+            }
+
+            //Make user subscription, it the subscription is not available
+            appProvider.subscribeMobileApp(username, appId);
+
+            if (AppMConstants.MobileAppTypes.ENTERPRISE.equals(mobileApp.getType())) {
+                String oneTimeDownloadUUID = appProvider.generateOneTimeDownloadLink(appId);
+                if (AppMConstants.MOBILE_APPS_PLATFORM_ANDROID.equals(mobileApp.getPlatform())) {
+                    appURL = HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(
+                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath() +
+                            AppMConstants.MOBILE_ONE_TIME_DOWNLOAD_API_PATH + File.separator + oneTimeDownloadUUID;
+                } else if (AppMConstants.MOBILE_APPS_PLATFORM_IOS.equals(mobileApp.getPlatform())) {
+                    appURL = HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
+                            .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath()
+                            + AppMConstants.MOBILE_PLIST_API_PATH + File.separator + appId + File.separator + oneTimeDownloadUUID;
+                }
+            } else if (AppMConstants.MOBILE_APPS_PLATFORM_WEBAPP.equals(mobileApp.getType()) ||
+                    AppMConstants.MobileAppTypes.PUBLIC.equals(mobileApp.getType())) {
+                appURL = mobileApp.getAppUrl();
+            }
+            Map<String,String> response = new HashMap<>();
+            response.put("appUrl", appURL);
+            return Response.ok().entity(response).build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(AppMConstants.MOBILE_ASSET_TYPE, appId, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while subscribing to mobile app with uuid : " + appId, e, log);
+            }
+        }
+        return null;
 
     }
 
@@ -156,7 +250,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         if (events.getEvents().size() == 0) {
             RestApiUtil.handleBadRequest("Invalid event stream", log);
         }
-        APPMgtUiActivitiesBamDataPublisher appMgtBAMPublishObj = new APPMgtUiActivitiesBamDataPublisher();
+        AppMUIActivitiesDASDataPublisher appMgtBAMPublishObj = new AppMUIActivitiesDASDataPublisher();
 
         NativeObject[] statsObjectArr = new NativeObject[events.getEvents().size()];
         for (int i = 0; i < events.getEvents().size(); i++) {
@@ -179,6 +273,13 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.accepted().build();
     }
 
+    /**
+     * Get Favourite home page in App Store
+     *
+     * @param accept
+     * @param ifNoneMatch
+     * @return
+     */
     @Override
     public Response appsFavouritePageGet(String accept, String ifNoneMatch) {
         FavouritePageDTO favouritePageDTO = new FavouritePageDTO();
@@ -212,6 +313,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(favouritePageDTO).build();
     }
 
+    /**
+     * Set favourite page for currently logged in user in App Store
+     *
+     * @return
+     */
     @Override
     public Response appsFavouritePagePost() {
         boolean isTenantFlowStarted = false;
@@ -241,6 +347,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Remove favourite page of the currently logged i user in App Store
+     *
+     * @return
+     */
     @Override
     public Response appsFavouritePageDelete() {
         boolean isTenantFlowStarted = false;
@@ -276,13 +387,18 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param fileName          binary file name
      * @param ifMatch
      * @param ifUnmodifiedSince
-     * @return
+     * @return mobile app binary file content
      */
     @Override
     public Response appsMobileBinariesFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
         File binaryFile = null;
         String contentType = null;
         try {
+
+            if(!RestApiUtil.isValidFileName(fileName)){
+                RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' is provided", log);
+            }
+
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
@@ -311,6 +427,106 @@ public class AppsApiServiceImpl extends AppsApiService {
                 + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
         response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
         return response.build();
+    }
+
+    /**
+     * Mobile app one-time download API
+     *
+     * @param uuid              one-time download link uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsMobileBinariesOneTimeUuidGet(String uuid, String ifMatch, String ifUnmodifiedSince) {
+        File binaryFile = null;
+        String contentType = null;
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if (oneTimeDownloadLink.isDownloaded()) {
+                RestApiUtil.handleForbiddenRequest("App binary one-time download API resource access with uuid '" +
+                                                           uuid + "' is forbidden", log);
+            }
+            String fileName = oneTimeDownloadLink.getFileName();
+            binaryFile = RestApiUtil.readFileFromStorage(fileName);
+            contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
+            if (!contentType.startsWith("application")) {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
+                                             log);
+            }
+            Response.ResponseBuilder response = Response.ok((Object) binaryFile);
+            response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
+                    + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
+            response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
+            oneTimeDownloadLink.setDownloaded(true);
+            appProvider.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
+            return response.build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid downloadable link uuid", uuid, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving mobile binary via one-time download link with uuid" + uuid, e,
+                        log);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param appId
+     * @param uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsMobilePlistAppIdUuidGet(String appId, String uuid, String ifMatch, String ifUnmodifiedSince) {
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            OneTimeDownloadLink oneTimeDownloadLink = appProvider.getOneTimeDownloadLinkDetails(uuid);
+            if (oneTimeDownloadLink == null) {
+                RestApiUtil.handleResourceNotFoundError("one-time download link uuid", uuid, log);
+            }
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            carbonContext.setUsername(oneTimeDownloadLink.getCreatedUserName());
+            carbonContext.setTenantDomain(
+                    org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            carbonContext.setTenantId(oneTimeDownloadLink.getCreatedTenantID());
+            appProvider = RestApiUtil.getLoggedInUserProvider();
+            MobileApp mobileApp = appProvider.getMobileApp(appId);
+            if (mobileApp == null) {
+                RestApiUtil.handleResourceNotFoundError("Mobile Application", appId, log);
+            }
+            if (!APIStatus.PUBLISHED.getStatus().equals(mobileApp.getLifeCycleStatus().getStatus())) {
+                RestApiUtil.handleBadRequest(
+                        "Mobile application with uuid '" + appId + "' is not in '" + APIStatus.PUBLISHED + "' state",
+                        log);
+            }
+            String oneTimeDownloadLinkAPIPath =
+                    HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(
+                            MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + RestApiUtil.getStoreRESTAPIContextPath() +
+                            AppMConstants.MOBILE_ONE_TIME_DOWNLOAD_API_PATH +  File.separator + uuid;
+            PlistTemplateContext plistTemplateContext = new PlistTemplateContext();
+            plistTemplateContext.setAppName(mobileApp.getAppName());
+            plistTemplateContext.setBundleVersion(mobileApp.getBundleVersion());
+            plistTemplateContext.setPackageName(mobileApp.getPackageName());
+            plistTemplateContext.setOneTimeDownloadUrl(oneTimeDownloadLinkAPIPath);
+            PlistTemplateBuilder plistTemplateBuilder = new PlistTemplateBuilder();
+            String plistFileContent = plistTemplateBuilder.generatePlistConfig(plistTemplateContext);
+            return Response.ok().entity(plistFileContent).build();
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Invalid plist retrieval", appId, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving plist configuration for IOS mobile app '" + appId +
+                                "' installation", e, log);
+            }
+        }
+        return null;
     }
 
     /**
@@ -349,9 +565,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (staticContentFile == null || !staticContentFile.exists()) {
                 RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
             }
-            if (!contentType.startsWith("image")) {
+            if (contentType != null && !contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
-                                             log);
+                        log);
             }
 
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
@@ -384,7 +600,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
-            //check app validity
+
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
             List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
@@ -401,10 +617,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length,
+                                           String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -423,16 +640,25 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
-        } catch (AppManagementException | MobileApplicationException e) {
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(),
+                                                              appId, parameters, null, null);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
+           // mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store related Error occurred while uninstalling", e, log);
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("JSON casting related Error occurred while uninstalling", e, log);
         }
-
-        return Response.ok().build();
+        return Response.serverError().build();
     }
 
     @Override
@@ -446,27 +672,28 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         try {
             //check if a valid asset type is provided
-            if (!(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType))) {
-                String errorMessage = "Invalid Asset Type : " + appType;
-                RestApiUtil.handleBadRequest(errorMessage, log);
-            }
+            CommonValidator.isValidAppType(appType);
+
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // due to, publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
 
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
-            List<App> result = apiProvider.searchApps(appType, RestApiUtil.getSearchTerms(query));
-
-
-            if (result.isEmpty()) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
-            }
+            List<App> result = apiProvider.searchPublishedApps(appType, RestApiUtil.getSearchTerms(query));
 
             AppListDTO appListDTO = null;
-            if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
+            if (fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)) {
                 appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
 
-            }else{
+            } else {
                 appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
 
@@ -484,16 +711,25 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
                                           String ifModifiedSince) {
         AppDTO appToReturn = null;
+        String query = "";
         try {
+            //check if a valid asset type is provided
+            CommonValidator.isValidAppType(appType);
 
-            if (!(AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType))) {
-                String errorMessage = "Invalid Asset Type : " + appType;
-                RestApiUtil.handleBadRequest(errorMessage, log);
-            }
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // since the publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
 
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
+            searchTerms.putAll(RestApiUtil.getSearchTerms(query));
 
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<App> result = apiProvider.searchApps(appType, searchTerms);
@@ -521,20 +757,28 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                      String ifUnmodifiedSince) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeIdAppIdFavouriteAppPost(String appType, String appId, String contentType) {
         boolean isTenantFlowStarted = false;
+        String query = "";
         try {
             //check if a valid asset type is provided. Currently support only webapps
-            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE)) {
+            if (!(appType.equalsIgnoreCase(AppMConstants.WEBAPP_ASSET_TYPE) ||
+                    appType.equalsIgnoreCase(AppMConstants.SITE_ASSET_TYPE))) {
                 String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
+
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // since the publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
+
             //logged user's username
             String username = RestApiUtil.getLoggedInUsername();
             //logged user's tenant domain
@@ -555,6 +799,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
+            searchTerms.putAll(RestApiUtil.getSearchTerms(query));
+
             //get app details by id
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             //check if it's valid app
@@ -593,12 +839,26 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdFavouriteAppDelete(String appType, String appId, String contentType) {
         boolean isTenantFlowStarted = false;
+        String query = "";
         try {
             //check if a valid asset type is provided. Currently support only webapps
-            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE)) {
+            if (!(appType.equalsIgnoreCase(AppMConstants.WEBAPP_ASSET_TYPE) ||
+                    appType.equalsIgnoreCase(AppMConstants.SITE_ASSET_TYPE))) {
                 String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
+
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // since the publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
+
             //logged user's username
             String username = RestApiUtil.getLoggedInUsername();
             //logged user's tenant domain
@@ -619,6 +879,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
+            searchTerms.putAll(RestApiUtil.getSearchTerms(query));
+
             //get app details by id
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             //check if it's valid app
@@ -660,18 +922,27 @@ public class AppsApiServiceImpl extends AppsApiService {
         AppRatingListDTO appRatingListDTO = new AppRatingListDTO();
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
-
+        String query = "";
         try {
-            //check App Type validity
-            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
-            }
+            //check if a valid asset type is provided
+            CommonValidator.isValidAppType(appType);
+
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // since the publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
 
             //check App Id validity
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
+            searchTerms.putAll(RestApiUtil.getSearchTerms(query));
+
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             if (result.isEmpty()) {
@@ -729,17 +1000,27 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdRatePut(String appType, String appId, AppRatingInfoDTO rating, String contentType,
                                               String ifMatch, String ifUnmodifiedSince) {
         AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
+        String query = "";
         try {
-            //check App Type validity
-            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
-            }
+            //check if a valid asset type is provided
+            CommonValidator.isValidAppType(appType);
+
+            /*
+            // If the asset type is 'site' we need to add the registry attribute filtering and make the appType as webapp
+            // since the publisher side we don't have separate asset type as 'site' rather then a flag as 'treatAsASite'
+            // to the webapp asset type.
+            */
+
+            //Building registry filtering field.
+            query = APPMappingUtil.buildQuery(appType, query);
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
 
             //check App Id validity
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
+            searchTerms.putAll(RestApiUtil.getSearchTerms(query));
+
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             if (result.isEmpty()) {
@@ -797,6 +1078,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                       String ifModifiedSince) {
 
         APIConsumer apiConsumer = null;
+        Map<String, String> subscriptionData = new HashMap<>();
         boolean isTenantFlowStarted = false;
         String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
         try {
@@ -817,8 +1099,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
                                                                     Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
             if (subscription != null) {
-
-
+                subscriptionData.put("SubscriptionId", String.valueOf(subscription.getSubscriptionId()));
+                subscriptionData.put("SubscriptionType", subscription.getSubscriptionType());
+                subscriptionData.put("Status", subscription.getSubscriptionStatus());
+                subscriptionData.put("SubscriptionTime", subscription.getSubscriptionTime());
+                subscriptionData.put("SubscribedUser", subscription.getUserId());
             }
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError(
@@ -829,7 +1114,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return Response.ok().build();
+        return Response.ok().entity(subscriptionData).build();
     }
 
     /**
@@ -851,13 +1136,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             int tenantId = AppManagerUtil.getTenantId(userName);
 
-            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
-            Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                    AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-            Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                    AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-            if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            if (AppManagerUtil.isSelfSubscriptionEnable() || AppManagerUtil.isEnterpriseSubscriptionEnable()) {
                 //Check for subscriber existence
                 Subscriber subscriber = apiConsumer.getSubscriber(userName);
                 if (subscriber == null) {
@@ -952,15 +1231,8 @@ public class AppsApiServiceImpl extends AppsApiService {
         UserIdListDTO userIdListDTO = new UserIdListDTO();
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-
-                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) || AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+                if (AppManagerUtil.isSelfSubscriptionEnable() || AppManagerUtil.isEnterpriseSubscriptionEnable()) {
                     WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
                     Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
                     userIdListDTO.setUserIds(subscriberSet);
@@ -1023,17 +1295,19 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
         TagListDTO tagListDTO = new TagListDTO();
         try {
-            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
-            }
+            CommonValidator.isValidAppType(appType);
+
             APIConsumer appConsumer = RestApiUtil.getLoggedInUserConsumer();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             Map<String, String> attributeMap = new HashMap<>();
-            if (AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType)) {
-                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "true");
+            if (AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) {
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "TRUE");
+            } else if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)){
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "FALSE");
             }
+
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
 
             List<String> tagList = new ArrayList<>();
             Iterator tagIterator = appConsumer.getAllTags(tenantDomain, appType, attributeMap).iterator();
@@ -1052,5 +1326,288 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(tagListDTO).build();
     }
 
+
+    @Override
+    public Response appsMobileScheduleInstallPost(String contentType, ScheduleDTO schedule,
+                                                  SecurityContext securityContext) {
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", schedule.getAppId());
+
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, schedule.getAppId()).getResponse();
+            }
+
+
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = schedule.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "install";
+            String type = "device";
+            String[] parameters;
+            parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
+                    String[].class);
+            if (parameters == null) {
+                RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                        log);
+            }
+            String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime, null);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
+        }
+        return Response.ok().build();
+    }
+
+    /**
+     * Document Content retrieve
+     * @param appId  id of the application
+     * @param documentId id of the documentation
+     * @param appType type of the application
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentGet(String appId, String documentId, String appType, String accept, String ifNoneMatch, String ifModifiedSince) {
+
+        Documentation documentation;
+        try {
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) || AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+
+                String username = RestApiUtil.getLoggedInUsername();
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+                WebApp webApp = appProvider.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+                documentation = appProvider.getDocumentation(documentId, tenantDomain);
+                if (documentation == null) {
+                    RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                    return null;
+                }
+
+                //gets the content depending on the type of the document
+                if (documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
+                    String resource = documentation.getFilePath();
+                    Map<String, Object> docResourceMap = AppManagerUtil.getDocument(username, resource, tenantDomain);
+                    Object fileDataStream = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_DATA);
+                    Object contentType = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE);
+                    contentType = contentType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : contentType;
+                    String name = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_NAME).toString();
+                    return Response.ok(fileDataStream)
+                            .header(RestApiConstants.HEADER_CONTENT_TYPE, contentType)
+                            .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
+                            .build();
+                } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
+                    String content = appProvider.getDocumentationContent(appIdentifier, documentation.getName());
+                    return Response.ok(content)
+                            .header(RestApiConstants.HEADER_CONTENT_TYPE, AppMConstants.DOCUMENTATION_INLINE_CONTENT_TYPE)
+                            .build();
+                } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.URL)) {
+                    String sourceUrl = documentation.getSourceUrl();
+                    return Response.seeOther(new URI(sourceUrl)).build();
+                }
+            } else {
+                RestApiUtil.handleBadRequest("App type " + appType + " is not supported", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document " + documentId + " of the " + appType +
+                        " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (URISyntaxException e) {
+            String errorMessage = "Error while retrieving source URI location of " + documentId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieve documentation for a given documentationId and for a given app id
+     * @param appType application type ie: webapp,mobileapp
+     * @param appId application uuid
+     * @param documentId  documentID
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
+        Documentation documentation;
+        DocumentDTO documentDTO = null;
+        try {
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) || AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+                //TODO:Check App access prmissions
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+                documentation = appProvider.getDocumentation(documentId, tenantDomain);
+                if (documentation == null) {
+                    RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                }
+                documentDTO = DocumentationMappingUtil.fromDocumentationToDTO(documentation);
+            }else {
+                RestApiUtil.handleBadRequest("App type " + appType + " is not supported", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document : " + documentId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().entity(documentDTO).build();
+    }
+
+    /**
+     *  Returns all the documents of the given APP uuid that matches to the search condition
+     *
+     * @param appType application type ie:webapp,mobileapp
+     * @param appId application identifier
+     * @param limit
+     * @param offset
+     * @param accept
+     * @param ifNoneMatch
+     * @return matched documents as a list if DocumentDTOs
+     */
+    @Override
+    public Response appsAppTypeIdAppIdDocsGet(String appType, String appId, Integer limit, Integer offset, String accept, String ifNoneMatch) {
+        //pre-processing
+        //setting default limit and offset values if they are not set
+        limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
+        offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
+
+        try {
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) || AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+                //this will fail if user does not have access to the API or the API does not exist
+
+                WebApp webApp = appProvider.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+
+                List<Documentation> allDocumentation = appProvider.getAllDocumentation(appIdentifier);
+                DocumentListDTO documentListDTO = DocumentationMappingUtil.fromDocumentationListToDTO(allDocumentation,
+                        offset, limit);
+                DocumentationMappingUtil
+                        .setPaginationParams(documentListDTO, appId, offset, limit, allDocumentation.size());
+                return Response.ok().entity(documentListDTO).build();
+            } else {
+                RestApiUtil.handleBadRequest("App type " + appType + " is not supported", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
+            } else {
+                String msg = "Error while retrieving documents of App "+appType +" with appId "+ appId;
+                RestApiUtil.handleInternalServerError(msg, e, log);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Response appsMobileScheduleUpdatePost(String contentType, ScheduleDTO schedule,
+                                                 SecurityContext securityContext) {
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", schedule.getAppId());
+
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, schedule.getAppId()).getResponse();
+            }
+
+
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = schedule.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "update";
+            String type = "device";
+            String[] parameters;
+            parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
+                    String[].class);
+            if (parameters == null) {
+                RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                        log);
+            }
+            String scheduleTime = schedule.getScheduleTime();
+
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            sdf.setLenient(false);
+            Date date = sdf.parse(scheduleTime);
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, type, appId,
+                                                              parameters, scheduleTime, null);
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response.toString()).build();
+
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (MobileApplicationException e) {
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        } catch (ParseException e) {
+            RestApiUtil.handleBadRequest("Invalid schedule date format", log);
+        }
+        return Response.ok().build();
+    }
 
 }

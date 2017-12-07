@@ -8,13 +8,12 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.rest.api.store.TagsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TagsApiServiceImpl extends TagsApiService {
     private static final Log log = LogFactory.getLog(TagsApiServiceImpl.class);
@@ -26,16 +25,23 @@ public class TagsApiServiceImpl extends TagsApiService {
         AppIdListDTO appIDListDTO = new AppIdListDTO();
         try {
             //check App Type validity
-            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
-                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
-            }
+            CommonValidator.isValidAppType(appType);
+
             APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
 
+            Map<String, String> attributeMap = new HashMap<>();
+            if (AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) {
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "TRUE");
+            } else if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)){
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "FALSE");
+            }
+
+            //Make the asset type as 'webapp'.
+            appType = APPMappingUtil.updateAssetType(appType);
+
             //all tags
-            apiConsumer.getAllTags(tenantDomain, appType, null);
+            apiConsumer.getAllTags(tenantDomain, appType, attributeMap);
             Map<String, Set<WebApp>> allTaggedApps = apiConsumer.getTaggedAPIs();
             if (allTaggedApps == null) {
                 return RestApiUtil.buildNotFoundException("Apps (with Tag:" + tagName + ")", null).getResponse();

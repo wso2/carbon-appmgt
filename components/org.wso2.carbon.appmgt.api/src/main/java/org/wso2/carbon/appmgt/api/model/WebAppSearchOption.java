@@ -25,5 +25,9 @@ public enum WebAppSearchOption {
     /**
      * Search for apps by app provider name.
      */
-    SEARCH_BY_APP_PROVIDER
+    SEARCH_BY_APP_PROVIDER,
+    /**
+     * Search for apps by business owner.
+     */
+    SEARCH_BY_BUSINESS_OWNER
 }

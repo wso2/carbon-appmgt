@@ -3,6 +3,7 @@ var render = function(theme, data, meta, require) {
 	
 	var images = data.asset.attributes.images_screenshots.split(",");
 	data.asset.attributes.images_screenshots = images;
+        data.header.hideFavouriteMenu = true;
 
     var searchQuery =  data.search.query;
     if(typeof(searchQuery) != typeof({})){
@@ -66,6 +67,7 @@ var render = function(theme, data, meta, require) {
                                                                            asset: data.asset,
                                                                            type: data.type,
                                                                            inDashboard: data.inDashboard,
+                                                                           isUpdatedApp: data.isUpdatedApp,
                                                                            isEnterpriseInstallEnabled: data.isEnterpriseInstallEnabled,
                                                                            isDeviceSubscriptionEnabled: data.isDeviceSubscriptionEnabled,
                                                                            isDirectDownloadEnabled: data.isDirectDownloadEnabled,

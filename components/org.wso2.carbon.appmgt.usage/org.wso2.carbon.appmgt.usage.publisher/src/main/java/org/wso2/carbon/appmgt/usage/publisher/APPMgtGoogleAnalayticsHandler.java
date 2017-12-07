@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +200,7 @@ public class APPMgtGoogleAnalayticsHandler extends AbstractHandler {
         String message;
         message = userAgent + getRandomNumber() + UUID.randomUUID().toString();
 
-        MessageDigest m = MessageDigest.getInstance("MD5");
+        MessageDigest m = MessageDigest.getInstance("SHA-512");
         m.update(message.getBytes("UTF-8"), 0, message.length());
         byte[] sum = m.digest();
         BigInteger messageAsNumber = new BigInteger(1, sum);
@@ -230,7 +231,8 @@ public class APPMgtGoogleAnalayticsHandler extends AbstractHandler {
      * @return
      */
     private static String getRandomNumber() {
-        return Integer.toString((int) (Math.random() * 0x7fffffff));
+        SecureRandom secureRandom = new SecureRandom();
+        return Integer.toString((int) (secureRandom.nextInt() * 0x7fffffff));
     }
 
     /**

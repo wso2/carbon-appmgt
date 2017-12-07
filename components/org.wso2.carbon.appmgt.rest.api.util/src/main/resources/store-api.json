@@ -64,7 +64,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "A search condition.\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
+                        "description": "A search condition.\n\nYou can search attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id, business_owner_id**]\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n",
                         "type": "string"
                     },
                     {
@@ -670,13 +670,13 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs/{fileName}": {
+        "/apps/{appType}/id/{appId}/docs": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "summary": "Retrieving document",
-                "description": "Retrieving document.\n",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/0950b09c-0afe-47f2-88d6-72e9b88b1931/docs\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
+                "summary": "Get App Documents",
+                "description": "Get a list of documents belonging to an App.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -685,7 +685,72 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
-                        "$ref": "#/parameters/fileName"
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "APP Document"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\nDocument list is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/DocumentList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified.\nEmpty body because the client already has the latest version of the requested resource.\n"
+                    },
+                    "404": {
+                        "description": "Not Found.\nRequested resource does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable.\nThe requested media type is not supported.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/docs/{documentId}": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 4fc0a364a336a37c663790364da307a3\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/a7a7dacc-8a1c-428e-930d-d181f60f14bd/docs/6d47f5d5-f046-47e9-a65d-6eb50d5cd05e\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification Documentation\",\n   \"type\": \"HOWTO\"\n}",
+                "summary": "Retrieving document",
+                "description": "Retrieving the document.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/documentId"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -695,17 +760,17 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "App Documents"
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK.\nDocument Retrieved successfully.\n",
+                        "description": "OK.\nDocument retrieved successfully.\n",
                         "schema": {
                             "type": "file"
                         },
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches or in conditional request.\n",
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional requests.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
@@ -735,10 +800,85 @@
                 }
             }
         },
+        "/apps/{appType}/id/{appId}/docs/{documentId}/content": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 637084f12e5f93b8c4e7a8d7307635ab\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/927068ec-300a-4503-89fc-ef5ebc41a7db/docs/6777080d-99eb-402b-aadc-a00a17e178c3/content\" > sample.pdf",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Disposition: attachment; filename=\"sample.pdf\"\nContent-Type: application/octet-stream\nContent-Length: 7802\n\n%PDF-1.4\n%äüöß\n2 0 obj\n<</Length 3 0 R/Filter/FlateDecode>>\nstream\n..\n>>\nstartxref\n7279\n%%EOF",
+                "summary": "Get document content",
+                "description": "Downloads a FILE type document/get the inline content or source url of a certain document.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/documentId"
+                    },
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "App Document"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nFile or inline content returned.\n",
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource.\nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last time. \nUsed by caches, or in conditional reuquests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "303": {
+                        "description": "See Other.\nSource can be retrived from the URL specified at the Location header.\n",
+                        "headers": {
+                            "Location": {
+                                "description": "The Source URL of the document.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified. \nEmpty body because the client has already the latest version of the requested resource.\n"
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested Document does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable. \nThe requested media type is not supported\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/favourite-page": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Set as a favourite page",
                 "description": "Set as a favourite page.\n",
@@ -777,7 +917,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "",
                 "summary": "Remove from the favourite page",
@@ -817,7 +957,7 @@
             },
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" \"http://localhost:9763/api/appm/store/v1.1/apps/favourite-page\"",
                 "x-wso2-response": "{\"isDefaultPage\": true}",
                 "summary": "Check if it is a favourite page",
                 "description": "Check if it is a favourite page.\n",
@@ -917,7 +1057,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 8609e0949042b8c1c4274e39dc50e685\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/eaf2f81d-3580-4bde-a02b-18770ea035b8/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Remove from favourite Apps",
                 "description": "Remove from favourite Apps.\n",
@@ -963,9 +1103,9 @@
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/download\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
+                "x-wso2-response": "HTTP/1.1 202 Accepted",
+                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Download App",
                 "description": "Download a new App\n",
                 "parameters": [
@@ -1008,12 +1148,55 @@
                 }
             }
         },
+        "/apps/mobile/id/{appId}/download": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/download\"",
+                "x-wso2-response": "HTTP/1.1 200 Ok \n {\n   \"appUrl\":\"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/07463547-c3dd-469b-9027-80da107ad101\"   \n}",
+                "summary": "Subscribe to app and get app url",
+                "description": "Subscribe to a mobile App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/uninstallation\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 3500931880f806ad2523c4ce7079c505\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/uninstallation\"",
+                "x-wso2-response": "HTTP/1.1 202 Accepted",
+                "x-wso2-request": "{\"type\": \"user\",\"appId\": \"fcf96617-093a-4d0f-9d27-6f41b0d0c8b8\"}",
                 "summary": "Uninstall App",
                 "description": "Uninstall an existing App\n",
                 "parameters": [
@@ -1062,10 +1245,106 @@
                 }
             }
         },
+        "/apps/mobile/schedule-install": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-install\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
+                "summary": "Schedule Install App",
+                "description": "Schedule Install an App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "schedule",
+                        "schema": {
+                            "$ref": "#/definitions/Schedule"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/mobile/schedule-update": {
+            "post": {
+                "x-scope": "appm:create",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 795740b5fa8e632f9c2d969b6165b7fc\" -H \"Content-Type: application\/json\" -d '{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/apps\/mobile\/schedule-update\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\r\n  \"deviceIds\": [\"{\\\"id\\\":\\\"358812061121105\\\",\\\"type\\\":\\\"ANDROID\\\"}\"],\r\n  \"appId\": \"35050dda-217f-4638-9e1d-bbcf5aebc09b\",\r\n  \"scheduleTime\":\"04-30-2016 11:25 am\"\r\n}\r\n",
+                "summary": "Schedule Update App",
+                "description": "Schedule Update an App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "schedule",
+                        "schema": {
+                            "$ref": "#/definitions/Schedule"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/devices": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -b cookies -X GET http://localhost:9763/store/api/devices",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e0fb5670b87e2e83bbe563a7ba2c9610\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/store/v1.1/devices\"",
                 "x-wso2-response": "{\"next\": \"\",\"previous\": \"\",\"count\": 2,\"deviceList\":[{\"name\": \"My Nexus\",\"id\": \"11\",\"type\": \"phone\",\"platform\": \"android\",\"platformVersion\": \"5.0\",\"image\": \"/store/extensions/assets/mobileapp/resources/models/nexus.png\",\"model\": \"Nexus\"}]}",
                 "summary": "Get all Devices",
                 "description": "Get a list of available devices qualifying under a given search condition.\n",
@@ -1133,7 +1412,7 @@
         "/administration/roles": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/roles\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/store/v1.1/administration/roles\"",
                 "x-wso2-response": "{\"roleIds\": [\"admin\",\"Application/app_11_04_001\", \"Application/app_11_04_002\",\"Application/app_11_04_011\"]}",
                 "summary": "Get all roles",
                 "description": "Get a list of available roles.\n",
@@ -1257,7 +1536,7 @@
         "/administration/apps/download": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [ \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/administration/apps/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer fcd3a2474ffb23414f8cc0b398d3f7d3\" -H \"Content-Type: application\/json\" -d '{\"type\": \"user\",  \"typeIds\": [\"admin\",\"user1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise Download/Install App",
@@ -1303,11 +1582,11 @@
             }
         },
         "/administration/apps/uninstallation": {
-            "x-scope": "appm:administration",
-            "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation\"",
-            "x-wso2-response": "HTTP/1.1 200 OK",
-            "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
             "post": {
+                "x-scope": "appm:administration",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 6d781e9fce073db36d6481054da46311\" -H \"Content-Type: application\/json\" -d '{  \"type\": \"role\", \"typeIds\": [\"admin\",\"role1\"],  \"appId\": \"5acd652e-9d6e-465f-86bf-e30838a16123\"}' \"http:\/\/localhost:9763\/api\/appm\/store\/v1.1\/administration\/apps\/uninstallation\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise uninstall App",
                 "description": "Enterprise uninstall an existing App\n",
                 "parameters": [
@@ -1461,8 +1740,8 @@
         "/apps/static-contents/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/DCJGZqVpOBo4swf.jpg?appType=mobileapp\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving images, pdf and document files",
                 "description": "Retrieving images for banners, screenshots, etc.\n",
                 "parameters": [
@@ -1527,8 +1806,8 @@
         "/apps/mobile/binaries/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 980c5e45f2415f0b1ab8923f2c593c85\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/RKHktVsxjmFOZz1.apk\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binaries",
                 "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -1576,6 +1855,136 @@
                     },
                     "412": {
                         "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/mobile/plist/{appId}/{uuid}": {
+            "get": {
+                "produces": [
+                    "text/xml"
+                ],
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -X GET \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/plist/f2d9703b-df65-4b8a-8250-0d033e969f55/50ba9a5e-a261-453d-a58f-c6b68d42150d\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "summary": "Retrieving plist for ios app installation",
+                "description": "Retrieving plist for ios mobile apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/uuid"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\nIOS Mobile app plist content retrieved successfully.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/mobile/binaries/one-time/{uuid}": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -X GET -H \"http://localhost:9763/api/appm/store/v1.1/apps/mobile/binaries/one-time/fa1f4634-77cb-4bd7-9100-f0dcf0a04d6a\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "summary": "Retrieving mobile application binary",
+                "description": "Retrieving .apk and .ipa binaries for mobile apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/uuid"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\nMobile app binary content retrieved successfully.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time at which the resource was last modified.\nUsed by caches or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request.\nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found.\nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden.\nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1722,6 +2131,13 @@
             "required": true,
             "type": "string"
         },
+        "uuid": {
+            "name": "uuid",
+            "in": "path",
+            "description": "The UUID parameter of the one-time download link, which has the external representation of a downloadable binary file",
+            "required": true,
+            "type": "string"
+        },
         "appType": {
             "name": "appType",
             "in": "path",
@@ -1775,6 +2191,13 @@
             "description": "Business Owner Id.\n",
             "required": true,
             "type": "integer"
+        },
+        "documentId": {
+            "name": "documentId",
+            "in": "path",
+            "description": "Document UUID.\n",
+            "required": true,
+            "type": "string"
         },
         "Accept": {
             "name": "Accept",
@@ -2042,6 +2465,12 @@
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "customProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CustomProperty"
+                    }
                 }
             }
         },
@@ -2140,9 +2569,12 @@
                     "example": "user/device"
                 },
                 "deviceIds": {
-                    "type": "object",
+                    "type": "array",
                     "description": "List of device Id's",
-                    "example": "[{\"id\":\"358812061121105\",\"type\":\"ANDROID\"}]"
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": "[\"{\"id\":\"358812061121105\",\"type\":\"ANDROID\"}\"]"
                 },
                 "appId": {
                     "type": "string",
@@ -2316,6 +2748,106 @@
                 }
             }
         },
+        "Schedule": {
+            "title": "Schedule Install App",
+            "properties": {
+                "scheduleTime": {
+                    "type": "string",
+                    "example": "04-30-2016 11:25 am"
+                },
+                "deviceIds": {
+                    "type": "array",
+                    "description": "List of device Id's",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": "[\"{\"id\":\"358812061121105\",\"type\":\"ANDROID\"}\"]"
+                },
+                "appId": {
+                    "type": "string",
+                    "description": "Installing mobile app ID",
+                    "example": "aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c"
+                }
+            }
+        },
+        "DocumentList": {
+            "title": "Document List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of Documents returned.\n",
+                    "example": 1
+                },
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n",
+                    "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=2"
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n",
+                    "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=0"
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Document"
+                    }
+                }
+            }
+        },
+        "Document": {
+            "title": "Document",
+            "required": [
+                "name",
+                "type",
+                "sourceType"
+            ],
+            "properties": {
+                "documentId": {
+                    "type": "string",
+                    "example": "01234567-0123-0123-0123-012345678901"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "CalculatorDoc"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "HOWTO",
+                        "SAMPLES",
+                        "PUBLIC_FORUM",
+                        "SUPPORT_FORUM",
+                        "API_MESSAGE_FORMAT",
+                        "SWAGGER_DOC",
+                        "OTHER"
+                    ],
+                    "example": "HOWTO"
+                },
+                "summary": {
+                    "type": "string",
+                    "example": "Summary of Calculator Documentation"
+                },
+                "sourceType": {
+                    "type": "string",
+                    "enum": [
+                        "INLINE",
+                        "URL",
+                        "FILE"
+                    ],
+                    "example": "INLINE"
+                },
+                "sourceUrl": {
+                    "type": "string",
+                    "example": ""
+                },
+                "otherTypeName": {
+                    "type": "string",
+                    "example": ""
+                }
+            }
+        },
         "Error": {
             "title": "Error object returned with 4XX HTTP status",
             "required": [
@@ -2361,6 +2893,21 @@
                 "message": {
                     "type": "string",
                     "description": "Description about individual errors occurred\n"
+                }
+            }
+        },
+        "CustomProperty": {
+            "title": "The DTO for a custom app property",
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

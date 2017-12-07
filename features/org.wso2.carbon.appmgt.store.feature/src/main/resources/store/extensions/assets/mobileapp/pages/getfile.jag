@@ -13,6 +13,9 @@ var binaryFileLocation = storeObj.getBinaryFileStorage();
 
 if (binaryFileLocation.substring(0, 1) === "/") {
     var path = binaryFileLocation + fileName;
+} else if(binaryFileLocation.indexOf("\\")>-1) {
+	binaryFileLocation = storeObj.getBinaryFileStorage().replace(/\//g, '\\');
+	var path = binaryFileLocation + fileName;
 } else {
     var path = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + fileName;
 }
@@ -41,12 +44,6 @@ switch (ext) {
 try {
     var file = new File("file://" + path);
     if (file.isExists()) {
-        if (ext == "apk" || ext == "ipa") {
-            var username = require('store').server.current(session);
-            if (!username) {
-                response.sendRedirect(caramel.configs().context + "/login");
-            }
-        }
         response.addHeader('Content-Type', mime);
         file.open("r");
         print(file.getStream());

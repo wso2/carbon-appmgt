@@ -34,7 +34,16 @@
                             <i class="fw fw-ellipsis fw-rotate-90"></i>
                         </a>
                         <ul class="more-menu-items dropdown-menu">
-                            <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                <li>
+                                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../type}}/{{attributes.overview_advertisedAppUuid}}">
+                                        More Details
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{/ifCond}}
+
                             {{#if ../user}}
                                 {{#if isSubscribed}}
                                 <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}

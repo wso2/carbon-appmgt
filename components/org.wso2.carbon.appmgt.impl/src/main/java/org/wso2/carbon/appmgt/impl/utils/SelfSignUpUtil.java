@@ -39,6 +39,7 @@ import org.wso2.carbon.user.core.UserRealm;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -109,7 +110,10 @@ public final class SelfSignUpUtil {
 
                 Resource resource = registry.get(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION);
                 // build config from registry resource
-                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+
                 String configXml = new String((byte[]) resource.getContent());
                 InputSource configInputSource = new InputSource();
                 configInputSource.setCharacterStream(new StringReader(configXml.trim()));
@@ -141,12 +145,14 @@ public final class SelfSignUpUtil {
                                         .item(0).getTextContent();
                         boolean tmpIsExternal = Boolean.parseBoolean(tmpEl.getElementsByTagName(
                                 AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL).item(0).getTextContent());
-                        String permissions = tmpEl.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_PERMISSIONS)
-                                .item(0).getTextContent();
-                        String[] permissionList = null;
-                        if (permissions != null) {
-                            permissionList = permissions.split(",");
+                        String permissions = null;
+                        NodeList permissionsNodeList = tmpEl.getElementsByTagName("Permissions");
+                        if (permissionsNodeList.item(0) != null) {
+                            permissions = permissionsNodeList.item(0).getTextContent();
                         }
+                        String[] permissionList = null;
+                        permissionList = permissions != null ? permissions.split(",") :
+                                new String[]{"/permission/admin/login", "/permission/admin/manage/webapp/subscribe"};
                         SignUpRole signUpRole = new SignUpRole();
                         signUpRole.setRoleName(tmpRole);
                         signUpRole.setExternalRole(tmpIsExternal);

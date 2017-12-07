@@ -34,11 +34,7 @@ $(function () {
             jsonObj.appData.appName = $(this).data("name");
             jsonObj.appData.appVersion = $(this).data("version");
             jsonObj.appData.context = $(this).data("context");
-            if (loggedInUserTenantId != -1234) {
-                jsonObj.appData.userId = loggedInUserName + "@" + loggedInUserTenantDomain;
-            } else {
-                jsonObj.appData.userId = loggedInUserName;
-            }
+            jsonObj.appData.userId = loggedInUserName;
             jsonObj.appData.tenantId = loggedInUserTenantId;
             //only tag -"page-load"  is currently filtered in backend
             //so even though this is a click event add the tag as 'page-load'
@@ -217,19 +213,19 @@ $(function () {
                 content: "You can mark or unmark your favourite apps in My Apps page"
             },
             {
-                element: "#set-home",
+                element: "#dropdown-toggle-conf",
                 title: "Set the default page",
                 placement: "left",
                 content: "My Favourites page can be set/reset as your default page with the configuration option here."
             },
             {
-                element: "#all-apps-link",
+                element: "#store-link",
                 title: "Checkout new applications",
                 placement: "right",
                 content: "You can go to App Store from this link, search and subscribe to new applications"
             },
             {
-                element: "#my-favorites-link",
+                element: "#store-link",
                 title: "Add to your favourites",
                 placement: "right",
                 content: "The subscribed application can be marked as your Favourites and make it your default home page."

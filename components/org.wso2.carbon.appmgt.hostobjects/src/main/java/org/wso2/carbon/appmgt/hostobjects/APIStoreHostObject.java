@@ -31,21 +31,24 @@ import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.dto.AppVersionUserUsageDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
-import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
-import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
-import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
@@ -53,6 +56,8 @@ import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
@@ -65,6 +70,7 @@ import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
+import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.SelfSignUpUtil;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
@@ -72,9 +78,6 @@ import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
-import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUserUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -119,7 +122,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
     private static final long serialVersionUID = -3169012616750937045L;
     private static final Log log = LogFactory.getLog(APIStoreHostObject.class);
-    private static final String hostObjectName = "APIStore";
+    private static final String hostObjectName = "AppStore";
     private static final String httpPort = "mgt.transport.http.port";
     private static final String httpsPort = "mgt.transport.https.port";
     private static final String hostName = "carbon.local.ip";
@@ -219,46 +222,46 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Retrieve the business Owner
-     * @param cx      Rhino context
+     * Retrieve the business owner
+     *
+     * @param context Rhino context
      * @param thisObj Scriptable object
-     * @param args    Passing arguments
+     * @param args    Arguments
      * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     * @return List of business owners
+     * @throws AppManagementException on error while trying to get business owner
      */
-    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws
-            AppManagementException {
-
-        if (args == null || args.length != 1) {
+    public static NativeObject jsFunction_getBusinessOwner(Context context, Scriptable thisObj, Object[] args,
+                                                           Function funObj) throws AppManagementException {
+        if (args == null || args.length != 2) {
             throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
         }
 
         int businessOwnerId = Integer.valueOf(args[0].toString());
+        int tenantId = Integer.valueOf(args[1].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(businessOwnerId);
-        NativeObject row = new NativeObject();
-        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwnerForAppStore(businessOwnerId, tenantId);
+        NativeObject nativeObject = new NativeObject();
+        nativeObject.put("businessOwnerId", nativeObject, businessOwner.getBusinessOwnerId());
+        nativeObject.put("businessOwnerName", nativeObject, businessOwner.getBusinessOwnerName());
+        nativeObject.put("businessOwnerEmail", nativeObject, businessOwner.getBusinessOwnerEmail());
+        nativeObject.put("businessOwnerDescription", nativeObject, businessOwner.getBusinessOwnerDescription());
+        nativeObject.put("businessOwnerSite", nativeObject, businessOwner.getBusinessOwnerSite());
         List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
-        if(businessOwnerPropertiesList != null) {
+        if (businessOwnerPropertiesList != null) {
             JSONObject businessOwnerPropertiesObject = new JSONObject();
             for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                 JSONObject businessOwnerPropertyObject = new JSONObject();
                 BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
                 businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
                 businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
-                businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyId(),businessOwnerPropertyObject);
+                businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyKey(), businessOwnerPropertyObject);
             }
-            row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
+            nativeObject.put("businessOwnerProperties", nativeObject, businessOwnerPropertiesObject.toJSONString());
         } else {
-            row.put("businessOwnerProperties", row, null);
+            nativeObject.put("businessOwnerProperties", nativeObject, null);
         }
-        return row;
+        return nativeObject;
     }
 
     /**
@@ -1392,79 +1395,6 @@ public class APIStoreHostObject extends ScriptableObject {
 
     }
 
-
-    public static NativeArray jsFunction_getComments(Context cx,
-                                                     Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-        Comment[] commentlist = new Comment[0];
-        String providerName = "";
-        String apiName = "";
-        String version = "";
-        if (args!=null && args.length!=0 ) {
-            providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            apiName = (String)args[1];
-            version = (String)args[2];
-        }
-        APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName,
-                version);
-        NativeArray myn = new NativeArray(0);
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        try {
-            commentlist = apiConsumer.getComments(apiIdentifier);
-        } catch (AppManagementException e) {
-            handleException("Error from registry while getting  comments for " + apiName, e);
-        } catch (Exception e) {
-            handleException("Error while getting comments for " + apiName, e);
-        }
-
-        int i = 0;
-        if(commentlist!=null){
-        for (Comment n : commentlist) {
-            NativeObject row = new NativeObject();
-            row.put("userName", row, n.getUser());
-            row.put("comment", row, n.getText());
-            row.put("createdTime", row, n.getCreatedTime().getTime());
-            myn.put(i, myn, row);
-            i++;
-        }
-        }
-        return myn;
-
-    }
-
-    public static NativeArray jsFunction_addComments(Context cx,
-                                                     Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-        String providerName = "";
-        String apiName = "";
-        String version = "";
-        String commentStr = "";
-        if (args!=null&& args.length!=0 &&isStringArray(args)) {
-            providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            apiName = (String)args[1];
-            version = (String)args[2];
-            commentStr = (String)args[3];
-        }
-        APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
-        NativeArray myn = new NativeArray(0);
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        try {
-            apiConsumer.addComment(apiIdentifier, commentStr, getUsernameFromObject(thisObj));
-        } catch (AppManagementException e) {
-            handleException("Error from registry while adding comments for " + apiName, e);
-        } catch (Exception e) {
-            handleException("Error while adding comments for " + apiName, e);
-        }
-
-        int i = 0;
-        NativeObject row = new NativeObject();
-        row.put("userName", row, providerName);
-        row.put("comment", row, commentStr);
-        myn.put(i, myn, row);
-
-        return myn;
-    }
-
     /**
      * Returns the subscription for the given criteria based on the subscription type. e.g. Individual, Enterprise
      * @param cx
@@ -1505,6 +1435,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 subscriptionToReturn.put("applicationId", subscriptionToReturn, subscription.getApplicationId());
                 subscriptionToReturn.put("subscriptionType", subscriptionToReturn, subscription.getSubscriptionType());
                 subscriptionToReturn.put("subscriptionStatus",subscriptionToReturn,subscription.getSubscriptionStatus());
+                subscriptionToReturn.put("subscriptionTime",subscriptionToReturn,subscription.getSubscriptionTime());
+                subscriptionToReturn.put("subscribedUser",subscriptionToReturn,subscription.getUserId());
 
                 Set<String> trustedIdps = subscription.getTrustedIdps();
 
@@ -1773,131 +1705,6 @@ public class APIStoreHostObject extends ScriptableObject {
         }
 
     }
-
-
-    public static NativeArray jsFunction_rateAPI(Context cx,
-                                                 Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
-        if (args!=null && args.length!=0 ) {
-            String providerName = AppManagerUtil.replaceEmailDomain((String)args[0]);
-            String apiName = (String)args[1];
-            String version = (String)args[2];
-            String rateStr = (String)args[3];
-            int rate;
-            try {
-                rate = Integer.parseInt(rateStr.substring(0, 1));
-            } catch (NumberFormatException e) {
-                log.error("Rate must to be number " + rateStr, e);
-                return myn;
-            } catch (Exception e) {
-                log.error("Error from while Rating WebApp " + rateStr, e);
-                return myn;
-            }
-            APIIdentifier apiId;
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            try {
-                apiId = new APIIdentifier(providerName, apiName, version);
-                String user = getUsernameFromObject(thisObj);
-                switch (rate) {
-                    //Below case 0[Rate 0] - is to remove ratings from a user
-                    case 0: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_ZERO, user);
-                        break;
-                    }
-                    case 1: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_ONE, user);
-                        break;
-                    }
-                    case 2: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_TWO, user);
-                        break;
-                    }
-                    case 3: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_THREE, user);
-                        break;
-                    }
-                    case 4: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_FOUR, user);
-                        break;
-                    }
-                    case 5: {
-                        apiConsumer.rateAPI(apiId, APIRating.RATING_FIVE, user);
-                        break;
-                    }
-                    default: {
-                        throw new IllegalArgumentException("Can't handle " + rate);
-                    }
-
-                }
-            } catch (AppManagementException e) {
-                log.error("Error while Rating WebApp " + apiName
-                        + e);
-                return myn;
-            } catch (Exception e) {
-                log.error("Error while Rating WebApp " + apiName + e);
-                return myn;
-            }
-
-            NativeObject row = new NativeObject();
-            row.put("name", row, apiName);
-            row.put("provider", row, AppManagerUtil.replaceEmailDomainBack(providerName));
-            row.put("version", row, version);
-            row.put("rates", row, rateStr);
-            row.put("newRating", row, Float.toString(apiConsumer.getAPI(apiId).getRating()));
-            myn.put(0, myn, row);
-
-        }// end of the if
-        return myn;
-    }
-
-    public static NativeArray jsFunction_removeAPIRating(Context cx,
-                                                 Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
-        if (args != null && args.length != 0) {
-            String providerName = AppManagerUtil.replaceEmailDomain((String) args[0]);
-            String apiName = (String) args[1];
-            String version = (String) args[2];
-            float rating = 0;
-            APIIdentifier apiId;
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            boolean isTenantFlowStarted = false;
-            try {
-                apiId = new APIIdentifier(providerName, apiName, version);
-                String user = getUsernameFromObject(thisObj);
-                
-                String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(user));
-                if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
-                		isTenantFlowStarted = true;
-                        PrivilegedCarbonContext.startTenantFlow();
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-                }
-                
-                apiConsumer.removeAPIRating(apiId, user);
-                rating = apiConsumer.getAPI(apiId).getRating();
-
-            } catch (AppManagementException e) {
-                throw new AppManagementException("Error while remove User Rating of the WebApp " + apiName
-                          + e);
-
-            } catch (Exception e) {
-                throw new AppManagementException("Error while remove User Rating of the WebApp  " + apiName + e);
-
-            } finally {
-            	if (isTenantFlowStarted) {
-            		PrivilegedCarbonContext.endTenantFlow();
-            	}
-            }
-            NativeObject row = new NativeObject();
-            row.put("newRating", row, Float.toString(rating));
-            myn.put(0, myn, row);
-        }// end of the if
-        return myn;
-    }
-
 
     public static NativeArray jsFunction_getSubscriptions(Context cx,
                                                           Scriptable thisObj, Object[] args, Function funObj)
@@ -2698,6 +2505,29 @@ public class APIStoreHostObject extends ScriptableObject {
 
     }
 
+    /**
+     * Search business owner.
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Arguments
+     * @param funObj  Function object
+     * @return List of business owner ids
+     * @throws AppManagementException on error while trying to search business owner
+     */
+    public static List<String> jsFunction_getBusinessOwnerIdsByBusinessOwnerNameField(
+            Context context, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+        if (args == null || args.length != 2) {
+            handleException("Invalid number of parameters.");
+        }
+
+        String searchPrefix = args[0].toString();
+        int tenantId = Integer.valueOf(args[1].toString());
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        List<String> businessOwnersList = apiConsumer.getBusinessOwnerIdsBySearchPrefix(searchPrefix, tenantId);
+        return businessOwnersList;
+    }
+
     public static boolean jsFunction_removeSubscription(Context cx, Scriptable thisObj,
                                                         Object[] args,
                                                         Function funObj)
@@ -2795,8 +2625,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 currentApi.put("version", currentApi,
                         apiIdentifier.getVersion());
                 currentApi.put("description", currentApi, api.getDescription());
-                //Rating should retrieve from db
-                currentApi.put("rates", currentApi, AppMDAO.getAverageRating(api.getId()));
+                //Retrieving Rating
+                currentApi.put("rates", currentApi, apiConsumer.getAverageRating(api.getUUID(), AppMConstants.API_KEY));
                 if (api.getThumbnailUrl() == null) {
                     currentApi.put("thumbnailurl", currentApi, "images/api-default.png");
                 } else {
@@ -2872,7 +2702,7 @@ public class APIStoreHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAPIUsageforSubscriber(Context cx, Scriptable thisObj,
                                                                   Object[] args, Function funObj)
             throws AppManagementException {
-        List<APIVersionUserUsageDTO> list = null;
+        List<AppVersionUserUsageDTO> list = null;
         if (args==null || args.length == 0) {
             handleException("Invalid number of parameters.");
         }
@@ -2884,12 +2714,14 @@ public class APIStoreHostObject extends ScriptableObject {
         String period = (String) args[1];
 
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIStoreHostObject) thisObj).getUsername());
-            list = client.getUsageBySubscriber(subscriberName, period);
-        } catch (APIMgtUsageQueryServiceClientException e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(((APIProviderHostObject) thisObj).getUsername());
+            list = appUsageStatisticsService.
+                    getUsageBySubscriber(subscriberName, period);
+        } catch (AppUsageQueryServiceClientException e) {
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         } catch (Exception e) {
-            handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            handleException("Error while invoking AbstractAppUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2902,7 +2734,7 @@ public class APIStoreHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
-                APIVersionUserUsageDTO usage = (APIVersionUserUsageDTO) usageObject;
+                AppVersionUserUsageDTO usage = (AppVersionUserUsageDTO) usageObject;
                 row.put("api", row, usage.getApiname());
                 row.put("version", row, usage.getVersion());
                 row.put("count", row, usage.getCount());
@@ -3107,7 +2939,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             return domains;
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
-            throw new AppManagementException("Error while checking the APIStore is running in tenant mode or not.", e);
+            throw new AppManagementException("Error while checking the AppStore is running in tenant mode or not.", e);
         }
 
 
@@ -3484,21 +3316,22 @@ public class APIStoreHostObject extends ScriptableObject {
             int i = 0;
             for (APIIdentifier identifier : identifiers) {
                 WebApp app = apiConsumer.getAPI(identifier);
-                String lifeCycleStatus = app.getStatus().getStatus();
-                String accessUrl = getAccessUrl(app);
-
-                NativeObject row = new NativeObject();
-                row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
-                row.put("version", row, identifier.getVersion());
-                row.put("context", row, app.getContext());
-                row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                row.put("gatewayUrl", row, accessUrl);
-                row.put("uuid", row, app.getUUID());
-                row.put("treatAsSite", row, app.getTreatAsASite());
-                row.put("appDisplayName", row, app.getDisplayName());
-                row.put("lifeCycleStatus", row, lifeCycleStatus);
-                nativeArray.put(i++, nativeArray, row);
+                if (app != null) {
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    String accessUrl = getAccessUrl(app);
+                    NativeObject row = new NativeObject();
+                    row.put("appName", row, identifier.getApiName());
+                    row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
+                    row.put("version", row, identifier.getVersion());
+                    row.put("context", row, app.getContext());
+                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                    row.put("gatewayUrl", row, accessUrl);
+                    row.put("uuid", row, app.getUUID());
+                    row.put("treatAsSite", row, app.getTreatAsASite());
+                    row.put("appDisplayName", row, app.getDisplayName());
+                    row.put("lifeCycleStatus", row, lifeCycleStatus);
+                    nativeArray.put(i++, nativeArray, row);
+                }
             }
         }
         return nativeArray;
@@ -3634,37 +3467,39 @@ public class APIStoreHostObject extends ScriptableObject {
             int i = 0;
             for (APIIdentifier identifier : identifiers) {
                 WebApp app = apiConsumer.getAPI(identifier);
-                String lifeCycleStatus = app.getStatus().getStatus();
-                //Anonymous apps which are in published status, and subscribed apps which are in published,
-                //unpublished, deprecated and retired states will be displayed in myapps page when
-                //subscription option is enabled
-                if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
-                    continue;
+                if (app != null) {
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Anonymous apps which are in published status, and subscribed apps which are in published,
+                    //unpublished, deprecated and retired states will be displayed in myapps page when
+                    //subscription option is enabled
+                    if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        continue;
+                    }
+
+                    String accessUrl = getAccessUrl(app);
+
+                    NativeObject attributes = new NativeObject();
+                    attributes.put("overview_name", attributes, identifier.getApiName());
+                    attributes.put("overview_displayName", attributes, app.getDisplayName());
+                    attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                            identifier.getProviderName()));
+                    attributes.put("overview_context", attributes, app.getContext());
+                    attributes.put("overview_version", attributes, identifier.getVersion());
+                    attributes.put("overview_appTenant", attributes, app.getAppTenant());
+                    attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
+                            app.getThumbnailUrl()));
+                    attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
+                    attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
+                    attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
+
+                    NativeObject asset = new NativeObject();
+                    asset.put("id", asset, app.getUUID());
+                    asset.put("lifecycleState", asset, lifeCycleStatus);
+                    asset.put("accessUrl", asset, accessUrl);
+                    asset.put("attributes", asset, attributes);
+
+                    nativeArray.put(i++, nativeArray, asset);
                 }
-
-                String accessUrl = getAccessUrl(app);
-
-                NativeObject attributes = new NativeObject();
-                attributes.put("overview_name", attributes, identifier.getApiName());
-                attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
-                        identifier.getProviderName()));
-                attributes.put("overview_context", attributes, app.getContext());
-                attributes.put("overview_version", attributes, identifier.getVersion());
-                attributes.put("overview_appTenant", attributes, app.getAppTenant());
-                attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
-                        app.getThumbnailUrl()));
-                attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
-                attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
-                attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
-
-                NativeObject asset = new NativeObject();
-                asset.put("id", asset, app.getUUID());
-                asset.put("lifecycleState", asset, lifeCycleStatus);
-                asset.put("accessUrl", asset, accessUrl);
-                asset.put("attributes", asset, attributes);
-
-                nativeArray.put(i++, nativeArray, asset);
             }
         }
         return nativeArray;
@@ -3891,7 +3726,7 @@ public class APIStoreHostObject extends ScriptableObject {
                                                                  Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray availableAssetTypes = new NativeArray(0);
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
         for (int i = 0; i < typeList.size(); i++) {
             availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
         }
@@ -3919,7 +3754,7 @@ public class APIStoreHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid argument type. App name should be a String.");
         }
         String assetType = (String) args[0];
-        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        List<String> typeList = HostObjectUtils.getEnabledAssetTypes();
 
         for (String type : typeList) {
             if (assetType.equals(type)) {

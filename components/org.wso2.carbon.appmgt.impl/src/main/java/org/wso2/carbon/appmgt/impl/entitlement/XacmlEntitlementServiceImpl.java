@@ -23,18 +23,15 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
-import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
-import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.identity.entitlement.EntitlementUtil;
 import org.wso2.carbon.identity.entitlement.proxy.Attribute;
 import org.wso2.carbon.identity.entitlement.proxy.PEPProxy;
@@ -47,9 +44,6 @@ import org.wso2.carbon.identity.entitlement.stub.dto.PolicyDTO;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
@@ -75,23 +69,28 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     private static final String XACML_ATTRIBUTE_ID_POLICY_ID = "urn:wso2:appm:xacml:custom:policy-id";
 
     private String serverUrl;
-    private String username;
-    private String password;
+    private String cookie;
 
     private EntitlementPolicyAdminServiceStub entitlementPolicyAdminServiceStub;
 
-    public XacmlEntitlementServiceImpl(String serverUrl, String username, String password) {
+    public XacmlEntitlementServiceImpl(String serverUrl, String authorizedAdminCookie) {
         this.serverUrl = serverUrl;
-        this.username = username;
-        this.password = password;
+        this.cookie = authorizedAdminCookie;
     }
 
-    public void init(){
-        try {
-            String cookie = login(serverUrl, username, password);
+    public XacmlEntitlementServiceImpl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
+
+    /**
+     * Initialize EntitlementPolicyAdminServiceStub
+     * @throws AppManagementException on errors while trying to initialize EntitlementPolicyAdminServiceStub
+     */
+    public void init() throws AppManagementException {
+        try {
             entitlementPolicyAdminServiceStub = new EntitlementPolicyAdminServiceStub(serverUrl +
-                    "/services/EntitlementPolicyAdminService");
+                                                                                              "/services/EntitlementPolicyAdminService");
 
             ServiceClient client = entitlementPolicyAdminServiceStub._getServiceClient();
             Options options = client.getOptions();
@@ -100,15 +99,13 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         } catch (AxisFault axisFault) {
             String errorMessage = "Cannot initialize XACML entitlement service.";
             log.error(errorMessage, axisFault);
-            throw new SynapseException(errorMessage, axisFault);
+            throw new AppManagementException(errorMessage, axisFault);
         }
     }
 
     @Override
     public void savePolicy(EntitlementPolicy policy) {
-
         try {
-
             if (!policy.isValid()) {
                 return;
             }
@@ -132,9 +129,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
 
     @Override
     public void updatePolicy(EntitlementPolicy policy) {
-
         EntitlementPolicy processedPolicy = preProcess(policy);
-
         if (processedPolicy == null) {
             return;
         }
@@ -147,12 +142,10 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
             log.error("Cannot update XACML policy with id : " + policy.getPolicyId() +
                     ". Error occurred in EntitlementPolicyAdminService", e);
         }
-
     }
 
     @Override
     public EntitlementPolicyValidationResult validatePolicyPartial(String partial) {
-
         // Generate mock policy from the given partial.
         org.wso2.carbon.identity.entitlement.dto.PolicyDTO policyDTO = new org.wso2.carbon.identity.entitlement.dto.PolicyDTO();
         policyDTO.setPolicy(generateMockPolicy(partial));
@@ -181,39 +174,43 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     public void generateAndSaveEntitlementPolicies(List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts) {
         XACMLTemplateBuilder xacmlTemplateBuilder = new XACMLTemplateBuilder();
 
-        for(XACMLPolicyTemplateContext context : xacmlPolicyTemplateContexts){
+        for (XACMLPolicyTemplateContext context : xacmlPolicyTemplateContexts) {
             generateAndSaveEntitlementPolicy(context, xacmlTemplateBuilder);
         }
     }
 
+    /**
+     * Check whether entitlement decision request is permitted or not.
+     *
+     * @param request Request to be checked.
+     * @return whether entitlement decision request is permitted or not
+     * @throws AppManagementException on error while trying to check whether entitlement decision request is
+     *                                permitted or not
+     */
     @Override
-    public boolean isPermitted(EntitlementDecisionRequest request) {
-
+    public boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException {
         PEPProxy pepProxy = getPepProxy();
-
-        if(pepProxy == null){
-            throw new SynapseException("Cannot create PEP proxy.");
+        if (pepProxy == null) {
+            throw new AppManagementException("Cannot create PEP proxy.");
         }
 
         String decisionResult = null;
         try {
-
             decisionResult = pepProxy.getDecision(getEntitlementAttributes(request));
 
             OMElement decisionElement = AXIOMUtil.stringToOM(decisionResult);
             String decision = decisionElement.getFirstChildWithName(new QName(XML_NS_XACML_RESULT, XML_ELEMENT_RESULT)).
                     getFirstChildWithName(new QName(XML_NS_XACML_RESULT, XML_ELEMENT_DECISION)).getText();
 
-            if(decision != null && DECISION_DENY.equals(decision.toUpperCase())){
+            if (decision != null && DECISION_DENY.equals(decision.toUpperCase())) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
-
         } catch (Exception e) {
             String errorMessage = String.format("Error while evaluating entitlement for the policy id '%s'.", request.getPolicyId());
             log.error(errorMessage, e);
-            throw new SynapseException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         }
 
     }
@@ -223,7 +220,6 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         try {
             PolicyDTO existingPolicy = getPolicy(policyId);
             return existingPolicy.getPolicy();
-
         } catch (RemoteException e) {
             log.error("Error occurred while retrieving policy with policy id : " + policyId, e);
         } catch (EntitlementPolicyAdminServiceEntitlementException e) {
@@ -307,8 +303,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
 
         clientConfigMap.put("client", "soap");
         clientConfigMap.put("serverUrl", this.serverUrl+"/services");
-        clientConfigMap.put("userName", this.username);
-        clientConfigMap.put("password", this.password);
+        clientConfigMap.put("authorizedCookie", this.cookie);
         clientConfigMap.put("reuseSession", "yes");
 
         appToPDPClientConfigMap.put("AppManagerGateway", clientConfigMap);
@@ -345,34 +340,6 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
 
     }
 
-    private String login(String url, String username, String password) throws AxisFault {
-
-        String host;
-
-        try {
-            host = new URL(url).getHost();
-        } catch (MalformedURLException e) {
-            throw new AxisFault("Entitlement service URL is malformed.", e);
-        }
-
-        AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url + "/services/AuthenticationAdmin");
-        ServiceClient client = authAdminStub._getServiceClient();
-        Options options = client.getOptions();
-        options.setManageSession(true);
-
-        try {
-            authAdminStub.login(username, password, host);
-            ServiceContext serviceContext = authAdminStub.
-                    _getServiceClient().getLastOperationContext().getServiceContext();
-            String sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
-            return sessionCookie;
-        } catch (RemoteException e) {
-            throw new AxisFault("Error while contacting the authentication admin services", e);
-        } catch (LoginAuthenticationExceptionException e) {
-            throw new AxisFault("Error while authenticating against the entitlement service", e);
-        }
-    }
-    
     private Attribute[] getEntitlementAttributes(EntitlementDecisionRequest request){
     
     	Attribute policyIdAttribute = new Attribute(XACML_ATTRIBUTE_CATEGORY_CUSTOM, XACML_ATTRIBUTE_ID_POLICY_ID, ProxyConstants.DEFAULT_DATA_TYPE, request.getPolicyId());

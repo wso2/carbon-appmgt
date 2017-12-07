@@ -24,13 +24,16 @@ var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var caramel = require('caramel');
+var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
 var log = new Log();
 
 breadcrumbItems = deploymentManager.getAssetData();
 
-var generateLeftNavJson = function (data, listPartial) {
+var generateLeftNavJson = function(data, listPartial) {
 
-    var leftNavItems = {leftNavLinks: []};
+    var leftNavItems = {
+        leftNavLinks: []
+    };
 
     if (listPartial != 'view-mobileapp') {
         return leftNavItems;
@@ -42,65 +45,61 @@ var generateLeftNavJson = function (data, listPartial) {
 
     var user = server.current(session);
     var userManager = server.userManager(user.tenantId);
-    var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, userManager);
+    var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_create, userManager);
+    var mobileAppUpdateAuthorized = permissions.isAuthorized(user.username, config.permissions.mobileapp_update, userManager);
     if (!createActionAuthorized) {
         return leftNavItems;
     }
 
     var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, userManager);
-    if (user.hasRoles(["admin"])) {
+    var lifecycleState = data.artifact.lifecycleState;
+
+    if(user.hasRoles([ADMIN_ROLE]) || (mobileAppUpdateAuthorized &&  !(lifecycleState == "Published"))){
         editEnabled = true;
-    }
-    if (data.artifact.lifecycleState == "Published") {
+    } else {
         editEnabled = false;
     }
 
     if (editEnabled) {
         leftNavItems = {
-            leftNavLinks: [
-                {
-                    name: "Edit",
-                    iconClass: "icon-edit",
-                    additionalClasses: (listPartial == "edit-asset" ) ? "active" : null,
-                    url: caramel.configs().context + "/asset/operations/edit/" + data.shortName + "/"
-                         + data.artifact.id,
-                    isEditable: editEnabled
-                },
-                {
-                    name: "Create New Version",
-                    iconClass: "icon-file",
-                    additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
-                    url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/"
-                         + data.artifact.id
-                }
-            ]
+            leftNavLinks: [{
+                name: "Edit",
+                iconClass: "icon-edit",
+                additionalClasses: (listPartial == "edit-asset") ? "active" : null,
+                url: caramel.configs().context + "/asset/operations/edit/" + data.shortName + "/" +
+                    data.artifact.id,
+                isEditable: editEnabled
+            }, {
+                name: "Create New Version",
+                iconClass: "icon-file",
+                additionalClasses: (listPartial == "copy-app") ? "active" : null,
+                url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/" +
+                    data.artifact.id
+            }]
         };
     } else {
         leftNavItems = {
-            leftNavLinks: [
-                {
-                    name: "Edit",
-                    iconClass: "icon-edit",
-                    additionalClasses: (listPartial == "edit-asset" ) ? "active" : false,
-                    url: "#",
-                    title: "Edit action not permitted.",
-                    isEditable: editEnabled
-                },
-                {
-                    name: "Create New Version",
-                    iconClass: "icon-file",
-                    additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
-                    url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/"
-                         + data.artifact.id
-                }
-            ]
+            leftNavLinks: [{
+                name: "Edit",
+                iconClass: "icon-edit",
+                additionalClasses: (listPartial == "edit-asset") ? "active" : false,
+                url: "#",
+                title: "Edit action not permitted.",
+                isEditable: editEnabled
+            }, {
+                name: "Create New Version",
+                iconClass: "icon-file",
+                additionalClasses: (listPartial == "copy-app") ? "active" : null,
+                url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/" +
+                    data.artifact.id
+            }]
         };
     }
     return leftNavItems;
 
 };
 
-getTypeObj = function (type) {
+getTypeObj = function(type) {
     for (item in breadcrumbItems) {
         var obj = breadcrumbItems[item];
         if (obj.assetType == type) {

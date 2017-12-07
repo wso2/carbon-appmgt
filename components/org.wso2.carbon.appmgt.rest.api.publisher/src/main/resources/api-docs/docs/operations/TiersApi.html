@@ -1,47 +1,33 @@
 <div class="main-content">
     <h1><a name="TiersApi"></a>TiersApi</h1>
 
-    
-        
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdThrottlingtiersGet"></a>Get all Tiers</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeThrottlingtiersGet"></a>Get all Tiers</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of tiers.\n</p>
+            <p class="marked">Get a list of tiers. </p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/throttlingtiers</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/throttlingtiers</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
-            
                 <code>appm:read</code>
-            
-            
 
             <h4 class="section-heading">CURL Example</h4>
-            
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 0b236aa97005945bd9796149e54cd0b7&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/throttlingtiers&quot;</code></div>
 
-            
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdThrottlingtiersGet">
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeThrottlingtiersGet">
                 <h4 class="section-heading">
                     Sample Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
             </h4>
             </div>
-            
-                <div id="response-appsAppTypeIdAppIdThrottlingtiersGet" class="pre collapse"><code class="json">{&quot;tierList&quot;:[{&quot;tierSortKey&quot;:1,&quot;tierName&quot;:&quot;Bronze&quot;,&quot;tierDisplayName&quot;:&quot;Bronze&quot;,&quot;tierDescription&quot;:&quot;Allows 1 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:20,&quot;tierName&quot;:&quot;Gold&quot;,&quot;tierDisplayName&quot;:&quot;Gold&quot;,&quot;tierDescription&quot;:&quot;Allows 20 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:5,&quot;tierName&quot;:&quot;Silver&quot;,&quot;tierDisplayName&quot;:&quot;Silver&quot;,&quot;tierDescription&quot;:&quot;Allows 5 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:10000,&quot;tierName&quot;:&quot;Unlimited&quot;,&quot;tierDisplayName&quot;:&quot;Unlimited&quot;,&quot;tierDescription&quot;:&quot;Allows unlimited requests&quot;}]}</code></div>
-            
-            
+                <div id="response-appsAppTypeThrottlingtiersGet" class="pre collapse"><code class="json">{&quot;tierList&quot;:[{&quot;tierSortKey&quot;:1,&quot;tierName&quot;:&quot;Bronze&quot;,&quot;tierDisplayName&quot;:&quot;Bronze&quot;,&quot;tierDescription&quot;:&quot;Allows 1 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:20,&quot;tierName&quot;:&quot;Gold&quot;,&quot;tierDisplayName&quot;:&quot;Gold&quot;,&quot;tierDescription&quot;:&quot;Allows 20 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:5,&quot;tierName&quot;:&quot;Silver&quot;,&quot;tierDisplayName&quot;:&quot;Silver&quot;,&quot;tierDescription&quot;:&quot;Allows 5 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:10000,&quot;tierName&quot;:&quot;Unlimited&quot;,&quot;tierDisplayName&quot;:&quot;Unlimited&quot;,&quot;tierDescription&quot;:&quot;Allows unlimited requests&quot;}]}</code></div>
             <h4 class="section-heading">Parameters</h4>
             <table class="table table-hover">
                 <colgroup>
@@ -60,7 +46,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -77,50 +62,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
-                            
+                            <p class="param-description marked">The App type (either Webapp/Mobile app). </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appId</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -137,20 +89,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Media types acceptable for the response. Default is JSON.\n</p>
-                            
+                            <p class="param-description marked">Media types acceptable for the response. Default is JSON. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">JSON</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -167,20 +116,17 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
-                            
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved variant of the resource. </p>
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -199,61 +145,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of tiers is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. List of tiers is returned. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#TierList">TierList</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

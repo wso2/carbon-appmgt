@@ -56,10 +56,11 @@ public class AppDataLoader {
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
                 app.setType(artifact.getAttribute("overview_type"));
-                if("install".equals(action)){
+                if("install".equals(action) || "update".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + MobileConfigurations.APP_GET_URL
+                                + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
@@ -80,6 +81,7 @@ public class AppDataLoader {
             if("android".equals(artifact.getAttribute("overview_platform"))){
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setIdentifier(artifact.getAttribute("overview_packagename"));
+                app.setAppIdentifier(artifact.getAttribute("overview_packagename"));
             }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setAppIdentifier(artifact.getAttribute("overview_appid"));

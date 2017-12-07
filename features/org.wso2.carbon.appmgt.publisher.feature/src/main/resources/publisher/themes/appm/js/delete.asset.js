@@ -15,7 +15,7 @@ $(function () {
         var name = $(this).data("name");
         var version = $(this).data("version");
         var parent = $(this).parent();
-
+        var btnDelete = $(this);
 
         var status = isExistInExternalStore(provider, name, version);
         if(status) {
@@ -32,7 +32,15 @@ $(function () {
         e.preventDefault();
         e.stopPropagation();
 
-        var confirmDel = confirm("Are you sure you want to delete this app?");
+        var confirmationMsg;
+        var hasSubscription = hasSubscriptions(type, id);
+        if (hasSubscription) {
+            confirmationMsg = "This Application already has subscriptions. Are you sure you want to delete this app?";
+        } else {
+            confirmationMsg = "Are you sure you want to delete this app?";
+        }
+
+        var confirmDel = confirm(confirmationMsg);
         if (confirmDel == true) {
             $.ajax({
                 url: caramel.context + '/api/asset/delete/' + type + '/' + id,
@@ -41,7 +49,11 @@ $(function () {
                 success: function (response) {
                     var result = response;
                     if (result.isDeleted) {
-                        showDeleteModel(result.message, result.message, type);
+                        btnDelete.closest('tr').remove();
+                        //if no apps, reload page
+                        //if(btnDelete.closest('tbody').find('tr').length == 0) {
+                        //    window.location = caramel.context + '/assets/' + type + '/';
+                        //}
                     } else if (result.isDeleted == false) {
                         showDeleteModel(result.message, result.message, type);
                         $(parent).children().attr('disabled', false);
@@ -61,6 +73,19 @@ $(function () {
 
     });
 
+    function hasSubscriptions(asset, id) {
+        var hasSubscription = false;
+        $.ajax({
+                   url: caramel.context + '/api/lifecycle/subscribe/' + asset + '/' + id,
+                   type: 'GET',
+                   async: false,
+                   success: function (response) {
+                       hasSubscription = response.subscribed;
+                   }
+               });
+        return hasSubscription;
+    }
+
     var showDeleteModel = function (msg, head, type) {
 
         $('#messageModal2').html($('#confirmation-data1').html());
@@ -78,7 +103,7 @@ $(function () {
         var publishedInExternalStores = false;
         $.ajax({
             async: false,
-            url: caramel.context + '/api/asset/get/external/stores/webapp/' + provider + '/' + name + '/' + version,
+            url: caramel.context + '/api/asset/get/external/stores/webapp/' + encodeURIComponent(provider) + '/' + name + '/' + version,
             type: 'GET',
             processData: true,
             success: function (response) {

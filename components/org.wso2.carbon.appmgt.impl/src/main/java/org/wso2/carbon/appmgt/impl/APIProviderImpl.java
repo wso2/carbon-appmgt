@@ -23,18 +23,42 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.JavaPolicy;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.OneTimeDownloadLink;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
@@ -71,7 +95,9 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,6 +107,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,43 +129,48 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Delete business owner.
-     * @param businessOwnerId ID of the owner.
-     * @return
-     * @throws AppManagementException
+     * Delete a given business owner.
+     *
+     * @param businessOwnerId Id of the business owner
+     * @return Whether business owner was deleted or not
+     * @throws AppManagementException on error while trying to delete business owner
      */
     @Override
-    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+    public boolean deleteBusinessOwner(int businessOwnerId) throws AppManagementException {
         boolean isBusinessOwnerAssociatedWithApps = appMDAO.isBusinessOwnerAssociatedWithApps(businessOwnerId,
                                                                                               registry, tenantDomain);
         if (!isBusinessOwnerAssociatedWithApps) {
             appMDAO.deleteBusinessOwner(businessOwnerId);
-            // return true if business owner is successfully deleted.
+            // Return true if business owner is successfully deleted.
             return true;
         }
-        // return false if business owner is associated with one or more web apps.
+        // Return false if business owner is associated with one or more web apps.
         return false;
     }
+
     /**
-     *Update a business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     * Update a given business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Whether business owner was updated or not
+     * @throws AppManagementException on error while trying to update business owner
      */
     @Override
     public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
         boolean isUpdated = false;
         if (appMDAO.getBusinessOwner(businessOwner.getBusinessOwnerId(), tenantId) != null) {
             appMDAO.updateBusinessOwner(businessOwner);
-            isUpdated =true;
+            isUpdated = true;
         }
         return isUpdated;
     }
 
 
     /**
-     * Get all business Owners.
-     * @return
-     * @throws AppManagementException
+     * Get all business owners.
+     *
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to get business owners
      */
     @Override
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
@@ -146,10 +178,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get business owners.
+     * Retrieve business owner by given id.
+     *
      * @param businessOwnerId Business owner Id.
-     * @return
-     * @throws AppManagementException
+     * @return {@link BusinessOwner} object
+     * @throws AppManagementException on error while trying to get business owner
      */
     @Override
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
@@ -158,31 +191,53 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Search business owners with pagination.
-     * @param startIndex
-     * @param pageSize
-     * @param searchValue
-     * @return
-     * @throws AppManagementException
+     *
+     * @param startIndex  Start index
+     * @param pageSize    Page size
+     * @param searchKey Search key
+     * @return List of {@link BusinessOwner} objects
+     * @throws AppManagementException on error while trying to search business owners
      */
     @Override
-    public  List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
-                                                                                          AppManagementException {
-        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue, tenantId);
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchKey)
+            throws AppManagementException {
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchKey, tenantId);
     }
 
+    /**
+     * Get the count of business owners.
+     *
+     * @return Number of business owners.
+     * @throws AppManagementException on error while trying to get business owners count
+     */
     @Override
-    public  int getBusinessOwnersCount() throws AppManagementException {
+    public int getBusinessOwnersCount() throws AppManagementException {
         return appMDAO.getBusinessOwnersCount(tenantId);
     }
 
     /**
-     *Save business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     * Save business owner.
+     *
+     * @param businessOwner {@link BusinessOwner} object
+     * @return Saved business owner id
+     * @throws AppManagementException on error while trying to save business owner
      */
     @Override
     public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
         return appMDAO.saveBusinessOwner(businessOwner, tenantId);
+    }
+
+    /**
+     * Get Business owner id by business owner name and email.
+     *
+     * @param businessOwnerName  Business owner name
+     * @param businessOwnerEmail Business owner email
+     * @return Business owner id
+     * @throws AppManagementException on error while trying to get business owner id
+     */
+    @Override
+    public int getBusinessOwnerId(String businessOwnerName, String businessOwnerEmail) throws AppManagementException {
+        return appMDAO.getBusinessOwnerId(businessOwnerName, businessOwnerEmail, tenantId);
     }
 
     /**
@@ -559,15 +614,37 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
 
+        final String appName = webApp.getId().getApiName();
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.WEBAPP_ASSET_TYPE);
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A duplicate webapp already exists with name : " +
+                        appName);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error occurred while checking existence for webapp with name '" + appName);
+        }
         AppRepository appRepository = new DefaultAppRepository(registry);
         String appId = appRepository.saveApp(webApp);
         return appId;
 
     }
 
+    /**
+     * Create new version of the application
+     * @param app applictaion
+     * @return app UUID
+     * @throws AppManagementException
+     */
     @Override
     public String createNewVersion(App app) throws AppManagementException {
-
         AppRepository appRepository = new DefaultAppRepository(registry);
         String uuid = appRepository.createNewVersion(app);
         return uuid;
@@ -596,6 +673,30 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
         }
         return webApp;
+    }
+
+    /**
+     * Retrieve webapp for the given uuid
+     * @param uuid uuid of the Application
+     * @return Webapp
+     * @throws AppManagementException
+     */
+    @Override
+    public MobileApp getMobileApp(String uuid) throws AppManagementException {
+        GenericArtifact artifact = null;
+        MobileApp mobileApp = null;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, AppMConstants.MOBILE_ASSET_TYPE);
+            artifact = artifactManager.getGenericArtifact(uuid);
+            if (artifact != null) {
+                mobileApp = AppManagerUtil.getMobileApp(artifact);
+            }
+
+        } catch (GovernanceException e) {
+            handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
+        }
+        return mobileApp;
     }
 
 
@@ -658,10 +759,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Generates entitlement policies for the given app.
      *
      * @param apiIdentifier@throws AppManagementException
+     * @param authorizedAdminCookie      Authorized cookie to access IDP admin services
      */
     @Override
-    public void generateEntitlementPolicies(APIIdentifier apiIdentifier) throws
-                                                                         AppManagementException {
+    public void generateEntitlementPolicies(APIIdentifier apiIdentifier, String authorizedAdminCookie) throws
+                                                                                                 AppManagementException {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -669,21 +771,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts =
                 appMDAO.getEntitlementPolicyTemplateContexts(apiIdentifier);
 
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
-        entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+        if (xacmlPolicyTemplateContexts != null && !xacmlPolicyTemplateContexts.isEmpty()) {
+            EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config,
+                                                                                                    authorizedAdminCookie);
 
-        // Update URL mapping => XACML partial mapping with the generated policy IDs.
-        appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+            entitlementService.generateAndSaveEntitlementPolicies(xacmlPolicyTemplateContexts);
+
+            // Update URL mapping => XACML partial mapping with the generated policy IDs.
+            appMDAO.updateURLEntitlementPolicyPartialMappings(xacmlPolicyTemplateContexts);
+        }
     }
 
     /**
      * Updates given entitlement policies.
      *
-     * @param policies Entitlement policies to be updated.
+     * @param policies        Entitlement policies to be updated.
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     @Override
-    public void updateEntitlementPolicies(List<EntitlementPolicy> policies) throws
+    public void updateEntitlementPolicies(List<EntitlementPolicy> policies,String authorizedAdminCookie) throws
                                                                             AppManagementException {
 
         if (policies == null || policies.isEmpty()) {
@@ -692,7 +799,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
 
         for (EntitlementPolicy policy : policies) {
             entitlementService.updatePolicy(policy);
@@ -700,20 +807,22 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get entitlement policy content from policy id
+     * Get entitlement policy content from policy id.
      *
-     * @param policyId Entitlement policy id
+     * @param policyId        Entitlement policy id
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
      * @return entitlement policy content
+     * @throws AppManagementException on error while trying to get entitlement policy
      */
     @Override
-    public String getEntitlementPolicy(String policyId) {
+    public String getEntitlementPolicy(String policyId, String authorizedAdminCookie) throws AppManagementException {
         if (policyId == null) {
             return null;
         }
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
 
-        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config, authorizedAdminCookie);
         return entitlementService.getPolicyContent(policyId);
     }
 
@@ -731,15 +840,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared,String policyPartialDesc) throws
-                                                                                   AppManagementException {
+                                                  String author, boolean isShared, String policyPartialDesc,
+                                                  String authorizedAdminCookie) throws AppManagementException {
         appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
 
         // Regenerate XACML policies of the apps which are using the updated policy partial.
         List<APIIdentifier> associatedApps = getAssociatedApps(policyPartialId);
 
         for(APIIdentifier associatedApp : associatedApps){
-        	generateEntitlementPolicies(associatedApp);
+        	generateEntitlementPolicies(associatedApp, authorizedAdminCookie);
         }
 
         return true;
@@ -832,11 +941,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Updates an existing WebApp
      *
-     * @param api WebApp
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *          if failed to update WebApp
+     * @param api             WebApp
+     * @param authorizedAdminCookie Authorized cookie to access IDP admin services
+     * @throws AppManagementException if failed to update WebApp
      */
-    public void updateAPI(WebApp api) throws AppManagementException {
+    public void updateAPI(WebApp api, String authorizedAdminCookie) throws AppManagementException {
         WebApp oldApi = getAPI(api.getId());
         if (oldApi.getStatus().equals(api.getStatus())) {
             try {
@@ -850,7 +959,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     api.setApiHeaderChanged(true);
                 }
 
-                appMDAO.updateAPI(api);
+                appMDAO.updateAPI(api, authorizedAdminCookie);
 
                 AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
@@ -1164,7 +1273,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
-                        } else {
+                        } else if (status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
                             removeFromGateway(api);
                         }
                     }
@@ -1412,7 +1521,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             Association[] associations = registry.getAssociations(docPath,
-                                                                  AppMConstants.DOCUMENTATION_KEY);
+                                                                  AppMConstants.DOCUMENTATION_ASSOCIATION);
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
             }
@@ -1457,7 +1566,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             Association[] associations = registry.getAssociations(docPath,
-                    AppMConstants.DOCUMENTATION_KEY);
+                    AppMConstants.DOCUMENTATION_ASSOCIATION);
 
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
@@ -1878,9 +1987,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * Delete applicatoion
      * @param identifier AppIdentifier
      * @param ssoProvider SSO provider
+     * @param authorizedAdminCookie The cookie which was generated from the SAML assertion.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
+    public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider, String authorizedAdminCookie) throws
                                                                                 AppManagementException {
 
         SSOConfiguratorUtil ssoConfiguratorUtil;
@@ -1896,7 +2006,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Resource appArtifactResource = registry.get(appArtifactPath);
             String applicationStatus = appArtifactResource.getProperty(AppMConstants.WEB_APP_LIFECYCLE_STATUS);
             if (subsCount > 0 && !applicationStatus.equals("Retired")) {
-               return isAppDeleted;
+                //remove subscriptions per app
+                appMDAO.removeAPISubscription(identifier);
             }
 
             //If SSOProvider exists, remove it
@@ -1905,7 +2016,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Removing the SSO Provider with name : " + ssoProvider.getProviderName());
                 }
                 ssoConfiguratorUtil = new SSOConfiguratorUtil();
-                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider);
+
+                Map<String, String> serviceConfigs = new HashMap<String, String>();
+                serviceConfigs.put(SSOConfiguratorUtil.SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY, authorizedAdminCookie);
+
+                ssoConfiguratorUtil.deleteSSOProvider(ssoProvider, serviceConfigs);
             }
 
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
@@ -1957,7 +2072,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Gateway is not existed for the current applications Provider");
                 }
             }
-            appMDAO.deleteAPI(identifier);
+            appMDAO.deleteAPI(identifier, authorizedAdminCookie);
 
             /*remove empty directories*/
             String appCollectionPath = AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
@@ -2107,6 +2222,33 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
     }
 
+    /**
+     *
+     * Search and return the published apps for the given search terms.
+     *
+     * @param appType App type
+     * @param searchTerms Search terms
+     * @return List of {@link App}
+     * @throws AppManagementException on errors while trying to search published apps.
+     */
+    @Override
+    public List<App> searchPublishedApps(String appType, Map<String, String> searchTerms) throws
+                                                                                          AppManagementException {
+        // If the app type is 'webapp' use the App Repository implementation path.
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)) {
+            return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
+        } else {
+            List<App> apps = new ArrayList<App>();
+            List<GenericArtifact> appArtifacts = getPublishedAppArtifacts(appType);
+
+            for (GenericArtifact artifact : appArtifacts) {
+                if (isSearchHit(artifact, searchTerms)) {
+                    apps.add(createApp(artifact, appType));
+                }
+            }
+            return apps;
+        }
+    }
 
     /**
      * Update the Tier Permissions
@@ -2625,14 +2767,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException {
+
         String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
         Resource resource = null;
         boolean isSubscribed = false;
         try {
-            if (!registry.resourceExists(path)) {
-                resource = registry.newResource();
+            UserRegistry sysRegistry = ServiceReferenceHolder.getInstance().getRegistryService()
+                    .getGovernanceSystemRegistry(tenantId);
+            if (!sysRegistry.resourceExists(path)) {
+                resource = sysRegistry.newResource();
                 resource.setContent("");
-                registry.put(path, resource);
+                sysRegistry.put(path, resource);
                 isSubscribed = true;
             }
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
@@ -2694,6 +2839,40 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appArtifacts;
     }
 
+    /**
+     *
+     * Return the published 'app' (e.g. webapp, mobileapp) registry artifacts.
+     *
+     * @param appType App type
+     * @return List of {@link GenericArtifact}
+     * @throws AppManagementException on errors while trying to get published app artifacts
+     */
+    private List<GenericArtifact> getPublishedAppArtifacts(String appType) throws AppManagementException {
+        List<GenericArtifact> appArtifacts = new ArrayList<GenericArtifact>();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                if (artifact.getLifecycleState().toUpperCase().equals(AppMConstants.PUBLISHED)) {
+                    appArtifacts.add(artifact);
+                }
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs from the registry", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return appArtifacts;
+    }
 
     private App createApp(GenericArtifact artifact, String appType) throws AppManagementException {
 
@@ -2817,7 +2996,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 handleException("Could not retrieve tags. Unsupported applictaion type :" + appType +" provided");
             }
 
-            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
 
             org.wso2.carbon.registry.core.Collection collection = registry.executeQuery(tagsQueryPath, params);
             for (String fullTag : collection.getChildren()) {
@@ -2890,4 +3069,115 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return null;
     }
 
+    /**
+     * Remove mobile applications binary files from storage
+     * @param filePath file path of the banner image, thumbnail, screenshots and app binary
+     * @throws AppManagementException
+     */
+    public void removeBinaryFromStorage(String filePath) throws AppManagementException {
+        if (StringUtils.isEmpty(filePath)) {
+            handleException("Mobile Application BinaryFileStorage Configuration cannot be found." +
+                    " Pleas check the configuration in app-management.xml ");
+        }
+
+        File binaryFile = new File(filePath);
+        if (!binaryFile.exists()) {
+            handleException("Binary file " + filePath + " does not exist");
+        }
+
+        boolean isDeleted = binaryFile.delete();
+        if (!isDeleted) {
+            handleException("Error occurred while deleting file " + filePath);
+        }
+    }
+
+    /**
+     * Generate one-time download link content in Database
+     * @param appId mobile application id that the one-time download link generated for
+     * @return UUID of the download link
+     * @throws AppManagementException
+     */
+    public String generateOneTimeDownloadLink(String appId) throws AppManagementException {
+
+        String downloadLinkUUID = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            GenericArtifact mobileAppArtifact = artifactManager.getGenericArtifact(appId);
+            if (mobileAppArtifact == null) {
+                handleResourceNotFoundException(
+                        "Failed to generate one-time download link for Mobile App. The artifact corresponding to artifactId "
+                                + appId + " does not exist");
+            }
+
+            if (!AppMConstants.MOBILE_APP_TYPE_PUBLIC.equals(mobileAppArtifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE))) {
+                OneTimeDownloadLink oneTimeDownloadLink = new OneTimeDownloadLink();
+                UUID contentUUID = UUID.randomUUID();
+                downloadLinkUUID = contentUUID.toString();
+                oneTimeDownloadLink.setUUID(downloadLinkUUID);
+                oneTimeDownloadLink.setFileName(mobileAppArtifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+                oneTimeDownloadLink.setDownloaded(false);
+                appRepository.persistOneTimeDownloadLink(oneTimeDownloadLink);
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while generating one-time download link for mobile application : " + appId, e);
+        }
+        return downloadLinkUUID;
+    }
+
+
+    /**
+     * Retrieve one-time download link details from database
+     * @param UUID UUID of the one-time download link
+     * @return
+     * @throws AppManagementException
+     */
+    public OneTimeDownloadLink getOneTimeDownloadLinkDetails(String UUID) throws AppManagementException{
+        return appRepository.getOneTimeDownloadLinkDetails(UUID);
+    }
+
+    /**
+     * Update one-time download link details in database
+     * @param oneTimeDownloadLink OneTimeDownloadLink content
+     * @throws AppManagementException
+     */
+    public void updateOneTimeDownloadLinkStatus(OneTimeDownloadLink oneTimeDownloadLink) throws AppManagementException{
+        appRepository.updateOneTimeDownloadLinkStatus(oneTimeDownloadLink);
+    }
+
+    public String getGatewayEndpoint() {
+        Environment gatewayEnvironment = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getApiGatewayEnvironments().get(0);
+
+        String gatewayUrl = gatewayEnvironment.getApiGatewayEndpoint().split(",")[0];
+        return gatewayUrl;
+    }
+
+    public String getAppUUIDbyName(String appName, String appVersion, int tenantId) throws AppManagementException{
+       return appRepository.getAppUUIDbyName(appName, appVersion, tenantId);
+    }
+
+    public String uploadImage(FileContent fileContent) throws AppManagementException {
+        UUID contentUUID = UUID.randomUUID();
+        String fileExtension = FilenameUtils.getExtension(fileContent.getFileName());
+        String filename = generateBinaryUUID() + "." + fileExtension;
+        fileContent.setFileName(filename);
+        fileContent.setContentType("image/" + fileExtension);
+        fileContent.setUuid(contentUUID.toString());
+        try {
+            fileContent.setContentLength(fileContent.getContent().available());
+        } catch (IOException e) {
+            handleException("Error occurred while uploading static content", e);
+        }
+        appRepository.persistStaticContents(fileContent);
+        return contentUUID.toString() + File.separator + fileContent.getFileName();
+    }
+
+    private static String generateBinaryUUID() {
+        SecureRandom secRandom = new SecureRandom();
+        byte[] result = new byte[8];
+        secRandom.nextBytes(result);
+        String uuid = String.valueOf(Hex.encodeHex(result));
+        return uuid;
+    }
 }

@@ -2,11 +2,22 @@
     {{#each assets}}
         <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
             <div class="app-tile">
-                <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
+                <a href="{{accessUrl}}"
+                   target="_blank" data-id="{{id}}"
                    data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
                    data-context="{{attributes.overview_context}}" data-stats="usage" class="hover-overlay-container">
                     <div class="ratio-responsive-4by3">
+                        {{#if isFavourite}}
                         {{> ribbons/favorite}}
+                    {{else}}
+                        {{#if isSubscribed}}
+                            {{> ribbons/subscribed}}
+                        {{else}}
+                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                {{> ribbons/advertise}}
+                            {{/ifCond}}
+                        {{/if}}
+                    {{/if}}
                         {{#if defaultThumbnail}}
                             <div class="ratio-responsive-item"
                                  style="background-color: #{{defaultThumbnail.color}};">
@@ -36,7 +47,16 @@
                             <i class="fw fw-ellipsis fw-rotate-90"></i>
                         </a>
                         <ul class="more-menu-items dropdown-menu">
-                            <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                <li>
+                                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../type}}/{{attributes.overview_advertisedAppUuid}}">
+                                        More Details
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{/ifCond}}
+
                             {{#if ../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
                                         style="display: none" {{/unless}}>

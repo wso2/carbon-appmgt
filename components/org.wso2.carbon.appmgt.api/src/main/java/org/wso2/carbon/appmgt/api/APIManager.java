@@ -85,11 +85,11 @@ public interface APIManager {
     /**
      * Returns a list of documentation attached to a particular WebApp
      *
-     * @param apiId APIIdentifier
+     * @param appId APIIdentifier
      * @return List<Documentation>
      * @throws AppManagementException if failed to get Documentations
      */
-    public List<Documentation> getAllDocumentation(APIIdentifier apiId)
+    public List<Documentation> getAllDocumentation(APIIdentifier appId)
             throws AppManagementException;
 
     /**

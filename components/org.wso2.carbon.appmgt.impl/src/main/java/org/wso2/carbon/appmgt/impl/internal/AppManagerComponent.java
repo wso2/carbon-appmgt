@@ -27,14 +27,19 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppUsageStatisticsClient;
 import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.*;
+import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
+import org.wso2.carbon.appmgt.impl.config.TenantConfigurationLoader;
 import org.wso2.carbon.appmgt.impl.idp.sso.configurator.IS510IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.listners.UserAddListener;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationServiceImpl;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
@@ -43,6 +48,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.util.GovernanceConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.core.util.IdentityCoreInitializedEvent;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
@@ -71,9 +77,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.services.appm" immediate="true"
+ * @scr.component name="org.wso2.appmgt.impl.services.appm" immediate="true"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -101,6 +109,12 @@ import java.io.InputStream;
  * @scr.reference name="identity.application.management.adapter"
  * interface="org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory" cardinality="0..n" policy="dynamic"
  * bind="setIdentityApplicationManagementFactory" unbind="unsetIdentityApplicationManagementFactory"
+ * @scr.reference name="app.manager.default.stat.usageClient"
+ * interface="org.wso2.carbon.appmgt.api.AppUsageStatisticsClient" cardinality="0..n"
+ * policy="dynamic" bind="setAppUsageStatisticsClient" unbind="unsetAppUsageStatisticsClient"
+ *  @scr.reference name="org.wso2.carbon.identity.core.util"
+ * interface="org.wso2.carbon.identity.core.util.IdentityCoreInitializedEvent"
+ * cardinality="1..1" policy="dynamic" bind="setIdentityCoreInitializedEvent" unbind="unsetIdentityCoreInitializedEvent"
  */
 public class AppManagerComponent {
     //TODO refactor caching implementation
@@ -108,10 +122,11 @@ public class AppManagerComponent {
     private static final Log log = LogFactory.getLog(AppManagerComponent.class);
 
     private ServiceRegistration registration;
-
     private static TenantRegistryLoader tenantRegistryLoader;
-
     private APIMGTSampleService apimgtSampleService;
+    private AppUsageStatisticsClient appUsageStatisticsClient;
+    private Set<AppUsageStatisticsClient> appUsageStatisticsClients = new HashSet<>();
+    private  String appUsageStatisticsClientImplClass;
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
@@ -128,8 +143,7 @@ public class AppManagerComponent {
             addDefinedSequencesToRegistry();
 
             AppManagerConfiguration configuration = new AppManagerConfiguration();
-            String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+            String filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
             configuration.load(filePath);
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -138,9 +152,11 @@ public class AppManagerComponent {
 
             //load self sigup configuration to the registry
             AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
-            AppManagerUtil.loadTenantConf(tenantId);
+            AppManagerUtil.createSelfSignUpRoles(tenantId);
+            AppManagerUtil.createTenantSpecificConfigurationFilesInRegistry(tenantId);
+            AppManagerUtil.createTenantConfInRegistry(tenantId);
             SignupObserver signupObserver = new SignupObserver();
-            bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
+            bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver, null);
 
             AppManagerConfigurationServiceImpl configurationService =
                     new AppManagerConfigurationServiceImpl(configuration);
@@ -149,6 +165,15 @@ public class AppManagerComponent {
             registration = componentContext.getBundleContext().registerService(
                     AppManagerConfigurationService.class.getName(), configurationService, null);
             APIStatusObserverList.getInstance().init(configuration);
+
+            // Register the default implementation of the tenant configuration service.
+            TenantConfigurationService tenantConfigurationService = new TenantConfigurationServiceImpl();
+
+            // Load the tenant configurations for the super tenant.
+            TenantConfiguration tenantConfiguration = new TenantConfigurationLoader().load(MultitenantConstants.SUPER_TENANT_ID);
+            tenantConfigurationService.addTenantConfiguration(tenantConfiguration);
+
+            componentContext.getBundleContext().registerService(TenantConfigurationService.class, tenantConfigurationService, null);
 
             AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
                                                         RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
@@ -177,7 +202,15 @@ public class AppManagerComponent {
                     new Permission(AppMConstants.Permissions.DOCUMENT_EDIT, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
                     new Permission(AppMConstants.Permissions.MOBILE_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
-                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION)};
+                    new Permission(AppMConstants.Permissions.MOBILE_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_APPLICATION_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.IDENTITY_IDP_MANAGEMENT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ADD, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_EDIT, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_ENABLE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_PUBLISH, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.XACML_POLICY_VIEW, UserMgtConstants.EXECUTE_ACTION)};
 
             AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, creatorPermissions, realm);
 
@@ -217,6 +250,11 @@ public class AppManagerComponent {
                 //Sets the default adapter
                 unsetIdentityApplicationManagementFactory(null);
             }
+
+            //Find the app usage statistics client which is proffered in the configuration and set instance of it.
+            appUsageStatisticsClientImplClass = configuration.getFirstProperty(AppMConstants.APP_STATISTIC_CLIENT_PROVIDER);
+            doRegisterAppUsageStatisticsClient();
+
         } catch (AppManagementException e) {
             log.error("Error while initializing the WebApp manager component", e);
         }
@@ -230,6 +268,18 @@ public class AppManagerComponent {
         APIManagerFactory.getInstance().clearAll();
         RemoteAuthorizationManager authorizationManager = RemoteAuthorizationManager.getInstance();
         authorizationManager.destroy();
+    }
+
+    private void doRegisterAppUsageStatisticsClient() {
+        for (AppUsageStatisticsClient tempAppUsageStatisticsClient : appUsageStatisticsClients) {
+            if (tempAppUsageStatisticsClient.getClass().getName().equals(appUsageStatisticsClientImplClass)) {
+                appUsageStatisticsClient = tempAppUsageStatisticsClient;
+            }
+        }
+        if (appUsageStatisticsClient != null) {
+            org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
+                    .setAppUsageStatClient(appUsageStatisticsClient);
+        }
     }
 
     protected void setRegistryService(RegistryService registryService) {
@@ -252,6 +302,18 @@ public class AppManagerComponent {
     protected void unsetApplicationMgtService(ApplicationManagementService registryService) {
         if (registryService != null && log.isDebugEnabled()) {
             log.debug("Application mgt service destroyed.");
+        }
+    }
+
+    protected void setIdentityCoreInitializedEvent(IdentityCoreInitializedEvent identityCoreInitializedEvent) {
+        if (identityCoreInitializedEvent != null && log.isDebugEnabled()) {
+            log.debug("IdentityCoreInitializedEvent service initialized.");
+        }
+    }
+
+    protected void unsetIdentityCoreInitializedEvent(IdentityCoreInitializedEvent identityCoreInitializedEvent) {
+        if (identityCoreInitializedEvent != null && log.isDebugEnabled()) {
+            log.debug("IdentityCoreInitializedEvent service destroyed.");
         }
     }
 
@@ -497,5 +559,20 @@ public class AppManagerComponent {
             IdentityApplicationManagementFactory identityApplicationManagementFactory) {
         ServiceReferenceHolder.getInstance()
                 .setIdentityApplicationManagementFactory(new IS510IdentityApplicationManagementFactory());
+    }
+
+    protected void setAppUsageStatisticsClient(AppUsageStatisticsClient appUsageStatClient) {
+        if (log.isDebugEnabled()) {
+            log.debug("App usage stat client bind method is calling");
+        }
+        appUsageStatisticsClients.add(appUsageStatClient);
+        doRegisterAppUsageStatisticsClient();
+    }
+
+    protected void unsetAppUsageStatisticsClient(AppUsageStatisticsClient appUsageStatClient) {
+        if (log.isDebugEnabled()) {
+            log.debug("App usage stat client unbind method is calling");
+        }
+        appUsageStatisticsClients.remove(appUsageStatClient);
     }
 }

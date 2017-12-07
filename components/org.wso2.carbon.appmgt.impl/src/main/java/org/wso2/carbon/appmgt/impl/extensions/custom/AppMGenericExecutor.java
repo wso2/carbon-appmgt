@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.impl.extensions.custom;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -50,6 +51,7 @@ import java.util.Map;
 public class AppMGenericExecutor extends GenericExecutor {
 
     private static final Log log= LogFactory.getLog(ApproveEventExecutor.class);
+    private static final String REGISTRY_LC_NAME =  "registry.LC.name";
 
     private UserRealm userRealm;
     private int tenantId;
@@ -65,14 +67,22 @@ public class AppMGenericExecutor extends GenericExecutor {
     @Override
     public boolean execute(RequestContext requestContext, String fromState, String toState) {
         Registry registry = null;
-        String resourceID = requestContext.getResource().getUUID();
         String providerName = null;
+        String assetType = null;
+        String resourceID = null;
 
         try {
+            resourceID = requestContext.getResource().getUUID();
             registry = RegistryCoreServiceComponent.getRegistryService().getGovernanceUserRegistry(CurrentSession.getUser(), CurrentSession.getTenantId());
+            String lifecycleName = requestContext.getResource().getProperty(REGISTRY_LC_NAME);
             //Load Gov Artifacts
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
-            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, AppMConstants.API_KEY);
+            if(AppMConstants.WEBAPP_LIFE_CYCLE.equals(lifecycleName)){
+                assetType = AppMConstants.WEBAPP_ASSET_TYPE;
+            }else if(AppMConstants.MOBILE_LIFE_CYCLE.equals(lifecycleName)){
+                assetType = AppMConstants.MOBILE_ASSET_TYPE;
+            }
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, assetType);
 
             GenericArtifact webAppArtifact = artifactManager.getGenericArtifact(resourceID);
             providerName = webAppArtifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);

@@ -32,7 +32,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 import java.io.File;
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.configuration.services" immediate="true"
+ * @scr.component name="org.wso2.appmgt.impl.configuration.services" immediate="true"
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService"
  * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService"
@@ -52,8 +52,7 @@ public class APPManagerConfigurationServiceComponent {
         try {
             //Initialize AppManager Configuration
             AppManagerConfiguration configuration = new AppManagerConfiguration();
-            filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+            filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "app-manager.xml";
             configuration.load(filePath);
             amConfigService = new AppManagerConfigurationServiceImpl(configuration);
             ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amConfigService);

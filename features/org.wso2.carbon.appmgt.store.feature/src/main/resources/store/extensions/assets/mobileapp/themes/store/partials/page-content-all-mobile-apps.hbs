@@ -15,27 +15,9 @@
                             </div>
                         {{else}}
                             <div class="ratio-responsive-img">
-                                <img src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
+                                <img src="{{url "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
                             </div>
                         {{/if}}
-                        {{#ifCond attributes.overview_platform "==" "android"}}
-                            <div class="app-thumbnail-type background-color-android
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-android"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond attributes.overview_platform "==" "ios"}}
-                            <div class="app-thumbnail-type background-color-apple
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw fw-apple"></i></span>
-                            </div>
-                        {{/ifCond}}
-                        {{#ifCond attributes.overview_platform "==" "webapp"}}
-                            <div class="app-thumbnail-type background-color-webapps
-                                        col-xs-2 col-sm-3 col-md-3 col-lg-3">
-                                <span><i class="fw  fw-cloud"></i></span>
-                            </div>
-                        {{/ifCond}}
 
                         {{> overlays/view}}
                     </div>

@@ -23,6 +23,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
@@ -47,6 +48,7 @@ import java.util.Map;
 
 public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implements SSOConfigurator {
 
+    public static final String LOCAL_IDP_NAME = "LOCAL";
     private static Log log = LogFactory.getLog(IS500SAMLSSOConfigurator.class);
 
     private static String APP_DESC = "WSO2 Application Manager generated service provider.";
@@ -73,7 +75,13 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         this.authenticationStep = configuration.get(AUTHENTICATION_STEP);
 
         try {
-            cookie = login();
+
+            cookie = configuration.get(SSOConfiguratorUtil.SP_ADMIN_SERVICE_COOKIE_PROPERTY_KEY);
+
+            if(cookie == null){
+                cookie = login();
+            }
+
             String serviceURL = backendServerURL + "/services/IdentitySAMLSSOConfigService";
             ssoStub = new IdentitySAMLSSOConfigServiceStub(serviceURL);
             ServiceClient client = ssoStub._getServiceClient();
@@ -117,11 +125,13 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         } else {
-            if (acsUrl != null && acsUrl.length() > 0) {
+            if (!StringUtils.isEmpty(acsUrl)) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
-                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(webApp));
             }
+
+            ssoProvider.setLogoutUrl(ssoProvider.getLogoutUrl());
 
             ServiceProvider serviceProvider;
             SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
@@ -206,11 +216,14 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         } else {
-            if (acsUrl != null && acsUrl.length() > 0) {
+            if (!StringUtils.isEmpty(acsUrl)) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
-                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getACSURL(application));
             }
+
+            ssoProvider.setLogoutUrl(ssoProvider.getLogoutUrl());
+
             SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
             ServiceProvider serviceProvider = null;
             try {
@@ -307,6 +320,10 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             IdentityProvider[] providers;
             if(authenticationSteps != null){
                 for(AuthenticationStep step : authenticationSteps){
+
+                    if(step.getLocalAuthenticatorConfigs() != null){
+                        identityProviders.add(LOCAL_IDP_NAME);
+                    }
 
                     providers = step.getFederatedIdentityProviders();
 
@@ -443,6 +460,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         serviceProvider.setInboundAuthenticationConfig(iac);
 
         setLocalAndOutBoundAuthentication(serviceProvider);
+        serviceProvider.getLocalAndOutBoundAuthenticationConfig().setUseTenantDomainInLocalSubjectIdentifier(true);
         return serviceProvider;
     }
 

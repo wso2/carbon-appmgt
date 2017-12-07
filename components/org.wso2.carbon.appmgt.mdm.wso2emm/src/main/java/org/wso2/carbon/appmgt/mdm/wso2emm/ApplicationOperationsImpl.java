@@ -21,17 +21,21 @@
 package org.wso2.carbon.appmgt.mdm.wso2emm;
 
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.ssl.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
@@ -53,12 +57,12 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
     private static final Log log = LogFactory.getLog(ApplicationOperationsImpl.class);
 
-	/**
+    /**
      *
      * @param applicationOperationAction holds the information needs to perform an action on mdm
      */
 
-    public void performAction(ApplicationOperationAction applicationOperationAction) {
+    public String performAction(ApplicationOperationAction applicationOperationAction) {
 
         HashMap<String, String> configProperties = applicationOperationAction.getConfigParams();
 
@@ -116,13 +120,15 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
         requestObj.put("app", requestApp);
 
-        HttpClient httpClient = new HttpClient();
-        StringRequestEntity requestEntity = null;
+        String requestURL = serverURL + String.format(Constants.API_OPERATION, tenantId);
+        HttpClient httpClient = AppManagerUtil.getHttpClient(requestURL);
+        StringEntity requestEntity = null;
 
         if(log.isDebugEnabled()) log.debug("Request Payload for MDM: " + requestObj.toJSONString());
 
         try {
-            requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
+            requestEntity = new StringEntity(requestObj.toJSONString(), "UTF-8");
+            requestEntity.setContentType(Constants.RestConstants.APPLICATION_JSON);
         } catch (UnsupportedEncodingException e) {
             String errorMessage = "JSON encoding not supported";
             if(log.isDebugEnabled()){
@@ -132,16 +138,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
             }
         }
 
-        String requestURL = serverURL + String.format(Constants.API_OPERATION, tenantId);
-
-        PostMethod postMethod = new PostMethod(requestURL);
-        postMethod.setRequestEntity(requestEntity);
-        postMethod.setRequestHeader("Authorization", "Basic " +
+        HttpPost postMethod = new HttpPost(requestURL);
+        postMethod.setEntity(requestEntity);
+        postMethod.setHeader(Constants.RestConstants.AUTHORIZATION, Constants.RestConstants.BASIC +
                 new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
 
         try {
             if(log.isDebugEnabled()) log.debug("Sending POST request to perform operation on MDM. Request path:  "  + requestURL);
-            int statusCode = httpClient.executeMethod(postMethod);
+            HttpResponse response = httpClient.execute(postMethod);
+            int statusCode = response.getStatusLine().getStatusCode();
+
             if (statusCode == HttpStatus.SC_OK) {
                 if(log.isDebugEnabled()) log.debug(action + " operation on WSO2 EMM performed successfully");
             }
@@ -155,9 +161,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
             }
         }
 
+        return null;
+
     }
 
-	/**
+    /**
      *
      * @param applicationOperationDevice holds the information needs to retrieve device list
      * @return List of devices
@@ -173,18 +181,25 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
         List<Device> devices = new ArrayList<>();
 
-        HttpClient httpClient = new HttpClient();
+        HttpClient httpClient = AppManagerUtil.getHttpClient(serverURL);
         int tenantId = applicationOperationDevice.getTenantId();
         String[] params = applicationOperationDevice.getParams();
-        GetMethod getMethod = new GetMethod(
+        HttpGet getMethod = new HttpGet(
                 serverURL + String.format(Constants.API_DEVICE_LIST, tenantId, params[0]));
-        getMethod.setRequestHeader("Authorization", "Basic " + new String(
+        getMethod.setHeader(Constants.RestConstants.AUTHORIZATION, Constants.RestConstants.BASIC + new String(
                 Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
         try {
-            int statusCode = httpClient.executeMethod(getMethod);
+            HttpResponse response = httpClient.execute(getMethod);
+            int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == 200) {
-                String response = getMethod.getResponseBodyAsString();
-                JSONArray devicesArray = (JSONArray) new JSONValue().parse(response);
+                HttpEntity entity = response.getEntity();
+                String responseString = "";
+                if (entity != null) {
+                    responseString = EntityUtils.toString(entity, "UTF-8");
+                    EntityUtils.consume(entity);
+                }
+
+                JSONArray devicesArray = (JSONArray) new JSONValue().parse(responseString);
                 if (log.isDebugEnabled())
                     log.debug("Devices Received" + devicesArray.toJSONString());
                 Iterator<JSONObject> iterator = devicesArray.iterator();
@@ -206,7 +221,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
                         device.setPlatform("ios");
                     }
                     device.setImage(String.format(configProperties.get("ImageURL"),
-                                                  properties.get("model").toString()));
+                            properties.get("model").toString()));
                     device.setType("mobileDevice");
                     device.setPlatformVersion("0");
                     devices.add(device);

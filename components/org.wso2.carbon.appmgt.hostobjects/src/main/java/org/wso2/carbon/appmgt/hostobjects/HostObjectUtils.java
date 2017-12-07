@@ -28,6 +28,8 @@ import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.config.TenantConfiguration;
+import org.wso2.carbon.appmgt.impl.service.TenantConfigurationService;
 import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -35,6 +37,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HostObjectUtils {
@@ -204,16 +207,21 @@ public class HostObjectUtils {
      * @return Subscription Configuration.
      */
     public static Map<String, Boolean> getSubscriptionConfiguration() {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        Boolean selfSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
-                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
-                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+        TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
+
+        Boolean selfSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getFirstProperty(TenantConfiguration.PropertyNames.IS_SELF_SUBSCRIPTION_ENABLED));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(tenantConfigurationService.getFirstProperty(TenantConfiguration.PropertyNames.IS_ENTERPRISE_SUBSCRIPTION_ENABLED));
 
         Map<String, Boolean> subscriptionCofig = new HashMap<String, Boolean>(2);
         subscriptionCofig.put("EnableSelfSubscription", selfSubscriptionStatus);
         subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
         return subscriptionCofig;
+    }
+
+    public static List<String> getEnabledAssetTypes(){
+        TenantConfigurationService tenantConfigurationService = ServiceReferenceHolder.getInstance().getTenantConfigurationService();
+        return tenantConfigurationService.getProperties(TenantConfiguration.PropertyNames.ENABLED_ASSET_TYPES);
     }
 
     /**
@@ -223,7 +231,20 @@ public class HostObjectUtils {
      */
     public static String getBinaryStorageConfiguration() {
         AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        String binaryStorageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        String binaryStorageLocation = config.getFirstProperty(AppMConstants.BINARY_FILE_STORAGE_ABSOLUTE_LOCATION);
         return binaryStorageLocation;
     }
+
+    /**
+     * Get the configuration for create service provider for skip gateway enabled apps
+     * @return is create service provider for skip gateway apps enabled or disabled
+     */
+    public static boolean isServiceProviderCreateEnabledForSkipGatewayApp(){
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        boolean isCreateServiceProviderForSkipGatewayApps =
+                Boolean.parseBoolean(config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_CREATE_SP_FOR_SKIP_GATEWAY_APPS));
+        return isCreateServiceProviderForSkipGatewayApps;
+    }
+
+
 }

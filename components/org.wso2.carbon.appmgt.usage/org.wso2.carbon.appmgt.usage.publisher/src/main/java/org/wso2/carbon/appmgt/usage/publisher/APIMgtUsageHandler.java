@@ -40,6 +40,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
+import org.apache.synapse.transport.certificatevalidation.cache.CacheManager;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
@@ -54,6 +55,7 @@ import org.wso2.carbon.appmgt.usage.publisher.internal.UsageComponent;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.usage.agent.beans.APIManagerRequestStats;
 import org.wso2.carbon.usage.agent.util.PublisherUtils;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -106,15 +108,31 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String trackingCode = headers.get("trackingCode");
             WebAppInfoDTO webAppInfoDTO = AppMDAO.getWebAppByTrackingCode(trackingCode);
             String version = webAppInfoDTO.getVersion();
-            //referer = referer + version;
             String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
             if (context.contains("/t/")) {
             	tenantDomain = contextAndVersion[1];
             }
 
-            WebApp webApp = getWebApp(context, version);
-            String api = webApp.getId().getApiName();
-            String api_version = api + ":" + version;
+            String usageCacheKey = tenantDomain + ":" + context;
+            if (version != null) {
+                usageCacheKey = usageCacheKey + ":" + version;
+            }
+
+            WebApp webApp = null;
+            if (getUsageCache().get(usageCacheKey) != null) {
+                webApp = (WebApp) getUsageCache().get(usageCacheKey);
+            } else {
+                if (version != null) {
+                    webApp = getWebApp(context, version);
+                } else {
+                    webApp = getNonVersionedWebApp(context, tenantDomain);
+                }
+                getUsageCache().put(usageCacheKey, webApp);
+            }
+
+            String appName = webApp.getId().getApiName();
+            version = webApp.getId().getVersion();
+            String appNameWithVersion = appName + ":" + version;
 
             String hashcode = webApp.getTrackingCode();
 
@@ -202,8 +220,8 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
                 RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO();
                 requestPublisherDTO.setContext(context);
-                requestPublisherDTO.setApi_version(api_version);
-                requestPublisherDTO.setApi(api);
+                requestPublisherDTO.setApi_version(appNameWithVersion);
+                requestPublisherDTO.setApi(appName);
                 requestPublisherDTO.setVersion(version);
                 requestPublisherDTO.setResource(resource);
                 requestPublisherDTO.setMethod(method);
@@ -238,8 +256,8 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
                 mc.setProperty(APIMgtUsagePublisherConstants.USER_ID, username);
                 mc.setProperty(APIMgtUsagePublisherConstants.CONTEXT, context);
-                mc.setProperty(APIMgtUsagePublisherConstants.APP_VERSION, api_version);
-                mc.setProperty(APIMgtUsagePublisherConstants.API, api);
+                mc.setProperty(APIMgtUsagePublisherConstants.APP_VERSION, appNameWithVersion);
+                mc.setProperty(APIMgtUsagePublisherConstants.API, appName);
                 mc.setProperty(APIMgtUsagePublisherConstants.VERSION, version);
                 mc.setProperty(APIMgtUsagePublisherConstants.RESOURCE, resource);
                 mc.setProperty(APIMgtUsagePublisherConstants.HTTP_METHOD, method);
@@ -329,14 +347,13 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
         String sqlQuery = "SELECT APP_NAME,APP_PROVIDER,TRACKING_CODE FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=?";
 
-
         try {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(sqlQuery);
             ps.setString(1,context);
             ps.setString(2,version);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 String webAppname = rs.getString("APP_NAME");
                 String provider = rs.getString("APP_PROVIDER");
                 String trackingCode = rs.getString("TRACKING_CODE");
@@ -356,9 +373,62 @@ public class APIMgtUsageHandler extends AbstractHandler {
           return webApp;
     }
 
+    /**
+     * Get non versioned web apps.
+     *
+     * @param context Webapp context
+     * @param tenantDomain Tenant domain
+     * @return {@link WebApp} object
+     * @throws AppManagementException on error while trying to get webapp
+     */
+    public WebApp getNonVersionedWebApp(String context, String tenantDomain) throws AppManagementException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        WebApp webApp = null;
+
+        String sqlQuery = "SELECT APM_APP.APP_NAME, APM_APP.APP_PROVIDER, APM_APP.TRACKING_CODE, " +
+                "APM_APP_DEFAULT_VERSION.PUBLISHED_DEFAULT_APP_VERSION FROM APM_APP LEFT JOIN " +
+                "APM_APP_DEFAULT_VERSION ON APM_APP_DEFAULT_VERSION.APP_NAME=APM_APP.APP_NAME AND " +
+                "APM_APP_DEFAULT_VERSION.APP_PROVIDER=APM_APP.APP_PROVIDER WHERE APM_APP.CONTEXT=? AND APM_APP" +
+                ".TENANT_ID=?";
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            int tenantId = UsageComponent.getRealmService().getTenantManager().getTenantId(tenantDomain);
+            preparedStatement.setString(1, context);
+            preparedStatement.setInt(2, tenantId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String webAppName = resultSet.getString(AppMConstants.FIELD_API_NAME);
+                String provider = resultSet.getString(AppMConstants.FIELD_API_PUBLISHER);
+                String trackingCode = resultSet.getString(AppMConstants.FIELD_TRACKING_CODE);
+                String version = resultSet.getString(AppMConstants.FIELD_PUBLISHED_DEFAULT_APP_VERSION);
+                APIIdentifier apiIdentifier = new APIIdentifier(provider, webAppName, version);
+                webApp = new WebApp(apiIdentifier);
+                webApp.setTrackingCode(trackingCode);
+                webApp.setContext(context);
+            }
+        } catch (SQLException e) {
+            String errorMessage = "Error occurred while reading non versioned web app. Context : " + context +
+                    " tenant domain: " + tenantDomain;
+            throw new AppManagementException(errorMessage, e);
+        } catch (UserStoreException e) {
+            String errorMessage = "Error occurred while getting tenant Id for tenant domain: " + tenantDomain;
+            throw new AppManagementException(errorMessage, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
+        }
+        return webApp;
+    }
+
     private Cache getUsageConfigCache() {
             return Caching.getCacheManager(AppMConstants.USAGE_CONFIG_CACHE_MANAGER)
                     .getCache(AppMConstants.USAGE_CONFIG_CACHE);
+    }
+
+    private Cache getUsageCache() {
+        return Caching.getCacheManager(AppMConstants.USAGE_CACHE_MANAGER).getCache(AppMConstants.USAGE_CACHE);
     }
 
    }

@@ -12,8 +12,9 @@
                 data-id="{{../this.id}}"
                 data-platform="{{../this.attributes.overview_platform}}"
                 data-type="{{../this.attributes.overview_type}}"
-                data-url="{{../this.attributes.overview_url}}"
+                data-url="{{url "/api/mobileapp/getfile/"}}{{../this.attributes.overview_url}}"
                 data-package="{{../this.attributes.overview_packagename}}"
+                data-appid="{{../this.attributes.overview_appid}}"
                 title="Get download link or QR code">
             <i class="icon-download"></i>
         </button>
@@ -47,19 +48,19 @@
 <td data-column="lifecycleAvailableActions">
     <span>
         {{#each this.lifecycleAvailableActions}}
-            <button type="button" class='btn {{selectIf this "Demote:btn-blue,
-            Submit for Review:btn-blue, Publish:btn-blue, Unpublish:btn-orange,
-            Re-Publish:btn-blue, Deprecate:btn-danger, Retire:btn-danger,
-            Approve:btn-blue, Reject:btn-danger"}} btn-action'
-                    data-action="{{this}}" data-id="{{../this.id}}"
+            <button type="button" class='btn {{style}} btn-action'
+                    data-action="{{name}}" data-id="{{../this.id}}"
                     data-loading-text="<i class='icon-refresh icon-spin'></i> {{this}}">
-                {{this}}
+                {{name}}
             </button>
         {{/each}}
     </span>
-    <button type="button" name="app-delete-btn" class="btn btn-danger"
-            data-id="{{this.id}}"
-            data-name="{{this.attributes.overview_displayName}}">
-        Delete
-    </button>
+
+    {{#this.deleteButtonAvailability}}
+        <button type="button" name="app-delete-btn" class="btn btn-danger"
+                data-id="{{this.id}}"
+                data-name="{{this.attributes.overview_displayName}}">
+            Delete
+        </button>
+    {{/this.deleteButtonAvailability}}
 </td>

@@ -7,7 +7,7 @@ var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
 
 require('/modules/store.js').exec(function (ctx) {
-    var paging,  manager, assets, length,
+    var paging, manager, assets, length,
             log = ctx.log,
             query = ctx.params.query,
             tag = ctx.params.tag,
@@ -42,7 +42,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     var subscriptionService;
-    if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+    if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
         // Init subscription service.
         var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
         subscriptionService = new subscriptionServiceModule.SubscriptionService();
@@ -57,8 +57,16 @@ require('/modules/store.js').exec(function (ctx) {
     var MOBILEAPP_TYPE = 'mobileapp';
     var siteAttribute;
 
+    //Get the store public visibility. Read the registry file store.json(tenanted) and get the value of publicVisibility
+    var storePublicVisibility = store.getPublicVisibility();
+    if (storePublicVisibility == null) {
+        storePublicVisibility = false;
+        log.warn('\'publicVisibility\' property has not been configured in the store.json config file. Use the default value as \'false\'');
+    }
+    var tagInfo = {};
+
     types.forEach(function (type) {
-        if(!storeHostObj.isAssetTypeEnabled(type)) {
+        if (!storeHostObj.isAssetTypeEnabled(type)) {
             return
         }
         //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
@@ -73,116 +81,118 @@ require('/modules/store.js').exec(function (ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
         }
-        if (query) {
-            assets = store.search({
-                                      attributes: query,
-                                      tag: tag,
-                                      type: type
-                                  }, paging);
-        } else if (tag) {
-            var options = {}
-            if(type == WEBAPP_TYPE){
-                var SITE_QUERY = {};
-                SITE_QUERY.overview_treatAsASite = (customType==SITE_TYPE) ? "TRUE": "FALSE";
-                if (!isMultipleVersionDisplayEnabled) {
-                    SITE_QUERY.overview_makeAsDefaultVersion = "true"
+
+        //Retrieve asset form the registry only for the given condition to increase the store performances.
+        if(storePublicVisibility == true || (storePublicVisibility == false && user)) {
+            if (query) {
+                assets = store.search({
+                    attributes: query,
+                    tag: tag,
+                    type: type
+                }, paging);
+            } else if (tag) {
+                var options = {}
+                if (type == WEBAPP_TYPE) {
+                    var SITE_QUERY = {};
+                    SITE_QUERY.overview_treatAsASite = (customType == SITE_TYPE) ? "TRUE" : "FALSE";
+                    if (!isMultipleVersionDisplayEnabled) {
+                        SITE_QUERY.overview_makeAsDefaultVersion = "true"
+                    }
+                    options.attributes = SITE_QUERY;
                 }
-                options.attributes = SITE_QUERY;
-            }
-            options.tag = tag;
-            options.type = type;
-            options.lifecycleState = ["published"];
-            assets = store.taggeds(type, options, paging);
-        } else {
-            if (customType == MOBILEAPP_TYPE) {
-                assets = store.assets(customType, paging);
+                options.tag = tag;
+                options.type = type;
+                options.lifecycleState = ["published"];
+                assets = store.taggeds(type, options, paging);
             } else {
-                if (customType == SITE_TYPE) {
-                    if (isMultipleVersionDisplayEnabled) {
-                        //if multiple versions to be displayed don't consider default version
-                        siteAttribute = {"overview_treatAsASite": "TRUE"};
-                    } else {
-                        siteAttribute = {
+                if (customType == MOBILEAPP_TYPE) {
+                    assets = store.assets(customType, paging);
+                } else {
+                    if (customType == SITE_TYPE) {
+                        if (isMultipleVersionDisplayEnabled) {
+                            //if multiple versions to be displayed don't consider default version
+                            siteAttribute = {"overview_treatAsASite": "TRUE"};
+                        } else {
+                            siteAttribute = {
+                                //if multiple versions to be displayed do consider default version
+                                "overview_treatAsASite": "TRUE",
+                                "overview_makeAsDefaultVersion": "true"
+                            };
+                        }
+                    } else if (customType == WEBAPP_TYPE) {
+                        if (isMultipleVersionDisplayEnabled) {
+                            //if multiple versions to be displayed don't consider default version
+                            siteAttribute = {"overview_treatAsASite": "FALSE"};
+                        } else {
                             //if multiple versions to be displayed do consider default version
-                            "overview_treatAsASite": "TRUE",
-                            "overview_makeAsDefaultVersion": "true"
-                        };
+                            siteAttribute = {
+                                "overview_treatAsASite": "FALSE",
+                                "overview_makeAsDefaultVersion": "true"
+                            };
+                        }
                     }
-                } else if (customType == WEBAPP_TYPE) {
-                    if (isMultipleVersionDisplayEnabled) {
-                        //if multiple versions to be displayed don't consider default version
-                        siteAttribute = {"overview_treatAsASite": "FALSE"};
+                    var siteOption = {
+                        type: type,
+                        attributes: siteAttribute
+                    };
+                    assets = store.search(siteOption, paging);
+                }
+            }
+
+            assets.forEach(function (asset) {
+
+                //set rating
+                if (JSON.parse(social.getRating(type + ":" + asset.id))) {
+                    asset.rating = Math.floor(JSON.parse(social.getRating(type + ":" + asset.id)).rating);
+                } else {
+                    asset.rating = 0;
+                }
+                if (type == WEBAPP_TYPE) {
+                    // set default thumbnail
+                    setDefaultThumbnail(asset);
+
+                    //check app is favourite or not
+                    if (user) {
+                        if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
+                                        asset.attributes.overview_provider, user, storeTenantDomain)) {
+                            asset.isFavourite = true;
+                        }
+                    }
+
+
+                    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                        //Set access URL
+                        //set direct app access url
+                        if (asset.attributes.overview_skipGateway.toLowerCase() == "false") {
+                            //Get the gateway url
+                            var APIInformationService = require('/extensions/assets/webapp/services/api-information.js').serviceModule;
+                            var apiInfoManager = new APIInformationService.APIInformationService();
+                            apiInfoManager.init(jagg, session);
+                            var appData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
+                                    asset.attributes.overview_name,
+                                    asset.attributes.overview_version);
+                            asset.accessUrl = appData.serverURL.productionURL;
+                        } else {
+                            //Get the direct webapp url
+                            asset.accessUrl = asset.attributes.overview_webAppUrl;
+                        }
                     } else {
-                        //if multiple versions to be displayed do consider default version
-                        siteAttribute = {
-                            "overview_treatAsASite": "FALSE",
-                            "overview_makeAsDefaultVersion": "true"
-                        };
+                        //check app is subscribed or not
+                        if (user) {
+                            asset.isSubscribed = isSubscribed(asset, user, subscriptionService);
+                        }
                     }
                 }
-                var siteOption = {
-                    type: type,
-                    attributes: siteAttribute
-                };
-                assets = store.search(siteOption, paging);
-            }
+            });
         }
 
-
-        assets.forEach(function (asset) {
-
-            //set rating
-            if (JSON.parse(social.getRating(type + ":" + asset.id))) {
-                asset.rating = Math.floor(JSON.parse(social.getRating(type + ":" + asset.id)).rating);
-            } else {
-                asset.rating = 0;
-            }
-            if (type == WEBAPP_TYPE) {
-                // set default thumbnail
-                setDefaultThumbnail(asset);
-
-                //check app is favourite or not
-                if(user) {
-                    if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
-                                       asset.attributes.overview_provider, user, storeTenantDomain)) {
-                        asset.isFavourite = true;
-                    }
-                }
-
-
-                if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-                    //Set access URL
-                    //set direct app access url
-                    if (asset.attributes.overview_skipGateway.toLowerCase() == "false") {
-                        //Get the gateway url
-                        var APIInformationService = require('/extensions/assets/webapp/services/api-information.js').serviceModule;
-                        var apiInfoManager = new APIInformationService.APIInformationService();
-                        apiInfoManager.init(jagg, session);
-                        var appData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
-                                                                       asset.attributes.overview_name,
-                                                                       asset.attributes.overview_version);
-                        asset.accessUrl = appData.serverURL.productionURL;
-                    } else {
-                        //Get the direct webapp url
-                        asset.accessUrl = asset.attributes.overview_webAppUrl;
-                    }
-                } else {
-                    //check app is subscribed or not
-                    if(user) {
-                        asset.isSubscribed = isSubscribed(asset,user,subscriptionService);
-                    }
-                }
-            }
-        });
-
-
         items.push({
-                       assets: assets,
-                       plural: manager.pluralLabel,
-                       singular: manager.singularLabel,
-                       type: manager.shortName,
-                       pageSize: store.getRecentAppCount().topAssetPage
-                   });
+            assets: assets,
+            plural: manager.pluralLabel,
+            singular: manager.singularLabel,
+            type: manager.shortName,
+            pageSize: store.getRecentAppCount().topAssetPage
+        });
 
     });
 
@@ -218,8 +228,6 @@ require('/modules/store.js').exec(function (ctx) {
         }
 
 
-
-
         //remove duplicate elements from tags
         if (types.length > 0) {
             var tags = tags.reduce(function (a, b) {
@@ -239,32 +247,41 @@ require('/modules/store.js').exec(function (ctx) {
         return tags;
     }
 
-
+    if(storePublicVisibility == true || (storePublicVisibility == false && user)) {
+        tagInfo.allTags = tags;
+        tagInfo.searchedTag = tag;
+    } else {
+        tagInfo.allTags = null;
+        tagInfo.searchedTag = null;
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            items[i].assets = null;
+        }
+    }
 
     caramel.render({
-                       title: 'Apps | Store',
-                       header: {
-                           user: user,
-                           sso: sso,
-                           storeTenantDomain: storeTenantDomain,
-                           enabledTypeList: enabledTypeList,
-                           isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
-                       },
-                       tags: {
-                           data: {allTags: tags, searchedTag: tag}
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-                           enabledTypeList: enabledTypeList
-                       },
-                       navigation: navigationData,
-                       topAssets: {
-                           assets: items,
-                           popularAssets: popularItems
-                       },
-                       recentAssets: recentItems
-                   });
+        title: 'Apps | Store',
+        header: {
+            user: user,
+            sso: sso,
+            storeTenantDomain: storeTenantDomain,
+            enabledTypeList: enabledTypeList,
+            isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
+        },
+        tags: {
+            data: tagInfo
+        },
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        },
+        navigation: navigationData,
+        topAssets: {
+            assets: items,
+            popularAssets: popularItems
+        },
+        recentAssets: recentItems
+    });
 }, request, response, session);
 
 function getServiceDir(serviceName) {
@@ -292,16 +309,11 @@ function setDefaultThumbnail(asset) {
 function isFavouriteApp(appName, version, provider, user, storeTenantDomain) {
     var status = false;
     if (user) {
-        var tenantUsername;
-        if (user.tenantId == -1234) {
-            tenantUsername = user.username;
-        } else {
-            tenantUsername = user.username + "@" + user.tenantDomain;
-        }
+        var tenantUsername = user ? user.username : null;
 
         // check whether this is favourite app of user.
         status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
-                                        storeTenantDomain).status;
+                storeTenantDomain).status;
     }
     return status;
 };
@@ -319,14 +331,9 @@ function isSubscribed(asset, user, subscriptionService) {
     appInfo["provider"] = asset.attributes.overview_provider;
 
     var defaultApplicationName = "DefaultApplication";
-    var tenantUsername;
-    if (user.tenantId == -1234) {
-        tenantUsername = user.username;
-    } else {
-        tenantUsername = user.username + "@" + user.tenantDomain;
-    }
+    var tenantUsername = user ? user.username : null;
     var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
-                                                                     tenantUsername).subscription;
+            String(tenantUsername)).subscription;
     if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
         return true;
     }

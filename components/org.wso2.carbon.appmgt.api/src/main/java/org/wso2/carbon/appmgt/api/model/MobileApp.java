@@ -44,6 +44,8 @@ public class MobileApp extends App{
     private String recentChanges;
     private List<String> screenShots;
     private String createdTime;
+    private String originVersion;
+    private String previousVersionAppID;
 
     public String getCreatedTime() {
         return createdTime;
@@ -196,4 +198,19 @@ public class MobileApp extends App{
         this.screenShots = screenShots;
     }
 
+    public String getOriginVersion() {
+        return originVersion;
+    }
+
+    public void setOriginVersion(String originVersion) {
+        this.originVersion = originVersion;
+    }
+
+	public String getPreviousVersionAppID() {
+		return previousVersionAppID;
+	}
+
+	public void setPreviousVersionAppID(String previousVersionAppID) {
+		this.previousVersionAppID = previousVersionAppID;
+	}
 }

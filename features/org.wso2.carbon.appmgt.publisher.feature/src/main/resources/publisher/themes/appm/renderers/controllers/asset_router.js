@@ -7,8 +7,9 @@ var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
+var businessOwnerHelper = require('../../helpers/businessowner.js');
 
-var render = function (theme, data, meta, require) {
+var render = function(theme, data, meta, require) {
 
     var log = new Log();
     var apiProvider = jagg.module('manager').getAPIProviderObj();
@@ -16,9 +17,9 @@ var render = function (theme, data, meta, require) {
     var um = server.userManager(user.tenantId);
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
+    var updateWebAppAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_update, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
     var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
-    //var _url = "/publisher/asset/"  + data.meta.shortName + "/" + data.info.id + "/edit"
     var listPartial = 'view-asset';
     var heading = "";
     var newViewData;
@@ -26,7 +27,9 @@ var render = function (theme, data, meta, require) {
     var notificationCount = session.get('notificationCount');
     var typeList = apiProvider.getEnabledAssetTypeList();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+    var ADMIN_ROLE = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminRoleName();
     var appMDAOObj = new appMDAO();
+
     //Determine what view to show
     switch (data.op) {
 
@@ -46,12 +49,41 @@ var render = function (theme, data, meta, require) {
                 data.newViewData.images.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(appName);
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
+            if(data.artifact.attributes.overview_subscriptionAvailability == "current_tenant") {
+                data.newViewData.showExternalStoreTab = false;
+            } else if (data.artifact.attributes.overview_subscriptionAvailability == "specific_tenants") {
+                var appStores = data.appStores.externalStores;
+                var noOfStoreToList = 0;
+                for(var i = 0; i < appStores.length; i++) {
+                    var appStore = appStores[i];
+                    if( (data.artifact.attributes.overview_tenants.indexOf(appStore.name) > -1)) {
+                        appStore.showInStoreList = true;
+                        appStores[i] = appStore;
+                        noOfStoreToList++;
+                    } else {
+                        appStore.showInStoreList = false;
+                    }
+                }
+                data.appStores.externalStores = appStores;
+                if(noOfStoreToList > 0) {
+                    data.newViewData.showExternalStoreTab = true;
+                }
+            } else {
+                var appStores = data.appStores.externalStores;
+                for(var i = 0; i < appStores.length; i++) {
+                    var appStore = appStores[i];
+                    appStore.showInStoreList = true;
+                }
+                data.appStores.externalStores = appStores;
+                data.newViewData.showExternalStoreTab = true;
+            }
+
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
-            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {
-
+            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute
+                                                                                         != "null") {
                 var businessOwner = apiProvider.getBusinessOwner(businessOwnerAttribute);
-                data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
+                data.businessOwnerViewData = businessOwnerHelper.transform(businessOwner);
                 data.businessOwner = businessOwner;
             }
             break;
@@ -60,7 +92,7 @@ var render = function (theme, data, meta, require) {
             if (data.artifact.lifecycleState == "Published") {
                 editEnabled = false;
             }
-            if (user.hasRoles(["admin"])) {
+            if (user.hasRoles([ADMIN_ROLE]) || updateWebAppAuthorized) {
                 editEnabled = true;
             }
             if (!editEnabled) {
@@ -103,48 +135,37 @@ var render = function (theme, data, meta, require) {
 
     theme('single-col-fluid', {
         title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data
+        header: [{
+            partial: 'header',
+            context: data
+        }],
+        ribbon: [{
+            partial: 'ribbon',
+            context: {
+                active: listPartial,
+                createPermission: createActionAuthorized,
+                viewStats: viewStatsAuthorized,
+                um: um,
+                notifications: notifications,
+                notificationCount: notificationCount,
+                typeList: typeList
             }
-        ],
-        ribbon: [
-            {
-                partial: 'ribbon',
-                context: {
-                    active: listPartial,
-                    createPermission: createActionAuthorized,
-                    viewStats: viewStatsAuthorized,
-                    um: um,
-                    notifications: notifications,
-                    notificationCount: notificationCount,
-                    typeList: typeList
-                }
+        }],
+        leftnav: [{
+            partial: 'left-nav',
+            context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
+        }],
+        listassets: [{
+            partial: listPartial,
+            context: data
+        }],
+        heading: [{
+            partial: 'heading',
+            context: {
+                title: heading,
+                menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
             }
-        ],
-        leftnav: [
-            {
-                partial: 'left-nav',
-                context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
-            }
-        ],
-        listassets: [
-            {
-                partial: listPartial,
-                context: data
-            }
-        ],
-        heading: [
-            {
-                partial: 'heading',
-                context: {
-                    title: heading,
-                    menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
-                }
-            }
-        ]
+        }]
     });
-
 
 };

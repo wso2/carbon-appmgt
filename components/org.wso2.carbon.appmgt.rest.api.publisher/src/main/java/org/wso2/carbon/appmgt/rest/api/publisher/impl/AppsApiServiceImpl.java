@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
-import java.text.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -32,15 +31,45 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseTimeDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageByUserDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.SubscriptionCount;
+import org.wso2.carbon.appmgt.api.model.Subscriptions;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
+import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StatSummaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.DocumentationMappingUtil;
@@ -49,27 +78,38 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
-import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
-import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -96,9 +136,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             if (fileInputStream != null) {
                 if ("application".equals(fileDetail.getContentType().getType())) {
+                    String fileName = fileDetail.getContentDisposition().getParameter("filename");
+
+                    if(!RestApiUtil.isValidFileName(fileName)){
+                        RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' has been provided to upload", log);
+                    }
 
                     String fileExtension =
-                            FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter("filename"));
+                            FilenameUtils.getExtension(fileName);
                     if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                             AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
@@ -155,13 +200,16 @@ public class AppsApiServiceImpl extends AppsApiService {
         File binaryFile = null;
         String contentType = null;
         try {
+            if(!RestApiUtil.isValidFileName(fileName)){
+                RestApiUtil.handleBadRequest("Invalid filename '"+fileName +"' is provided", log);
+            }
+
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
                 binaryFile = RestApiUtil.readFileFromStorage(fileName);
-
-                contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
+                contentType = new MimetypesFileTypeMap().getContentType(binaryFile);
                 if (!contentType.startsWith("application")) {
                     RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
                                                  log);
@@ -212,11 +260,17 @@ public class AppsApiServiceImpl extends AppsApiService {
                 FileContent fileContent = new FileContent();
                 if ("image".equals(fileDetail.getContentType().getType()) ||
                         "application".equals(fileDetail.getContentType().getType())) {
-                    String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
-                            RestApiConstants.CONTENT_DISPOSITION_FILENAME));
+                    String fileName = fileDetail.getContentDisposition().getParameter(
+                            RestApiConstants.CONTENT_DISPOSITION_FILENAME);
+                    if(!RestApiUtil.isValidFileName(fileName)){
+                        RestApiUtil.handleBadRequest("Invalid file '"+fileName +"' has been provided to upload", log);
+                    }
+
+                    String fileExtension = FilenameUtils.getExtension(fileName);
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     fileContent.setFileName(filename);
                     fileContent.setContent(fileInputStream);
+                    fileContent.setContentType(fileDetail.getContentType().toString());
                     if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
                         RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         response.put("id", filename);
@@ -226,7 +280,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                             UUID contentUUID = UUID.randomUUID();
                             fileContent.setUuid(contentUUID.toString());
                             fileContent.setContentLength(fileInputStream.available());
-                            fileContent.setContentType(fileDetail.getContentType().toString());
                             defaultAppRepository.persistStaticContents(fileContent);
                             response.put("id", contentUUID.toString() + File.separator + filename);
                         } catch (IOException e) {
@@ -328,12 +381,6 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             List<App> result = apiProvider.searchApps(appType, RestApiUtil.getSearchTerms(query));
 
-
-            if (result.isEmpty()) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
-            }
-
             AppListDTO appListDTO = null;
             if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
                 appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
@@ -379,6 +426,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
+                validateWebApp(webApp, appProvider, true);
                 webApp.setCreatedTime(RestApiPublisherUtils.getCreatedTimeEpoch());
                 applicationId = appProvider.createWebApp(webApp);
             }
@@ -394,6 +442,78 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
 
         return Response.ok().entity(response).build();
+    }
+
+    /**
+     * @param webApp
+     * @param appProvider
+     * @param isNewApp    if the app is a new app or existing app
+     * @return
+     * @throws AppManagementException
+     */
+    private boolean validateWebApp(WebApp webApp, APIProvider appProvider, boolean isNewApp)
+            throws AppManagementException {
+        //check if the context is unique
+        if (isNewApp) {
+            boolean isContextExists = appProvider.isContextExist(webApp.getContext());
+            if (isContextExists) {
+                throw new AppManagementException("Context - " + webApp.getContext() + " already exists");
+            }
+        }
+
+        //check if the business owner exists
+        if (webApp.getBusinessOwner() != null) {
+            int businessOwnerId = Integer.parseInt(webApp.getBusinessOwner());
+            BusinessOwner businessOwner = appProvider.getBusinessOwner(businessOwnerId);
+            if (businessOwner == null) {
+                throw new AppManagementException("Invalid Business Owner - " + businessOwnerId);
+            }
+        }
+
+
+        //check if the role/tiers are exists
+        //iterate through all groups
+        List<EntitlementPolicyGroup> groups = webApp.getAccessPolicyGroups();
+        String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+        for (EntitlementPolicyGroup group : groups) {
+            //iterate through all roles
+            List<String> roles = group.getUserRolesAsList();
+            for (String role : roles) {
+                try {
+                    if (!"".equals(role)) {
+                        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class,
+                                                                                                null);
+                        int tenantId =
+                                ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                                        tenantDomainName);
+                        UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                        UserStoreManager manager = realm.getUserStoreManager();
+                        //check if the role is exists
+                        if (!manager.isExistingRole(role)) {
+                            throw new AppManagementException("Invalid role - " + role);
+                        }
+                    }
+
+                } catch (UserStoreException e) {
+                    throw new AppManagementException("Error while fetching User Store");
+                }
+            }
+
+            String throttlingTier = group.getThrottlingTier();
+            Set<Tier> tiers = appProvider.getTiers(tenantDomainName);
+            boolean tierExists = false;
+            for (Tier tier : tiers) {
+                if (tier.getName().equals(throttlingTier)) {
+                    tierExists = true;
+                }
+            }
+            if (!tierExists) {
+                throw new AppManagementException("Invalid Throttling Tier - " + throttlingTier);
+            }
+        }
+
+        return true;
     }
 
 
@@ -423,12 +543,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             appProvider.changeLifeCycleStatus(appType, appId, action);
 
-            responseMessageDTO.setMessage("Lifecycle status to be changed : " + action);
+            responseMessageDTO.setMessage("Lifecycle action : " + action + " has been accepted for processing ");
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else if (RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailedError("The user is not permitted to perform lifecycle action '" +
                                                                    action + "' on " + appType + " with uuid " + appId,
@@ -454,8 +574,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             List<App> result = apiProvider.searchApps(appType, searchTerms);
 
             if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                RestApiUtil.handleBadRequest(errorMessage, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             App app = result.get(0);
@@ -466,7 +585,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while retrieving App : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -507,7 +626,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             try {
                 APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+                body.setId(appId);
                 WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
+                validateWebApp(webApp, apiProvider, false);
                 apiProvider.updateApp(webApp);
 
             } catch (AppManagementException e) {
@@ -518,7 +639,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } else{
             RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
         }
-        return Response.accepted().build();
+        return Response.ok().build();
     }
 
     @Override
@@ -534,8 +655,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             List<App> result = apiProvider.searchApps(appType, searchTerms);
             if (result.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             App app = result.get(0);
@@ -547,7 +667,9 @@ public class AppsApiServiceImpl extends AppsApiService {
                 if (webApp.isAdvertiseOnly()) {
                     removeRegistryArtifact(webApp, username);
                 } else {
-                    apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails());
+                    //todo: pass the correct auth cookie
+                    String authorizedAdminCookie = null;
+                    apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails(), authorizedAdminCookie);
                 }
             } else if (appType.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
                 removeRegistryArtifact(app, username);
@@ -557,7 +679,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while deleting App : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -579,8 +701,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             App app = null;
-            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 app = APPMappingUtil.fromDTOToWebapp(body);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                MobileApp mobileAppModel = new MobileApp();
+                mobileAppModel.setVersion(body.getVersion());
+                mobileAppModel.setDisplayName(body.getDisplayName());
+                mobileAppModel.setType(AppMConstants.MOBILE_ASSET_TYPE);
+                app = mobileAppModel;
+            } else {
+                RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
             }
 
             app.setUUID(appId);
@@ -638,7 +768,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String msg = "Error while retrieving documents of App "+appType +" with appId "+ appId;
                 RestApiUtil.handleInternalServerError(msg, e, log);
@@ -699,7 +829,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while adding the document for "+appType+" with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -741,7 +871,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while retrieving document : " + documentId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -778,9 +908,9 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
-                String errorMessage = "Error while retrieving API : " + appId;
+                String errorMessage = "Error while retrieving " + appType + " : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
@@ -788,12 +918,136 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     /**
-     * Document content upload
-     * @param appType application type
-     * @param appId application uuid
+     * Update a document with a given document id
+     * @param appId application id
      * @param documentId documentation id
-     * @param fileInputStream document content stream
-     * @param fileDetail document file details
+     * @param appType application type
+     * @param body Documentation DTO
+     * @param contentType
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdPut(String appId, String documentId, String appType, DocumentDTO body, String contentType, String ifMatch, String ifUnmodifiedSince) {
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            WebApp webApp = appProvider.getWebApp(appId);
+            String sourceUrl = body.getSourceUrl();
+            Documentation oldDocument = appProvider.getDocumentation(documentId, tenantDomain);
+
+            //validation checks for existence of the document
+            if (oldDocument == null) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                return null;
+            }
+            if (body.getType() == DocumentDTO.TypeEnum.OTHER && StringUtils.isBlank(body.getOtherTypeName())) {
+                //check otherTypeName for not null if doc type is OTHER
+                RestApiUtil.handleBadRequest("otherTypeName cannot be empty if type is OTHER.", log);
+                return null;
+            }
+            if (body.getSourceType() == DocumentDTO.SourceTypeEnum.URL &&
+                    (StringUtils.isBlank(sourceUrl) || !RestApiUtil.isURL(sourceUrl))) {
+                RestApiUtil.handleBadRequest("Invalid document sourceUrl Format", log);
+                return null;
+            }
+
+            //overriding some properties
+            body.setName(oldDocument.getName());
+
+            Documentation newDocumentation = DocumentationMappingUtil.fromDTOtoDocumentation(body);
+            //this will fail if user does not have access to the API or the API does not exist
+            APIIdentifier appIdentifier = webApp.getId();
+            appProvider.updateDocumentation(appIdentifier, newDocumentation);
+
+            //retrieve the updated documentation
+            newDocumentation = appProvider.getDocumentation(documentId, tenantDomain);
+            return Response.ok().entity(DocumentationMappingUtil.fromDocumentationToDTO(newDocumentation)).build();
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
+            } else {
+                String errorMessage = "Error while updating the document " + documentId + " for API : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Document Content retrieve
+     * @param appId  id of the application
+     * @param documentId id of the documentation
+     * @param appType type of the application
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentGet(String appId, String documentId, String appType, String accept, String ifNoneMatch, String ifModifiedSince) {
+
+        Documentation documentation;
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            WebApp webApp = appProvider.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            documentation = appProvider.getDocumentation(documentId, tenantDomain);
+            if (documentation == null) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                return null;
+            }
+
+            //gets the content depending on the type of the document
+            if (documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
+                String resource = documentation.getFilePath();
+                Map<String, Object> docResourceMap = AppManagerUtil.getDocument(username, resource, tenantDomain);
+                Object fileDataStream = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_DATA);
+                Object contentType = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE);
+                contentType = contentType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : contentType;
+                String name = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_NAME).toString();
+                return Response.ok(fileDataStream)
+                        .header(RestApiConstants.HEADER_CONTENT_TYPE, contentType)
+                        .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
+                        .build();
+            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
+                String content = appProvider.getDocumentationContent(appIdentifier, documentation.getName());
+                return Response.ok(content)
+                        .header(RestApiConstants.HEADER_CONTENT_TYPE, AppMConstants.DOCUMENTATION_INLINE_CONTENT_TYPE)
+                        .build();
+            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.URL)) {
+                String sourceUrl = documentation.getSourceUrl();
+                return Response.seeOther(new URI(sourceUrl)).build();
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document " + documentId + " of the " + appType +
+                        " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (URISyntaxException e) {
+            String errorMessage = "Error while retrieving source URI location of " + documentId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return null;
+    }
+
+    /**
+     * Document content upload
+     *
+     * @param appType           application type
+     * @param appId             application uuid
+     * @param documentId        documentation id
+     * @param fileInputStream   document content stream
+     * @param fileDetail        document file details
      * @param inlineContent
      * @param ifMatch
      * @param ifUnmodifiedSince
@@ -845,7 +1099,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while retrieving document " + documentId + " of the API " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -856,57 +1110,6 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
 
         return null;
-
-
-
-        /*Documentation documentation;
-        try {
-            String username = RestApiUtil.getLoggedInUsername();
-            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
-
-            WebApp webApp = appProvider.getWebApp(appId);
-            APIIdentifier appIdentifier = webApp.getId();
-            documentation = appProvider.getDocumentation(documentId, tenantDomain);
-            if (documentation == null) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
-                return null;
-            }
-
-            //gets the content depending on the type of the document
-            if (documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
-                String resource = documentation.getFilePath();
-                Map<String, Object> docResourceMap = AppManagerUtil.getDocument(username, resource, tenantDomain);
-                Object fileDataStream = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_DATA);
-                Object contentType = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE);
-                contentType = contentType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : contentType;
-                String name = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_NAME).toString();
-                return Response.ok(fileDataStream)
-                        .header(RestApiConstants.HEADER_CONTENT_TYPE, contentType)
-                        .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
-                        .build();
-            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
-                String content = appProvider.getDocumentationContent(appIdentifier, documentation.getName());
-                return Response.ok(content)
-                        .header(RestApiConstants.HEADER_CONTENT_TYPE, AppMConstants.DOCUMENTATION_INLINE_CONTENT_TYPE)
-                        .build();
-            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.URL)) {
-                String sourceUrl = documentation.getSourceUrl();
-                return Response.seeOther(new URI(sourceUrl)).build();
-            }
-        } catch (AppManagementException e) {
-            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
-            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
-            } else {
-                String errorMessage = "Error while retrieving document " + documentId + " of the API " + appId;
-                RestApiUtil.handleInternalServerError(errorMessage, e, log);
-            }
-        } catch (URISyntaxException e) {
-            String errorMessage = "Error while retrieving source URI location of " + documentId;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
-        }
-        return null;*/
     }
 
     @Override
@@ -929,7 +1132,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
             //Validate App Id
             if (artifact == null) {
-                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             String state = artifact.getLifecycleState().toUpperCase();
@@ -968,7 +1171,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
             //Validate App Id
             if (artifact == null) {
-                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, log);
             }
 
             String historyRegPath = getHistoryPath(artifact);
@@ -983,10 +1186,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 JSONObject lifecycleHistoryStateObj = (JSONObject) historyResourceJsonArray.get(i);
                 LifeCycleHistoryDTO lifeCycleHistoryDTO = new LifeCycleHistoryDTO();
                 lifeCycleHistoryDTO.setOrder(Integer.parseInt(lifecycleHistoryStateObj.get("order").toString()));
-                lifeCycleHistoryDTO.setState(lifecycleHistoryStateObj.get("state").toString());
-                lifeCycleHistoryDTO.setTargetState(lifecycleHistoryStateObj.get("targetState").toString());
-                lifeCycleHistoryDTO.setTimestamp(lifecycleHistoryStateObj.get("timestamp").toString());
-                lifeCycleHistoryDTO.setUser(lifecycleHistoryStateObj.get("user").toString());
+                lifeCycleHistoryDTO.setState((String) lifecycleHistoryStateObj.get("state"));
+                lifeCycleHistoryDTO.setTargetState((String) lifecycleHistoryStateObj.get("targetState"));
+                lifeCycleHistoryDTO.setTimestamp((String) lifecycleHistoryStateObj.get("timestamp"));
+                lifeCycleHistoryDTO.setUser((String) lifecycleHistoryStateObj.get("user"));
                 lifeCycleHistoryDTOList.add(lifeCycleHistoryDTO);
             }
             lifeCycleHistoryListDTO.setLifeCycleHistoryList(lifeCycleHistoryDTOList);
@@ -1035,7 +1238,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1047,6 +1250,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
+        TagListDTO tagListDTO = new TagListDTO();
         List<String> tags = new ArrayList<>();
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
@@ -1055,6 +1259,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 for (Tag tag : appProvider.getAllTags(appType, appId)) {
                     tags.add(tag.getName());
                 }
+                tagListDTO.setTags(tags);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -1062,13 +1267,13 @@ public class AppsApiServiceImpl extends AppsApiService {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error retrieving tags for " + appType + " with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return Response.ok().entity(tags).build();
+        return Response.ok().entity(tagListDTO).build();
     }
 
     /**
@@ -1100,7 +1305,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while adding a tag to " + appType + " with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1129,7 +1334,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+                RestApiUtil.handleResourceNotFoundError(appType, appId, e, log);
             } else {
                 String errorMessage = "Error while deleting tags from " + appType + " with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1139,8 +1344,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdThrottlingtiersGet(String appType, String appId, String accept,
-                                                         String ifNoneMatch) {
+    public Response appsAppTypeThrottlingtiersGet(String appType, String accept,
+                                                  String ifNoneMatch) {
         TierListDTO tierListDTO = new TierListDTO();
         try {
             //check appType validity (currently support only webApps)
@@ -1210,9 +1415,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                         statSummaryDTO = getAppUsagePerPage(providerName, username, tenantDomainName, startTimeStamp,
                                                             endTimeStamp);
                         break;
-                    case "getCacheHit":
-                        statSummaryDTO = getCacheHits(providerName, username, startTimeStamp, endTimeStamp);
-                        break;
                     default:
                         RestApiUtil.handleBadRequest("Unsupported statistics type '" + statType + "' has provided",
                                                      log);
@@ -1242,15 +1444,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             startTimeStamp, String endTimeStamp) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient statisticsClient = new APIUsageStatisticsClient(userName);
-            List<APIUsageByUserDTO> appUsageByUserList = statisticsClient.getAPIUsageByUser(providerName, startTimeStamp,
-                                                                                  endTimeStamp, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppUsageByUserDTO> appUsageByUserList = appUsageStatisticsService.getAppUsageByUser
+                    (providerName, startTimeStamp, endTimeStamp, tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIUsageByUserDTO appUsageByUser : appUsageByUserList) {
+            for (AppUsageByUserDTO appUsageByUser : appUsageByUserList) {
                 appObjectList.add(appUsageByUser);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app usage per users for the period " +
                     startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1262,15 +1465,18 @@ public class AppsApiServiceImpl extends AppsApiService {
             tenantDomainName, String startTimeStamp, String endTimeStamp) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            List<APIPageUsageDTO> appUsageByPageList = client.getAPIUsageByPage(providerName, startTimeStamp,
-                                                                                endTimeStamp, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppPageUsageDTO> appUsageByPageList = appUsageStatisticsService.getAppUsageByPage(providerName,
+                                                                                                   startTimeStamp,
+                                                                                                   endTimeStamp,
+                                                                                                   tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIPageUsageDTO appUsageByPage : appUsageByPageList) {
+            for (AppPageUsageDTO appUsageByPage : appUsageByPageList) {
                 appObjectList.add(appUsageByPage);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app usage per page for the period " +
                     startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1282,15 +1488,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             tenantDomainName, String startTimeStamp, String endTimeStamp, int limit) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            List<APIResponseTimeDTO> appResponseTimeList = client.getResponseTimesByAPIs(providerName, startTimeStamp,
-                                                                    endTimeStamp, limit, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppResponseTimeDTO> appResponseTimeList = appUsageStatisticsService.getResponseTimesByApps
+                    (providerName, startTimeStamp, endTimeStamp, limit, tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIResponseTimeDTO appResponseTime : appResponseTimeList) {
+            for (AppResponseTimeDTO appResponseTime : appResponseTimeList) {
                 appObjectList.add(appResponseTime);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app response time for the period "
                     + startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1360,26 +1567,6 @@ public class AppsApiServiceImpl extends AppsApiService {
         return statSummaryDTO;
     }
 
-    private StatSummaryDTO getCacheHits(String providerName, String username, String startTimeStamp, String
-            endTimeStamp) {
-        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
-        try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(username);
-            List<APPMCacheCountDTO> cacheHitCountList = client.getCacheHitCount(providerName, startTimeStamp,
-                                                                                endTimeStamp);
-            List<Object> listObject = new ArrayList<>();
-            for (APPMCacheCountDTO cacheHitCount : cacheHitCountList) {
-                listObject.add(cacheHitCount);
-            }
-            statSummaryDTO.setResult(listObject);
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while retrieving statistics of cache hits for the period " +
-                    startTimeStamp + "to " + endTimeStamp;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
-        }
-        return statSummaryDTO;
-    }
-
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
         Set<Tag> tagSet = new HashSet<>();
@@ -1414,6 +1601,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
                                                    String ifModifiedSince) {
         boolean isContextExists = false;
+        Map<String, Boolean> responseMap = new HashMap<>();
         try {
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 if (StringUtils.isEmpty(appContext)) {
@@ -1425,6 +1613,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 }
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 isContextExists = appProvider.isContextExist(appContext);
+                responseMap.put("IsContextExists", isContextExists);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -1432,9 +1621,37 @@ public class AppsApiServiceImpl extends AppsApiService {
             String errorMessage = "Error retrieving tags for " + appType + "s.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return Response.ok().entity(isContextExists).build();
+        return Response.ok().entity(responseMap).build();
     }
 
+    @Override
+    public Response appsAppTypeNameAppNameVersionVersionUuidGet(String appType, String appName, String version,
+                                                                String accept, String ifNoneMatch) {
+        AppDTO appDTO = new AppDTO();
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                        RestApiUtil.getLoggedInUserTenantDomain());
+
+                String uuid = appProvider.getAppUUIDbyName(appName, version, tenantId);
+                if (log.isDebugEnabled()) {
+                    log.debug("UUID of the app: " + appName + ", version: " + version + " is " + uuid);
+                }
+                appDTO.setId(uuid);
+            } catch (AppManagementException e) {
+                String errorMessage = "Error while retrieving UUID for app: " + appName + " and version: " + version;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            } catch (UserStoreException e) {
+                String errorMessage = "Error while retrieving tenant details";
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        } else {
+            RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+        }
+        return Response.ok().entity(appDTO).build();
+    }
 
     //remove artifact from registry
     private void removeRegistryArtifact(App webApp, String username)

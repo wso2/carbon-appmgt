@@ -31,11 +31,10 @@ public final class APIMgtUsagePublisherConstants {
     public static final String API_USAGE_TRACKING = "Analytics.";
     public static final String API_USAGE_ENABLED = API_USAGE_TRACKING + "Enabled";
     public static final String API_USAGE_THRIFT_PORT = API_USAGE_TRACKING + "ThriftPort";
-    public static final String API_USAGE_BAM_SERVER_URL = API_USAGE_TRACKING + "BAMServerURL";
-    public static final String API_USAGE_BAM_SERVER_USER = API_USAGE_TRACKING + "BAMUsername";
-    public static final String API_USAGE_BAM_SERVER_PASSWORD = API_USAGE_TRACKING + "BAMPassword";
+    public static final String API_USAGE_DAS_SERVER_URL = API_USAGE_TRACKING + "DASServerURL";
+    public static final String API_USAGE_DAS_SERVER_USER = API_USAGE_TRACKING + "DASUsername";
+    public static final String API_USAGE_DAS_SERVER_PASSWORD = API_USAGE_TRACKING + "DASPassword";
     public static final String API_USAGE_PUBLISHER_CLASS = API_USAGE_TRACKING + "PublisherClass";
-	public static final String API_USAGE_CACHE_STATS_ENABLED = API_USAGE_TRACKING + "CacheStatsEnabled";
 
     public static final String CONSUMER_KEY = "api.ut.consumerKey";
     public static final String USER_ID = "api.ut.userId";
@@ -51,8 +50,9 @@ public final class APIMgtUsagePublisherConstants {
     public static final String APPLICATION_NAME = "api.ut.application.name";
     public static final String APPLICATION_ID = "api.ut.application.id";
     public static final String ANONYMOUS_USER = "anonymous.user";
+    public static final String API_AUTH_CONTEXT = "__API_AUTH_CONTEXT";
 
-	public static final String API_MANAGER_STREAM_NAME_DEFINITION = API_USAGE_TRACKING + "BAMEventStreams.";
+	public static final String API_MANAGER_STREAM_NAME_DEFINITION = API_USAGE_TRACKING + "DASEventStreams.";
 	public static final String API_MANAGER_REQUEST_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "RequestStreamName";
 	public static final String API_MANAGER_REQUEST_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
@@ -70,10 +70,10 @@ public final class APIMgtUsagePublisherConstants {
 	public static final String API_MANAGER_CACHE_STAT_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "CacheStatStreamVersion";
 
-	// To add UI Activity BAM publisher
-	public static final String API_BAM_UI_ACTIVITY_STREAM = API_MANAGER_STREAM_NAME_DEFINITION
+	// To add UI Activity DAS publisher
+	public static final String API_DAS_UI_ACTIVITY_STREAM = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "UIActivityStreamName";
-	public static final String API_BAM_UI_ACTIVITY_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
+	public static final String API_DAS_UI_ACTIVITY_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "UIActivityStreamVersion";
 
     public static final String API_GOOGLE_ANALYTICS_TRACKING = API_USAGE_TRACKING + "GoogleAnalyticsTracking.";
@@ -89,10 +89,10 @@ public final class APIMgtUsagePublisherConstants {
     public static final String TRANSPORT_URL = "api.ut.transportURL";
 
     /** To add new ANALYTICS engines, create a static String and populate the ENGINE_TO_CLASS_MAP below **/
-    public static final String ANALYTIC_ENGINE_BAM = "ANALYTIC_ENGINE_BAM";
+    public static final String ANALYTIC_ENGINE_DAS = "ANALYTIC_ENGINE_DAS";
     public static final String ANALYTIC_ENGINE_GOOGLE = "ANALYTIC_ENGINE_GOOGLE";
     public final static Map<String, String> ENGINE_TO_CLASS_MAP = new HashMap<String, String>() {{
-        put(ANALYTIC_ENGINE_BAM, APIMgtUsageHandler.class.getName());
+        put(ANALYTIC_ENGINE_DAS, APIMgtUsageHandler.class.getName());
         put(ANALYTIC_ENGINE_GOOGLE, APPMgtGoogleAnalayticsHandler.class.getName());
     }};
   	

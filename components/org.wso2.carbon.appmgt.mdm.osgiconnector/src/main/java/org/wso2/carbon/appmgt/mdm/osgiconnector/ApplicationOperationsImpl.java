@@ -37,6 +37,7 @@ import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.Platform;
 import org.wso2.carbon.device.mgt.common.app.mgt.ApplicationManagementException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Activity;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 
 import java.util.ArrayList;
@@ -51,11 +52,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 * @throws MobileApplicationException
 	 */
-	public void performAction(ApplicationOperationAction applicationOperationAction)
+	public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (log.isDebugEnabled()) {
 			log.debug(applicationOperationAction.getAction() + " action is triggered for " +
-			          applicationOperationAction.getType() +".");
+					applicationOperationAction.getType() +".");
 		}
 
 		Operation operation = null;
@@ -78,7 +79,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			} catch (DeviceManagementException devEx) {
 				String errorMsg = "Error occurred fetch device for user " + userName +
 				                  " at app installation";
-				log.error(errorMsg, devEx);
+				logError(errorMsg, devEx);
 				throw new MobileApplicationException(errorMsg, devEx);
 			}
 		} else if (MDMAppConstants.ROLE.equals(applicationOperationAction.getType())) {
@@ -98,7 +99,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			} catch (DeviceManagementException devMgtEx) {
 				String errorMsg = "Error occurred fetch device for user role " + userRole +
 				                  " at app installation";
-				log.error(errorMsg, devMgtEx);
+				logError(errorMsg, devMgtEx);
 				throw new MobileApplicationException(errorMsg, devMgtEx);
 			}
 
@@ -114,7 +115,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						deviceIdentifier.setType((String) parsedObj.get(MDMAppConstants.TYPE));
 						deviceIdentifiers.add(deviceIdentifier);
 					} catch (ParseException e) {
-						log.error("Device Identifier is not valid json object.", e);
+						logError("Device Identifier is not valid json object.", e);
 						throw new MobileApplicationException(e);
 					}
 
@@ -156,15 +157,19 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		mobileApp.setProperties(properties);
 		try {
 			for (DeviceIdentifier deviceIdentifier : deviceIdentifiers) {
-				if (deviceIdentifier.getType().equalsIgnoreCase(Platform.android.toString())) {
+				if (deviceIdentifier.getType().equalsIgnoreCase(Platform.ANDROID.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
-								.createInstallAppOperation(mobileApp);
+								.createInstallAppOperation(mobileApp, applicationOperationAction.getSchedule());
+					} else if (MDMAppConstants.UPDATE.equals(applicationOperationAction.getAction())) {
+						operation = AndroidApplicationOperationUtil
+								.createUpdateAppOperation(mobileApp, applicationOperationAction.getSchedule());
+
 					} else {
 						operation = AndroidApplicationOperationUtil
-								.createAppUninstallOperation(mobileApp);
+								.createAppUninstallOperation(mobileApp, applicationOperationAction.getSchedule());
 					}
-				} else if (deviceIdentifier.getType().equalsIgnoreCase(Platform.ios.toString())) {
+				} else if (deviceIdentifier.getType().equalsIgnoreCase(Platform.IOS.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation =
 								IOSApplicationOperationUtil.createInstallAppOperation(mobileApp);
@@ -173,17 +178,19 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 								IOSApplicationOperationUtil.createAppUninstallOperation(mobileApp);
 					}
 				}
-				MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
-				                  .installApplicationForDevices(operation, deviceIdentifiers);
+				Activity activity = MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
+						.installApplicationForDevices(operation, deviceIdentifiers);
+
+				return activity.getActivityId();
 			}
 		} catch (DeviceApplicationException mdmExce) {
-			log.error("Error in creating operation object using app.", mdmExce);
-			throw new MobileApplicationException(mdmExce);
+			logError("Error in creating operation object using app.", mdmExce);
+			throw new MobileApplicationException(mdmExce.getMessage());
 		} catch (ApplicationManagementException appMgtExce) {
-			log.error("Error in app installation.", appMgtExce);
-			throw new MobileApplicationException(appMgtExce);
+			logError("Error in app installation.", appMgtExce);
+			throw new MobileApplicationException(appMgtExce.getErrorMessage());
 		}
-
+		return null;
 	}
 
 	/**
@@ -234,16 +241,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					String imgUrl;
 					if (MDMAppConstants.ANDROID.equalsIgnoreCase(commonDevice.getType())) {
 						imgUrl = String.format(applicationOperationDevice.getConfigParams()
-						                                                 .get(MDMAppConstants.IMAGE_URL),
-						                       MDMAppConstants.NEXUS);
+										.get(MDMAppConstants.IMAGE_URL),
+								MDMAppConstants.NEXUS);
 					} else if (MDMAppConstants.IOS.equalsIgnoreCase(commonDevice.getType())) {
 						imgUrl = String.format(applicationOperationDevice.getConfigParams()
-						                                                 .get(MDMAppConstants.IMAGE_URL),
-						                       MDMAppConstants.IPHONE);
+										.get(MDMAppConstants.IMAGE_URL),
+								MDMAppConstants.IPHONE);
 					} else {
 						imgUrl = String.format(applicationOperationDevice.getConfigParams()
-						                                                 .get(MDMAppConstants.IMAGE_URL),
-						                       MDMAppConstants.NONE);
+										.get(MDMAppConstants.IMAGE_URL),
+								MDMAppConstants.NONE);
 					}
 					device.setImage(imgUrl);
 					device.setPlatform(commonDevice.getType());
@@ -251,8 +258,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				}
 			}
 		} catch (DeviceManagementException e) {
-			log.error("Error While retrieving Device List.", e);
-			throw new MobileApplicationException(e);
+			logError("Error While retrieving Device List.", e);
+			throw new MobileApplicationException(e.getMessage());
 
 		}
 		return devices;
@@ -266,6 +273,14 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			return false;
 		}
 		return true;
+	}
+
+	private void logError(String errorMessage, Throwable e) {
+		if (log.isDebugEnabled()) {
+			log.error(errorMessage, e);
+		} else {
+			log.error(errorMessage);
+		}
 	}
 
 }

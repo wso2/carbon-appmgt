@@ -104,11 +104,11 @@ function getBodyContext(data, subscriptionOnStatus) {
         assetTypes[i].user = user;
         var type = assetTypes[i].singular.toLowerCase().replace(/ /g, '');
         if (type == "mobileapp") {
-            if (mobileAppCount > pageSize) {
+            if (mobileAppCount >= pageSize) {
                 assetTypes[i].seeMoreUrl = "/assets/mobileapp/"
             }
         } else {
-            if (webAppCount > pageSize) {
+            if (webAppCount >= pageSize) {
                 if (subscriptionOnStatus) {
                     assetTypes[i].seeMoreUrl = "/assets/" + type + "/"
                 } else {
@@ -128,10 +128,14 @@ function setTotalAssetCount(assetTypes) {
     for (var i = 0; i < assetTypes.length; i++) {
         var assetType = assetTypes[i].singular.toLowerCase();
         var type = assetType.replace(/ /g, '');
-        if (type == "mobileapp") {
-            mobileAppCount++;
-        } else {
-            webAppCount++;
+        var assets = assetTypes[i].assets;
+        if(assets){
+            if (type == "mobileapp") {
+
+                mobileAppCount == assets.length;
+            } else {
+                webAppCount += assets.length;
+            }
         }
     }
 }

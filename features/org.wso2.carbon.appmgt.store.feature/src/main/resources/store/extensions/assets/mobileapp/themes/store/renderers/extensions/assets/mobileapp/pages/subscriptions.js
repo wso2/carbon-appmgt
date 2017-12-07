@@ -6,6 +6,7 @@ var render = function (theme, data, meta, require) {
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
     var enabledTypeList = storeObj.getEnabledAssetTypeList();
+    data.header.hideFavouriteMenu = true;
     data.tags.tagUrl = "/assets/mobileapp";
     if(data.userAssets){
 

@@ -33,6 +33,11 @@ var checkeRole = function (username, session) {
            return false;
   	}
 
+    //append domain for tenant users
+    if (usr.tenantId != -1234) {
+        usr.username += "@" + usr.tenantDomain;
+    }
+
     event.emit('login', usr.tenantId, usr, session);
   	return true;
 };
