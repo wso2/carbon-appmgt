@@ -259,6 +259,8 @@ public class APPResourceManager {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         if (!tenantDomain.equalsIgnoreCase("carbon.super")) {
             user = user + '@' + tenantDomain;
+        } else if (user.contains("@carbon.super")){
+	        user = user.substring(0, user.length()-"@carbon.super".length());
         }
 
         APIKeyValidationInfoDTO info = dataStore.getAPPData(appContext, appVersion, user, null);
