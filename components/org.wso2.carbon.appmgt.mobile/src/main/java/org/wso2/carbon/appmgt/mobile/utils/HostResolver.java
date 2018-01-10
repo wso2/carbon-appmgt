@@ -38,7 +38,7 @@ public class HostResolver {
 
         String host = "";
 
-        if("%http%".equals(abbr)){
+        if("%http%".equals(abbr) || "http".equals(abbr)){
 
             try {
                 host += "http://" + getServerHost() + ":" +
@@ -47,7 +47,7 @@ public class HostResolver {
                log.error("Error occurred while getting host", e);
                log.debug("Error: " + e);
             }
-        }else if("%https%".equals(abbr)){
+        }else if("%https%".equals(abbr) || "https".equals(abbr)){
             try {
                 host += "https://" + getServerHost() + ":" +
                         CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
