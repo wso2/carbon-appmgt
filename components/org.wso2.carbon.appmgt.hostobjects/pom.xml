@@ -2,13 +2,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.45</version>
+        <version>1.2.46-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
-    <version>1.2.45</version>
+    <version>1.2.46-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - HostObject for APP management</name>
     <url>http://wso2.org</url>
