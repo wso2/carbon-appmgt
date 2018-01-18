@@ -35,6 +35,7 @@ import java.io.File;
 public class AppDataLoader {
 
     private static final Log log = LogFactory.getLog(AppDataLoader.class);
+    private static final String iOSDefaultTransportProtocol = "https";
 
     /**
      * Load the data to the empty app instance based on the artifact
@@ -63,8 +64,7 @@ public class AppDataLoader {
                                 + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
-                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance()
+                        app.setLocation(HostResolver.getHost(iOSDefaultTransportProtocol) + "/" + MobileConfigurations.getInstance().getInstance()
                                 .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
                     }
                 }
