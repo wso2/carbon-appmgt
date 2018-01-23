@@ -1550,7 +1550,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             Association[] associations = registry.getAssociations(docPath,
-                                                                  AppMConstants.DOCUMENTATION_KEY);
+                                                                  AppMConstants.DOCUMENTATION_ASSOCIATION);
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
             }
