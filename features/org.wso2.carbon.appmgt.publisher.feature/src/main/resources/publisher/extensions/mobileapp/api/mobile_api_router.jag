@@ -49,7 +49,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             var appVersion = attributes["overview_version"];
             var appProvider = attributes["overview_provider"];
             var appPlatform = attributes["overview_platform"];
-            path = "/_system/governance/mobileapps/" + appProvider + "/" + appPlatform + "/" + appName + "/"
+            path = "/_system/governance/mobileapps/" + appProvider + "/" + appPlatform + "/" + appName + "/" +
+                   appVersion;
             registry.remove(path);
             apiProvider.removeBinaryFilesFromStorage(fileNames);
             auditLog.writeLog(tenantId, username, "AssetDeleted", appType, "{providerName='" + appProvider +
