@@ -56,17 +56,18 @@ public class MobileConfigurations {
     private static HashMap<String, String> activeMDMProperties;
     private static HashMap<String, String> mDMConfigs;
 
-    public final static String  ENABLED = "Enabled";
-    public final static String  ENABLE_SAMPLE_DEVICES = "EnableSampleDevices";
-    public final static String  APP_DOWNLOAD_URL_HOST = "AppDownloadURLHost";
-    public final static String  APP_GET_URL = "/store/api/mobileapp/getfile/";
-    public final static String  ACTIVE_MDM = "ActiveMDM";
-    public final static String  IOS_PLIST_PATH = "IosPlistPath";
-    public final static String  ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
-    public final static String  ENTERPRISE_OPERATIONS_AUTHORIZED_ROLE = "EnterpriseOperations_AuthorizedRole";
+    public final static String ENABLED = "Enabled";
+    public final static String ENABLE_SAMPLE_DEVICES = "EnableSampleDevices";
+    public final static String APP_DOWNLOAD_URL_HOST = "AppDownloadURLHost";
+    public final static String APP_GET_URL = "/store/api/mobileapp/getfile/";
+    public final static String ACTIVE_MDM = "ActiveMDM";
+    public final static String IOS_PLIST_PATH = "IosPlistPath";
+    public final static String ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
+    public final static String ENTERPRISE_OPERATIONS_AUTHORIZED_ROLE = "EnterpriseOperations_AuthorizedRole";
+    public final static String IOT_CORE_HTTPS_PORT = "iot.core.https.port";
 
 
-    private MobileConfigurations(){
+    private MobileConfigurations() {
         XMLStreamReader parser = null;
         try {
             parser = XMLInputFactory.newInstance().createXMLStreamReader(new FileInputStream(CONFIG_FILE_PATH));
@@ -82,30 +83,29 @@ public class MobileConfigurations {
     }
 
 
-    public static MobileConfigurations getInstance(){
-        if(mobileConfigurations == null){
+    public static MobileConfigurations getInstance() {
+        if (mobileConfigurations == null) {
             mobileConfigurations = new MobileConfigurations();
         }
         return mobileConfigurations;
     }
 
     /**
-     *
      * @return list of active MDM properties
      */
-    public HashMap<String, String> getActiveMDMProperties(){
-        if(activeMDMProperties == null){
+    public HashMap<String, String> getActiveMDMProperties() {
+        if (activeMDMProperties == null) {
 
             OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement)
                     .getFirstChildWithName(new QName("MDMProperties"));
 
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 OMElement mdmElement = iterator.next();
-                if(getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))){
+                if (getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))) {
                     HashMap<String, String> properties = new HashMap<String, String>();
                     Iterator<OMElement> propertiesElement = mdmElement.getChildElements();
-                    while(propertiesElement.hasNext()){
+                    while (propertiesElement.hasNext()) {
                         OMElement propertyElement = propertiesElement.next();
                         properties.put(propertyElement.getAttributeValue(new QName("name")), propertyElement.getText());
                     }
@@ -119,18 +119,17 @@ public class MobileConfigurations {
     }
 
     /**
-     *
      * @return list of active MDM configurations
      */
-    public HashMap<String, String> getMDMConfigs(){
-        if(mDMConfigs == null){
+    public HashMap<String, String> getMDMConfigs() {
+        if (mDMConfigs == null) {
 
             OMElement mDMConfigsElement = documentElement.getFirstChildWithName(mobileConfElement)
                     .getFirstChildWithName(new QName("MDMConfig"));
             HashMap<String, String> configs = new HashMap<String, String>();
             Iterator<OMElement> iterator = mDMConfigsElement.getChildElements();
 
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 OMElement propertyElement = iterator.next();
                 configs.put(propertyElement.getAttributeValue(new QName("name")), propertyElement.getText());
             }
@@ -141,28 +140,25 @@ public class MobileConfigurations {
     }
 
     /**
-     *
      * @return the bundle id of the active MDM
      */
-    public String getActiveMDMBundle(){
-        if(activeMDMBundle == null){
+    public String getActiveMDMBundle() {
+        if (activeMDMBundle == null) {
 
             OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement)
                     .getFirstChildWithName(new QName("MDMProperties"));
 
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 OMElement mdmElement = iterator.next();
-                if(getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))){
-                    return activeMDMBundle =  mdmElement.getAttributeValue(new QName("bundle"));
+                if (getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))) {
+                    return activeMDMBundle = mdmElement.getAttributeValue(new QName("bundle"));
                 }
             }
         }
 
         return activeMDMBundle;
     }
-
-
 
 
 }
