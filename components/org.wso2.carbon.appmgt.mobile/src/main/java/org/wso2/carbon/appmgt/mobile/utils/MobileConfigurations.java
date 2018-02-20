@@ -64,6 +64,8 @@ public class MobileConfigurations {
     public final static String  IOS_PLIST_PATH = "IosPlistPath";
     public final static String  ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
     public final static String  ENTERPRISE_OPERATIONS_AUTHORIZED_ROLE = "EnterpriseOperations_AuthorizedRole";
+    public final static String IOT_CORE_HTTPS_PORT = "iot.core.https.port";
+
 
 
     private MobileConfigurations(){

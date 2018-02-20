@@ -49,9 +49,7 @@ public class HostResolver {
             }
         }else if("%https%".equals(abbr) || "https".equals(abbr)){
             try {
-                host += "https://" + getServerHost() + ":" +
-                        CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
-
+                host += "https://" + getServerHost() + ":" + System.getProperty(MobileConfigurations.IOT_CORE_HTTPS_PORT);
             } catch (Exception e) {
                 log.error("Error occurred while getting host", e);
             }
