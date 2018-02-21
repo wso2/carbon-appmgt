@@ -112,6 +112,11 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>1.8</version>
         </plugin>
+        <plugin>
+          <groupId>io.swagger</groupId>
+          <artifactId>swagger-codegen-maven-plugin</artifactId>
+          <version>${swagger.codegen.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
