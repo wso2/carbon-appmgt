@@ -117,9 +117,9 @@ public abstract class AbstractAPIManager implements APIManager {
             throws RegistryException, AppManagementException {
         String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary-appmgt";
         String latestAPIsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/latest-apis";
-        String resourcesByTag = RegistryConstants.QUERIES_COLLECTION_PATH + "/resource-by-tag";
+        String resourcesByTag = RegistryConstants.QUERIES_COLLECTION_PATH + "/resource-by-tag-appm";
         String path = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                                                    RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + "/repository/components/org.wso2.carbon.governance");
+                RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + "/repository/components/org.wso2.carbon.governance");
         if (username == null) {
             try {
                 UserRealm realm = ServiceReferenceHolder.getUserRealm();

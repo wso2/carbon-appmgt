@@ -2,7 +2,7 @@ var render = function (theme, data, meta, require) {
 
 
     data.header.config = data.config;
-    data.header.hideFavouriteMenu = true;
+
 
     var searchQuery =  data.search.query;
     if(typeof(searchQuery) != typeof({})){

@@ -221,7 +221,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
         	}
-            String resourceByTagQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/resource-by-tag";
+            String resourceByTagQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH +
+                    "/resource-by-tag-appm";
             Map<String, String> params = new HashMap<String, String>();
             params.put("1", tag);
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(assetType) || AppMConstants.SITE_ASSET_TYPE.equals(assetType)){
