@@ -9,7 +9,7 @@ $(document).ready(function() {
                      theme_advanced_toolbar_location : "top",
                      theme_advanced_toolbar_align : "left",
                      theme_advanced_resizing : true,
-                     init_instance_callback: loadDefaultTinyMCEContent()
+                     init_instance_callback: "loadDefaultTinyMCEContent"
 
                  });
     
@@ -18,7 +18,7 @@ $(document).ready(function() {
 });
 
 
-function loadDefaultTinyMCEContent() {
+function loadDefaultTinyMCEContent(tinyMCEEditor) {
 	
     var provider = $("#provider").val();
     var apiName  = $("#webapp").val();
@@ -38,7 +38,7 @@ function loadDefaultTinyMCEContent() {
 	                var docContent = provider.content;
 
 	               $('#apiDeatils').empty().html('<p><h1> ' + docName + '</h1></p>');
-	               $('#inlineEditor').val(docContent);
+	               tinyMCEEditor.setContent(docContent);
 	               //tinyMCE.activeEditor.setContent(docContent);
 				 }
 				
