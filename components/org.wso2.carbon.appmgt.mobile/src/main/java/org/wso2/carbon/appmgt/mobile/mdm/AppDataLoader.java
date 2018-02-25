@@ -35,17 +35,18 @@ import java.io.File;
 public class AppDataLoader {
 
     private static final Log log = LogFactory.getLog(AppDataLoader.class);
-    private static final String iOSDefaultTransportProtocol = "https";
+    private static final String IOS_DEFAULT_TRANSPORT_PROTOCOL = "https";
 
     /**
      * Load the data to the empty app instance based on the artifact
-     * @param app Instance of the empty app
+     *
+     * @param app      Instance of the empty app
      * @param artifact Artifact of the mobile app
-     * @param action Action of the operation
+     * @param action   Action of the operation
      * @param tenantId Tenant Id
      * @return App which is filled by artifact
      */
-    public static App load(App app, GenericArtifact artifact, String action, int tenantId){
+    public static App load(App app, GenericArtifact artifact, String action, int tenantId) {
 
         try {
             app.setId(artifact.getId());
@@ -55,34 +56,37 @@ public class AppDataLoader {
             app.setType(artifact.getAttribute("overview_type"));
             app.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
-            if("enterprise".equals(artifact.getAttribute("overview_type"))){
+            if ("enterprise".equals(artifact.getAttribute("overview_type"))) {
                 app.setType(artifact.getAttribute("overview_type"));
-                if("install".equals(action) || "update".equals(action)){
-                    if("android".equals(artifact.getAttribute("overview_platform"))){
+                if ("install".equals(action) || "update".equals(action)) {
+                    if ("android".equals(artifact.getAttribute("overview_platform"))) {
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
-                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + MobileConfigurations.APP_GET_URL
-                                + artifact.getAttribute("overview_url"));
-                    }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+                                                                     .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) +
+                                                MobileConfigurations.APP_GET_URL
+                                                + artifact.getAttribute("overview_url"));
+                    } else if ("ios".equals(artifact.getAttribute("overview_platform"))) {
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
-                        app.setLocation(HostResolver.getHost(iOSDefaultTransportProtocol) + "/" + MobileConfigurations.getInstance().getInstance()
-                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
+                        app.setLocation(HostResolver.getHost(IOS_DEFAULT_TRANSPORT_PROTOCOL) + "/" +
+                                                MobileConfigurations.getInstance().getInstance()
+                                                        .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) +
+                                                "/" + tenantId + "/" + fileName);
                     }
                 }
 
-            }else if ("public".equals(artifact.getAttribute("overview_type"))){
+            } else if ("public".equals(artifact.getAttribute("overview_type"))) {
                 app.setType(artifact.getAttribute("overview_type"));
-            }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
+            } else if ("webapp".equals(artifact.getAttribute("overview_type"))) {
                 app.setType(artifact.getAttribute("overview_type"));
                 app.setLocation(artifact.getAttribute("overview_url"));
                 app.setIdentifier(artifact.getAttribute("overview_url"));
             }
 
 
-            if("android".equals(artifact.getAttribute("overview_platform"))){
+            if ("android".equals(artifact.getAttribute("overview_platform"))) {
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setIdentifier(artifact.getAttribute("overview_packagename"));
                 app.setAppIdentifier(artifact.getAttribute("overview_packagename"));
-            }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+            } else if ("ios".equals(artifact.getAttribute("overview_platform"))) {
                 app.setPackageName(artifact.getAttribute("overview_packagename"));
                 app.setAppIdentifier(artifact.getAttribute("overview_appid"));
                 app.setIdentifier(artifact.getAttribute("overview_appid"));
