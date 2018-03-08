@@ -27,6 +27,7 @@ var driverManager=function(){
         MYSQL_DRIVER:{key:'jdbc:mysql',value:'mysql'},
         ORACLE_DRIVER:{key:'jdbc:oracle',value:'oracle'},
         H2_DRIVER:{key:'jdbc:h2',value:'h2'},
+        POSTGRESQL_DRIVER:{key:'jdbc:postgresql',value:'postgresql'},
         UNSUPPORTED:{key:'none',value:'none'}
     };
 
