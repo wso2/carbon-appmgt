@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.52</version>
+        <version>1.2.53-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
   <groupId>org.wso2.carbon.appmgt</groupId>
   <artifactId>org.wso2.carbon.appmgt.services.api</artifactId>
-  <version>1.2.52</version>
+  <version>1.2.53-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>WSO2 Carbon - App Manager Services API Component</name>
   <url>http://maven.apache.org</url>
