@@ -22,7 +22,7 @@ var queryProvider = function () {
     var POSTGRESQL_DRIVER = 'postgresql';
 
     /*
-     The function builds a CREATE sql statement based on the provided schema
+     Builds a CREATE sql statement based on the provided schema
      */
     function create(schema) {
         var query = dbScriptManager.find(POSTGRESQL_DRIVER, schema.table);
@@ -33,7 +33,7 @@ var queryProvider = function () {
         return '';
     }
 
-    return{
+    return {
         create: create
     }
 };
