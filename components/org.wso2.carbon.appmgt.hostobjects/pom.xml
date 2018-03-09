@@ -36,7 +36,13 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.impl</artifactId>  
+            <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.wso2.carbon.identity.framework</groupId>
+                    <artifactId>org.wso2.carbon.identity.testutil</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jaggeryjs</groupId>
