@@ -192,7 +192,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -498,27 +497,7 @@
                         <artifactId>powermock-module-testng</artifactId>
                     </exclusion>
                 </exclusions>
-
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.testng</groupId>-->
-                <!--<artifactId>testng</artifactId>-->
-                <!--<version>${testng.version}</version>-->
-                <!--<exclusions>-->
-                    <!--<exclusion>-->
-                        <!--<groupId>junit</groupId>-->
-                        <!--<artifactId>junit</artifactId>-->
-                    <!--</exclusion>-->
-                    <!--<exclusion>-->
-                        <!--<groupId>org.beanshell</groupId>-->
-                        <!--<artifactId>bsh</artifactId>-->
-                    <!--</exclusion>-->
-                    <!--<exclusion>-->
-                        <!--<groupId>org.yaml</groupId>-->
-                        <!--<artifactId>snakeyaml</artifactId>-->
-                    <!--</exclusion>-->
-                <!--</exclusions>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
@@ -726,7 +705,6 @@
                 <artifactId>axiom</artifactId>
                 <version>${axiom.wso2.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.oauth.core</artifactId>
@@ -814,8 +792,7 @@
     </dependencyManagement>
 
     <properties>
-
-        <!--<testng.version>6.8</testng.version>-->
+        
         <!-- SCM Server -->
         <project.scm.id>github-scm</project.scm.id>
 
