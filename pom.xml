@@ -1,11 +1,10 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>carbon-appmgt</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.53-SNAPSHOT</version>
+    <version>1.2.53</version>
     <name>WSO2 Carbon - App Management Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -19,7 +18,7 @@
         <url>https://github.com/wso2/carbon-appmgt.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-appmgt.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-appmgt.git</connection>
-        <tag>HEAD</tag>
+        <tag>v1.2.53</tag>
     </scm>
 
     <modules>
@@ -797,7 +796,7 @@
         <project.scm.id>github-scm</project.scm.id>
 
         <!-- AppM Component Version -->
-        <carbon.appmgt.version>1.2.53-SNAPSHOT</carbon.appmgt.version>
+        <carbon.appmgt.version>1.2.53</carbon.appmgt.version>
         <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
 
         <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
