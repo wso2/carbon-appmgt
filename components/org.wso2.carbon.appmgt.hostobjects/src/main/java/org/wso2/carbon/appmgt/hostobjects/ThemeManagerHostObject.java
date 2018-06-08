@@ -17,14 +17,14 @@
  */
 package org.wso2.carbon.appmgt.hostobjects;
 
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.simple.JSONObject;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
+import org.json.simple.JSONObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
@@ -32,8 +32,9 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.UserPortalTheme;
-import org.wso2.carbon.appmgt.impl.utils.FileUtil;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.utils.FileUtil;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,9 +48,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.apache.commons.io.FileUtils;
-import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * This class has methods to add,remove custom themes.
@@ -339,7 +337,8 @@ public class ThemeManagerHostObject extends ScriptableObject {
 
             while (ze != null) {
                 String fileName = ze.getName();
-                Path newFilePath = themePath.resolve(fileName);
+                String intendedDir = themePath.toString();
+                Path newFilePath = Paths.get(validateFilename(fileName, intendedDir));
                 if (ze.isDirectory()) {
                     if (!Files.exists(newFilePath)) {
                         createDirectory(newFilePath);
@@ -381,6 +380,22 @@ public class ThemeManagerHostObject extends ScriptableObject {
         }
     }
 
+    private static String validateFilename(String filename, String intendedDir)
+            throws IOException {
+
+        String appendedFilePath = Paths.get(intendedDir, filename).toString();
+        File file = new File(appendedFilePath);
+        String systemDependentFilePath = file.getCanonicalPath();
+
+        File intendedDirectory = new File(intendedDir);
+        String systemDependentIntendedDirectoryPath = intendedDirectory.getCanonicalPath();
+
+        if (systemDependentFilePath.startsWith(systemDependentIntendedDirectoryPath)) {
+            return systemDependentFilePath;
+        } else {
+            throw new IllegalStateException("File: " + filename + " is outside extraction target directory.");
+        }
+    }
 
     private static void createDirectory(Path directoryPath) throws AppManagementException {
         try {
