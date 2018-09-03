@@ -511,6 +511,8 @@ public class APPMappingUtil {
         dto.setCreatedtime(mobileApp.getDisplayName());
         dto.setBanner(mobileApp.getBanner());
         dto.setRecentChanges(mobileApp.getRecentChanges());
+        dto.setLifecycleState(mobileApp.getLifeCycleStatus().getStatus());
+        dto.setProvider(mobileApp.getAppProvider());
 
         AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
         appAppmetaDTO.setPackage(mobileApp.getPackageName());
