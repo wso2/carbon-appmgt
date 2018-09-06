@@ -36,7 +36,7 @@ public class AppDataLoader {
 
     private static final Log log = LogFactory.getLog(AppDataLoader.class);
     private static final String IOS_DEFAULT_TRANSPORT_PROTOCOL = "https";
-
+    private static final String IOS_MOBILE_APP_ICON_PATH = "/store/api/mobileapp/getfile/";
     /**
      * Load the data to the empty app instance based on the artifact
      *
@@ -54,7 +54,8 @@ public class AppDataLoader {
             app.setPlatform(artifact.getAttribute("overview_platform"));
             app.setVersion(artifact.getAttribute("overview_version"));
             app.setType(artifact.getAttribute("overview_type"));
-            app.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
+            app.setIconImage(HostResolver.getHostWithHTTP() +IOS_MOBILE_APP_ICON_PATH +
+                    artifact.getAttribute("images_thumbnail"));
 
             if ("enterprise".equals(artifact.getAttribute("overview_type"))) {
                 app.setType(artifact.getAttribute("overview_type"));
