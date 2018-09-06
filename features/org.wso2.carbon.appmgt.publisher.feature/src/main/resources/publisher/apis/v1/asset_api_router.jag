@@ -1551,6 +1551,9 @@ require('/modules/publisher.js').exec(function(ctx) {
         var mobileValidatorModule = require('/extensions/mobileapp/validations.js');
         var newVersionModel = modelManager.getModel(appType);
         newVersionModel.import('asset', oldVersionArtifact);
+        var oldidField = newVersionModel.get('*.id');
+        var tags=getTagsOfOldApplication(oldidField.value, rxtManager, appType);
+        var newTags=String(tags);
         newVersionModel.set('*.id', null);
         // these attributes do not change: provider, name, platform, type, category
 
@@ -1682,6 +1685,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         try {
             newVersionModel.save();
+            var newIdField = newVersionModel.get('*.id');
+            addTags(newTags, newIdField.value, rxtManager, appType);
         } catch (e) {
             log.error("Cannot create new version '" + version + "' of mobile app '"
                       + oldVersionArtifact.attributes.overview_displayName + "' from its version'"
@@ -1793,6 +1798,20 @@ function updateTags(newTags, assetId, rxtManager, type) {
     //add New Tags
     addTags(newTags, assetId, rxtManager, type);
     log.debug("Tags added visibility");
+}
+/**
+ retrive  tags of given asset
+ @assetId - app id
+ @rxtManager
+ @type - apptype e.g mobileapp
+ **/
+function getTagsOfOldApplication(assetId, rxtManager, type) {
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var asset = artifactManager.get(assetId);
+
+    var path = asset.path;
+    var oldTags = rxtManager.registry.tags(path);
+    return oldTags;
 }
 
 
