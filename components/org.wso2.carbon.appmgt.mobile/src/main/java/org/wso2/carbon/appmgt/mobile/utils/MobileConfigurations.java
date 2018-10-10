@@ -65,6 +65,7 @@ public class MobileConfigurations {
     public final static String ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
     public final static String ENTERPRISE_OPERATIONS_AUTHORIZED_ROLE = "EnterpriseOperations_AuthorizedRole";
     public final static String IOT_CORE_HTTPS_PORT = "iot.core.https.port";
+    public final static String IOT_CORE_HTTP_PORT = "iot.core.http.port";
 
 
     private MobileConfigurations() {
