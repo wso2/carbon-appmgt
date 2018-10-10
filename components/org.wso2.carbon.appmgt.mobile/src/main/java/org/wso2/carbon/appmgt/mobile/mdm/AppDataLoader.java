@@ -55,8 +55,8 @@ public class AppDataLoader {
             app.setPlatform(artifact.getAttribute("overview_platform"));
             app.setVersion(artifact.getAttribute("overview_version"));
             app.setType(artifact.getAttribute("overview_type"));
-            app.setIconImage(HostResolver.getHostWithHTTP() + IOS_MOBILE_APP_ICON_PATH +
-                    artifact.getAttribute("images_thumbnail"));
+            app.setIconImage(HostResolver.getHostWithHTTP() +
+                    IOS_MOBILE_APP_ICON_PATH + artifact.getAttribute("images_thumbnail"));
 
             if ("enterprise".equals(artifact.getAttribute("overview_type"))) {
                 app.setType(artifact.getAttribute("overview_type"));
@@ -69,9 +69,8 @@ public class AppDataLoader {
                     } else if ("ios".equals(artifact.getAttribute("overview_platform"))) {
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
                         app.setLocation(HostResolver.getHost(IOS_DEFAULT_TRANSPORT_PROTOCOL) + "/" +
-                                                MobileConfigurations.getInstance().getInstance()
-                                                        .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) +
-                                                "/" + tenantId + "/" + fileName);
+                                MobileConfigurations.getInstance().getInstance().getMDMConfigs().
+                                        get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
                     }
                 }
 

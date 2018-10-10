@@ -43,16 +43,15 @@ public class HostResolver {
 
             try {
                 host += "http://" + getServerHost() + ":" +
-                        CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(),
-                                                     "http");
+                        System.getProperty(MobileConfigurations.IOT_CORE_HTTP_PORT);
             } catch (Exception e) {
                 log.error("Error occurred while getting host", e);
                 log.debug("Error: " + e);
             }
         } else if ("%https%".equals(abbr) || "https".equals(abbr)) {
             try {
-                host += "https://" + getServerHost() + ":" + System.getProperty(
-                        MobileConfigurations.IOT_CORE_HTTPS_PORT);
+                host += "https://" + getServerHost() + ":" +
+                        System.getProperty(MobileConfigurations.IOT_CORE_HTTPS_PORT);
             } catch (Exception e) {
                 log.error("Error occurred while getting host", e);
             }
@@ -70,8 +69,7 @@ public class HostResolver {
 
         try {
             host += "http://" + getServerHost() + ":" +
-                    CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(),
-                                                 "http");
+                    System.getProperty(MobileConfigurations.IOT_CORE_HTTP_PORT);
         } catch (Exception e) {
             log.error("Error occurred while getting host", e);
         }
