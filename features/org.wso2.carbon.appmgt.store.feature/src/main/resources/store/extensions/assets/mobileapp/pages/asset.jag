@@ -91,9 +91,15 @@ require('/modules/store.js').exec(function (ctx) {
     var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
     var devices = [];
-        if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-                devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username], asset.attributes.overview_platform)));
-        }
+    var isDeviceAvailable = false;
+
+    if (user != null && isNotCatalog && isDeviceSubscriptionEnabled) {
+        devices = parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username],
+          asset.attributes.overview_platform)));
+      if (devices.length > 0) {
+        isDeviceAvailable = true;
+      }
+    }
 
     var headerData = site.header(tenantId, {
         sso: sso,
@@ -119,6 +125,7 @@ require('/modules/store.js').exec(function (ctx) {
         user: user,
         sso: sso,
         devices: devices,
+        isDeviceAvailable : isDeviceAvailable,
         isEnterpriseInstallEnabled: isEnterpriseInstallEnabled,
         isDeviceSubscriptionEnabled : isDeviceSubscriptionEnabled,
         isDirectDownloadEnabled :isDirectDownloadEnabled,
