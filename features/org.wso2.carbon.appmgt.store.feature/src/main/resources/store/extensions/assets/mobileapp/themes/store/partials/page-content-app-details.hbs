@@ -43,51 +43,68 @@
                     {{!--buttons --}}
                     <div class="actions">
                         {{#if user}}
-                            {{#if inDashboard}}
-                                {{#if isDeviceSubscriptionEnabled}}
-                                    <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-                                       data-target="#modalInstallApp"
-                                       class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                            {{#if isDeviceAvailable}}
+                                {{#if inDashboard}}
+                                    {{#if isDeviceSubscriptionEnabled}}
+                                        <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                           data-target="#modalInstallApp"
+                                           class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                                    {{else}}
+                                        <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}"
+                                           class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                                    {{/if}}
+                                {{!--Check if already subscribed to previous version of the app--}}
+                                {{else}} {{#if isUpdatedApp}}
+                                    {{#if isDeviceSubscriptionEnabled}}
+                                        <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                           data-target="#modalUpdateApp"
+                                           class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                    {{else}}
+                                        <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}"
+                                           class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                    {{/if}}
                                 {{else}}
-                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}"
-                                       class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
-                                {{/if}}
-                            {{!--Check if already subscribed to previous version of the app--}}
-                            {{else}} {{#if isUpdatedApp}}
-                                {{#if isDeviceSubscriptionEnabled}}
-                                    <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-                                       data-target="#modalUpdateApp"
-                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                    {{#if isDeviceSubscriptionEnabled}}
+                                        <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                           data-target="#modalInstallApp"
+                                           class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
+                                    {{else}}
+                                        <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                           data-platform="{{asset.attributes.overview_platform}}"
+                                           class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
+                                    {{/if}}
+                                {{/if}}{{/if}}
+                                {{#if isEnterpriseInstallEnabled}}
+                                    <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal"
+                                       data-target="#modalEnterpriseInstall"
+                                       class="btn btn-subscribe"><i class="fw fw-enterprise"></i>Ent. Install</a>
+                                    <input id="isEnterpriseInstallEnabledisEnterpriseInstallEnabled" type="hidden" value="true">
                                 {{else}}
-                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}"
-                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
                                 {{/if}}
                             {{else}}
-                                {{#if isDeviceSubscriptionEnabled}}
-                                    <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
-                                       data-target="#modalInstallApp"
-                                       class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
-                                {{else}}
-                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
-                                       data-platform="{{asset.attributes.overview_platform}}"
-                                       class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
-                                {{/if}}
-                            {{/if}}{{/if}}
+                                <a id="btn-add-gadget-install" href="#" class="btn btn-subscribe disabled">
+                                    <i class="fw fw-mobile"></i>
+                                    Install
+                                </a>
+                                <a href="#" id="btn-ent-install" class="btn btn-subscribe disabled">
+                                    <i class="fw fw-enterprise"></i>
+                                    Ent. Install
+                                </a>
+                            {{/if}}
                         {{else}}
-                            <a id="btn-add-gadget-install" href="{{tenantedUrl "/login"}}"
-                               class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
-                        {{/if}}
-
-                        {{#if isEnterpriseInstallEnabled}}
-                            <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal"
-                               data-target="#modalEnterpriseInstall"
-                               class="btn btn-subscribe"><i class="fw fw-enterprise"></i>Ent. Install</a>
-                            <input id="isEnterpriseInstallEnabled" type="hidden" value="true">
+                            <a id="btn-add-gadget-install" href="#" class="btn btn-subscribe disabled">
+                                <i class="fw fw-mobile"></i>
+                                Install
+                            </a>
+                            <a href="#" id="btn-ent-install" class="btn btn-subscribe disabled">
+                                <i class="fw fw-enterprise"></i>
+                                Ent. Install
+                            </a>
                         {{/if}}
                     </div>
                 </div>
