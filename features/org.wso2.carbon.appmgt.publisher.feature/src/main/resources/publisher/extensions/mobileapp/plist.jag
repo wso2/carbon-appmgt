@@ -6,7 +6,20 @@ matcher.match('/{context}/api/mobileapp/getplist/{tenantId}/{filename}');
 var tenantId = matcher.elements().tenantId;
 var fileName = matcher.elements().filename;
 var server = require('store').server;
-var registry = server.systemRegistry(tenantId);
+var domain = carbon.server.tenantDomain({
+                tenantId: 1
+            });
+
+var obj = {
+                tenantId: carbon.server.tenantId({
+                    domain: domain
+                }),
+                domain: domain,
+                username: carbon.user.anonUser,
+                secured: false
+            };
+server.loadTenant(obj);
+var registry = server.systemRegistry(parseInt(tenantId));
 var caramel = require('caramel');
 var contextPath = caramel.configs().context;
 
