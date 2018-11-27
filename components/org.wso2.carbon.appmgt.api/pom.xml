@@ -11,13 +11,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.2.59-SNAPSHOT</version>
+        <version>1.2.59</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.api</artifactId>
-    <version>1.2.59-SNAPSHOT</version>
+    <version>1.2.59</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Api for APP Management</name>
 
