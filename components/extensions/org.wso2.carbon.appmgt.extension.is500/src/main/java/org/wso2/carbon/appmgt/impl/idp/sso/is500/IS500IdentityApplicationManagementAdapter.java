@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class IS500IdentityApplicationManagementAdapter implements IdentityApplicationManagementAdapter {
 
-    private static Log log = LogFactory.getLog(IS500IdentityApplicationManagementAdapter.class);
+    private static final Log log = LogFactory.getLog(IS500IdentityApplicationManagementAdapter.class);
 
     private static String APP_DESC = "WSO2 Application Manager generated service provider.";
     private static String AUTH_TYPE = "samlsso";

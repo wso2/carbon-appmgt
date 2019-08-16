@@ -39,7 +39,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class AppManagerOAuth2Service extends AbstractAdmin {
 
-    private static Log log = LogFactory.getLog(AppManagerOAuth2Service.class);
+    private static final Log log = LogFactory.getLog(AppManagerOAuth2Service.class);
 
 
     /**

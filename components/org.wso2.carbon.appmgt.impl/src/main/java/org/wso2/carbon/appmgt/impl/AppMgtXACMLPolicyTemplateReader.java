@@ -30,7 +30,7 @@ public class AppMgtXACMLPolicyTemplateReader  {
 
     private String configuration;
 
-    private static Log log = LogFactory.getLog(AppManagerConfiguration.class);
+    private static final Log log = LogFactory.getLog(AppManagerConfiguration.class);
 
 
     boolean initialized;

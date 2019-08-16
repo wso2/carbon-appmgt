@@ -50,7 +50,7 @@ public class APIKeyValidator {
     private APIKeyDataStore dataStore;
     private AxisConfiguration axisConfig;
     private boolean isGatewayAPIKeyValidationEnabled = true;
-    protected Log log = LogFactory.getLog(getClass());
+    protected static final Log log = LogFactory.getLog(APIKeyValidator.class);
 
     public APIKeyValidator(AxisConfiguration axisConfig) {
         this.axisConfig = axisConfig;

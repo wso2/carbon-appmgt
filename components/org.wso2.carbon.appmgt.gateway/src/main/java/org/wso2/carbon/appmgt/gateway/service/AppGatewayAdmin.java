@@ -43,7 +43,7 @@ import java.util.List;
  * mediation services.
  */
 public class AppGatewayAdmin extends AbstractAdmin {
-    private static Log log = LogFactory.getLog(AppGatewayAdmin.class);
+    private static final Log log = LogFactory.getLog(AppGatewayAdmin.class);
 
     /**
      * Add versioned webapp configuration to the gateway for tenant users.

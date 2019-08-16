@@ -68,7 +68,7 @@ import java.util.Set;
  * to other stores in App Manager.
  */
 public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher {
-    private static Log log = LogFactory.getLog(WSO2ExternalAppStorePublisher.class);
+    private static final Log log = LogFactory.getLog(WSO2ExternalAppStorePublisher.class);
 
     @Override
     public void publishToStore(WebApp webApp, AppStore store) throws AppManagementException {
