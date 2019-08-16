@@ -37,7 +37,7 @@ public class SessionStore {
 
     private static SessionStore instance;
 
-    private static Log log = LogFactory.getLog(SessionStore.class);
+    private static final Log log = LogFactory.getLog(SessionStore.class);
 
     public static SessionStore getInstance() {
         if (instance == null) {

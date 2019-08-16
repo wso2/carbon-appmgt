@@ -35,7 +35,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 @Path("/token")
 public class OAuth2TokenEndpoint {
 
-    private static Log log = LogFactory.getLog(OAuth2TokenEndpoint.class);
+    private static final Log log = LogFactory.getLog(OAuth2TokenEndpoint.class);
 
     @POST
     @Path("/")

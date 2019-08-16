@@ -62,7 +62,7 @@ import java.util.Map;
 
 public class GatewayUtils {
 
-    private static Log log = LogFactory.getLog(GatewayUtils.class);
+    private static final Log log = LogFactory.getLog(GatewayUtils.class);
 
     public static String getIDPUrl() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().

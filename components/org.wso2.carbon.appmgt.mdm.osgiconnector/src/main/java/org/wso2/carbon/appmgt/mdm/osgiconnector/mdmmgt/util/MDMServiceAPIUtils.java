@@ -27,7 +27,7 @@ import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
  */
 public class MDMServiceAPIUtils {
 
-	private static Log log = LogFactory.getLog(MDMServiceAPIUtils.class);
+	private static final Log log = LogFactory.getLog(MDMServiceAPIUtils.class);
 
 	/**
 	 * Returns the DeviceManagementProviderService osgi service.
